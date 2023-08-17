@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "stylelint.vscode-stylelint",
+    "streetsidesoftware.code-spell-checker",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    // "ms-python.flake8",
+    "charliermarsh.ruff",
+    "ms-python.black-formatter",
+    "ms-vscode-remote.remote-containers"
+  ],
+  "unwantedRecommendations": []
+}

@@ -1,0 +1,49 @@
+// cSpell Settings
+{
+  // Version of the setting file.  Always 0.2
+  "version": "0.2",
+  // language - current active spelling language
+  "language": "en",
+  // words - list of words to be always considered correct
+  "words": [
+    "aiofiles",
+    "algoliasearch",
+    "astd",
+    "awatch",
+    "bufbuild",
+    "dbaeumer",
+    "dumi",
+    "dumirc",
+    "fdpexpect",
+    "fdspawn",
+    "hlistcol",
+    "kuscia",
+    "mdast",
+    "mdclient",
+    "mdserver",
+    "mdxjs",
+    "MDXJSESM",
+    "nrwl",
+    "pbar",
+    "pbars",
+    "proto",
+    "protobuf",
+    "protoc",
+    "pypa",
+    "pyproject",
+    "remarkrc",
+    "scql",
+    "tablefmt",
+    "tgroup",
+    "thead",
+    "tqdm",
+    "unist",
+    "Vercel",
+    "webp",
+    "yuque"
+  ],
+  // flagWords - list of words to be always considered incorrect
+  // This is useful for offensive words and common spelling errors.
+  // For example "hte" should be "the"
+  "flagWords": ["hte"]
+}

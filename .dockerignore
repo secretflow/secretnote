@@ -1,0 +1,19 @@
+# .git
+
+.git
+
+# packages
+
+**/node_modules
+**/.venv
+
+# artifacts
+
+**/__pycache__
+**/build
+**/dist
+**/.dumi/tmp
+**/.dumi/tmp-production
+
+**/Dockerfile
+**/*.Dockerfile

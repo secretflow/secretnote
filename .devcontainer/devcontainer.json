@@ -1,0 +1,46 @@
+{
+  "name": "javascript-monorepo-template",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "containerUser": "vscode",
+  "mounts": [
+    // https://github.com/pnpm/pnpm/issues/5803
+    {
+      "type": "volume",
+      "source": "${localWorkspaceFolderBasename}-node_modules",
+      "target": "${containerWorkspaceFolder}/node_modules"
+    }
+  ],
+  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "stylelint.vscode-stylelint",
+        "streetsidesoftware.code-spell-checker",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-python.black-formatter"
+      ]
+    }
+  },
+  "forwardPorts": [3000, 8000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Docusaurus",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "Umi",
+      "onAutoForward": "notify"
+    }
+  }
+}
