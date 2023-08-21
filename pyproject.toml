@@ -1,11 +1,11 @@
 [project]
 authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
 dependencies = []
-description = "JavaScript + Python hybrid monorepo"
+description = "FIXME: update name and description"
 name = "javascript-monorepo-template"
 readme = "README.md"
 requires-python = ">=3.8.15, <3.11"
-version = "0.0.0"
+dynamic = ["version"]
 
 [project.scripts]
 
