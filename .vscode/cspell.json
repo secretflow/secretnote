@@ -7,22 +7,12 @@
   // words - list of words to be always considered correct
   "words": [
     "aiofiles",
-    "algoliasearch",
     "astd",
     "awatch",
-    "bufbuild",
     "dbaeumer",
-    "dumi",
-    "dumirc",
     "fdpexpect",
     "fdspawn",
-    "hlistcol",
     "kuscia",
-    "mdast",
-    "mdclient",
-    "mdserver",
-    "mdxjs",
-    "MDXJSESM",
     "nrwl",
     "pbar",
     "pbars",
@@ -31,16 +21,14 @@
     "protoc",
     "pypa",
     "pyproject",
+    "pyright",
     "remarkrc",
     "scql",
     "tablefmt",
-    "tgroup",
-    "thead",
     "tqdm",
-    "unist",
-    "Vercel",
-    "webp",
-    "yuque"
+    "vercel",
+    "vitest",
+    "webp"
   ],
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.

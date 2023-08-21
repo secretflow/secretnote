@@ -1,0 +1,44 @@
+# https://github.com/sveltejs/kit/blob/32afba695088b946aefe96da75b36de9b0667fbe/.github/workflows/release.yml
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  release:
+    # FIXME: change this to the canonical repo name
+    # prevents this action from running on forks
+    if: github.repository == 'example/example'
+    permissions:
+      contents: write # to create release (changesets/action)
+      pull-requests: write # to create pull request (changesets/action)
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # fetch the full history for changesets to generate changelog
+          fetch-depth: 0
+
+      - uses: ./.github/actions/ci-setup
+
+      - name: Build
+        run: pnpm exec nx run-many --target=build --exclude docs,website
+
+      - name: Create release PR or publish packages
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # run changeset version to consume all changesets and bump versions
+          version: pnpm run version
+          # publish with Nx. won't call changeset publish but does call changeset tag
+          publish: pnpm run release
+          # commit message for the release commits
+          commit: 'chore: stage changes for next release'
+          # title of the release PR
+          title: 'chore: release'

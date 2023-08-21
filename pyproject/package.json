@@ -7,6 +7,7 @@
     "test:pytest": "pytest",
     "lint": ": Note: lint task is delegated to lint scripts",
     "lint:black": "black --check src tests",
-    "lint:ruff": "ruff check src tests"
+    "lint:ruff": "ruff check src tests",
+    "release": ": hatch publish ./dist"
   }
 }

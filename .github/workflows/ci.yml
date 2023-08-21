@@ -1,4 +1,4 @@
-name: 'Code: CI'
+name: CI
 
 on:
   pull_request:
@@ -11,63 +11,86 @@ on:
     branches:
       - main
 
-jobs:
-  ci:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
+  actions: read # required by nrwl/nx-set-shas
 
+jobs:
+  lint:
+    name: 'Lint'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # fetch the full history for Nx to determine affected projects
+          fetch-depth: 0
+      - uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: 'main'
+
+      - uses: ./.github/actions/ci-setup
+        with:
+          job-name: 'lint'
+
+      - name: Lint
+        run: pnpm exec nx affected --target=lint:prettier,lint
+
+  test-js:
+    name: 'Test JavaScript: Node ${{ matrix.node-version }}'
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         node-version: ['16.20.x']
-        python-version: ['3.8.16', '3.9.x', '3.10.x']
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
       - uses: nrwl/nx-set-shas@v3
-        # https://nx.dev/recipes/ci/monorepo-ci-github-actions
-        # https://github.com/marketplace/actions/nx-set-shas
         with:
           main-branch-name: 'main'
 
-      - name: Use Python ${{ matrix.python-version }}
-        id: setup-python
-        uses: actions/setup-python@v4
+      - uses: ./.github/actions/ci-setup
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.lock
-            requirements-dev.lock
-
-      - name: Use PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: ^8.6.0
-          run_install: false
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
+          job-name: 'test-js'
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
 
-      - name: Cache Nx output
-        uses: actions/cache@v3
+      - name: Test
+        run: pnpm exec nx affected --target=test:vitest
+
+  test-py:
+    name: 'Test Python: Python ${{ matrix.python-version }}'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8.x', '3.9.x', '3.10.x']
+
+    steps:
+      - uses: actions/checkout@v3
         with:
-          path: node_modules/.cache/nx
-          key: |
-            cache-nx
-            -${{ runner.os }}
-            -${{ matrix.node-version }}
-            -${{ matrix.python-version }}
-            -${{ github.ref }}
+          fetch-depth: 0
+      - uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: 'main'
 
-      - name: Setup projects
-        run: pnpm bootstrap
+      - uses: ./.github/actions/ci-setup
+        with:
+          job-name: 'test-py'
+          python-version: ${{ matrix.python-version }}
 
-      - name: Run linters and tests
-        run: pnpm run ci:affected
+      - name: Test
+        run: pnpm exec nx affected --target=test:pytest
+
+  docker-image:
+    name: 'Build Docker image'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/build-push-action@v4
+        with:
+          push: false
+          # FIXME: change this to the actual Dockerfile name
+          file: ./docker/example.Dockerfile

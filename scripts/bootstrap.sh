@@ -10,8 +10,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Install Node dependencies
-pnpm install --frozen-lockfile
+# Setup Python environment
 
 if type "rye" &> /dev/null; then
   echo "Setting up Python virtual environment using rye"
@@ -39,5 +38,5 @@ else
   fi
 fi
 
-# Run setup tasks across all packages
-pnpm run setup
+# Setup Node environment
+pnpm install --frozen-lockfile

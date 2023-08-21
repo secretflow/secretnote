@@ -27,8 +27,14 @@ managed = true
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.hatch.version]
+path = "pyproject/package.json"
+# regex to match "version" in package.json
+pattern = '"version": "(?P<version>[^"]+)"'
+
 [tool.hatch.build]
-only-include = ["pyproject/src"]
+only-include = ["pyproject/src", "pyproject/package.json"]
+artifacts = ["**/node_modules/mdserver/dist"]
 directory = "pyproject/dist"
 
 [tool.hatch.build.targets.wheel]
@@ -49,3 +55,9 @@ _pb2\\.pyi?
 line-length = 88
 select = ["E", "F", "W", "B", "I"]
 src = ["pyproject/src", "pyproject/tests"]
+
+[tool.pyright]
+include = ["pyproject/src"]
+exclude = ["**/node_modules", "**/__pycache__"]
+reportGeneralTypeIssues = "information"
+reportOptionalMemberAccess = "information"
