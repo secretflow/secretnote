@@ -92,5 +92,4 @@ jobs:
       - uses: docker/build-push-action@v4
         with:
           push: false
-          # FIXME: change this to the actual Dockerfile name
-          file: ./docker/example.Dockerfile
+          file: ./docker/notebook.Dockerfile
