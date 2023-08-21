@@ -15,7 +15,6 @@
   "scripts": {
     "setup": "tsup",
     "build": "tsup",
-    "lint": ": Note: lint task is delegated to lint:* scripts",
     "lint:eslint": "eslint src",
     "lint:tsc": "tsc --noEmit",
     "release": "pnpm publish --dry-run"

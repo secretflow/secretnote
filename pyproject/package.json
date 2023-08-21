@@ -4,9 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "hatch clean && hatch build -t sdist -t wheel",
-    "test": ": Note: test task is delegated to test:* scripts",
     "test:pytest": "pytest",
-    "lint": ": Note: lint task is delegated to lint scripts",
     "lint:black": "black --check src tests",
     "lint:ruff": "ruff check src tests",
     "lint:pyright": "pyright src",

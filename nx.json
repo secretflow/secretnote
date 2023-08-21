@@ -79,25 +79,11 @@
     "lint:ruff": {
       "inputs": [":python", ":ruff"]
     },
-    "lint": {
-      "dependsOn": [
-        "lint:eslint",
-        "lint:stylelint",
-        "lint:prettier",
-        "lint:tsc",
-        "lint:black",
-        "lint:pyright",
-        "lint:ruff"
-      ]
-    },
     "test:vitest": {
       "inputs": [":default", ":vitest"]
     },
     "test:pytest": {
-      "inputs": [":default"]
-    },
-    "test": {
-      "dependsOn": ["test:vitest", "test:pytest"]
+      "inputs": [":default", ":python"]
     },
     "release": {
       "dependsOn": ["^build", "^release", "build"]

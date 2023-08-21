@@ -33,7 +33,15 @@ jobs:
           job-name: 'lint'
 
       - name: Lint
-        run: pnpm exec nx affected --target=lint:prettier,lint
+        run: |
+          pnpm exec nx affected \
+            -t lint:prettier \
+            -t lint:eslint \
+            -t lint:stylelint \
+            -t lint:tsc \
+            -t lint:black \
+            -t lint:ruff \
+            -t lint:pyright \
 
   test-js:
     name: 'Test JavaScript: Node ${{ matrix.node-version }}'
@@ -57,7 +65,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Test
-        run: pnpm exec nx affected --target=test:vitest
+        run: pnpm exec nx affected -t test:vitest
 
   test-py:
     name: 'Test Python: Python ${{ matrix.python-version }}'
@@ -81,7 +89,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Test
-        run: pnpm exec nx affected --target=test:pytest
+        run: pnpm exec nx affected -t test:pytest
 
   docker-image:
     name: 'Build Docker image'
