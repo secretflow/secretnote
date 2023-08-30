@@ -1,18 +1,12 @@
 {
-  "name": "javascript-monorepo-template",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "name": "notebook",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "development",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
   "containerUser": "vscode",
-  "mounts": [
-    // https://github.com/pnpm/pnpm/issues/5803
-    {
-      "type": "volume",
-      "source": "${localWorkspaceFolderBasename}-node_modules",
-      "target": "${containerWorkspaceFolder}/node_modules"
-    }
-  ],
   "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
+  "waitFor": "postCreateCommand",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -28,7 +22,8 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "tamasfe.even-better-toml"
       ]
     }
   },

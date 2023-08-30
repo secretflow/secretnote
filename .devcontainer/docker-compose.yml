@@ -1,0 +1,51 @@
+services:
+  development:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    command: sleep infinity
+    volumes:
+      - type: bind
+        source: ..
+        target: /workspace
+        consistency: cached
+      - type: volume
+        source: node-modules
+        target: /workspace/node_modules
+
+  alice:
+    build:
+      context: ..
+      dockerfile: .devcontainer/standalone/Dockerfile
+    environment:
+      - SELF_PARTY=alice
+      - ALL_PARTIES=alice,bob
+    ports:
+      # Jupyter
+      - 8090:8888
+    command: /home/vscode/scripts/start.sh
+    volumes:
+      - type: bind
+        source: ..
+        target: /home/vscode/workspace
+        consistency: cached
+
+  bob:
+    build:
+      context: ..
+      dockerfile: .devcontainer/standalone/Dockerfile
+    environment:
+      - SELF_PARTY=bob
+      - ALL_PARTIES=alice,bob
+    ports:
+      # Jupyter
+      - 8092:8888
+    command: /home/vscode/scripts/start.sh
+    volumes:
+      - type: bind
+        source: ..
+        target: /home/vscode/workspace
+        consistency: cached
+
+volumes:
+  node-modules:

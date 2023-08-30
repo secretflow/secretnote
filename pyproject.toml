@@ -1,6 +1,6 @@
 [project]
 authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
-dependencies = []
+dependencies = ["secretflow==1.0.0b3"]
 description = "Notebook suite for SecretFlow"
 name = "secretnote"
 readme = "README.md"
@@ -21,6 +21,7 @@ dev-dependencies = [
   "pytest-watch>=4.2.0",
   "pytest>=7.4.0",
   "ruff>=0.0.284",
+  "jupyterlab>=4.0.5",
 ]
 managed = true
 
