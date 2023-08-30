@@ -6,6 +6,7 @@ c = get_config()  # type: ignore
 c.NotebookApp.token = ""
 c.NotebookApp.password = ""
 c.NotebookApp.allow_origin = "*"
+c.ContentsManager.allow_hidden = True
 
 # ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
@@ -1024,7 +1025,6 @@ c.NotebookApp.allow_origin = "*"
 
 ## Allow access to hidden files
 #  Default: False
-c.ContentsManager.allow_hidden = False
 
 #  Default: None
 # c.ContentsManager.checkpoints = None
