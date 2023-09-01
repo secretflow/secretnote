@@ -23,6 +23,8 @@ services:
     ports:
       # Jupyter
       - 8090:8888
+      # Ray Dashboard
+      - 8091:8265
     command: /home/vscode/scripts/start.sh
     volumes:
       - type: bind
@@ -40,6 +42,8 @@ services:
     ports:
       # Jupyter
       - 8092:8888
+      # Ray Dashboard
+      - 8093:8265
     command: /home/vscode/scripts/start.sh
     volumes:
       - type: bind

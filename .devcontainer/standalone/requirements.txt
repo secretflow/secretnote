@@ -1,1 +1,4 @@
 jupyterlab==4.0.3
+ray[default]==2.2.0
+pydantic==1.10.12
+packaging==23.1

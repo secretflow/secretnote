@@ -15,7 +15,6 @@ RUN useradd --create-home --home-dir /home/${DEFAULT_USER} \
   -u 1001 \
   ${DEFAULT_USER}
 
-USER ${DEFAULT_USER}
 WORKDIR /home/${DEFAULT_USER}
 
 COPY ${BUILD_CWD}/requirements.txt .
@@ -27,6 +26,8 @@ RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 EXPOSE 8888
 # Ray Dashboard
 EXPOSE 8265
+
+USER ${DEFAULT_USER}
 
 # Copy content from .devcontainer/standalone/home into /home/vscode
 COPY --chown=vscode:vscode ${BUILD_CWD}/home ./
