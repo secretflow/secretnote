@@ -8,7 +8,7 @@ USER vscode
 WORKDIR /home/vscode
 
 # Install fnm
-RUN curl -fsSL https://fnm.vercel.app/install \
+RUN curl -sSL https://raw.githubusercontent.com/Schniz/fnm/master/.ci/install.sh \
   | bash -s -- --install-dir $HOME/.fnm
 
 # Install Node
@@ -21,4 +21,5 @@ RUN eval $($HOME/.fnm/fnm env) \
   && SHELL=bash pnpm setup
 
 # Install Poetry
-RUN curl -sSL https://install.python-poetry.org | POETRY_NO_INTERACTION=1 python3 -
+RUN curl -sSL https://install.python-poetry.org \
+  | POETRY_NO_INTERACTION=1 python3 -
