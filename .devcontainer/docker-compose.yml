@@ -12,6 +12,9 @@ services:
       - type: volume
         source: node-modules
         target: /workspace/node_modules
+      - type: volume
+        source: virtualenv
+        target: /workspace/.venv
 
   alice:
     build:
@@ -53,3 +56,4 @@ services:
 
 volumes:
   node-modules:
+  virtualenv:

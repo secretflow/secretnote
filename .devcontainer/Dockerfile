@@ -1,10 +1,11 @@
-FROM mcr.microsoft.com/devcontainers/base:bullseye
+FROM mcr.microsoft.com/devcontainers/python:3.8-bullseye
 
 RUN apt-get update \
-  && apt-get install -y unzip curl
+  && apt-get install -y unzip curl python3-distutils
 
 # Default non-root user
 USER vscode
+WORKDIR /home/vscode
 
 # Install fnm
 RUN curl -fsSL https://fnm.vercel.app/install \
@@ -19,8 +20,5 @@ RUN eval $($HOME/.fnm/fnm env) \
   && npm install -g pnpm \
   && SHELL=bash pnpm setup
 
-# Install Rye
-# https://rye-up.com/guide/installation/
-RUN curl -fsS https://rye-up.com/get \
-  | RYE_INSTALL_OPTION=--yes bash \
-  && echo '\nsource "$HOME/.rye/env"' >> $HOME/.bashrc
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | POETRY_NO_INTERACTION=1 python3 -

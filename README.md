@@ -72,7 +72,3 @@
 ![](./docs/assets/devcontainer/container-started.png)
 
 如果开发容器启动时长时间停留在上图所示的状态，可能需要断开链接再重新尝试：执行命令 `Close Remote Connection`。具体原因未知。
-
-### Python 虚拟环境
-
-开发环境中的 Python 虚拟环境位于 `/workspace/.venv`，但 `/workspace` 通过 Docker bind mount 的方式挂载到宿主机，在容器中对虚拟环境的修改会影响到宿主机，也就是说目前只能同时存在一个虚拟环境。如果在本地已经存在一个 `.venv`，在容器中要先删除它，再创建虚拟环境，反之亦然。

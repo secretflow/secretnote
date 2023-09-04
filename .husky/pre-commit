@@ -19,6 +19,6 @@ fi;
 
 # 2) Lint staged files
 
-source .venv/bin/activate
+. .venv/bin/activate
 
 pnpm exec lint-staged
