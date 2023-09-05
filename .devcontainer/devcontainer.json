@@ -1,28 +1,41 @@
 {
   "name": "notebook",
-  "dockerComposeFile": "./docker-compose.yml",
-  "service": "development",
-  "workspaceFolder": "/workspace",
+  "build": {
+    "dockerfile": "./Dockerfile"
+  },
+  "mounts": [
+    {
+      "type": "volume",
+      "source": "${localWorkspaceFolderBasename}-node_modules",
+      "target": "${containerWorkspaceFolder}/node_modules"
+    },
+    {
+      "type": "volume",
+      "source": "${localWorkspaceFolderBasename}-virtualenv",
+      "target": "${containerWorkspaceFolder}/.venv"
+    }
+  ],
   "remoteUser": "vscode",
   "containerUser": "vscode",
-  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
+  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/scripts/post-create.sh",
   "waitFor": "postCreateCommand",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
-    // "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    // "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
+        "charliermarsh.ruff",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "stylelint.vscode-stylelint",
-        "streetsidesoftware.code-spell-checker",
+        "ms-azuretools.vscode-docker",
+        "ms-python.black-formatter",
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "charliermarsh.ruff",
-        "ms-python.black-formatter",
+        "streetsidesoftware.code-spell-checker",
+        "stylelint.vscode-stylelint",
         "tamasfe.even-better-toml"
       ]
     }

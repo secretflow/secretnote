@@ -1,24 +1,44 @@
-[tool.poetry]
-authors = ["Tony Wu <tonywu6@protonmail.com>"]
+[project]
+authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
+dependencies = ["secretflow==1.0.0b3"]
 description = "Notebook suite for SecretFlow"
+dynamic = ["version"]
 name = "secretnote"
 readme = "README.md"
-version = "0.1.0"
+requires-python = ">=3.8, <3.9"
 
-[tool.poetry.dependencies]
-python = "~3.8.3"
-secretflow = "1.0.0b3"
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.7.0"
-ipython = "^8.12.0"
-jupyterlab = "^4.0.5"
-pytest = "^7.4.1"
-ruff = "^0.0.287"
+[project.scripts]
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core"]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.rye]
+dev-dependencies = [
+  "black>=23.7.0",
+  "hatch>=1.7.0",
+  "ipython>=8.12.2",
+  "pytest>=7.4.0",
+  "ruff>=0.0.284",
+  "jupyterlab>=4.0.5",
+]
+managed = false
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+path = "pyproject/package.json"
+# regex to match "version" in package.json
+pattern = '"version": "(?P<version>[^"]+)"'
+
+[tool.hatch.build]
+artifacts = []
+directory = "pyproject/dist"
+only-include = ["pyproject/src", "pyproject/package.json"]
+
+[tool.hatch.build.targets.wheel]
+sources = ["pyproject/src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["pyproject/src"]
