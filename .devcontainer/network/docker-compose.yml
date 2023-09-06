@@ -1,25 +1,8 @@
 services:
-  development:
-    build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
-    command: sleep infinity
-    volumes:
-      - type: bind
-        source: ..
-        target: /workspace
-        consistency: cached
-      - type: volume
-        source: node-modules
-        target: /workspace/node_modules
-      - type: volume
-        source: virtualenv
-        target: /workspace/.venv
-
   alice:
     build:
-      context: ..
-      dockerfile: .devcontainer/standalone/Dockerfile
+      context: ../..
+      dockerfile: .devcontainer/network/Dockerfile
     environment:
       - SELF_PARTY=alice
       - ALL_PARTIES=alice,bob
@@ -31,14 +14,14 @@ services:
     command: /home/vscode/scripts/start.sh
     volumes:
       - type: bind
-        source: ..
+        source: ../..
         target: /home/vscode/workspace
         consistency: cached
 
   bob:
     build:
-      context: ..
-      dockerfile: .devcontainer/standalone/Dockerfile
+      context: ../..
+      dockerfile: .devcontainer/network/Dockerfile
     environment:
       - SELF_PARTY=bob
       - ALL_PARTIES=alice,bob
@@ -50,10 +33,6 @@ services:
     command: /home/vscode/scripts/start.sh
     volumes:
       - type: bind
-        source: ..
+        source: ../..
         target: /home/vscode/workspace
         consistency: cached
-
-volumes:
-  node-modules:
-  virtualenv:

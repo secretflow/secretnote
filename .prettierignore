@@ -16,3 +16,12 @@ pnpm-lock.yaml
 # protobuf
 **/*_pb.ts
 **/*_connect.ts
+
+# sphinx_mdx tests
+**/tests/**/expect/**/*
+
+# vendored files
+**/vendor/**
+
+# symlinks
+.github/pull_request_template.md

@@ -1,6 +1,6 @@
 FROM secretflow/secretflow-lite-anolis8:latest
 
-ARG BUILD_CWD=.devcontainer/standalone
+ARG BUILD_CWD=.devcontainer/network
 ARG DEFAULT_USER=vscode
 
 RUN yum update -y && \

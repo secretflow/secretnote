@@ -1,6 +1,6 @@
 [project]
 authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
-dependencies = ["secretflow==1.0.0b3"]
+dependencies = []
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
 name = "secretnote"
@@ -18,9 +18,10 @@ dev-dependencies = [
   "black>=23.7.0",
   "hatch>=1.7.0",
   "ipython>=8.12.2",
+  "jupyterlab>=4.0.5",
   "pytest>=7.4.0",
   "ruff>=0.0.284",
-  "jupyterlab>=4.0.5",
+  "secretflow-lite==1.0.0b3",
 ]
 managed = false
 

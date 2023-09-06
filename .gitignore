@@ -26,7 +26,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
+MANIFEST.in
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -70,8 +70,12 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
+# Sphinx stuff:
+_build
+*.doctree
+*.pickle
+objects.inv
+.buildinfo
 
 # PyBuilder
 .pybuilder/
@@ -295,17 +299,12 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-.DS_Store
-
-# dumi
-
+# Dumi
 **/.dumi/tmp
 **/.dumi/tmp-production
 
-# sphinx artifacts
+# macOS stuff
+.DS_Store
 
-_build
-*.doctree
-*.pickle
-objects.inv
-.buildinfo
+# Personalization
+.vscode/launch.json
