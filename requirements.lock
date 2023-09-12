@@ -7,3 +7,6 @@
 #   all-features: false
 
 -e file:.
+packaging==23.1
+pydantic==1.10.12
+typing-extensions==4.7.1
