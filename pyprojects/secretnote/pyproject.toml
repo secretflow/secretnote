@@ -1,0 +1,41 @@
+[project]
+authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "License :: OSI Approved :: Apache Software License",
+]
+dependencies = [
+  "pydantic>=1.10, <2",
+  "packaging>=23.1",
+  "spu-stubs>=0.0.1",
+]
+description = "Notebook suite for SecretFlow"
+dynamic = ["version"]
+name = "secretnote"
+readme = "README.md"
+requires-python = ">=3.8, <3.9"
+
+[project.scripts]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+path = "package.json"
+# regex to match "version" in package.json
+pattern = '"version": "(?P<version>[^"]+)"'
+
+[tool.hatch.build]
+artifacts = []
+directory = "dist"
+only-include = ["src", "package.json"]
+
+[tool.hatch.build.targets.wheel]
+sources = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

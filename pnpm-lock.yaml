@@ -139,7 +139,13 @@ importers:
         specifier: ^18.16.19
         version: 18.16.19
 
-  pyproject: {}
+  pyprojects/secretnote: {}
+
+  pyprojects/spu-stubs:
+    dependencies:
+      '@secretflow/py-spu-stubs':
+        specifier: workspace:^
+        version: 'link:'
 
 packages:
 

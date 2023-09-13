@@ -2,11 +2,9 @@
 
 from typing import List
 
-from libspu import spu_pb2 as spu_proto
-from libspu.spu_pb2 import RuntimeConfig
 from pydantic import BaseModel, validator
 
-spu_proto = spu_proto
+from libspu.spu_pb2 import RuntimeConfig
 
 
 class SPUNode(BaseModel):

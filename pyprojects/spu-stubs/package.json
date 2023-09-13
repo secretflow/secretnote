@@ -1,7 +1,7 @@
 {
-  "name": "pyproject",
+  "name": "@secretflow/py-spu-stubs",
   "files": [],
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "build": "hatch clean && hatch build -t sdist -t wheel",
     "test:pytest": "pytest",
@@ -9,6 +9,9 @@
     "lint:ruff": "ruff check src tests",
     "lint:pyright": "pyright src",
     "release": ": hatch publish ./dist"
+  },
+  "dependencies": {
+    "@secretflow/py-spu-stubs": "workspace:^"
   },
   "nx": {
     "$schema": "https://cdn.jsdelivr.net/npm/nx@16.7.0/schemas/project-schema.json",

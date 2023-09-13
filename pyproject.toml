@@ -1,14 +1,13 @@
 [project]
 authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
-dependencies = [
-  "pydantic>=1.10, <2",
-  "packaging>=23.1",
+classifiers = [
+  "Private :: Do Not Upload",
 ]
-description = "Notebook suite for SecretFlow"
-dynamic = ["version"]
-name = "secretnote"
+dependencies = []
+name = "secretflow-notebook-monorepo"
 readme = "README.md"
 requires-python = ">=3.8, <3.9"
+version = "0.0.0"
 
 [project.scripts]
 
@@ -16,36 +15,26 @@ requires-python = ">=3.8, <3.9"
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
+[tool.rye.workspace]
+members = ["pyprojects/*"]
+
 [tool.rye]
 dev-dependencies = [
-  "black>=23.7.0",
-  "hatch>=1.7.0",
-  "ipython>=8.12.2",
-  "jupyterlab>=4.0.5",
-  "pytest>=7.4.0",
-  "ruff>=0.0.284",
-  "secretflow-lite==1.1.0b0",
+    "black>=23.7.0",
+    "hatch>=1.7.0",
+    "ipython>=8.12.2",
+    "jupyterlab>=4.0.5",
+    "pip>=23.2.1",
+    "pytest>=7.4.0",
+    "ruff>=0.0.284",
+    "secretflow-lite==1.1.0b0",
+    "ray[default]~=2.2.0",
+    "setuptools>=68.2.2",
 ]
-managed = false
+managed = true
 
 [tool.hatch.metadata]
 allow-direct-references = true
-
-[tool.hatch.version]
-path = "pyproject/package.json"
-# regex to match "version" in package.json
-pattern = '"version": "(?P<version>[^"]+)"'
-
-[tool.hatch.build]
-artifacts = []
-directory = "pyproject/dist"
-only-include = ["pyproject/src", "pyproject/package.json"]
-
-[tool.hatch.build.targets.wheel]
-sources = ["pyproject/src"]
-
-[tool.pytest.ini_options]
-pythonpath = ["pyproject/src"]
 
 [tool.black]
 extend-exclude = """
@@ -58,10 +47,10 @@ target-versions = ["py38", "py39", "py310"]
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "W", "B", "I"]
-src = ["pyproject/src", "pyproject/tests"]
+src = ["pyprojects/*/src"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]
-include = ["pyproject/src"]
+include = ["pyprojects/*/src"]
 reportGeneralTypeIssues = "information"
 reportOptionalMemberAccess = "information"
