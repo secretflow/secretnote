@@ -21,6 +21,7 @@
   "editor.insertSpaces": true,
   "files.insertFinalNewline": true,
   "black-formatter.args": ["--config", "pyproject.toml"],
+  "notebook.formatOnSave.enabled": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.validate": [
     "javascript",

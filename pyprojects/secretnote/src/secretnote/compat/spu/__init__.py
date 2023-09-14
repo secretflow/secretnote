@@ -1,10 +1,9 @@
 """Pydantic models for SecretFlow and SPU."""
 
+from enum import IntEnum
 from typing import List
 
-from pydantic import BaseModel, validator
-
-from libspu.spu_pb2 import RuntimeConfig
+from pydantic import BaseModel
 
 
 class SPUNode(BaseModel):
@@ -12,17 +11,24 @@ class SPUNode(BaseModel):
     address: str
 
 
+class SPUProtocolKind(IntEnum):
+    REF2K = 1
+    SEMI2K = 2
+    ABY3 = 3
+    CHEETAH = 4
+
+
+class SPUFieldType(IntEnum):
+    FM32 = 1
+    FM64 = 2
+    FM128 = 3
+
+
+class SPURuntimeConfig(BaseModel):
+    protocol: SPUProtocolKind
+    field: SPUFieldType
+
+
 class SPUClusterDef(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-
     nodes: List[SPUNode]
-    runtime_config: RuntimeConfig
-
-    @validator("runtime_config", pre=True)
-    def validate_runtime_config(cls, v):
-        if isinstance(v, dict):
-            return RuntimeConfig(**v)
-        elif isinstance(v, RuntimeConfig):
-            return v
-        raise ValueError("runtime_config must be a dict or RuntimeConfig")
+    runtime_config: SPURuntimeConfig

@@ -90,6 +90,8 @@ jupyterlab-server==2.24.0
 keyring==24.2.0
 kuscia==0.0.1b2
 llvmlite==0.40.1
+logging-tree==1.9
+loguru==0.7.2
 markdown-it-py==3.0.0
 markupsafe==2.1.3
 matplotlib-inline==0.1.6

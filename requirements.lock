@@ -9,6 +9,7 @@
 -e file:.
 -e file:pyprojects/secretnote
 -e file:pyprojects/spu-stubs
+loguru==0.7.2
 packaging==23.1
 pydantic==1.10.12
 typing-extensions==4.7.1

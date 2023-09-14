@@ -30,6 +30,7 @@ dev-dependencies = [
     "secretflow-lite==1.1.0b0",
     "ray[default]~=2.2.0",
     "setuptools>=68.2.2",
+    "logging_tree>=1.9",
 ]
 managed = true
 
