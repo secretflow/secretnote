@@ -1,6 +1,5 @@
 FROM secretflow/secretflow-lite-anolis8:latest
 
-ARG BUILD_CWD=.devcontainer/network
 ARG DEFAULT_USER=vscode
 
 RUN yum update -y && \
@@ -17,7 +16,7 @@ RUN useradd --create-home --home-dir /home/${DEFAULT_USER} \
 
 WORKDIR /home/${DEFAULT_USER}
 
-COPY ${BUILD_CWD}/requirements.txt .
+COPY .devcontainer/network/requirements.txt .
 RUN pip install -r requirements.txt
 
 RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
@@ -29,5 +28,5 @@ EXPOSE 8265
 
 USER ${DEFAULT_USER}
 
-# Copy content from .devcontainer/standalone/home into /home/vscode
-COPY --chown=vscode:vscode ${BUILD_CWD}/home ./
+COPY --chown=vscode:vscode .devcontainer/network/home ./
+COPY --chown=vscode:vscode examples ./examples

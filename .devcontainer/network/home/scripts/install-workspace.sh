@@ -2,4 +2,6 @@
 
 source ~/.bashrc
 
-python3 -m pip install --force-reinstall ~/workspace
+pushd ~/workspace
+
+pip install -r requirements.lock

@@ -1,5 +1,22 @@
 # Notebook
 
+- [ ] Essential API tracing (OpenTelemetry)
+  - [ ] Tracing
+  - [ ] Static code analysis
+- [ ] Data flow tracking
+  - [ ] Tracing
+  - [ ] Static code analysis
+- [ ] MPC code transformation
+  - [ ] Tagged Notebook cell & implicit remote function
+  - [ ] Async/implicit evaluation
+- [ ] Linting & type-checking
+  - [ ] Impure functions
+- [ ] Errors & diagnostics
+- [ ] Status API: Ray, SecretFlow, SPU
+- [ ] Type stubs: SecretFlow, SPU, HEU
+- [ ] Unified configuration (Pydantic)
+  - [ ] Pydantic-Protobuf interop
+
 ## 本地开发
 
 `pnpm run bootstrap`

@@ -9,6 +9,7 @@ dependencies = [
   "packaging>=23.1",
   "pydantic>=1.10, <2",
   "spu-stubs>=0.0.1",
+  "ruamel.yaml>=0.17.32",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
