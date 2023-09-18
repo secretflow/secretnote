@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional, TypeVar, overload
+from typing import Any, Callable, TypeVar, overload
 
 from secretflow.device.device import DeviceObject
 from secretflow.device.device.pyu import PYU, PYUObject
@@ -7,45 +7,65 @@ from secretflow.device.device.spu import SPU, SPUObject
 T = TypeVar("T")
 
 
-def fn(*args: int):
-    return sum(args)
-
-
 @overload
-def use_term(device: PYU, data: Any = None) -> PYUObject:
+def use_term(identity: PYU, variable: None = None) -> Callable[[Any], PYUObject]:
     ...
 
 
 @overload
-def use_term(device: SPU, data: PYUObject) -> SPUObject:
+def use_term(identity: PYU, variable: DeviceObject) -> Callable[[], PYUObject]:
     ...
 
 
-def use_term(device, data=None):
-    if isinstance(data, DeviceObject):
-        return data.to(device)
-    return device(lambda x: x)(data)  # type: ignore
+@overload
+def use_term(identity: SPU, variable: PYUObject) -> Callable[[], SPUObject]:
+    ...
+
+
+def use_term(identity, variable=None):
+    """
+    Place `variable` in `device`, and return its device representation.
+
+    If `variable` is None (not provided), it is assumed to be remote data.
+    """
+    if isinstance(variable, DeviceObject):
+
+        def wrapper():
+            return variable.to(identity)
+
+        return wrapper
+
+    def wrapper(x=None):
+        return identity(lambda x: x)(x)
+
+    return wrapper
 
 
 @overload
 def use_application(
     device: PYU,
-    fn: Optional[Callable] = None,
     *args: PYUObject,
     **kwargs: PYUObject,
-) -> PYUObject:
+) -> Callable[[Callable], PYUObject]:
     ...
 
 
 @overload
 def use_application(
     device: SPU,
-    fn: Optional[Callable] = None,
     *args: SPUObject,
     **kwargs: SPUObject,
-) -> SPUObject:
+) -> Callable[[Callable], SPUObject]:
     ...
 
 
-def use_application(device, fn=lambda x: x, *args, **kwargs):
-    return device(fn)(*args, **kwargs)
+def use_application(device, *args, **kwargs):
+    """
+    Execute `fn` on `args` and `kwargs` in `device`, and return the device
+    representation of the result.
+    """
+
+    def wrapper(fn: Callable):
+        return device(fn)(*args, **kwargs)
+
+    return wrapper
