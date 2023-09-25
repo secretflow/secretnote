@@ -9,14 +9,14 @@ dependencies = [
   "loguru>=0.7.2",
   "packaging>=23.1",
   "pydantic>=1.10, <2",
-  "spu-stubs>=0.0.1",
+  "spu-stubs>=0.0.0",
   "ruamel.yaml>=0.17.32",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
 name = "secretnote"
 readme = "README.md"
-requires-python = ">=3.8, <3.9"
+requires-python = ">=3.8.15, <3.11"
 
 [project.scripts]
 
