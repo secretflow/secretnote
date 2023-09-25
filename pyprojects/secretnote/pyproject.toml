@@ -16,7 +16,7 @@ description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
 name = "secretnote"
 readme = "README.md"
-requires-python = ">=3.8.15, <3.11"
+requires-python = ">=3.8.15, <3.9"
 
 [project.scripts]
 
