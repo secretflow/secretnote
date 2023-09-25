@@ -63,3 +63,12 @@ def use_function(owner, *args, **kwargs):
         return owner(fn)(*args, **kwargs)
 
     return wrapper
+
+
+def use_barrier(*args: Union[SPUObject, PYUObject]):
+    def wrapper():
+        import secretflow
+
+        secretflow.wait(args)
+
+    return wrapper

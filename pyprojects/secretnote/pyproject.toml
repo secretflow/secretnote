@@ -5,11 +5,14 @@ classifiers = [
   "License :: OSI Approved :: Apache Software License",
 ]
 dependencies = [
-  "loguru>=0.7.2",
-  "packaging>=23.1",
-  "pydantic>=1.10, <2",
-  "spu-stubs>=0.0.1",
-  "ruamel.yaml>=0.17.32",
+    "loguru>=0.7.2",
+    "packaging>=23.1",
+    "pydantic>=1.10, <2",
+    "spu-stubs>=0.0.1",
+    "ruamel.yaml>=0.17.32",
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+    "more-itertools>=10.1.0",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]

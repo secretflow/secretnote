@@ -9,9 +9,17 @@
 -e file:.
 -e file:pyprojects/secretnote
 -e file:pyprojects/spu-stubs
+deprecated==1.2.14
+importlib-metadata==6.8.0
 loguru==0.7.2
+more-itertools==10.1.0
+opentelemetry-api==1.20.0
+opentelemetry-sdk==1.20.0
+opentelemetry-semantic-conventions==0.41b0
 packaging==23.1
 pydantic==1.10.12
 ruamel-yaml==0.17.32
 ruamel-yaml-clib==0.2.7
 typing-extensions==4.7.1
+wrapt==1.15.0
+zipp==3.17.0

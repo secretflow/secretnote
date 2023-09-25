@@ -22,6 +22,7 @@
     "ndarray",
     "netifaces",
     "nrwl",
+    "otlp",
     "pbar",
     "pbars",
     "pphlo",

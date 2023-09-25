@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:bullseye
+FROM --platform=x86_64 mcr.microsoft.com/devcontainers/base:bullseye
 
 ARG FNM_VERSION=1.35.1
 ARG RYE_VERSION=0.13.0
