@@ -2,7 +2,7 @@
   "name": "@secretflow/notebook-pyproject-secretnote",
   "private": true,
   "files": [],
-  "version": "0.0.0",
+  "version": "0.0.1-dev.0",
   "scripts": {
     "build": "hatch clean && hatch build -t sdist -t wheel",
     "test:pytest": "pytest",
