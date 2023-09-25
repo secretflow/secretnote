@@ -6,8 +6,8 @@
   "scripts": {
     "build": "hatch clean && hatch build -t sdist -t wheel",
     "test:pytest": "pytest",
-    "lint:black": "black --check src tests",
-    "lint:ruff": "ruff check src tests",
+    "lint:black": "black --check src",
+    "lint:ruff": "ruff check src",
     "lint:pyright": "pyright src",
     "release": ": hatch publish ./dist"
   },
