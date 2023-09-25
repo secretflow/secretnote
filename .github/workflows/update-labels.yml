@@ -1,0 +1,18 @@
+# This workflow updates our GitHub Labels using https://github.com/Financial-Times/github-label-sync
+# Labels are defined in .github/workflows/config/labels.yml
+# See that file for specific instructions on making changes.
+
+name: 'GitHub: Update labels'
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/config/labels.yml
+      - .github/workflows/update-labels.yml
+
+jobs:
+  update:
+    uses: secretflow/web-ci/.github/workflows/update-labels.yml@main
+    secrets: inherit

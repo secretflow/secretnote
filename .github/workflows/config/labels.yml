@@ -1,0 +1,14 @@
+# This file defines our GitHub Labels
+#
+# FOR MAINTAINERS:
+# To make changes to labels, update this file and submit a pull request. Changes will
+# take effect thru the update-labels action as soon as they are merged to main.
+#
+# IMPORTANT:
+# To rename a label, add the old name to the `aliases` field. This ensures currently
+# labeled issues and PRs are updated accordingly, otherwise the label will be DELETED
+# from affected issues/PRs.
+
+# FIXME: [repo] declare GitHub labels here
+
+[]
