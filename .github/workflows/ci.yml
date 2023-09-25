@@ -1,4 +1,4 @@
-name: CI
+name: 'Code: CI'
 
 on:
   pull_request:
@@ -7,97 +7,29 @@ on:
       - edited
       - reopened
       - synchronize
-  push:
-    branches:
-      - main
+  workflow_call:
 
 permissions:
   contents: read
   actions: read # required by nrwl/nx-set-shas
 
 jobs:
-  lint:
-    name: 'Lint'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          # fetch the full history for Nx to determine affected projects
-          fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: 'main'
-
-      - uses: ./.github/actions/ci-setup
-        with:
-          job-name: 'lint'
-
-      - name: Lint
-        run: |
-          pnpm exec nx affected \
-            -t lint:prettier \
-            -t lint:eslint \
-            -t lint:stylelint \
-            -t lint:tsc \
-            -t lint:black \
-            -t lint:ruff \
-            -t lint:pyright \
-
-  test-js:
-    name: 'Test JavaScript: Node ${{ matrix.node-version }}'
-    runs-on: ubuntu-latest
+  ci-javascript:
+    name: 'CI: JavaScript'
+    uses: secretflow/web-ci/.github/workflows/ci-javascript.yml@main
+    with:
+      node-version: ${{ matrix.node-version }}
     strategy:
       fail-fast: false
       matrix:
         node-version: ['16.20.x']
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: 'main'
-
-      - uses: ./.github/actions/ci-setup
-        with:
-          job-name: 'test-js'
-          node-version: ${{ matrix.node-version }}
-
-      - name: Test
-        run: pnpm exec nx affected -t test:vitest
-
-  test-py:
-    name: 'Test Python: Python ${{ matrix.python-version }}'
-    runs-on: ubuntu-latest
+  ci-python:
+    name: 'CI: Python'
+    uses: secretflow/web-ci/.github/workflows/ci-python.yml@main
+    with:
+      python-version: ${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.8.x', '3.9.x', '3.10.x']
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: 'main'
-
-      - uses: ./.github/actions/ci-setup
-        with:
-          job-name: 'test-py'
-          python-version: ${{ matrix.python-version }}
-
-      - name: Test
-        run: pnpm exec nx affected -t test:pytest
-
-  docker-image:
-    name: 'Build Docker image'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/build-push-action@v4
-        with:
-          push: false
-          file: ./docker/notebook.Dockerfile

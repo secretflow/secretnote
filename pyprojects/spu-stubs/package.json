@@ -1,7 +1,8 @@
 {
-  "name": "@secretflow/py-spu-stubs",
+  "name": "@secretflow/notebook-pyproject-spu-stubs",
+  "private": true,
   "files": [],
-  "version": "0.0.1",
+  "version": "0.0.0",
   "scripts": {
     "build": "hatch clean && hatch build -t sdist -t wheel",
     "test:pytest": "pytest",
