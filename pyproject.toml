@@ -6,7 +6,7 @@ classifiers = [
 dependencies = []
 name = "monorepo"
 readme = "README.md"
-requires-python = ">=3.8.15, <3.9"
+requires-python = ">=3.8, <3.9"
 version = "0.0.0"
 
 [project.scripts]
