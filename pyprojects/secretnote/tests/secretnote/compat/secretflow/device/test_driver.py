@@ -3,4 +3,4 @@ def test_cluster_party_export_omit_none():
     from secretnote.compat.secretflow.device.driver import SFClusterParty
 
     party = SFClusterParty(address="localhost:7860")
-    assert party.export() == {"address": "localhost:7860"}
+    assert party.dict() == {"address": "localhost:7860"}
