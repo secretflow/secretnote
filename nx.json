@@ -1,18 +1,18 @@
 {
   // We are using Nx for monorepo task orchestration
-  // See https://nx.dev/concepts/mental-model to understand more
+  // See https://nx.dev/concepts/mental-model
   "$schema": "https://cdn.jsdelivr.net/npm/nx@latest/schemas/nx-schema.json",
   // Inputs affect when Nx will re-run a task
   // If inputs are not changed then Nx will skip re-run and replay cached results
-  // For example, we want to re-run ESLint whenever eslintrc is updated
+  // For example, we would want to re-run ESLint whenever eslintrc is updated
   // This guarantees that tasks are always correct and up-to-date
   //
   // Named inputs defined here are to be referenced in targetDefaults
   // See https://nx.dev/concepts/mental-model#computation-hashing-and-caching
   // and https://nx.dev/reference/nx-json#inputs-&-namedinputs
   //
-  // workspaceRoot means the root of the monorepo
-  // projectRoot means the root of the package in which the task is defined
+  // ${workspaceRoot} = root of repo
+  // ${projectRoot} = root of package in which the task is defined
   "namedInputs": {
     ":default": ["{projectRoot}/**/*"],
     ":eslint": [
@@ -37,13 +37,10 @@
       "{projectRoot}/**/tsconfig.json",
       "{projectRoot}/**/tsconfig.*.json"
     ],
-    ":vitest": ["{workspaceRoot}/vitest.config.mts", "{projectRoot}/vitest.config.mts"],
-    ":python": [
-      "{workspaceRoot}/pyproject.toml",
-      "{workspaceRoot}/.python-version",
-      "{projectRoot}/**/*.{py,pyi}"
-    ],
-    ":ruff": ["{projectRoot}/ruff.toml"]
+    ":vitest": [
+      "{workspaceRoot}/vitest.config.mts",
+      "{workspaceRoot}/vitest.config.mjs"
+    ]
   },
   // targetDefaults configure default options for each task
   // such as inputs, outputs and dependencies
@@ -51,12 +48,17 @@
   // The actual commands are defined in the `scripts` section in each package's package.json
   "targetDefaults": {
     "setup": {
-      "outputs": ["{projectRoot}/dist", "{projectRoot}/.dumi/tmp"],
+      "inputs": [":default", ":tsc"],
+      "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^setup"]
     },
     "build": {
+      "inputs": [":default", ":tsc"],
       "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build"]
+    },
+    "release": {
+      "dependsOn": ["^build", "^release", "build"]
     },
     "lint:eslint": {
       "inputs": [":default", ":eslint"]
@@ -71,29 +73,28 @@
       "inputs": [":default", ":tsc"]
     },
     "lint:black": {
-      "inputs": [":python"]
+      "inputs": [":default"]
     },
     "lint:pyright": {
-      "inputs": [":python"]
+      "inputs": [":default"]
     },
     "lint:ruff": {
-      "inputs": [":python", ":ruff"]
+      "inputs": [":default"]
     },
     "test:vitest": {
-      "inputs": [":default", ":vitest"]
+      "inputs": [":default", ":vitest"],
+      "outputs": ["{projectRoot}/coverage"]
     },
     "test:pytest": {
-      "inputs": [":default", ":python"]
-    },
-    "release": {
-      "dependsOn": ["^build", "^release", "build"]
+      "inputs": [":default"],
+      "outputs": ["{projectRoot}/coverage"]
     }
   },
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "parallel": 6,
+        "parallel": 8,
         "cacheableOperations": [
           "setup",
           "build",
@@ -102,11 +103,10 @@
           "lint:prettier",
           "lint:tsc",
           "lint:black",
+          "lint:pyright",
           "lint:ruff",
-          "lint",
           "test:vitest",
-          "test:pytest",
-          "test"
+          "test:pytest"
         ]
       }
     }

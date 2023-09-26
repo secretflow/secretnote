@@ -1,44 +1,45 @@
 # https://github.com/sveltejs/kit/blob/32afba695088b946aefe96da75b36de9b0667fbe/.github/workflows/release.yml
-name: Release
+name: 'Release'
 
 on:
   push:
-    branches:
-      - main
+    branches: ['main']
 
 permissions: {}
 
 jobs:
-  release:
-    # FIXME: change this to the canonical repo name
+  changesets:
     # prevents this action from running on forks
-    if: github.repository == 'example/example'
+    if: github.repository == 'secretflow/notebook'
+
+    name: Changesets
+    uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main
+
     permissions:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
-    name: Release
-    runs-on: ubuntu-latest
+    secrets: inherit
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          # fetch the full history for changesets to generate changelog
-          fetch-depth: 0
+  ci:
+    needs: [changesets]
+    if: |
+      needs.changesets.outputs.should-release == 'true'
 
-      - uses: ./.github/actions/ci-setup
+    name: Prerelease CI
+    uses: ./.github/workflows/ci.yml
 
-      - name: Build
-        run: pnpm exec nx run-many --target=build --exclude docs,website
+    permissions:
+      contents: read
+      actions: read
 
-      - name: Create release PR or publish packages
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          # run changeset version to consume all changesets and bump versions
-          version: pnpm run version
-          # publish with Nx. won't call changeset publish but does call changeset tag
-          publish: pnpm run release
-          # commit message for the release commits
-          commit: 'chore: stage changes for next release'
-          # title of the release PR
-          title: 'chore: release'
+  publish:
+    needs: [ci]
+    if: |
+      needs.ci.result == 'success'
+
+    name: Publish
+    uses: secretflow/web-ci/.github/workflows/release-publish.yml@main
+
+    permissions:
+      contents: write # to create tags
+    secrets: inherit

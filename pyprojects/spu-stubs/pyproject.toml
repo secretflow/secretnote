@@ -26,7 +26,7 @@ path = "package.json"
 pattern = '"version": "(?P<version>[^"]+)"'
 
 [tool.hatch.build]
-artifacts = ["*.pyi"]
+artifacts = ["*.pyi", "py.typed"]
 dev-mode-dirs = ["src"] # make stubs discoverable thru editable install
 directory = "dist"
 only-include = ["src", "package.json"]
