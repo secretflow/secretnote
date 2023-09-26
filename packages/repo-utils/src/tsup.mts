@@ -81,7 +81,7 @@ export function signal() {
   signalInstalled = true;
 }
 
-export default function createOptions(options: Options): Options {
+export function defineOptions(options: Options): Options {
   if (options.watch) {
     signal();
   }

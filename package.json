@@ -8,16 +8,12 @@
   "scripts": {
     "bootstrap": "./scripts/setup_all.sh",
     "postinstall": "is-ci || husky install",
-    "lint:prettier": "prettier --check --ignore-unknown .",
-    "lint": "nx run-many -t lint:prettier -t lint:eslint -t lint:stylelint -t lint:black -t lint:ruff",
-    "test": "nx run-many -t test:pytest -t test:vitest",
-    "typecheck": "nx run-many -t typecheck:tsc -t typecheck:pyright",
     "changeset": "changeset",
-    "version": "changeset version",
-    "release": "nx run-many --nx-bail -t release",
-    "nx": "nx",
-    "start:docs": "nx run docs:start",
-    "clean": "git clean -fX ."
+    "clean": "git clean -fX .",
+    "lint:prettier": "prettier --check --ignore-unknown .",
+    "ci:javascript": "nx run-many -t lint:prettier -t lint:eslint -t lint:stylelint -t typecheck:tsc -t test:vitest",
+    "ci:python": "nx run-many -t lint:black -t lint:ruff -t test:pytest -t typecheck:pyright",
+    "ci:release": "nx run-many --nx-bail -t release"
   },
   "nx": {
     "includedScripts": [
@@ -28,6 +24,7 @@
     "@changesets/cli": "^2.26.2",
     "@commitlint/cli": "^17.6.6",
     "@commitlint/config-conventional": "^17.6.6",
+    "@secretflow/repo-utils": "workspace:^",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitest/coverage-v8": "^0.32.4",
@@ -65,5 +62,5 @@
   "engines": {
     "node": ">=16.20.0"
   },
-  "packageManager": "pnpm@8.4.0"
+  "packageManager": "pnpm@8.7.6"
 }

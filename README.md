@@ -34,7 +34,7 @@
 
 当终端出现如下关于 `postCreateCommand ...` 之内容，开发容器即创建完毕：
 
-![success output](./docs/assets/devcontainer/success-output.png)
+![success output](./docs/static/img/devcontainer/success-output.png)
 
 ### 使用开发容器
 
@@ -70,7 +70,7 @@
 
 文件系统的其余部分都处在容器内，对它们的变更不会同步到宿主机，但在容器停止后，这些变更会被保留，直到容器被删除。这也意味着所有的命令行工具都在容器中运行，而不是宿主机。
 
-![shell in container](./docs/assets/devcontainer/shell.png)
+![shell in container](./docs/static/img/devcontainer/shell.png)
 
 容器中仅部分 VS Code 插件可用（比如主题和快捷键），同时，开发容器的配置文件 [`.devcontainer/devcontainer.json`][devcontainer-conf] 中也指定了一些插件，这些插件会在容器创建时自动安装。
 
@@ -86,6 +86,6 @@
 
 ### 初次启动时间停滞在 `Started` 状态
 
-![](./docs/assets/devcontainer/container-started.png)
+![](./docs/static/img/devcontainer/container-started.png)
 
 如果开发容器启动时长时间停留在上图所示的状态，可能需要断开链接再重新尝试：执行命令 `Close Remote Connection`。具体原因未知。

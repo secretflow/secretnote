@@ -3,7 +3,6 @@ authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
 classifiers = [
   "Development Status :: 1 - Planning",
   "License :: OSI Approved :: Apache Software License",
-  "Private :: Do Not Upload",
 ]
 dependencies = []
 description = "Type stubs for SPU"

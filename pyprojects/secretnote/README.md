@@ -1,4 +1,4 @@
-# secretnote
+# SecretNote
 
 [Notebook] suite for [SecretFlow].
 
