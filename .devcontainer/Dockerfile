@@ -1,30 +1,31 @@
-FROM --platform=x86_64 mcr.microsoft.com/devcontainers/base:bullseye
+FROM mcr.microsoft.com/devcontainers/base:bullseye
 
 ARG FNM_VERSION=1.35.1
-ARG RYE_VERSION=0.13.0
+ARG RYE_VERSION=0.15.1
 ARG NODE_VERSION=16.20
 
 RUN apt-get update \
   && apt-get install -y \
   sudo \
-  unzip \
   curl
-
-# Install fnm (for Node)
-RUN curl -sSL https://github.com/Schniz/fnm/releases/download/v${FNM_VERSION}/fnm-linux.zip \
-  -o fnm.zip \
-  && unzip -d /usr/local/bin fnm.zip fnm \
-  && chmod +x /usr/local/bin/fnm \
-  && rm fnm.zip
-
-# Install Rye (for Python)
-RUN curl -sSL https://github.com/mitsuhiko/rye/releases/download/${RYE_VERSION}/rye-x86_64-linux.gz \
-  | gunzip > /usr/local/bin/rye \
-  && chmod +x /usr/local/bin/rye
 
 # Default non-root user
 USER vscode
 WORKDIR /home/vscode
+
+ENV PATH="/home/vscode/.cargo/bin:${PATH}"
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# Install fnm (for Node)
+RUN cargo install fnm \
+  --version ${FNM_VERSION}
+
+# Install Rye (for Python)
+RUN cargo install rye \
+  --git https://github.com/mitsuhiko/rye \
+  --tag ${RYE_VERSION}
 
 # Install Node
 RUN fnm install ${NODE_VERSION} \
