@@ -36,6 +36,8 @@ dev-dependencies = [
   "setuptools>=68.2.2",
   "portpicker>=1.6.0",
   "netifaces>=0.11.0",
+  "torch>=2.1.0",
+  "datamodel-code-generator>=0.22.1",
 ]
 managed = true
 
@@ -43,9 +45,10 @@ managed = true
 allow-direct-references = true
 
 [tool.black]
-extend-exclude = """
+force-exclude = """
 _pb2\\.pyi?
 | _pb2_grpc\\.pyi?
+| secretnote/proto
 """
 line-length = 88
 target-versions = ["py38", "py39", "py310"]

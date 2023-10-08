@@ -91,6 +91,7 @@ class ProfilingInstrumentor:
         source = f"{co.co_filename}:{lineno}"
 
         def find_upstream_refs(args: Tuple):
+            return []
             ctxs: List[trace.SpanContext] = []
             for sym in args:
                 ref = get_reference(sym)
