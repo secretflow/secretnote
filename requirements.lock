@@ -10,6 +10,7 @@
 -e file:pyprojects/secretnote
 -e file:pyprojects/spu-stubs
 deprecated==1.2.14
+flatdict==4.0.1
 importlib-metadata==6.8.0
 loguru==0.7.2
 more-itertools==10.1.0

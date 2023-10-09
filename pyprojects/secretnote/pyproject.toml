@@ -15,6 +15,7 @@ dependencies = [
   "opentelemetry-sdk>=1.20.0",
   "more-itertools>=10.1.0",
   "pyhumps>=3.8.0",
+  "flatdict>=4.0.1",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
