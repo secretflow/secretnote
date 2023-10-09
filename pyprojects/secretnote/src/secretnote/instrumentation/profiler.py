@@ -1,4 +1,5 @@
 import sys
+from contextlib import suppress
 from types import FrameType
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -91,7 +92,7 @@ class Profiler:
         )
 
     def __call__(self, frame: FrameType, event: str, arg: Any):
-        if not (_ := self.match_rule(frame)):
+        if not (rule := self.match_rule(frame)):
             return
 
         self.pathfinder.find(frame.f_code.co_filename)
@@ -102,6 +103,9 @@ class Profiler:
         if event == "call":
             span = self.tracer.start_span(funcname, curr_ctx)
             call = self.record_call(frame)
+            if rule.semantics:
+                with suppress(Exception):
+                    call.semantics = rule.semantics(frame)
             ctx = trace.set_span_in_context(span, curr_ctx)
             self.context_stack.append((ctx, call))
             return
@@ -109,6 +113,10 @@ class Profiler:
         if event == "return":
             span = trace.get_current_span(curr_ctx)
             span.set_attribute("secretnote.tracing.call", curr_call.json())
+            span.set_attribute(
+                "secretnote.tracing.call.semantics",
+                curr_call.semantics is not None,
+            )
             span.end()
             self.context_stack.pop()
             return

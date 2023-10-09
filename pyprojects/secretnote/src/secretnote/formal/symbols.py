@@ -35,12 +35,15 @@ class Location(BaseModel):
         return f"{self.kind}({', '.join(self.parties)})"
 
 
-Reference: TypeAlias = int
+Reference: TypeAlias = str
+
+FunctionArgument = Union[Reference, IO]
+FunctionResult = Union[Location, IO]
 
 
 class Function(BaseModel):
-    arguments: Tuple[Union[Reference, IO], ...]
-    result: Union[Location, IO]
+    arguments: Tuple[FunctionArgument, ...]
+    result: FunctionResult
 
     name: Optional[str] = None
 
