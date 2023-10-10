@@ -10,4 +10,4 @@ ray start \
   --dashboard-host "0.0.0.0" \
   --resources="{\"$SELF_PARTY\": 4}"
 
-jupyter lab --ip "0.0.0.0" --no-browser
+secretnote --no-browser

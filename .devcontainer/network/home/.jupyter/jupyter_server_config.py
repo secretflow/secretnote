@@ -3,10 +3,11 @@
 
 c = get_config()  # type: ignore
 
-c.NotebookApp.token = ""
-c.NotebookApp.password = ""
-c.NotebookApp.allow_origin = "*"
-c.ContentsManager.allow_hidden = True
+c.ServerApp.root_dir = "./examples"
+# c.NotebookApp.token = ""
+# c.NotebookApp.password = ""
+# c.NotebookApp.allow_origin = "*"
+# c.ContentsManager.allow_hidden = True
 
 # ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
