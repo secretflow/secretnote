@@ -49,14 +49,16 @@ def qualname(obj: Any) -> str:
     return ".".join(map(str, filter(None, names)))
 
 
-def source_code(obj):
+def function_source(obj):
+    if not callable(obj):
+        return None
     with suppress(Exception):
         return dedent(inspect.getsource(obj))
     return None
 
 
 def snapshot(obj: Any) -> str:
-    for getter in (source_code, pformat, str, repr, fingerprint):
+    for getter in (function_source, pformat, str, repr, fingerprint):
         with suppress(Exception):
             text = getter(obj)
             assert isinstance(text, str)

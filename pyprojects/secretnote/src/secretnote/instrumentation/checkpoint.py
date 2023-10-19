@@ -1,3 +1,4 @@
+import enum
 from types import FrameType
 from typing import Callable, Dict, Optional, TypeVar
 
@@ -37,3 +38,9 @@ class CheckpointCollection:
 DEFAULT_CHECKPOINTS = CheckpointCollection()
 
 tracing_checkpoint = DEFAULT_CHECKPOINTS.tracing_checkpoint
+
+
+class APILevel(enum.IntEnum):
+    IMPLEMENTATION = 10
+    INVARIANT = 20
+    USERLAND = 90

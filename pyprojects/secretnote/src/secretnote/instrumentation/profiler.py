@@ -8,9 +8,17 @@ from opentelemetry.context import Context
 
 from .checkpoint import DEFAULT_CHECKPOINTS, CheckpointCollection
 from .envvars import OTEL_PYTHON_SECRETNOTE_TRACING_CALL
-from .pprint import source_code
+from .pprint import function_source
 from .tree_util import pytree_snapshot
 from .types import Checkpoint, Invocation, SourceLocation
+
+
+class _NameError:
+    def __str__(self) -> str:
+        return "!NameError!"
+
+
+_NAME_ERROR = _NameError()
 
 
 class Profiler:
@@ -45,14 +53,21 @@ class Profiler:
 
     def _create_invocation(self, checkpoint: Checkpoint, frame: FrameType):
         values = {**frame.f_globals, **frame.f_locals}
-        boundvars = {k: values[k] for k in set(frame.f_code.co_varnames) & set(values)}
-        freevars = {k: values[k] for k in set(frame.f_code.co_freevars) & set(values)}
+        boundvars = {
+            k: values.get(k, _NAME_ERROR) for k in set(frame.f_code.co_varnames)
+        }
+        # TODO: this is insufficient for nested functions
+        freevars = {
+            k: values.get(k, _NAME_ERROR)
+            for k in (set(frame.f_code.co_freevars) | set(frame.f_code.co_names))
+            - set(frame.f_builtins)
+        }
         invocation = Invocation(
             checkpoint=checkpoint,
             boundvars=pytree_snapshot(boundvars),
             freevars=pytree_snapshot(freevars),
             stack=SourceLocation.from_stack(frame),
-            source=source_code(frame),
+            source=function_source(frame),
         )
         return invocation
 
@@ -74,6 +89,9 @@ class Profiler:
         span = trace.get_current_span(ctx)
         payload = call.json(by_alias=True, exclude_none=True)
         span.set_attribute(OTEL_PYTHON_SECRETNOTE_TRACING_CALL, payload)
+        exc_t, exc, tb = sys.exc_info()
+        if exc:
+            span.record_exception(exc.with_traceback(tb), escaped=True)
         span.end()
 
     def start(self):

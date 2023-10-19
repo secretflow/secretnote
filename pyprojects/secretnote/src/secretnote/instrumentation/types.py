@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import enum
 from types import CodeType, FrameType
 from typing import Any, Callable, List, Optional, Protocol, Tuple, Union
 
@@ -81,12 +80,6 @@ class Checkpoint(BaseModel):
         func_name = ".".join(reversed(func_name.split(".")))
 
         return Checkpoint(name=func_name, digest=hash_digest(code))
-
-
-class APILevel(enum.IntEnum):
-    IMPLEMENTATION = 10
-    INVARIANT = 20
-    USERLAND = 90
 
 
 class SourceLocation(BaseModel):

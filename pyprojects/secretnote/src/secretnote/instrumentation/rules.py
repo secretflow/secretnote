@@ -1,5 +1,5 @@
-from .checkpoint import DEFAULT_CHECKPOINTS
-from .types import APILevel, LocalCallable
+from .checkpoint import DEFAULT_CHECKPOINTS, APILevel
+from .types import LocalCallable
 
 
 def create_default_rules():
@@ -21,6 +21,8 @@ def create_default_rules():
         add(fn, api_level=APILevel.IMPLEMENTATION)
 
     for fn in (
+        secretflow.PYU.__call__,
+        secretflow.SPU.__call__,
         LocalCallable(fn=secretflow.PYU.__call__, load_const=(1,)),
         LocalCallable(fn=secretflow.SPU.__call__, load_const=(1,)),
         secretflow.SPU.infeed_shares,
