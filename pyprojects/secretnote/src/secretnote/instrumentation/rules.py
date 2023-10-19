@@ -1,69 +1,47 @@
-import re
-from types import FrameType, FunctionType
-from typing import List, Tuple
-
-from secretflow import PYU, SPU, DeviceObject
-
-from secretnote.formal.symbols import IO, Function, FunctionArgument, Location
-
-from .models import ProfilerRule
+from .checkpoint import DEFAULT_CHECKPOINTS
+from .types import APILevel, LocalCallable
 
 
-def semantics_pyu(frame: FrameType) -> Function:
-    pyu: PYU = frame.f_locals["self"]
-    fn: FunctionType = frame.f_locals["fn"]
-    args: Tuple = frame.f_locals["args"]
+def create_default_rules():
+    import fed
+    import fed._private.fed_call_holder
+    import ray
+    import secretflow
+    import secretflow.distributed
+    import secretflow.stats.biclassification_eval
 
-    arguments: List[FunctionArgument] = []
+    add = DEFAULT_CHECKPOINTS.add_function
 
-    for x in args:
-        if isinstance(x, DeviceObject):
-            arguments.append(f"0x{id(x):x}")
-        else:
-            arguments.append(IO())
+    for fn in (
+        ray.get,
+        fed.send,
+        fed.recv,
+        fed._private.fed_call_holder.FedCallHolder.internal_remote,
+    ):
+        add(fn, api_level=APILevel.IMPLEMENTATION)
 
-    result = Location(kind="PYU", parties=(pyu.party,))
+    for fn in (
+        LocalCallable(fn=secretflow.PYU.__call__, load_const=(1,)),
+        LocalCallable(fn=secretflow.SPU.__call__, load_const=(1,)),
+        secretflow.SPU.infeed_shares,
+        secretflow.SPU.outfeed_shares,
+        secretflow.device.kernels.pyu.pyu_to_pyu,
+        secretflow.device.kernels.pyu.pyu_to_spu,
+        secretflow.device.kernels.pyu.pyu_to_heu,
+        secretflow.device.kernels.pyu.pyu_to_teeu,
+        secretflow.device.kernels.spu.spu_to_pyu,
+        secretflow.device.kernels.spu.spu_to_spu,
+        secretflow.device.kernels.spu.spu_to_heu,
+        secretflow.device.kernels.heu.heu_to_pyu,
+        secretflow.device.kernels.heu.heu_to_spu,
+        secretflow.device.kernels.heu.heu_to_heu,
+        secretflow.reveal,
+    ):
+        add(fn, api_level=APILevel.INVARIANT)
 
-    return Function(arguments=tuple(arguments), result=result, name=fn.__name__)
-
-
-def semantics_move_spu(frame: FrameType) -> Function:
-    spu: SPU = frame.f_locals["spu"]
-
-    args: Tuple = (frame.f_locals["self"],)
-    arguments: List[FunctionArgument] = []
-
-    for x in args:
-        if isinstance(x, DeviceObject):
-            arguments.append(f"0x{id(x):x}")
-        else:
-            arguments.append(IO())
-
-    result = Location(kind="SPU", parties=tuple(spu.actors.keys()))
-
-    return Function(arguments=tuple(arguments), result=result, name="move")
-
-
-RULE_SECRETFLOW_API = ProfilerRule(
-    file=re.compile(r"^secretflow/.*"),
-    func_name=re.compile(r".*"),
-)
-
-RULE_SECRETFLOW_SEMANTICS_PYU = ProfilerRule(
-    file=re.compile(r"^secretflow/device/device/pyu\.py$"),
-    func_name=re.compile(r"^wrapper$"),
-    semantics=semantics_pyu,
-)
-
-RULE_SECRETFLOW_SEMANTICS_PYU_SPU = ProfilerRule(
-    file=re.compile(r"^secretflow/device/kernels/pyu\.py$"),
-    func_name=re.compile(r"^pyu_to_spu$"),
-    semantics=semantics_move_spu,
-)
-
-
-DEFAULT_RULES = [
-    RULE_SECRETFLOW_SEMANTICS_PYU,
-    RULE_SECRETFLOW_SEMANTICS_PYU_SPU,
-    RULE_SECRETFLOW_API,
-]
+    for fn in (
+        secretflow.data.horizontal.HDataFrame.shape.fget,
+        secretflow.data.vertical.VDataFrame.shape.fget,
+        secretflow.data.ndarray.FedNdarray.shape.fget,
+    ):
+        add(fn, api_level=APILevel.USERLAND)
