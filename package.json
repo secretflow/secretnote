@@ -10,7 +10,7 @@
     "postinstall": "is-ci || husky install",
     "changeset": "changeset",
     "clean": "git clean -fX .",
-    "lint:prettier": "prettier --check --ignore-unknown .",
+    "lint:prettier": "prettier --check --write --ignore-unknown .",
     "ci:javascript": "nx run-many -t lint:prettier -t lint:eslint -t lint:stylelint -t typecheck:tsc -t test:vitest",
     "ci:python": "nx run-many -t lint:black -t lint:ruff -t test:pytest -t typecheck:pyright",
     "ci:release": "nx run-many --nx-bail -t release"

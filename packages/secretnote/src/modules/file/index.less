@@ -1,0 +1,57 @@
+.secretnote-file-tree {
+  color: var(--mana-secretnote-text-color);
+  background-color: var(--mana-secretnote-sidebar-background);
+  font-size: 12px;
+  padding-left: 12px;
+
+  .ant-tree-treenode {
+    padding: 2px 0 4px 0;
+
+    &:hover::before {
+      background-color: var(--mana-secretnote-li-hover-background) !important;
+    }
+
+    .ant-tree-switcher {
+      margin-top: 2px;
+    }
+  }
+
+  .ant-tree-switcher-noop {
+    width: 0;
+  }
+
+  .secretnote-tree-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 4px;
+    color: var(--mana-secretnote-text-color);
+
+    .ant-dropdown-trigger {
+      visibility: hidden;
+    }
+
+    &:hover .ant-dropdown-trigger {
+      visibility: visible;
+    }
+
+    .ant-space-item {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .ant-tree-treenode-selected {
+    .ant-tree-switcher {
+      color: var(--mana-secretnote-text-color) !important;
+    }
+
+    &::before {
+      background-color: var(--mana-secretnote-li-hover-background) !important;
+    }
+
+    .ant-tree-node-selected {
+      color: var(--mana-secretnote-text-color) !important;
+    }
+  }
+}
