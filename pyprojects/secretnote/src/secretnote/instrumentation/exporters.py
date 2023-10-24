@@ -1,17 +1,25 @@
 import io
-from typing import List, Sequence
+from typing import List, Protocol, Sequence
 
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
 
-class MemoryExporter(SpanExporter):
+class ReadableExporter(Protocol):
+    def get_spans(self) -> Sequence[ReadableSpan]:
+        ...
+
+
+class InMemoryExporter(SpanExporter):
     def __init__(self) -> None:
         self.spans: List[ReadableSpan] = []
 
     def export(self, spans: Sequence[ReadableSpan]):
         self.spans.extend(spans)
         return SpanExportResult.SUCCESS
+
+    def get_spans(self) -> Sequence[ReadableSpan]:
+        return self.spans
 
 
 class JSONLinesSpanExporter(SpanExporter):

@@ -9,7 +9,10 @@ def create_default_rules():
     import ray.remote_function
     import secretflow
     import secretflow.distributed
-    import secretflow.stats.biclassification_eval
+    import secretflow.preprocessing.binning.vert_woe_binning
+    import secretflow.preprocessing.binning.vert_woe_substitution
+    import secretflow.stats
+    from secretflow.device.proxy import _actor_wrapper
 
     add = DEFAULT_CHECKPOINTS.add_function
 
@@ -23,14 +26,16 @@ def create_default_rules():
         fed._private.fed_call_holder.FedCallHolder.internal_remote,
         secretflow.SPU.infeed_shares,
         secretflow.SPU.outfeed_shares,
+        secretflow.PYU.__call__,
+        secretflow.SPU.__call__,
+        _actor_wrapper,
     ):
         add(fn, api_level=APILevel.IMPLEMENTATION)
 
     for fn in (
-        secretflow.PYU.__call__,
-        secretflow.SPU.__call__,
         LocalCallable(fn=secretflow.PYU.__call__, load_const=(1,)),
         LocalCallable(fn=secretflow.SPU.__call__, load_const=(1,)),
+        LocalCallable(fn=_actor_wrapper, load_const=(1,)),
         secretflow.device.kernels.pyu.pyu_to_pyu,
         secretflow.device.kernels.pyu.pyu_to_spu,
         secretflow.device.kernels.pyu.pyu_to_heu,
@@ -48,5 +53,7 @@ def create_default_rules():
         secretflow.data.horizontal.HDataFrame.shape.fget,
         secretflow.data.vertical.VDataFrame.shape.fget,
         secretflow.data.ndarray.FedNdarray.shape.fget,
+        secretflow.preprocessing.binning.vert_woe_binning.VertWoeBinning.binning,
+        secretflow.preprocessing.binning.vert_woe_substitution.VertWOESubstitution.substitution,
     ):
         add(fn, api_level=APILevel.USERLAND)

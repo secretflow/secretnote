@@ -18,10 +18,20 @@ from typing import (
     Optional,
     Tuple,
     Union,
+    cast,
     overload,
 )
 
 from pydantic import BaseModel, Field
+from secretflow.device.device import (
+    HEU,
+    PYU,
+    SPU,
+    DeviceObject,
+    HEUObject,
+    PYUObject,
+    SPUObject,
+)
 from typing_extensions import Annotated
 
 JSONKey = Union[str, int, float, bool, None]
@@ -138,6 +148,7 @@ def snapshot(obj: Any) -> str:
 SnapshotType = Annotated[
     Union[
         "SnapshotRef",
+        "RemoteObjectSnapshot",
         "FunctionSnapshot",
         "MappingSnapshot",
         "SequenceSnapshot",
@@ -152,7 +163,7 @@ SnapshotMemo = Dict[str, SnapshotType]
 _snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")
 
 
-def snapshot_recursion(fn):
+def break_circular_ref(fn):
     @wraps(fn)
     def wrapper(cls, obj, *args, **kwargs):
         try:
@@ -175,11 +186,13 @@ def snapshot_recursion(fn):
 
 
 def snapshot_tree(obj: Any) -> SnapshotType:
+    if isinstance(obj, DeviceObject):
+        return RemoteObjectSnapshot.from_object(obj)
     if inspect.isfunction(obj):
         return FunctionSnapshot.from_function(obj)
-    elif isinstance(obj, Mapping):
+    if isinstance(obj, Mapping):
         return MappingSnapshot.from_mapping(obj)
-    elif isinstance(obj, Sequence) and not isinstance(obj, str):
+    if isinstance(obj, Sequence) and not isinstance(obj, str):
         return SequenceSnapshot.from_sequence(obj)
     return ObjectSnapshot.from_any(obj)
 
@@ -208,6 +221,31 @@ class ObjectSnapshot(BaseModel):
         )
 
 
+class RemoteObjectSnapshot(BaseModel):
+    kind: Literal["remote_object"] = "remote_object"
+    type: str
+
+    id: str
+    location: Tuple[str, ...]
+
+    @classmethod
+    def from_object(cls, obj: DeviceObject):
+        if isinstance(obj, PYUObject):
+            location = ("PYU", cast(PYU, obj.device).party)
+        elif isinstance(obj, SPUObject):
+            location = ("SPU", *cast(SPU, obj.device).actors)
+        elif isinstance(obj, HEUObject):
+            device = cast(HEU, obj.device)
+            location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
+        else:
+            return ObjectSnapshot.from_any(obj)
+        return cls(
+            type=type_name(obj),
+            id=fingerprint(obj),
+            location=location,
+        )
+
+
 class SequenceSnapshot(BaseModel):
     kind: Literal["sequence"] = "sequence"
     type: str
@@ -219,7 +257,7 @@ class SequenceSnapshot(BaseModel):
     values: List[SnapshotType]
 
     @classmethod
-    @snapshot_recursion
+    @break_circular_ref
     def from_sequence(cls, obj: Sequence):
         return cls(
             type=type_name(obj),
@@ -241,7 +279,7 @@ class MappingSnapshot(BaseModel):
     values: Dict[JSONKey, SnapshotType]
 
     @classmethod
-    @snapshot_recursion
+    @break_circular_ref
     def from_mapping(cls, obj: Mapping):
         return cls(
             type=type_name(obj),
@@ -257,7 +295,7 @@ class UnboundSnapshot(BaseModel):
     annotation: str = str(Any)
 
     @classmethod
-    @snapshot_recursion
+    @break_circular_ref
     def from_parameter(cls, param: inspect.Parameter):
         if param.annotation is inspect.Parameter.empty:
             return cls()
@@ -276,13 +314,14 @@ class FunctionSnapshot(BaseModel):
     boundvars: Dict[str, SnapshotType]
     freevars: Dict[str, SnapshotType]
     retval: SnapshotType
+
     filename: Optional[str] = None
     firstlineno: Optional[int] = None
     source: Optional[str] = None
     docstring: Optional[str] = None
 
     @classmethod
-    @snapshot_recursion
+    @break_circular_ref
     def from_function(cls, func: Callable, frame: Optional[FrameType] = None):
         try:
             filename = source_path(inspect.getsourcefile(func))
@@ -298,7 +337,7 @@ class FunctionSnapshot(BaseModel):
         try:
             boundvars: Dict[str, SnapshotType] = {}
 
-            sig = inspect.signature(func)
+            sig = inspect.signature(func, follow_wrapped=False)
 
             for name, param in sig.parameters.items():
                 if frame and name in frame.f_locals:
@@ -356,7 +395,7 @@ class FunctionSnapshot(BaseModel):
         )
 
     @classmethod
-    @snapshot_recursion
+    @break_circular_ref
     def from_code(cls, code: CodeType, frame: Optional[FrameType] = None):
         variables = {**frame.f_locals, **frame.f_globals} if frame else {}
 
@@ -394,8 +433,6 @@ class FunctionSnapshot(BaseModel):
         )
 
 
-ObjectSnapshot.update_forward_refs()
 SequenceSnapshot.update_forward_refs()
 MappingSnapshot.update_forward_refs()
-UnboundSnapshot.update_forward_refs()
 FunctionSnapshot.update_forward_refs()
