@@ -81,13 +81,13 @@ export function signal() {
   signalInstalled = true;
 }
 
-export default function createOptions(options: Options): Options {
+export function preset(options: Options): Options {
   if (options.watch) {
     signal();
   }
   return {
     outDir: 'dist',
-    format: ['esm', 'cjs'],
+    format: ['esm'],
     outExtension,
     sourcemap: true,
     dts: false,

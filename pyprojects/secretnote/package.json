@@ -1,5 +1,5 @@
 {
-  "name": "@secretflow/notebook-pyproject-secretnote",
+  "name": "secretnote",
   "private": true,
   "files": [],
   "version": "0.0.0",
@@ -21,5 +21,8 @@
         ]
       }
     }
+  },
+  "devDependencies": {
+    "@secretflow/secretnote-ui": "workspace:^"
   }
 }

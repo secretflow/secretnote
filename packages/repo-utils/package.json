@@ -1,0 +1,45 @@
+{
+  "name": "@secretflow/repo-utils",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "module": "./dist/index.mjs",
+  "types": "./src/index.mts",
+  "sideEffects": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "bin": {
+    "repo-utils": "./bin/cli.mjs"
+  },
+  "scripts": {
+    "setup": "tsup",
+    "build": "tsup",
+    "lint:eslint": "eslint src",
+    "typecheck:tsc": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@swc/core": "^1.3.69",
+    "colorette": "^2.0.20",
+    "commander": "^11.0.0",
+    "enquirer": "^2.4.1",
+    "esbuild-plugin-svgr": "^1.1.0",
+    "globby": "^13.2.2",
+    "semver-regex": "^4.0.5",
+    "tsup": "^6.7.0",
+    "validate-npm-package-name": "^5.0.0",
+    "yoctocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.19",
+    "@types/validate-npm-package-name": "^4.0.0"
+  }
+}

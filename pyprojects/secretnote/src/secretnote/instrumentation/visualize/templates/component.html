@@ -1,0 +1,10 @@
+<div id="{{ element_id }}"></div>
+<script type="module">
+  import('{{ script_uri }}').then((module) => {
+    const renderFn = module.render;
+    const Component = module['{{ component }}'];
+    const elem = document.getElementById('{{ element_id }}');
+    const props = JSON.parse(atob('{{ encoded_props }}'));
+    renderFn({ elem, Component, props });
+  });
+</script>

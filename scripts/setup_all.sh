@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Bootstrap this monorepo for development
 
 # Setup Node environment
