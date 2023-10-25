@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dis
 import inspect
 from collections.abc import Mapping, Sequence
@@ -9,6 +11,7 @@ from pprint import pformat
 from textwrap import dedent
 from types import CodeType, FrameType
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -18,21 +21,15 @@ from typing import (
     Optional,
     Tuple,
     Union,
-    cast,
     overload,
 )
 
 from pydantic import BaseModel, Field
-from secretflow.device.device import (
-    HEU,
-    PYU,
-    SPU,
-    DeviceObject,
-    HEUObject,
-    PYUObject,
-    SPUObject,
-)
 from typing_extensions import Annotated
+
+if TYPE_CHECKING:
+    from secretflow.device.device import Device, DeviceObject
+
 
 JSONKey = Union[str, int, float, bool, None]
 
@@ -40,6 +37,7 @@ JSONKey = Union[str, int, float, bool, None]
 def fingerprint(obj: Any) -> str:
     from fed import FedObject
     from ray import ObjectRef
+    from secretflow.device.device.heu_object import HEUObject
     from secretflow.device.device.pyu import PYUObject
     from secretflow.device.device.spu import SPUObject
 
@@ -54,6 +52,9 @@ def fingerprint(obj: Any) -> str:
 
     if isinstance(obj, SPUObject):
         return f"secretflow/SPU/{fingerprint(obj.meta)}"
+
+    if isinstance(obj, HEUObject):
+        return f"secretflow/HEU/{fingerprint(obj.data)}"
 
     return f"python/id/{hex(id(obj))}"
 
@@ -105,9 +106,10 @@ def type_name(obj: Any) -> str:
 
 
 def source_code(obj):
-    with suppress(Exception):
+    try:
         return dedent(inspect.getsource(obj))
-    return None
+    except Exception:
+        return None
 
 
 @overload
@@ -145,27 +147,12 @@ def snapshot(obj: Any) -> str:
     return "<unserializable>"
 
 
-SnapshotType = Annotated[
-    Union[
-        "SnapshotRef",
-        "RemoteObjectSnapshot",
-        "FunctionSnapshot",
-        "MappingSnapshot",
-        "SequenceSnapshot",
-        "ObjectSnapshot",
-        "UnboundSnapshot",
-    ],
-    Field(discriminator="kind"),
-]
-
-SnapshotMemo = Dict[str, SnapshotType]
-
 _snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")
 
 
 def break_circular_ref(fn):
     @wraps(fn)
-    def wrapper(cls, obj, *args, **kwargs):
+    def wrapper(self, obj, *args, **kwargs):
         try:
             refs = _snapshot_refs.get()
             token = None
@@ -177,15 +164,22 @@ def break_circular_ref(fn):
             if ref in refs:
                 return SnapshotRef(id=ref)
             refs.add(ref)
-            return fn(cls, obj, *args, **kwargs)
+            result = fn(self, obj, *args, **kwargs)
+            refs.discard(ref)
+            return result
         finally:
             if token:
+                refs.clear()
                 _snapshot_refs.reset(token)
 
     return wrapper
 
 
 def snapshot_tree(obj: Any) -> SnapshotType:
+    from secretflow.device.device import Device, DeviceObject
+
+    if isinstance(obj, Device):
+        return LocationSnapshot.from_device(obj)
     if isinstance(obj, DeviceObject):
         return RemoteObjectSnapshot.from_object(obj)
     if inspect.isfunction(obj):
@@ -200,6 +194,9 @@ def snapshot_tree(obj: Any) -> SnapshotType:
 class SnapshotRef(BaseModel):
     kind: Literal["ref"] = "ref"
     id: str
+
+
+ObjectLocation = Tuple[str, ...]
 
 
 class ObjectSnapshot(BaseModel):
@@ -221,28 +218,44 @@ class ObjectSnapshot(BaseModel):
         )
 
 
+class LocationSnapshot(BaseModel):
+    kind: Literal["remote_location"] = "remote_location"
+    type: str
+
+    id: str
+    location: ObjectLocation
+
+    @classmethod
+    def from_device(cls, device: "Device"):
+        from secretflow.device.device import HEU, PYU, SPU
+
+        if isinstance(device, PYU):
+            location = ("PYU", device.party)
+        elif isinstance(device, SPU):
+            location = ("SPU", *device.actors)
+        elif isinstance(device, HEU):
+            location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
+        else:
+            return ObjectSnapshot.from_any(device)
+        return cls(type=type_name(device), id=fingerprint(device), location=location)
+
+
 class RemoteObjectSnapshot(BaseModel):
     kind: Literal["remote_object"] = "remote_object"
     type: str
 
     id: str
-    location: Tuple[str, ...]
+    location: ObjectLocation
 
     @classmethod
-    def from_object(cls, obj: DeviceObject):
-        if isinstance(obj, PYUObject):
-            location = ("PYU", cast(PYU, obj.device).party)
-        elif isinstance(obj, SPUObject):
-            location = ("SPU", *cast(SPU, obj.device).actors)
-        elif isinstance(obj, HEUObject):
-            device = cast(HEU, obj.device)
-            location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
-        else:
+    def from_object(cls, obj: "DeviceObject"):
+        device_snapshot = LocationSnapshot.from_device(obj.device)
+        if not isinstance(device_snapshot, LocationSnapshot):
             return ObjectSnapshot.from_any(obj)
         return cls(
             type=type_name(obj),
             id=fingerprint(obj),
-            location=location,
+            location=device_snapshot.location,
         )
 
 
@@ -364,12 +377,14 @@ class FunctionSnapshot(BaseModel):
             for name, value in closure.nonlocals.items():
                 freevars[name] = snapshot_tree(value)
 
+            global_values = {**closure.builtins, **closure.globals}
+
             # https://stackoverflow.com/a/61964607/22226623
             for inst in dis.get_instructions(func):
                 if inst.opname == "LOAD_GLOBAL":
                     name = inst.argval
                     try:
-                        value = closure.globals[name]
+                        value = global_values[name]
                     except Exception:
                         continue
                     freevars[name] = snapshot_tree(value)
@@ -397,7 +412,10 @@ class FunctionSnapshot(BaseModel):
     @classmethod
     @break_circular_ref
     def from_code(cls, code: CodeType, frame: Optional[FrameType] = None):
-        variables = {**frame.f_locals, **frame.f_globals} if frame else {}
+        if frame:
+            variables = {**frame.f_builtins, **frame.f_globals, **frame.f_locals}
+        else:
+            variables = {}
 
         boundvars: Dict[str, SnapshotType] = {}
 
@@ -432,6 +450,69 @@ class FunctionSnapshot(BaseModel):
             retval=UnboundSnapshot(),
         )
 
+    # def update_locals(self, frame: FrameType):
+    #     for name, value in frame.f_locals.items():
+    #         self.boundvars[name] = snapshot_tree(value)
+
+    def update_retval(self, retval: Any):
+        self.retval = snapshot_tree(retval)
+
+    def match(self, fn: Callable):
+        module, name = qualname(fn)
+        return self.module == module and self.name == name
+
+
+class SourceLocation(BaseModel):
+    filename: str
+    lineno: int
+    func: str
+    code: Optional[str]
+
+    @classmethod
+    def from_frame(cls, frame: FrameType):
+        stack: List[cls] = []
+        for f in inspect.getouterframes(frame):
+            if f.code_context is None:
+                code = None
+            else:
+                code = "".join(f.code_context)
+            stack.append(
+                cls(
+                    filename=source_path(f.filename),
+                    lineno=f.lineno,
+                    func=f.function,
+                    code=code,
+                )
+            )
+        return stack
+
+
+class CheckpointInfo(BaseModel):
+    api_level: Optional[int] = None
+    description: Optional[str] = None
+
+
+class Invocation(BaseModel):
+    checkpoint: CheckpointInfo
+    snapshot: FunctionSnapshot
+    stackframes: List[SourceLocation]
+
+
+SnapshotType = Annotated[
+    Union[
+        SnapshotRef,
+        RemoteObjectSnapshot,
+        LocationSnapshot,
+        FunctionSnapshot,
+        MappingSnapshot,
+        SequenceSnapshot,
+        ObjectSnapshot,
+        UnboundSnapshot,
+    ],
+    Field(discriminator="kind"),
+]
+
+SnapshotMemo = Dict[str, SnapshotType]
 
 SequenceSnapshot.update_forward_refs()
 MappingSnapshot.update_forward_refs()

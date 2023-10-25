@@ -5,7 +5,7 @@ from typing import Callable, Dict, Optional, Tuple, TypeVar, Union
 
 from pydantic import BaseModel
 
-from .snapshot import hash_digest
+from .snapshot import CheckpointInfo, hash_digest
 
 T = TypeVar("T", bound=Callable)
 
@@ -16,11 +16,6 @@ class LocalCallable(BaseModel):
 
 
 QualifiedCallable = Union[Callable, LocalCallable]
-
-
-class CheckpointInfo(BaseModel):
-    api_level: Optional[int] = None
-    description: Optional[str] = None
 
 
 class Checkpoint(BaseModel):

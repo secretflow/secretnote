@@ -7,47 +7,19 @@ from weakref import WeakValueDictionary
 
 from opentelemetry import trace
 from opentelemetry.context import Context
-from pydantic import BaseModel
 
 from .checkpoint import (
     DEFAULT_CHECKPOINTS,
     Checkpoint,
     CheckpointCollection,
-    CheckpointInfo,
 )
 from .envvars import OTEL_PYTHON_SECRETNOTE_TRACING_CALL
-from .snapshot import FunctionSnapshot, fingerprint, snapshot_tree, source_path
-
-
-class SourceLocation(BaseModel):
-    filename: str
-    lineno: int
-    func: str
-    code: Optional[str]
-
-    @classmethod
-    def from_frame(cls, frame: FrameType):
-        stack: List[cls] = []
-        for f in inspect.getouterframes(frame):
-            if f.code_context is None:
-                code = None
-            else:
-                code = "".join(f.code_context)
-            stack.append(
-                cls(
-                    filename=source_path(f.filename),
-                    lineno=f.lineno,
-                    func=f.function,
-                    code=code,
-                )
-            )
-        return stack
-
-
-class Invocation(BaseModel):
-    checkpoint: CheckpointInfo
-    snapshot: FunctionSnapshot
-    stack: List[SourceLocation]
+from .snapshot import (
+    FunctionSnapshot,
+    Invocation,
+    SourceLocation,
+    fingerprint,
+)
 
 
 class Profiler:
@@ -70,11 +42,11 @@ class Profiler:
             return
 
         if event == "call":
-            self._stack_push(checkpoint, frame)
+            self._stack_push(frame, checkpoint)
             return
 
         if event == "return":
-            self._stack_pop(arg)
+            self._stack_pop(frame, arg)
             return
 
     def _stack_peek(self) -> Tuple[Optional[Context], Optional[Invocation]]:
@@ -82,7 +54,7 @@ class Profiler:
             return self._ctx_stack[-1]
         return self.parent_context, None
 
-    def _stack_push(self, checkpoint: Checkpoint, frame: FrameType):
+    def _stack_push(self, frame: FrameType, checkpoint: Checkpoint):
         ctx, _ = self._stack_peek()
         if checkpoint.func:
             snapshot = FunctionSnapshot.from_function(checkpoint.func, frame)
@@ -93,7 +65,7 @@ class Profiler:
         invocation = Invocation(
             checkpoint=checkpoint.info,
             snapshot=snapshot,
-            stack=SourceLocation.from_frame(frame),
+            stackframes=SourceLocation.from_frame(frame),
         )
         fn = invocation.snapshot
         span_name = f"{fn.module or '<unknown_module>'}.{fn.name}"
@@ -107,12 +79,13 @@ class Profiler:
             return
         self._retvals[fingerprint(retval.__code__)] = retval
 
-    def _stack_pop(self, retval: Any):
+    def _stack_pop(self, frame: FrameType, retval: Any):
         if not self._ctx_stack:
             return
         ctx, call = self._ctx_stack.pop()
         self._track_retval(retval)
-        call.snapshot.retval = snapshot_tree(retval)
+        # call.snapshot.update_locals(frame)
+        call.snapshot.update_retval(retval)
         span = trace.get_current_span(ctx)
         payload = call.json(by_alias=True, exclude_none=True)
         span.set_attribute(OTEL_PYTHON_SECRETNOTE_TRACING_CALL, payload)

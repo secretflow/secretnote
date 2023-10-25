@@ -6,6 +6,7 @@ classifiers = [
   "Private :: Do Not Upload",
 ]
 dependencies = [
+  "orjson>=3.9.9",
   "loguru>=0.7.2",
   "packaging>=23.1",
   "pydantic>=1.10, <2",

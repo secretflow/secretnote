@@ -10,11 +10,12 @@ from opentelemetry.sdk.environment_variables import OTEL_SERVICE_NAME
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from ray.runtime_context import get_runtime_context
 
 from .envvars import OTEL_PYTHON_SECRETNOTE_W3C_TRACE
-from .exporters import InMemoryExporter, JSONLinesSpanExporter
+from .exporters import JSONLinesSpanExporter
 from .profiler import Profiler, current_profiler
 
 
@@ -50,7 +51,7 @@ def setup_jsonlines_exporter(prefix: str):
 
 def setup_memory_exporter():
     provider = trace.get_tracer_provider()
-    exporter = InMemoryExporter()
+    exporter = InMemorySpanExporter()
     processor = SimpleSpanProcessor(exporter)
     provider.add_span_processor(processor)
     return exporter

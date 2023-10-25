@@ -1,4 +1,8 @@
+from typing import Any
+
 from .checkpoint import DEFAULT_CHECKPOINTS, APILevel, LocalCallable
+
+MOCK: Any = ...
 
 
 def create_default_rules():
