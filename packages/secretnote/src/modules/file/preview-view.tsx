@@ -1,4 +1,5 @@
-import type { Contribution } from '@difizen/mana-app';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { Contribution } from '@difizen/mana-app';
 import {
   BaseView,
   contrib,
