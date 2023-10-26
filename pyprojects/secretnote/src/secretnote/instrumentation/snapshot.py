@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import dis
 import inspect
 from collections.abc import Mapping, Sequence
@@ -17,21 +18,30 @@ from typing import (
     Dict,
     Hashable,
     List,
-    Literal,
     Optional,
     Tuple,
     Union,
     overload,
 )
 
-from pydantic import BaseModel, Field
-from typing_extensions import Annotated
+from .models import (
+    FunctionSignature,
+    FunctionSnapshot,
+    MappingSnapshot,
+    ObjectSnapshot,
+    RemoteLocationSnapshot,
+    RemoteObjectSnapshot,
+    SequenceSnapshot,
+    SnapshotRef,
+    SnapshotType,
+    SourceLocation,
+    UnboundSnapshot,
+)
 
 if TYPE_CHECKING:
     from secretflow.device.device import Device, DeviceObject
 
-
-JSONKey = Union[str, int, float, bool, None]
+_snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")
 
 
 def fingerprint(obj: Any) -> str:
@@ -40,6 +50,7 @@ def fingerprint(obj: Any) -> str:
     from secretflow.device.device.heu_object import HEUObject
     from secretflow.device.device.pyu import PYUObject
     from secretflow.device.device.spu import SPUObject
+    from secretflow.device.device.teeu import TEEUObject
 
     if isinstance(obj, ObjectRef):
         return f"ray/{obj}"
@@ -48,13 +59,16 @@ def fingerprint(obj: Any) -> str:
         return f"rayfed/{fingerprint(obj.get_ray_object_ref())}"
 
     if isinstance(obj, PYUObject):
-        return f"secretflow/PYU/{fingerprint(obj.data)}"
+        return f"secretflow/python/{fingerprint(obj.data)}"
 
     if isinstance(obj, SPUObject):
-        return f"secretflow/SPU/{fingerprint(obj.meta)}"
+        return f"secretflow/mpc/{fingerprint(obj.meta)}"
 
     if isinstance(obj, HEUObject):
-        return f"secretflow/HEU/{fingerprint(obj.data)}"
+        return f"secretflow/homomorphic/{fingerprint(obj.data)}"
+
+    if isinstance(obj, TEEUObject):
+        return f"secretflow/tee/{fingerprint(obj.data)}"
 
     return f"python/id/{hex(id(obj))}"
 
@@ -147,12 +161,9 @@ def snapshot(obj: Any) -> str:
     return "<unserializable>"
 
 
-_snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")
-
-
 def break_circular_ref(fn):
     @wraps(fn)
-    def wrapper(self, obj, *args, **kwargs):
+    def wrapper(obj, *args, **kwargs):
         try:
             refs = _snapshot_refs.get()
             token = None
@@ -164,7 +175,7 @@ def break_circular_ref(fn):
             if ref in refs:
                 return SnapshotRef(id=ref)
             refs.add(ref)
-            result = fn(self, obj, *args, **kwargs)
+            result = fn(obj, *args, **kwargs)
             refs.discard(ref)
             return result
         finally:
@@ -175,345 +186,238 @@ def break_circular_ref(fn):
     return wrapper
 
 
-def snapshot_tree(obj: Any) -> SnapshotType:
+def dispatch_snapshot(obj: Any) -> SnapshotType:
     from secretflow.device.device import Device, DeviceObject
 
     if isinstance(obj, Device):
-        return LocationSnapshot.from_device(obj)
+        return record_device(obj)
     if isinstance(obj, DeviceObject):
-        return RemoteObjectSnapshot.from_object(obj)
+        return record_device_object(obj)
     if inspect.isfunction(obj):
-        return FunctionSnapshot.from_function(obj)
+        return record_function(obj)
     if isinstance(obj, Mapping):
-        return MappingSnapshot.from_mapping(obj)
+        return record_mapping(obj)
     if isinstance(obj, Sequence) and not isinstance(obj, str):
-        return SequenceSnapshot.from_sequence(obj)
-    return ObjectSnapshot.from_any(obj)
+        return record_sequence(obj)
+    return record_object(obj)
 
 
-class SnapshotRef(BaseModel):
-    kind: Literal["ref"] = "ref"
-    id: str
+@break_circular_ref
+def record_object(obj: Any):
+    return ObjectSnapshot(
+        type=type_name(obj),
+        id=fingerprint(obj),
+        hash=hash_digest(obj),
+        snapshot=snapshot(obj),
+    )
 
 
-ObjectLocation = Tuple[str, ...]
+@break_circular_ref
+def record_device(device: "Device"):
+    from secretflow.device.device import HEU, PYU, SPU
+
+    if isinstance(device, PYU):
+        location = ("PYU", device.party)
+    elif isinstance(device, SPU):
+        location = ("SPU", *device.actors)
+    elif isinstance(device, HEU):
+        location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
+    else:
+        return record_object(device)
+    return RemoteLocationSnapshot(
+        type=type_name(device),
+        id=fingerprint(device),
+        location=location,
+    )
 
 
-class ObjectSnapshot(BaseModel):
-    kind: Literal["object"] = "object"
-    type: str
-
-    id: str
-    hash: Optional[str]
-
-    snapshot: str
-
-    @classmethod
-    def from_any(cls, obj: Any):
-        return cls(
-            type=type_name(obj),
-            id=fingerprint(obj),
-            hash=hash_digest(obj),
-            snapshot=snapshot(obj),
-        )
+@break_circular_ref
+def record_device_object(obj: "DeviceObject"):
+    device_snapshot = record_device(obj.device)
+    if not isinstance(device_snapshot, RemoteLocationSnapshot):
+        return record_object(obj)
+    return RemoteObjectSnapshot(
+        type=type_name(obj),
+        id=fingerprint(obj),
+        location=device_snapshot.location,
+    )
 
 
-class LocationSnapshot(BaseModel):
-    kind: Literal["remote_location"] = "remote_location"
-    type: str
-
-    id: str
-    location: ObjectLocation
-
-    @classmethod
-    def from_device(cls, device: "Device"):
-        from secretflow.device.device import HEU, PYU, SPU
-
-        if isinstance(device, PYU):
-            location = ("PYU", device.party)
-        elif isinstance(device, SPU):
-            location = ("SPU", *device.actors)
-        elif isinstance(device, HEU):
-            location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
-        else:
-            return ObjectSnapshot.from_any(device)
-        return cls(type=type_name(device), id=fingerprint(device), location=location)
+@break_circular_ref
+def record_sequence(obj: Sequence):
+    return SequenceSnapshot(
+        type=type_name(obj),
+        id=fingerprint(obj),
+        hash=hash_digest(obj),
+        snapshot=snapshot(obj),
+        values=[dispatch_snapshot(value) for value in obj],
+    )
 
 
-class RemoteObjectSnapshot(BaseModel):
-    kind: Literal["remote_object"] = "remote_object"
-    type: str
-
-    id: str
-    location: ObjectLocation
-
-    @classmethod
-    def from_object(cls, obj: "DeviceObject"):
-        device_snapshot = LocationSnapshot.from_device(obj.device)
-        if not isinstance(device_snapshot, LocationSnapshot):
-            return ObjectSnapshot.from_any(obj)
-        return cls(
-            type=type_name(obj),
-            id=fingerprint(obj),
-            location=device_snapshot.location,
-        )
+@break_circular_ref
+def record_mapping(obj: Mapping):
+    return MappingSnapshot(
+        type=type_name(obj),
+        id=fingerprint(obj),
+        hash=hash_digest(obj),
+        snapshot=snapshot(obj),
+        values={json_key(key): dispatch_snapshot(value) for key, value in obj.items()},
+    )
 
 
-class SequenceSnapshot(BaseModel):
-    kind: Literal["sequence"] = "sequence"
-    type: str
-
-    id: str
-    hash: Optional[str]
-
-    snapshot: str
-    values: List[SnapshotType]
-
-    @classmethod
-    @break_circular_ref
-    def from_sequence(cls, obj: Sequence):
-        return cls(
-            type=type_name(obj),
-            id=fingerprint(obj),
-            hash=hash_digest(obj),
-            snapshot=snapshot(obj),
-            values=[snapshot_tree(value) for value in obj],
-        )
+@break_circular_ref
+def record_parameter(param: inspect.Parameter):
+    if param.annotation is not inspect.Parameter.empty:
+        annotation = str(param.annotation)
+    else:
+        annotation = str(Any)
+    if param.default is not inspect.Parameter.empty:
+        default = dispatch_snapshot(param.default)
+    else:
+        default = None
+    return UnboundSnapshot(annotation=annotation, default=default)
 
 
-class MappingSnapshot(BaseModel):
-    kind: Literal["mapping"] = "mapping"
-    type: str
+def _record_globals(code: Union[Callable, CodeType], global_ns: Dict):
+    global_vars: Dict[str, SnapshotType] = {}
 
-    id: str
-    hash: Optional[str]
-
-    snapshot: str
-    values: Dict[JSONKey, SnapshotType]
-
-    @classmethod
-    @break_circular_ref
-    def from_mapping(cls, obj: Mapping):
-        return cls(
-            type=type_name(obj),
-            id=fingerprint(obj),
-            hash=hash_digest(obj),
-            snapshot=snapshot(obj),
-            values={json_key(key): snapshot_tree(value) for key, value in obj.items()},
-        )
-
-
-class UnboundSnapshot(BaseModel):
-    kind: Literal["unbound"] = "unbound"
-    annotation: str = str(Any)
-
-    @classmethod
-    @break_circular_ref
-    def from_parameter(cls, param: inspect.Parameter):
-        if param.annotation is inspect.Parameter.empty:
-            return cls()
-        return cls(annotation=str(param.annotation))
-
-
-class FunctionSnapshot(BaseModel):
-    kind: Literal["function"] = "function"
-    type: str
-
-    id: str
-    hash: str
-    module: Optional[str] = None
-    name: str
-
-    boundvars: Dict[str, SnapshotType]
-    freevars: Dict[str, SnapshotType]
-    retval: SnapshotType
-
-    filename: Optional[str] = None
-    firstlineno: Optional[int] = None
-    source: Optional[str] = None
-    docstring: Optional[str] = None
-
-    @classmethod
-    @break_circular_ref
-    def from_function(cls, func: Callable, frame: Optional[FrameType] = None):
-        try:
-            filename = source_path(inspect.getsourcefile(func))
-        except Exception:
-            filename = None
-
-        try:
-            sourcelines, firstlineno = inspect.getsourcelines(func)
-            sourcelines = dedent("".join(sourcelines))
-        except Exception:
-            sourcelines = firstlineno = None
-
-        try:
-            boundvars: Dict[str, SnapshotType] = {}
-
-            sig = inspect.signature(func, follow_wrapped=False)
-
-            for name, param in sig.parameters.items():
-                if frame and name in frame.f_locals:
-                    boundvars[name] = snapshot_tree(frame.f_locals[name])
-                elif param.default is not inspect.Parameter.empty:
-                    boundvars[name] = snapshot_tree(param.default)
-                else:
-                    boundvars[name] = UnboundSnapshot.from_parameter(param)
-
-            if sig.return_annotation is not inspect.Signature.empty:
-                retval = UnboundSnapshot(annotation=str(sig.return_annotation))
-            else:
-                retval = UnboundSnapshot()
-
-        except Exception:
-            boundvars = {}
-            retval = UnboundSnapshot()
-
-        try:
-            freevars: Dict[str, SnapshotType] = {}
-
-            closure = inspect.getclosurevars(func)
-
-            for name, value in closure.nonlocals.items():
-                freevars[name] = snapshot_tree(value)
-
-            global_values = {**closure.builtins, **closure.globals}
-
-            # https://stackoverflow.com/a/61964607/22226623
-            for inst in dis.get_instructions(func):
-                if inst.opname == "LOAD_GLOBAL":
-                    name = inst.argval
-                    try:
-                        value = global_values[name]
-                    except Exception:
-                        continue
-                    freevars[name] = snapshot_tree(value)
-
-        except Exception:
-            freevars = {}
-
-        module, name = qualname(func)
-
-        return cls(
-            id=fingerprint(func),
-            hash=hash_digest(func),
-            type=type_name(func),
-            name=name or "<unknown>",
-            module=module,
-            filename=filename,
-            firstlineno=firstlineno,
-            source=sourcelines,
-            docstring=inspect.getdoc(func),
-            boundvars=boundvars,
-            freevars=freevars,
-            retval=retval,
-        )
-
-    @classmethod
-    @break_circular_ref
-    def from_code(cls, code: CodeType, frame: Optional[FrameType] = None):
-        if frame:
-            variables = {**frame.f_builtins, **frame.f_globals, **frame.f_locals}
-        else:
-            variables = {}
-
-        boundvars: Dict[str, SnapshotType] = {}
-
-        for name in chain(code.co_varnames, code.co_cellvars):
+    # https://stackoverflow.com/a/61964607/22226623
+    for inst in dis.get_instructions(code):
+        if inst.opname == "LOAD_GLOBAL":
+            name = inst.argval
             try:
-                value = variables[name]
-                boundvars[name] = snapshot_tree(value)
+                value = global_ns[name]
             except KeyError:
-                boundvars[name] = UnboundSnapshot()
-
-        freevars: Dict[str, SnapshotType] = {}
-
-        for name in chain(code.co_freevars, code.co_names):
-            try:
-                value = variables[name]
-                freevars[name] = snapshot_tree(value)
-            except KeyError:
-                freevars[name] = UnboundSnapshot()
-
-        return cls(
-            id=fingerprint(code),
-            hash=hash_digest(code),
-            type=type_name(code),
-            name=code.co_name or "<unknown>",
-            module=inspect.getmodulename(code.co_filename),
-            filename=source_path(code.co_filename),
-            firstlineno=code.co_firstlineno,
-            source=source_code(code),
-            docstring=inspect.getdoc(code),
-            boundvars=boundvars,
-            freevars=freevars,
-            retval=UnboundSnapshot(),
-        )
-
-    # def update_locals(self, frame: FrameType):
-    #     for name, value in frame.f_locals.items():
-    #         self.boundvars[name] = snapshot_tree(value)
-
-    def update_retval(self, retval: Any):
-        self.retval = snapshot_tree(retval)
-
-    def match(self, fn: Callable):
-        module, name = qualname(fn)
-        return self.module == module and self.name == name
-
-
-class SourceLocation(BaseModel):
-    filename: str
-    lineno: int
-    func: str
-    code: Optional[str]
-
-    @classmethod
-    def from_frame(cls, frame: FrameType):
-        stack: List[cls] = []
-        for f in inspect.getouterframes(frame):
-            if f.code_context is None:
-                code = None
+                if hasattr(builtins, name):
+                    continue
+                global_vars[name] = UnboundSnapshot()
             else:
-                code = "".join(f.code_context)
-            stack.append(
-                cls(
-                    filename=source_path(f.filename),
-                    lineno=f.lineno,
-                    func=f.function,
-                    code=code,
-                )
+                global_vars[name] = dispatch_snapshot(value)
+
+    return global_vars
+
+
+@break_circular_ref
+def record_function(func: Callable, frame: Optional[FrameType] = None):
+    try:
+        filename = source_path(inspect.getsourcefile(func))
+    except Exception:
+        filename = None
+
+    try:
+        sourcelines, firstlineno = inspect.getsourcelines(func)
+        sourcelines = dedent("".join(sourcelines))
+    except Exception:
+        sourcelines = firstlineno = None
+
+    sig = inspect.signature(func, follow_wrapped=False)
+
+    signature = FunctionSignature(
+        parameters={
+            name: record_parameter(param) for name, param in sig.parameters.items()
+        },
+        return_annotation=UnboundSnapshot(annotation=str(sig.return_annotation)),
+    )
+
+    local_vars: Dict[str, SnapshotType] = {}
+    closure_vars: Dict[str, SnapshotType] = {}
+
+    if frame:
+        f_locals = frame.f_locals
+        f_globals = frame.f_globals
+    else:
+        f_locals = {}
+        f_globals = getattr(func, "__globals__", {})
+
+    f_closures = inspect.getclosurevars(func).nonlocals
+
+    for name, value in f_locals.items():
+        if name not in f_closures:
+            local_vars[name] = dispatch_snapshot(value)
+
+    for name, value in f_closures.items():
+        closure_vars[name] = dispatch_snapshot(value)
+
+    global_vars = _record_globals(func, f_globals)
+
+    module, name = qualname(func)
+
+    return FunctionSnapshot(
+        id=fingerprint(func),
+        hash=hash_digest(func),
+        type=type_name(func),
+        name=name or "<unknown>",
+        module=module,
+        filename=filename,
+        firstlineno=firstlineno,
+        source=sourcelines,
+        docstring=inspect.getdoc(func),
+        signature=signature,
+        local_vars=local_vars,
+        closure_vars=closure_vars,
+        global_vars=global_vars,
+        return_value=UnboundSnapshot(),
+    )
+
+
+@break_circular_ref
+def record_code(code: CodeType, frame: Optional[FrameType] = None):
+    if frame:
+        f_locals = frame.f_locals
+        f_globals = frame.f_globals
+    else:
+        f_locals = {}
+        f_globals = {}
+
+    local_vars: Dict[str, SnapshotType] = {}
+    closure_vars: Dict[str, SnapshotType] = {}
+
+    for name in chain(code.co_varnames, code.co_cellvars):
+        try:
+            value = f_locals[name]
+            local_vars[name] = dispatch_snapshot(value)
+        except KeyError:
+            local_vars[name] = UnboundSnapshot()
+
+    for name in chain(code.co_freevars, code.co_names):
+        try:
+            value = f_locals[name]
+            closure_vars[name] = dispatch_snapshot(value)
+        except KeyError:
+            closure_vars[name] = UnboundSnapshot()
+
+    global_vars = _record_globals(code, f_globals)
+
+    return FunctionSnapshot(
+        id=fingerprint(code),
+        hash=hash_digest(code),
+        type=type_name(code),
+        name=code.co_name or "<unknown>",
+        module=inspect.getmodulename(code.co_filename),
+        filename=source_path(code.co_filename),
+        firstlineno=code.co_firstlineno,
+        source=source_code(code),
+        docstring=inspect.getdoc(code),
+        local_vars=local_vars,
+        closure_vars=closure_vars,
+        global_vars=global_vars,
+        return_value=UnboundSnapshot(),
+    )
+
+
+def record_stackframes(frame: FrameType):
+    stack: List[SourceLocation] = []
+    for f in inspect.getouterframes(frame):
+        if f.code_context is None:
+            code = None
+        else:
+            code = "".join(f.code_context).strip()
+        stack.append(
+            SourceLocation(
+                filename=source_path(f.filename),
+                lineno=f.lineno,
+                func=f.function,
+                code=code,
             )
-        return stack
-
-
-class CheckpointInfo(BaseModel):
-    api_level: Optional[int] = None
-    description: Optional[str] = None
-
-
-class Invocation(BaseModel):
-    checkpoint: CheckpointInfo
-    snapshot: FunctionSnapshot
-    stackframes: List[SourceLocation]
-
-
-SnapshotType = Annotated[
-    Union[
-        SnapshotRef,
-        RemoteObjectSnapshot,
-        LocationSnapshot,
-        FunctionSnapshot,
-        MappingSnapshot,
-        SequenceSnapshot,
-        ObjectSnapshot,
-        UnboundSnapshot,
-    ],
-    Field(discriminator="kind"),
-]
-
-SnapshotMemo = Dict[str, SnapshotType]
-
-SequenceSnapshot.update_forward_refs()
-MappingSnapshot.update_forward_refs()
-FunctionSnapshot.update_forward_refs()
+        )
+    return stack

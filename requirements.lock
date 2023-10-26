@@ -19,8 +19,6 @@ opentelemetry-semantic-conventions==0.41b0
 orjson==3.9.9
 packaging==23.2
 pydantic==1.10.13
-ruamel-yaml==0.17.33
-ruamel-yaml-clib==0.2.8
 typing-extensions==4.8.0
 wrapt==1.15.0
 zipp==3.17.0

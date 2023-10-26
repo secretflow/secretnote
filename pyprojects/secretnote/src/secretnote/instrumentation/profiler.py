@@ -8,17 +8,15 @@ from weakref import WeakValueDictionary
 from opentelemetry import trace
 from opentelemetry.context import Context
 
-from .checkpoint import (
-    DEFAULT_CHECKPOINTS,
-    Checkpoint,
-    CheckpointCollection,
-)
+from .checkpoint import DEFAULT_CHECKPOINTS, CheckpointCollection
 from .envvars import OTEL_PYTHON_SECRETNOTE_TRACING_CALL
+from .models import Checkpoint, Invocation
 from .snapshot import (
-    FunctionSnapshot,
-    Invocation,
-    SourceLocation,
+    dispatch_snapshot,
     fingerprint,
+    record_code,
+    record_function,
+    record_stackframes,
 )
 
 
@@ -57,15 +55,15 @@ class Profiler:
     def _stack_push(self, frame: FrameType, checkpoint: Checkpoint):
         ctx, _ = self._stack_peek()
         if checkpoint.func:
-            snapshot = FunctionSnapshot.from_function(checkpoint.func, frame)
+            snapshot = record_function(checkpoint.func, frame)
         elif func := self._retvals.get(fingerprint(frame.f_code)):
-            snapshot = FunctionSnapshot.from_function(func, frame)
+            snapshot = record_function(func, frame)
         else:
-            snapshot = FunctionSnapshot.from_code(frame.f_code, frame)
+            snapshot = record_code(frame.f_code, frame)
         invocation = Invocation(
             checkpoint=checkpoint.info,
             snapshot=snapshot,
-            stackframes=SourceLocation.from_frame(frame),
+            stackframes=record_stackframes(frame),
         )
         fn = invocation.snapshot
         span_name = f"{fn.module or '<unknown_module>'}.{fn.name}"
@@ -84,8 +82,7 @@ class Profiler:
             return
         ctx, call = self._ctx_stack.pop()
         self._track_retval(retval)
-        # call.snapshot.update_locals(frame)
-        call.snapshot.update_retval(retval)
+        call.snapshot.return_value = dispatch_snapshot(retval)
         span = trace.get_current_span(ctx)
         payload = call.json(by_alias=True, exclude_none=True)
         span.set_attribute(OTEL_PYTHON_SECRETNOTE_TRACING_CALL, payload)

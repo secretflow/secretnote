@@ -25,6 +25,8 @@ def create_default_rules():
         ray.actor.ActorClass._remote,
         ray.actor.ActorMethod._remote,
         ray.get,
+        ray.wait,
+        fed.get,
         fed.send,
         fed.recv,
         fed._private.fed_call_holder.FedCallHolder.internal_remote,

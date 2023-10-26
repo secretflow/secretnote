@@ -1,62 +1,50 @@
 import enum
 from inspect import unwrap
 from types import CodeType, FrameType
-from typing import Callable, Dict, Optional, Tuple, TypeVar, Union
+from typing import Callable, Dict, Optional, TypeVar, Union
 
-from pydantic import BaseModel
-
-from .snapshot import CheckpointInfo, hash_digest
+from .models import Checkpoint, LocalCallable
+from .snapshot import hash_digest
 
 T = TypeVar("T", bound=Callable)
-
-
-class LocalCallable(BaseModel):
-    fn: Callable
-    load_const: Tuple[int, ...] = ()
 
 
 QualifiedCallable = Union[Callable, LocalCallable]
 
 
-class Checkpoint(BaseModel):
-    code_hash: str
-    func: Optional[Callable]
-    info: CheckpointInfo = CheckpointInfo()
+def checkpoint_from_callable(fn: QualifiedCallable):
+    if isinstance(fn, LocalCallable):
+        func, load_const = fn.fn, fn.load_const
+    else:
+        func = fn
+        load_const = ()
 
-    @classmethod
-    def from_callable(cls, fn: QualifiedCallable):
-        if isinstance(fn, LocalCallable):
-            func, load_const = fn.fn, fn.load_const
-        else:
-            func = fn
-            load_const = ()
+    func = unwrap(func)
 
-        func = unwrap(func)
+    try:
+        code = func.__code__
 
-        try:
-            code = func.__code__
+        for const in load_const:
+            code = code.co_consts[const]
 
-            for const in load_const:
-                code = code.co_consts[const]
+        assert isinstance(code, CodeType)
 
-            assert isinstance(code, CodeType)
+    except IndexError as e:
+        raise TypeError(
+            f"unsupported callable {func} for tracing:"
+            f" index {load_const} out of range in co_consts"
+        ) from e
 
-        except IndexError as e:
-            raise TypeError(
-                f"unsupported callable {func} for tracing:"
-                f" index {load_const} out of range in co_consts"
-            ) from e
+    except (AttributeError, TypeError, AssertionError) as e:
+        raise TypeError(
+            f"unsupported callable {func} for tracing:" " cannot access code object"
+        ) from e
 
-        except (AttributeError, TypeError, AssertionError) as e:
-            raise TypeError(
-                f"unsupported callable {func} for tracing:" " cannot access code object"
-            ) from e
+    code_digest = hash_digest(code)
 
-        code_digest = hash_digest(code)
-
-        if isinstance(fn, LocalCallable):
-            return Checkpoint(func=None, code_hash=code_digest)
-        return Checkpoint(func=func, code_hash=code_digest)
+    if isinstance(fn, LocalCallable):
+        return Checkpoint(func=None, code_hash=code_digest)
+    return Checkpoint(func=func, code_hash=code_digest)
 
 
 class CheckpointCollection:
@@ -73,7 +61,7 @@ class CheckpointCollection:
         api_level: Optional[int] = None,
         description: Optional[str] = None,
     ):
-        ckpt = Checkpoint.from_callable(fn)
+        ckpt = checkpoint_from_callable(fn)
         ckpt.info.api_level = api_level
         ckpt.info.description = description
         self.checkpoints[ckpt.code_hash] = ckpt
