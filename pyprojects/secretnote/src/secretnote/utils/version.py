@@ -26,6 +26,6 @@ def assert_version(
 
     name = getattr(module, "__name__", str(module))
 
-    assert satisfied, (
-        f"This program requires {name} {expected}," f" but you have {current_version}"
-    )
+    assert (
+        satisfied
+    ), f"This program requires {name} {expected}, but you have {current_version}"
