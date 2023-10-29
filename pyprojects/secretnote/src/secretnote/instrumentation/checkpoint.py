@@ -36,7 +36,7 @@ def checkpoint_from_callable(fn: QualifiedCallable):
 
     except (AttributeError, TypeError, AssertionError) as e:
         raise TypeError(
-            f"unsupported callable {func} for tracing:" " cannot access code object"
+            f"unsupported callable {func} for tracing: cannot access code object"
         ) from e
 
     code_digest = hash_digest(code)
@@ -61,8 +61,8 @@ class CheckpointCollection:
         description: Optional[str] = None,
     ):
         ckpt = checkpoint_from_callable(fn)
-        ckpt.info.api_level = api_level
-        ckpt.info.description = description
+        ckpt.semantics.api_level = api_level
+        ckpt.semantics.description = description
         self.checkpoints[ckpt.code_hash] = ckpt
 
     def tracing_checkpoint(self, api_level: int, description: Optional[str] = None):

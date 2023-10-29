@@ -1,0 +1,8 @@
+<div id="{{ element_id }}"></div>
+<script type="module">
+  import * as ui from '{{ script_uri }}';
+  const Component = ui['{{ component }}'];
+  const elem = document.getElementById('{{ element_id }}');
+  const props = JSON.parse(atob('{{ encoded_props }}'));
+  ui.render({ elem, Component, props });
+</script>

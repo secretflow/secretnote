@@ -23,11 +23,12 @@ from typing import (
 )
 
 from .models import (
+    DeviceSnapshot,
     FunctionSignature,
     FunctionSnapshot,
+    LogicalLocation,
     MappingSnapshot,
     ObjectSnapshot,
-    RemoteLocationSnapshot,
     RemoteObjectSnapshot,
     SequenceSnapshot,
     SnapshotRef,
@@ -113,6 +114,17 @@ def qualname(obj: Any) -> Tuple[Optional[str], Optional[str]]:
 def type_name(obj: Any) -> str:
     module_name, obj_name = qualname(type(obj))
     return f"{module_name or '<unknown_module>'}.{obj_name or '<unknown>'}"
+
+
+def type_annotation(obj: Any) -> str:
+    if getattr(obj, "__module__", None) == "typing":
+        return str(obj)
+    module_name, obj_name = qualname(obj)
+    if module_name and obj_name:
+        return f"{module_name}.{obj_name}"
+    if obj_name:
+        return obj_name
+    return str(obj)
 
 
 def source_code(obj):
@@ -213,19 +225,34 @@ def record_device(device: "Device"):
     from secretflow.device.device import HEU, PYU, SPU, TEEU
 
     if isinstance(device, PYU):
-        location = ("PYU", device.party)
+        kind = "PYU"
+        parties = (device.party,)
+        params = {}
     elif isinstance(device, SPU):
-        location = ("SPU", *device.actors)
+        kind = "SPU"
+        parties = tuple(device.actors)
+        params = {
+            "protocol": device.conf.protocol,
+            "field": device.conf.field,
+            "fxp_fraction_bits": device.conf.fxp_fraction_bits,
+        }
     elif isinstance(device, HEU):
-        location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
+        kind = "HEU"
+        parties = (device.sk_keeper_name(), *device.evaluator_names())
+        params = {
+            "mode": device.config["mode"],
+            "encoding": device.config.get("encoding"),
+        }
     elif isinstance(device, TEEU):
-        location = ("TEE", device.party)
+        kind = "TEEU"
+        parties = (device.party,)
+        params = {}
     else:
         return record_object(device)
-    return RemoteLocationSnapshot(
+    return DeviceSnapshot(
         type=type_name(device),
         id=fingerprint(device),
-        location=location,
+        location=LogicalLocation(kind=kind, parties=parties, parameters=params),
     )
 
 
@@ -234,7 +261,7 @@ def record_device_object(obj: "DeviceObject"):
     from secretflow.device.device import HEUObject, PYUObject, SPUObject, TEEUObject
 
     device_snapshot = record_device(obj.device)
-    if not isinstance(device_snapshot, RemoteLocationSnapshot):
+    if not isinstance(device_snapshot, DeviceSnapshot):
         return record_object(obj)
     if isinstance(obj, PYUObject):
         refs = (fingerprint(obj.data),)
@@ -279,14 +306,29 @@ def record_mapping(obj: Mapping):
 @break_circular_ref
 def record_parameter(param: inspect.Parameter):
     if param.annotation is not inspect.Parameter.empty:
-        annotation = str(param.annotation)
+        annotation = type_annotation(param.annotation)
     else:
-        annotation = str(Any)
+        annotation = type_annotation(Any)
     if param.default is not inspect.Parameter.empty:
         default = dispatch_snapshot(param.default)
     else:
         default = None
     return UnboundSnapshot(annotation=annotation, default=default)
+
+
+@break_circular_ref
+def record_signature(sig: inspect.Signature):
+    parameters = {
+        name: record_parameter(param) for name, param in sig.parameters.items()
+    }
+    if sig.return_annotation is not inspect.Signature.empty:
+        return_annotation = type_annotation(sig.return_annotation)
+    else:
+        return_annotation = type_annotation(Any)
+    return FunctionSignature(
+        parameters=parameters,
+        return_annotation=UnboundSnapshot(annotation=return_annotation),
+    )
 
 
 def _record_globals(code: Union[Callable, CodeType], global_ns: Dict):
@@ -321,14 +363,7 @@ def record_function(func: Callable, frame: Optional[FrameType] = None):
     except Exception:
         sourcelines = firstlineno = None
 
-    sig = inspect.signature(func, follow_wrapped=False)
-
-    signature = FunctionSignature(
-        parameters={
-            name: record_parameter(param) for name, param in sig.parameters.items()
-        },
-        return_annotation=UnboundSnapshot(annotation=str(sig.return_annotation)),
-    )
+    signature = record_signature(inspect.signature(func, follow_wrapped=False))
 
     local_vars: Dict[str, SnapshotType] = {}
     closure_vars: Dict[str, SnapshotType] = {}
@@ -416,7 +451,7 @@ def record_code(code: CodeType, frame: Optional[FrameType] = None):
     )
 
 
-def record_stackframes(frame: FrameType):
+def record_traceback(frame: FrameType):
     stack: List[SourceLocation] = []
     for f in inspect.getouterframes(frame):
         if f.code_context is None:

@@ -1,18 +1,15 @@
-import { defineConfig } from 'vite';
+import { defineConfig, mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { dependencies, peerDependencies } from './package.json';
 
 export default defineConfig(({ mode }) => {
+  let dependencyConfig;
+
   if (mode === 'browser') {
-    return defineConfig({
-      plugins: [react()],
+    dependencyConfig = defineConfig({
       build: {
         outDir: 'dist/browser',
-        lib: {
-          formats: ['es'],
-          entry: ['./src/index.ts'],
-        },
-        target: 'ES2020',
+        target: 'ES2015',
       },
       define: { 'process.env.NODE_ENV': JSON.stringify(process.env['NODE_ENV']) },
       resolve: {
@@ -23,15 +20,10 @@ export default defineConfig(({ mode }) => {
         ),
       },
     });
-  } else {
-    return defineConfig({
-      plugins: [react()],
+  } else if (mode === 'esm') {
+    dependencyConfig = defineConfig({
       build: {
         outDir: 'dist/esm',
-        lib: {
-          formats: ['es'],
-          entry: ['./src/index.ts'],
-        },
         rollupOptions: {
           external: [
             ...Object.keys(peerDependencies),
@@ -41,5 +33,26 @@ export default defineConfig(({ mode }) => {
         },
       },
     });
+  } else {
+    throw new Error(`Invalid build mode: ${mode}`);
   }
+
+  return mergeConfig(
+    defineConfig({
+      plugins: [react()],
+      build: {
+        lib: {
+          entry: './src/index.ts',
+          formats: ['es'],
+        },
+        rollupOptions: {
+          output: {
+            entryFileNames: '[name].js',
+          },
+        },
+      },
+    }),
+    dependencyConfig,
+    true,
+  );
 });

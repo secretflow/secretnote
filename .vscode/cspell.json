@@ -29,6 +29,7 @@
     "nbclient",
     "ndarray",
     "netifaces",
+    "networkx",
     "nrwl",
     "otlp",
     "pbar",

@@ -3,9 +3,21 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js"
+    },
+    "./browser": {
+      "import": "./dist/browser/index.js",
+      "default": "./dist/browser/index.js"
+    },
+    "./templates/*": {
+      "default": "./templates/*"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && vite build --mode=browser",
+    "build": "tsc && vite build --mode=esm && vite build --mode=browser",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
@@ -38,6 +50,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "repo-utils": "workspace:^",
     "storybook": "^7.5.1",
     "vite": "^4.4.5"
   }

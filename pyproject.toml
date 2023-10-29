@@ -38,6 +38,7 @@ dev-dependencies = [
   "statsmodels>=0.14.0",
   "torch>=2.1.0",
   "uvicorn>=0.23.2",
+  "snakeviz>=2.2.0",
 ]
 managed = true
 

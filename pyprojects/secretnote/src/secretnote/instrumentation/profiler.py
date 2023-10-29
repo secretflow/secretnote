@@ -11,15 +11,15 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from .checkpoint import DEFAULT_CHECKPOINTS, CheckpointCollection
-from .envvars import OTEL_PYTHON_SECRETNOTE_TRACING_CALL
+from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME_SNAPSHOT
 from .exporters import InMemorySpanExporter
-from .models import Checkpoint, Invocation
+from .models import Checkpoint, FrameSnapshot
 from .snapshot import (
     dispatch_snapshot,
     fingerprint,
     record_code,
     record_function,
-    record_stackframes,
+    record_traceback,
 )
 
 
@@ -35,9 +35,20 @@ class Profiler:
         self._exporter: InMemorySpanExporter
 
         self._parent_context = context
-        self._ctx_stack: List[Tuple[Context, Invocation]] = []
+        self._ctx_stack: List[Tuple[Context, FrameSnapshot]] = []
         self._session_tokens: List[contextvars.Token] = []
         self._retvals: WeakValueDictionary[str, Callable] = WeakValueDictionary()
+
+    @property
+    def exporter(self):
+        try:
+            exporter = self._exporter
+        except AttributeError:
+            exporter = self._exporter = InMemorySpanExporter()
+            provider = cast(TracerProvider, trace.get_tracer_provider())
+            processor = SimpleSpanProcessor(exporter)
+            provider.add_span_processor(processor)
+        return exporter
 
     def __call__(self, frame: FrameType, event: str, arg: Any):
         if not (checkpoint := self._checkpoints.match(frame)):
@@ -64,13 +75,13 @@ class Profiler:
         else:
             snapshot = record_code(frame.f_code, frame)
 
-        invocation = Invocation(
-            checkpoint=checkpoint.info,
-            snapshot=snapshot,
-            stackframes=record_stackframes(frame),
+        invocation = FrameSnapshot(
+            semantics=checkpoint.semantics,
+            function=snapshot,
+            traceback=record_traceback(frame),
         )
 
-        fn = invocation.snapshot
+        fn = invocation.function
         span_name = f"{fn.module or '<unknown_module>'}.{fn.name}"
         span_name = ".".join(reversed(span_name.split(".")))
         span = self._tracer.start_span(span_name, ctx)
@@ -85,28 +96,17 @@ class Profiler:
         ctx, call = self._ctx_stack.pop()
 
         self._track_retval(retval)
-        call.snapshot.return_value = dispatch_snapshot(retval)
+        call.function.return_value = dispatch_snapshot(retval)
 
         span = trace.get_current_span(ctx)
         payload = call.json(by_alias=True, exclude_none=True)
-        span.set_attribute(OTEL_PYTHON_SECRETNOTE_TRACING_CALL, payload)
+        span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME_SNAPSHOT, payload)
         span.end()
 
     def _track_retval(self, retval: Any):
         if not inspect.isfunction(retval):
             return
         self._retvals[fingerprint(retval.__code__)] = retval
-
-    @property
-    def exporter(self):
-        try:
-            exporter = self._exporter
-        except AttributeError:
-            exporter = self._exporter = InMemorySpanExporter()
-            provider = cast(TracerProvider, trace.get_tracer_provider())
-            processor = SimpleSpanProcessor(exporter)
-            provider.add_span_processor(processor)
-        return exporter
 
     def start(self):
         self.exporter.clear()

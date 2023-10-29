@@ -13,8 +13,12 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from ray.runtime_context import get_runtime_context
 
-from .envvars import OTEL_PYTHON_SECRETNOTE_W3C_TRACE
+from .envvars import (
+    OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME_SNAPSHOT,
+    OTEL_PYTHON_SECRETNOTE_W3C_TRACE,
+)
 from .exporters import InMemorySpanExporter, JSONLinesSpanExporter
+from .models import FrameSnapshot, OTelSpanDict
 
 
 def setup_tracing(service_name: Optional[str] = None):
@@ -92,3 +96,13 @@ def remote_trace(fn: Callable) -> Callable:
             return fn(*args, **kwargs)
 
     return remote_task
+
+
+def get_frame_snapshot(span: OTelSpanDict) -> Optional[FrameSnapshot]:
+    if not span.attributes:
+        return None
+    try:
+        raw = cast(str, span.attributes[OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME_SNAPSHOT])
+        return FrameSnapshot.parse_raw(raw)
+    except Exception:
+        return None

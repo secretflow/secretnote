@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import (
     Any,
     Callable,
@@ -9,12 +10,12 @@ from typing import (
     Union,
 )
 
+from opentelemetry.util.types import Attributes
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 from secretnote.utils.pydantic import update_forward_refs
 
-ObjectLocation = Tuple[str, ...]
 JSONKey = Union[str, int, float, bool, None]
 
 
@@ -33,12 +34,32 @@ class ObjectSnapshot(BaseModel):
     snapshot: str
 
 
-class RemoteLocationSnapshot(BaseModel):
-    kind: Literal["remote_location"] = "remote_location"
+class LogicalLocation(BaseModel):
+    kind: str
+    parties: Tuple[str, ...]
+    parameters: Dict[str, Any] = {}
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, type(self))
+            and self.kind == other.kind
+            and self.parameters == other.parameters
+            and self.parties == other.parties
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.kind, self.parties, *self.parameters.items()))
+
+    def __str__(self) -> str:
+        return f"{self.kind}[{', '.join(self.parties)}]"
+
+
+class DeviceSnapshot(BaseModel):
+    kind: Literal["device"] = "device"
     type: str
 
     id: str
-    location: ObjectLocation
+    location: LogicalLocation
 
 
 class RemoteObjectSnapshot(BaseModel):
@@ -46,7 +67,7 @@ class RemoteObjectSnapshot(BaseModel):
     type: str
 
     id: str
-    location: ObjectLocation
+    location: LogicalLocation
     refs: Tuple[str, ...]
 
 
@@ -112,21 +133,21 @@ class SourceLocation(BaseModel):
     code: Optional[str]
 
 
-class CheckpointInfo(BaseModel):
+class Semantics(BaseModel):
     api_level: Optional[int] = None
     description: Optional[str] = None
-
-
-class Invocation(BaseModel):
-    checkpoint: CheckpointInfo
-    snapshot: FunctionSnapshot
-    stackframes: List[SourceLocation]
 
 
 class Checkpoint(BaseModel):
     code_hash: str
     func: Optional[Callable]
-    info: CheckpointInfo = CheckpointInfo()
+    semantics: Semantics = Semantics()
+
+
+class FrameSnapshot(BaseModel):
+    semantics: Semantics
+    function: FunctionSnapshot
+    traceback: List[SourceLocation]
 
 
 class LocalCallable(BaseModel):
@@ -138,7 +159,7 @@ SnapshotType = Annotated[
     Union[
         SnapshotRef,
         RemoteObjectSnapshot,
-        RemoteLocationSnapshot,
+        DeviceSnapshot,
         FunctionSnapshot,
         MappingSnapshot,
         SequenceSnapshot,
@@ -147,6 +168,47 @@ SnapshotType = Annotated[
     ],
     Field(discriminator="kind"),
 ]
+
+
+class OTelSpanContextDict(BaseModel):
+    span_id: str
+    trace_id: str
+    trace_state: str
+
+
+class OTelSpanStatusDict(BaseModel):
+    status_code: str
+    description: Optional[str] = None
+
+
+class OTelSpanEventDict(BaseModel):
+    name: str
+    attributes: Attributes
+    timestamp: datetime
+
+
+class OTelSpanLinkDict(BaseModel):
+    attributes: Attributes
+    span_context: OTelSpanContextDict
+
+
+class OTelSpanResourceDict(BaseModel):
+    attributes: Attributes
+    schema_url: str
+
+
+class OTelSpanDict(BaseModel):
+    name: str
+    context: OTelSpanContextDict
+    kind: str
+    parent_id: Optional[str] = None
+    start_time: datetime
+    end_time: datetime
+    status: Optional[OTelSpanStatusDict] = None
+    attributes: Attributes
+    events: List[OTelSpanEventDict]
+    links: List[OTelSpanLinkDict]
+    resource: OTelSpanResourceDict
 
 
 update_forward_refs(globals())
