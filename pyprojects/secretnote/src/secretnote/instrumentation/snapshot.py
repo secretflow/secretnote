@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import builtins
 import dis
 import inspect
@@ -40,8 +38,6 @@ from .models import (
 
 if TYPE_CHECKING:
     from secretflow.device.device import Device, DeviceObject
-
-_snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")
 
 
 def fingerprint(obj: Any) -> str:
@@ -214,7 +210,7 @@ def record_object(obj: Any):
 
 @break_circular_ref
 def record_device(device: "Device"):
-    from secretflow.device.device import HEU, PYU, SPU
+    from secretflow.device.device import HEU, PYU, SPU, TEEU
 
     if isinstance(device, PYU):
         location = ("PYU", device.party)
@@ -222,6 +218,8 @@ def record_device(device: "Device"):
         location = ("SPU", *device.actors)
     elif isinstance(device, HEU):
         location = ("HEU", device.sk_keeper_name(), *device.evaluator_names())
+    elif isinstance(device, TEEU):
+        location = ("TEE", device.party)
     else:
         return record_object(device)
     return RemoteLocationSnapshot(
@@ -233,13 +231,26 @@ def record_device(device: "Device"):
 
 @break_circular_ref
 def record_device_object(obj: "DeviceObject"):
+    from secretflow.device.device import HEUObject, PYUObject, SPUObject, TEEUObject
+
     device_snapshot = record_device(obj.device)
     if not isinstance(device_snapshot, RemoteLocationSnapshot):
+        return record_object(obj)
+    if isinstance(obj, PYUObject):
+        refs = (fingerprint(obj.data),)
+    elif isinstance(obj, SPUObject):
+        refs = (fingerprint(obj.meta), *map(fingerprint, obj.shares_name))
+    elif isinstance(obj, HEUObject):
+        refs = (fingerprint(obj.data),)
+    elif isinstance(obj, TEEUObject):
+        refs = (fingerprint(obj.data),)
+    else:
         return record_object(obj)
     return RemoteObjectSnapshot(
         type=type_name(obj),
         id=fingerprint(obj),
         location=device_snapshot.location,
+        refs=refs,
     )
 
 
@@ -421,3 +432,6 @@ def record_stackframes(frame: FrameType):
             )
         )
     return stack
+
+
+_snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")

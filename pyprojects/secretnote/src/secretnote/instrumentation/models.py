@@ -47,6 +47,7 @@ class RemoteObjectSnapshot(BaseModel):
 
     id: str
     location: ObjectLocation
+    refs: Tuple[str, ...]
 
 
 class SequenceSnapshot(BaseModel):

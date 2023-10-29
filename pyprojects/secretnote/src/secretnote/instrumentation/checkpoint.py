@@ -8,7 +8,6 @@ from .snapshot import hash_digest
 
 T = TypeVar("T", bound=Callable)
 
-
 QualifiedCallable = Union[Callable, LocalCallable]
 
 
