@@ -24,6 +24,11 @@ class SnapshotRef(BaseModel):
     id: str
 
 
+class UnboundSnapshot(BaseModel):
+    kind: Literal["unbound"] = "unbound"
+    annotation: str = str(Any)
+
+
 class ObjectSnapshot(BaseModel):
     kind: Literal["object"] = "object"
     type: str
@@ -93,12 +98,6 @@ class MappingSnapshot(BaseModel):
     values: Dict[JSONKey, "SnapshotType"]
 
 
-class UnboundSnapshot(BaseModel):
-    kind: Literal["unbound"] = "unbound"
-    annotation: str = str(Any)
-    default: Optional["SnapshotType"] = None
-
-
 class FunctionSignature(BaseModel):
     parameters: Dict[str, UnboundSnapshot]
     return_annotation: UnboundSnapshot
@@ -107,26 +106,23 @@ class FunctionSignature(BaseModel):
 class FunctionSnapshot(BaseModel):
     kind: Literal["function"] = "function"
     type: str
-
     id: str
     hash: str
     module: Optional[str] = None
     name: str
-
     signature: Optional[FunctionSignature] = None
-
-    local_vars: Dict[str, "SnapshotType"]
-    closure_vars: Dict[str, "SnapshotType"]
-    global_vars: Dict[str, "SnapshotType"]
-    return_value: "SnapshotType"
-
     filename: Optional[str] = None
     firstlineno: Optional[int] = None
     source: Optional[str] = None
     docstring: Optional[str] = None
+    closure_vars: Dict[str, "SnapshotType"]
+    global_vars: Dict[str, "SnapshotType"]
 
 
-class SourceLocation(BaseModel):
+class FrameSnapshot(BaseModel):
+    kind: Literal["frame"] = "frame"
+    type: str
+    id: str
     filename: str
     lineno: int
     func: str
@@ -144,30 +140,44 @@ class Checkpoint(BaseModel):
     semantics: Semantics = Semantics()
 
 
-class FrameSnapshot(BaseModel):
-    semantics: Semantics
-    function: FunctionSnapshot
-    traceback: List[SourceLocation]
-
-
-class LocalCallable(BaseModel):
-    fn: Callable
-    load_const: Tuple[int, ...] = ()
-
-
 SnapshotType = Annotated[
     Union[
         SnapshotRef,
+        UnboundSnapshot,
         RemoteObjectSnapshot,
         DeviceSnapshot,
         FunctionSnapshot,
         MappingSnapshot,
         SequenceSnapshot,
         ObjectSnapshot,
-        UnboundSnapshot,
+        FunctionSnapshot,
+        FrameSnapshot,
     ],
     Field(discriminator="kind"),
 ]
+
+
+class TracedFrame(BaseModel):
+    semantics: Semantics = Semantics()
+    function: FunctionSnapshot
+    local_vars: Dict[str, SnapshotType]
+    global_vars: Dict[str, SnapshotType]
+    return_value: SnapshotType
+    traceback: List[FrameSnapshot]
+
+
+class OpaqueTracedFrame(BaseModel):
+    semantics: Semantics = Semantics()
+    function: SnapshotRef
+    local_vars: Dict[str, SnapshotRef]
+    global_vars: Dict[str, SnapshotRef]
+    return_value: SnapshotRef
+    traceback: List[SnapshotRef]
+
+
+class LocalCallable(BaseModel):
+    fn: Callable
+    load_const: Tuple[int, ...] = ()
 
 
 class OTelSpanContextDict(BaseModel):

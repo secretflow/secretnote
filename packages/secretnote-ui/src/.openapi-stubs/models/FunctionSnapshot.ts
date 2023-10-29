@@ -4,6 +4,7 @@
 /* eslint-disable */
 
 import type { DeviceSnapshot } from './DeviceSnapshot';
+import type { FrameSnapshot } from './FrameSnapshot';
 import type { FunctionSignature } from './FunctionSignature';
 import type { MappingSnapshot } from './MappingSnapshot';
 import type { ObjectSnapshot } from './ObjectSnapshot';
@@ -20,13 +21,11 @@ export type FunctionSnapshot = {
   module?: string;
   name: string;
   signature?: FunctionSignature;
-  local_vars: Record<string, (SnapshotRef | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | UnboundSnapshot)>;
-  closure_vars: Record<string, (SnapshotRef | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | UnboundSnapshot)>;
-  global_vars: Record<string, (SnapshotRef | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | UnboundSnapshot)>;
-  return_value: (SnapshotRef | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | UnboundSnapshot);
   filename?: string;
   firstlineno?: number;
   source?: string;
   docstring?: string;
+  closure_vars: Record<string, (SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>;
+  global_vars: Record<string, (SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>;
 };
 

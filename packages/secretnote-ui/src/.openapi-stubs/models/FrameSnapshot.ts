@@ -3,13 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FunctionSnapshot } from './FunctionSnapshot';
-import type { Semantics } from './Semantics';
-import type { SourceLocation } from './SourceLocation';
-
 export type FrameSnapshot = {
-  semantics: Semantics;
-  function: FunctionSnapshot;
-  traceback: Array<SourceLocation>;
+  kind?: 'frame';
+  type: string;
+  id: string;
+  filename: string;
+  lineno: number;
+  func: string;
+  code?: string;
 };
 

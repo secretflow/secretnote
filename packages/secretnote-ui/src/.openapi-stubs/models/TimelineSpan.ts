@@ -3,14 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FrameSnapshot } from './FrameSnapshot';
+import type { OpaqueTracedFrame } from './OpaqueTracedFrame';
 
 export type TimelineSpan = {
   span_id: string;
   start_time: string;
   end_time: string;
-  index: number;
-  frame: FrameSnapshot;
+  rank: number;
+  frame: OpaqueTracedFrame;
   timeline?: Array<TimelineSpan>;
 };
 

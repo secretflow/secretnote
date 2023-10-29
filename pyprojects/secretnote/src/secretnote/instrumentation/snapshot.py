@@ -1,11 +1,11 @@
 import builtins
 import dis
 import inspect
+from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from contextvars import ContextVar
 from functools import wraps
-from itertools import chain
 from pprint import pformat
 from textwrap import dedent
 from types import CodeType, FrameType
@@ -17,28 +17,39 @@ from typing import (
     Hashable,
     List,
     Optional,
+    Set,
     Tuple,
+    TypeVar,
     Union,
+    cast,
     overload,
 )
 
+from typing_extensions import Concatenate, ParamSpec
+
 from .models import (
     DeviceSnapshot,
+    FrameSnapshot,
     FunctionSignature,
     FunctionSnapshot,
     LogicalLocation,
     MappingSnapshot,
     ObjectSnapshot,
+    OpaqueTracedFrame,
     RemoteObjectSnapshot,
     SequenceSnapshot,
     SnapshotRef,
     SnapshotType,
-    SourceLocation,
+    TracedFrame,
     UnboundSnapshot,
 )
 
 if TYPE_CHECKING:
     from secretflow.device.device import Device, DeviceObject
+
+P = ParamSpec("P")
+T = TypeVar("T")
+U = TypeVar("U")
 
 
 def fingerprint(obj: Any) -> str:
@@ -48,6 +59,9 @@ def fingerprint(obj: Any) -> str:
     from secretflow.device.device.pyu import PYUObject
     from secretflow.device.device.spu import SPUObject
     from secretflow.device.device.teeu import TEEUObject
+
+    if isinstance(obj, FrameType):
+        return f"python/frame/id/{hex(id(obj))}/line/{obj.f_lineno}"
 
     if isinstance(obj, ObjectRef):
         return f"ray/{obj}"
@@ -169,9 +183,11 @@ def snapshot(obj: Any) -> str:
     return "<unserializable>"
 
 
-def break_circular_ref(fn):
+def break_circular_ref(
+    fn: Callable[Concatenate[T, P], U]
+) -> Callable[Concatenate[T, P], Union[U, SnapshotRef]]:
     @wraps(fn)
-    def wrapper(obj, *args, **kwargs):
+    def wrapper(obj: T, *args: P.args, **kwargs: P.kwargs):
         try:
             refs = _snapshot_refs.get()
             token = None
@@ -194,7 +210,7 @@ def break_circular_ref(fn):
     return wrapper
 
 
-def dispatch_snapshot(obj: Any) -> SnapshotType:
+def record(obj: Any) -> SnapshotType:
     from secretflow.device.device import Device, DeviceObject
 
     if isinstance(obj, Device):
@@ -205,8 +221,9 @@ def dispatch_snapshot(obj: Any) -> SnapshotType:
         return record_function(obj)
     if isinstance(obj, Mapping):
         return record_mapping(obj)
-    if isinstance(obj, Sequence) and not isinstance(obj, str):
-        return record_sequence(obj)
+    if isinstance(obj, Sequence):
+        if not isinstance(obj, (str, bytes, bytearray, memoryview)):
+            return record_sequence(obj)
     return record_object(obj)
 
 
@@ -288,7 +305,7 @@ def record_sequence(obj: Sequence):
         id=fingerprint(obj),
         hash=hash_digest(obj),
         snapshot=snapshot(obj),
-        values=[dispatch_snapshot(value) for value in obj],
+        values=[record(value) for value in obj],
     )
 
 
@@ -299,24 +316,18 @@ def record_mapping(obj: Mapping):
         id=fingerprint(obj),
         hash=hash_digest(obj),
         snapshot=snapshot(obj),
-        values={json_key(key): dispatch_snapshot(value) for key, value in obj.items()},
+        values={json_key(key): record(value) for key, value in obj.items()},
     )
 
 
-@break_circular_ref
 def record_parameter(param: inspect.Parameter):
     if param.annotation is not inspect.Parameter.empty:
         annotation = type_annotation(param.annotation)
     else:
         annotation = type_annotation(Any)
-    if param.default is not inspect.Parameter.empty:
-        default = dispatch_snapshot(param.default)
-    else:
-        default = None
-    return UnboundSnapshot(annotation=annotation, default=default)
+    return UnboundSnapshot(annotation=annotation)
 
 
-@break_circular_ref
 def record_signature(sig: inspect.Signature):
     parameters = {
         name: record_parameter(param) for name, param in sig.parameters.items()
@@ -345,13 +356,27 @@ def _record_globals(code: Union[Callable, CodeType], global_ns: Dict):
                     continue
                 global_vars[name] = UnboundSnapshot()
             else:
-                global_vars[name] = dispatch_snapshot(value)
+                global_vars[name] = record(value)
 
     return global_vars
 
 
 @break_circular_ref
-def record_function(func: Callable, frame: Optional[FrameType] = None):
+def record_function(func: Union[Callable, CodeType]):
+    if inspect.isfunction(func):
+        module, name = qualname(func)
+        signature = record_signature(inspect.signature(func, follow_wrapped=False))
+        f_closures = inspect.getclosurevars(func).nonlocals
+        f_globals = getattr(func, "__globals__", {})
+    elif inspect.iscode(func):
+        name = func.co_name or "<unknown>"
+        module = inspect.getmodulename(func.co_filename)
+        signature = None
+        f_closures = {}
+        f_globals = {}
+    else:
+        raise TypeError(f"Expected function or code, got {type(func)}")
+
     try:
         filename = source_path(inspect.getsourcefile(func))
     except Exception:
@@ -363,30 +388,8 @@ def record_function(func: Callable, frame: Optional[FrameType] = None):
     except Exception:
         sourcelines = firstlineno = None
 
-    signature = record_signature(inspect.signature(func, follow_wrapped=False))
-
-    local_vars: Dict[str, SnapshotType] = {}
-    closure_vars: Dict[str, SnapshotType] = {}
-
-    if frame:
-        f_locals = frame.f_locals
-        f_globals = frame.f_globals
-    else:
-        f_locals = {}
-        f_globals = getattr(func, "__globals__", {})
-
-    f_closures = inspect.getclosurevars(func).nonlocals
-
-    for name, value in f_locals.items():
-        if name not in f_closures:
-            local_vars[name] = dispatch_snapshot(value)
-
-    for name, value in f_closures.items():
-        closure_vars[name] = dispatch_snapshot(value)
-
+    closure_vars = {k: record(v) for k, v in f_closures.items()}
     global_vars = _record_globals(func, f_globals)
-
-    module, name = qualname(func)
 
     return FunctionSnapshot(
         id=fingerprint(func),
@@ -399,67 +402,22 @@ def record_function(func: Callable, frame: Optional[FrameType] = None):
         source=sourcelines,
         docstring=inspect.getdoc(func),
         signature=signature,
-        local_vars=local_vars,
         closure_vars=closure_vars,
         global_vars=global_vars,
-        return_value=UnboundSnapshot(),
-    )
-
-
-@break_circular_ref
-def record_code(code: CodeType, frame: Optional[FrameType] = None):
-    if frame:
-        f_locals = frame.f_locals
-        f_globals = frame.f_globals
-    else:
-        f_locals = {}
-        f_globals = {}
-
-    local_vars: Dict[str, SnapshotType] = {}
-    closure_vars: Dict[str, SnapshotType] = {}
-
-    for name in chain(code.co_varnames, code.co_cellvars):
-        try:
-            value = f_locals[name]
-            local_vars[name] = dispatch_snapshot(value)
-        except KeyError:
-            local_vars[name] = UnboundSnapshot()
-
-    for name in chain(code.co_freevars, code.co_names):
-        try:
-            value = f_locals[name]
-            closure_vars[name] = dispatch_snapshot(value)
-        except KeyError:
-            closure_vars[name] = UnboundSnapshot()
-
-    global_vars = _record_globals(code, f_globals)
-
-    return FunctionSnapshot(
-        id=fingerprint(code),
-        hash=hash_digest(code),
-        type=type_name(code),
-        name=code.co_name or "<unknown>",
-        module=inspect.getmodulename(code.co_filename),
-        filename=source_path(code.co_filename),
-        firstlineno=code.co_firstlineno,
-        source=source_code(code),
-        docstring=inspect.getdoc(code),
-        local_vars=local_vars,
-        closure_vars=closure_vars,
-        global_vars=global_vars,
-        return_value=UnboundSnapshot(),
     )
 
 
 def record_traceback(frame: FrameType):
-    stack: List[SourceLocation] = []
+    stack: List[FrameSnapshot] = []
     for f in inspect.getouterframes(frame):
         if f.code_context is None:
             code = None
         else:
             code = "".join(f.code_context).strip()
         stack.append(
-            SourceLocation(
+            FrameSnapshot(
+                id=fingerprint(f.frame),
+                type=type_name(f.frame),
                 filename=source_path(f.filename),
                 lineno=f.lineno,
                 func=f.function,
@@ -467,6 +425,129 @@ def record_traceback(frame: FrameType):
             )
         )
     return stack
+
+
+def record_frame(frame: FrameType, func: Union[Callable, CodeType]):
+    if inspect.isfunction(func):
+        f_closures = inspect.getclosurevars(func).nonlocals
+    elif inspect.iscode(func):
+        name = func.co_name or "<unknown>"
+        f_closures = {}
+    else:
+        raise TypeError(f"Expected function or code, got {type(func)}")
+
+    f_locals = frame.f_locals
+    f_globals = frame.f_globals
+
+    local_vars: Dict[str, SnapshotType] = {}
+
+    for name, value in f_locals.items():
+        if name not in f_closures:
+            local_vars[name] = record(value)
+
+    global_vars = _record_globals(func, f_globals)
+    traceback = record_traceback(frame)
+
+    return TracedFrame(
+        function=cast(FunctionSnapshot, record_function(func)),
+        local_vars=local_vars,
+        global_vars=global_vars,
+        return_value=UnboundSnapshot(),
+        traceback=traceback,
+    )
+
+
+class SnapshotCompressor:
+    def __init__(self) -> None:
+        self.spans: Dict[str, OpaqueTracedFrame] = {}
+        self.locations: Set[LogicalLocation] = set()
+        self.variables: Dict[str, Dict[int, SnapshotType]] = defaultdict(dict)
+        self.object_refs: Dict[str, int] = {}
+
+    @property
+    def current_rank(self):
+        return len(self.spans)
+
+    def update(self, span_id: str, span: TracedFrame):
+        local_vars = {key: self.record(item) for key, item in span.local_vars.items()}
+        global_vars = {key: self.record(item) for key, item in span.global_vars.items()}
+        return_value = self.record(span.return_value)
+        function_ref = self.record(span.function)
+        traceback = [self.record(item) for item in span.traceback]
+        rank = self.current_rank
+        result = OpaqueTracedFrame(
+            semantics=span.semantics,
+            function=function_ref,
+            local_vars=local_vars,
+            global_vars=global_vars,
+            return_value=return_value,
+            traceback=traceback,
+        )
+        self.spans[span_id] = result
+        return rank, result
+
+    @overload
+    def record_object(self, data: UnboundSnapshot) -> UnboundSnapshot:
+        ...
+
+    @overload
+    def record_object(self, data: SnapshotType) -> SnapshotRef:
+        ...
+
+    def record_object(self, data: SnapshotType):
+        if isinstance(data, (SnapshotRef, UnboundSnapshot)):
+            return data
+
+        for existing in self.variables[data.id].values():
+            if existing == data:
+                return SnapshotRef(id=data.id)
+
+        self.variables[data.id][self.current_rank] = data
+        return SnapshotRef(id=data.id)
+
+    def record_device(self, data: DeviceSnapshot):
+        self.locations.add(data.location)
+        return self.record_object(data)
+
+    def record_remote_object(self, data: RemoteObjectSnapshot):
+        if self.object_refs.get(data.id) is None:
+            numbering = len(self.object_refs) + 1
+            self.object_refs[data.id] = numbering
+            self.locations.add(data.location)
+        return self.record_object(data)
+
+    def record_sequence(self, data: SequenceSnapshot):
+        converted = data.copy()
+        converted.values = [self.record(item) for item in data.values]
+        return self.record_object(converted)
+
+    def record_mapping(self, data: MappingSnapshot):
+        converted = data.copy()
+        converted.values = {key: self.record(item) for key, item in data.values.items()}
+        return self.record_object(converted)
+
+    def record_function(self, data: FunctionSnapshot):
+        converted = data.copy()
+        converted.closure_vars = {
+            key: self.record(item) for key, item in data.closure_vars.items()
+        }
+        converted.global_vars = {
+            key: self.record(item) for key, item in data.global_vars.items()
+        }
+        return self.record_object(converted)
+
+    def record(self, data: SnapshotType):
+        if isinstance(data, DeviceSnapshot):
+            return self.record_device(data)
+        if isinstance(data, RemoteObjectSnapshot):
+            return self.record_remote_object(data)
+        if isinstance(data, SequenceSnapshot):
+            return self.record_sequence(data)
+        if isinstance(data, MappingSnapshot):
+            return self.record_mapping(data)
+        if isinstance(data, FunctionSnapshot):
+            return self.record_function(data)
+        return self.record_object(data)
 
 
 _snapshot_refs: ContextVar[set] = ContextVar("_snapshot_refs")

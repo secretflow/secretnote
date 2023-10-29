@@ -11,16 +11,10 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from .checkpoint import DEFAULT_CHECKPOINTS, CheckpointCollection
-from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME_SNAPSHOT
+from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME
 from .exporters import InMemorySpanExporter
-from .models import Checkpoint, FrameSnapshot
-from .snapshot import (
-    dispatch_snapshot,
-    fingerprint,
-    record_code,
-    record_function,
-    record_traceback,
-)
+from .models import Checkpoint, TracedFrame
+from .snapshot import fingerprint, record, record_frame
 
 
 class Profiler:
@@ -35,7 +29,7 @@ class Profiler:
         self._exporter: InMemorySpanExporter
 
         self._parent_context = context
-        self._ctx_stack: List[Tuple[Context, FrameSnapshot]] = []
+        self._ctx_stack: List[Tuple[Context, TracedFrame]] = []
         self._session_tokens: List[contextvars.Token] = []
         self._retvals: WeakValueDictionary[str, Callable] = WeakValueDictionary()
 
@@ -69,25 +63,19 @@ class Profiler:
             ctx = self._parent_context
 
         if checkpoint.func:
-            snapshot = record_function(checkpoint.func, frame)
+            snapshot = record_frame(frame, checkpoint.func)
         elif func := self._retvals.get(fingerprint(frame.f_code)):
-            snapshot = record_function(func, frame)
+            snapshot = record_frame(frame, func)
         else:
-            snapshot = record_code(frame.f_code, frame)
+            snapshot = record_frame(frame, frame.f_code)
 
-        invocation = FrameSnapshot(
-            semantics=checkpoint.semantics,
-            function=snapshot,
-            traceback=record_traceback(frame),
-        )
+        snapshot.semantics = checkpoint.semantics
 
-        fn = invocation.function
-        span_name = f"{fn.module or '<unknown_module>'}.{fn.name}"
-        span_name = ".".join(reversed(span_name.split(".")))
+        span_name = snapshot.function.name
         span = self._tracer.start_span(span_name, ctx)
         ctx = trace.set_span_in_context(span, ctx)
 
-        self._ctx_stack.append((ctx, invocation))
+        self._ctx_stack.append((ctx, snapshot))
 
     def _stack_pop(self, frame: FrameType, retval: Any):
         if not self._ctx_stack:
@@ -96,11 +84,11 @@ class Profiler:
         ctx, call = self._ctx_stack.pop()
 
         self._track_retval(retval)
-        call.function.return_value = dispatch_snapshot(retval)
+        call.return_value = record(retval)
 
         span = trace.get_current_span(ctx)
         payload = call.json(by_alias=True, exclude_none=True)
-        span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME_SNAPSHOT, payload)
+        span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
         span.end()
 
     def _track_retval(self, retval: Any):

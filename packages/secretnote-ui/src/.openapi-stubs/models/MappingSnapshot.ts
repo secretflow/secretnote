@@ -4,6 +4,7 @@
 /* eslint-disable */
 
 import type { DeviceSnapshot } from './DeviceSnapshot';
+import type { FrameSnapshot } from './FrameSnapshot';
 import type { FunctionSnapshot } from './FunctionSnapshot';
 import type { ObjectSnapshot } from './ObjectSnapshot';
 import type { RemoteObjectSnapshot } from './RemoteObjectSnapshot';
@@ -17,6 +18,6 @@ export type MappingSnapshot = {
   id: string;
   hash?: string;
   snapshot: string;
-  values: Record<string, (SnapshotRef | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | UnboundSnapshot)>;
+  values: Record<string, (SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>;
 };
 

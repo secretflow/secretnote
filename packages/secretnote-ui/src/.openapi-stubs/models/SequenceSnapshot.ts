@@ -4,6 +4,7 @@
 /* eslint-disable */
 
 import type { DeviceSnapshot } from './DeviceSnapshot';
+import type { FrameSnapshot } from './FrameSnapshot';
 import type { FunctionSnapshot } from './FunctionSnapshot';
 import type { MappingSnapshot } from './MappingSnapshot';
 import type { ObjectSnapshot } from './ObjectSnapshot';
@@ -17,6 +18,6 @@ export type SequenceSnapshot = {
   id: string;
   hash?: string;
   snapshot: string;
-  values: Array<(SnapshotRef | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | UnboundSnapshot)>;
+  values: Array<(SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>;
 };
 
