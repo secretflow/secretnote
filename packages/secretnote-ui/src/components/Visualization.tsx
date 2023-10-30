@@ -1,9 +1,9 @@
 import { Visualization as VisualizationProps } from '../.openapi-stubs';
 
-export function Visualization({ timeline }: VisualizationProps) {
+export function Visualization({ graph }: VisualizationProps) {
   return (
     <pre>
-      <code>{JSON.stringify(timeline, null, 2)}</code>
+      <code>{JSON.stringify(graph, null, 2)}</code>
     </pre>
   );
 }

@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Optional, cast
+from typing import Callable, Dict, Generator, Iterable, Optional, Tuple, cast
 
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -106,3 +106,21 @@ def get_frame_data(span: OTelSpanDict) -> Optional[TracedFrame]:
         return TracedFrame.parse_raw(raw)
     except Exception:
         return None
+
+
+def iter_frames(
+    spans: Iterable[OTelSpanDict],
+) -> Generator[Tuple[Tuple[int, ...], TracedFrame, OTelSpanDict], None, None]:
+    api_levels: Dict[str, Tuple[int, ...]] = {}
+    for span in sorted(spans, key=lambda s: s.start_time):
+        frame = get_frame_data(span)
+        if not frame:
+            continue
+        if span.parent_id:
+            outer_api_levels = api_levels.get(span.parent_id, ())
+        else:
+            outer_api_levels = ()
+        if frame.semantics.api_level is not None:
+            current_api_level = (*outer_api_levels, frame.semantics.api_level)
+            api_levels[span.context.span_id] = current_api_level
+        yield outer_api_levels, frame, span

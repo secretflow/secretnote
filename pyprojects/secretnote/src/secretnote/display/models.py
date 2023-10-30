@@ -1,6 +1,5 @@
-from typing import Dict, List
+from typing import Dict, List, Literal
 
-import orjson
 from pydantic import BaseModel
 
 from secretnote.instrumentation.models import (
@@ -27,13 +26,28 @@ class Timeline(BaseModel):
     timeline: List[TimelineSpan] = []
 
 
-def orjson_dumps(v, *, default):
-    # orjson.dumps returns bytes, to match standard json.dumps we need to decode
-    return orjson.dumps(v, default=default).decode()
+class GraphNode(BaseModel):
+    id: str
+    epoch: int
+    kind: Literal["value", "location"]
+    ref: str
+
+
+class GraphEdge(BaseModel):
+    source: str
+    target: str
+    kind: Literal["identity", "transform"]
+    label: str
+
+
+class Graph(BaseModel):
+    nodes: List[GraphNode] = []
+    edges: List[GraphEdge] = []
 
 
 class Visualization(BaseModel):
     timeline: Timeline
+    graph: Graph
 
     class Config(ORJSONConfig):
         pass

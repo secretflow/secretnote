@@ -6,7 +6,7 @@
 import type { UnboundSnapshot } from './UnboundSnapshot';
 
 export type FunctionSignature = {
-  parameters: Record<string, UnboundSnapshot>;
-  return_annotation: UnboundSnapshot;
+  parameters?: Record<string, UnboundSnapshot>;
+  return_annotation?: UnboundSnapshot;
 };
 

@@ -7,7 +7,7 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
     InMemorySpanExporter as _InMemorySpanExporter,
 )
 from opentelemetry.sdk.util import ns_to_iso_str
-from opentelemetry.trace import Span, SpanContext, format_span_id
+from opentelemetry.trace import format_span_id
 
 from .models import OTelSpanDict
 
@@ -15,11 +15,7 @@ from .models import OTelSpanDict
 def parse_span(raw_span: ReadableSpan) -> OTelSpanDict:
     parent_id = None
     if raw_span.parent is not None:
-        if isinstance(raw_span.parent, Span):
-            ctx = raw_span.parent.context
-            parent_id = f"0x{format_span_id(ctx.span_id)}"
-        elif isinstance(raw_span.parent, SpanContext):
-            parent_id = f"0x{format_span_id(raw_span.parent.span_id)}"
+        parent_id = f"0x{format_span_id(raw_span.parent.span_id)}"
 
     start_time = None
     if raw_span._start_time:

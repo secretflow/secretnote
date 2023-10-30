@@ -99,8 +99,8 @@ class MappingSnapshot(BaseModel):
 
 
 class FunctionSignature(BaseModel):
-    parameters: Dict[str, UnboundSnapshot]
-    return_annotation: UnboundSnapshot
+    parameters: Dict[str, UnboundSnapshot] = {}
+    return_annotation: UnboundSnapshot = UnboundSnapshot()
 
 
 class FunctionSnapshot(BaseModel):
