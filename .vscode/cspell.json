@@ -13,6 +13,7 @@
     "consts",
     "coro",
     "cpus",
+    "dagre",
     "dbaeumer",
     "fdpexpect",
     "fdspawn",

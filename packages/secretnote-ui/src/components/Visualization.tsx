@@ -1,9 +1,11 @@
 import { Visualization as VisualizationProps } from '../.openapi-stubs';
+import { Graph } from './Graph';
+import { RefEnvironment } from '../utils';
 
-export function Visualization({ graph }: VisualizationProps) {
+export function Visualization({ graph, timeline }: VisualizationProps) {
   return (
-    <pre>
-      <code>{JSON.stringify(graph, null, 2)}</code>
-    </pre>
+    <RefEnvironment {...timeline}>
+      <Graph {...graph} />
+    </RefEnvironment>
   );
 }
