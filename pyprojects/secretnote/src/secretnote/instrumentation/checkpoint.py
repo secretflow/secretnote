@@ -4,7 +4,7 @@ from types import CodeType, FrameType
 from typing import Callable, Dict, Optional, TypeVar, Union
 
 from .models import Checkpoint, LocalCallable
-from .snapshot import hash_digest
+from .snapshot import hash_digest, qualname
 
 T = TypeVar("T", bound=Callable)
 
@@ -19,14 +19,15 @@ def checkpoint_from_callable(fn: QualifiedCallable):
         load_const = ()
 
     func = unwrap(func)
+    func_name = qualname(func)
 
     try:
         code = func.__code__
 
         for const in load_const:
             code = code.co_consts[const]
-
-        assert isinstance(code, CodeType)
+            assert isinstance(code, CodeType)
+            func_name += f".<locals>.{code.co_name}"
 
     except IndexError as e:
         raise TypeError(
@@ -41,9 +42,11 @@ def checkpoint_from_callable(fn: QualifiedCallable):
 
     code_digest = hash_digest(code)
 
-    if isinstance(fn, LocalCallable):
-        return Checkpoint(func=None, code_hash=code_digest)
-    return Checkpoint(func=func, code_hash=code_digest)
+    return Checkpoint(
+        name=func_name,
+        function=None if isinstance(fn, LocalCallable) else func,
+        code_hash=code_digest,
+    )
 
 
 class CheckpointCollection:
@@ -71,11 +74,6 @@ class CheckpointCollection:
             return fn
 
         return decorator
-
-
-DEFAULT_CHECKPOINTS = CheckpointCollection()
-
-tracing_checkpoint = DEFAULT_CHECKPOINTS.tracing_checkpoint
 
 
 class APILevel(enum.IntEnum):

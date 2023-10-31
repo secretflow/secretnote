@@ -19,7 +19,7 @@ members = ["pyprojects/*"]
 
 [tool.rye]
 dev-dependencies = [
-  "black>=23.7.0",
+  "black[jupyter]>=23.7.0",
   "datamodel-code-generator>=0.22.1",
   "fastapi<0.100",
   "hatch>=1.7.0",

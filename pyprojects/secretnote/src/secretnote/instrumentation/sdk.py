@@ -2,7 +2,17 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Dict, Generator, Iterable, Optional, Tuple, cast
+from typing import (
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    cast,
+)
 
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -11,14 +21,29 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
-from ray.runtime_context import get_runtime_context
 
+from .checkpoint import APILevel, CheckpointCollection
 from .envvars import (
     OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME,
     OTEL_PYTHON_SECRETNOTE_W3C_TRACE,
 )
 from .exporters import InMemorySpanExporter, JSONLinesSpanExporter
-from .models import OTelSpanDict, TracedFrame
+from .models import (
+    DictSnapshot,
+    FrameInfoSnapshot,
+    FrameSnapshot,
+    FunctionSnapshot,
+    ListSnapshot,
+    LocalCallable,
+    ModuleTracer,
+    ObjectSnapshot,
+    ObjectTracer,
+    OTelSpanDict,
+    RemoteLocationSnapshot,
+    RemoteObjectSnapshot,
+    TracedFrame,
+)
+from .profiler import Profiler
 
 
 def setup_tracing(service_name: Optional[str] = None):
@@ -32,6 +57,8 @@ def setup_tracing(service_name: Optional[str] = None):
 
 
 def setup_tracing_in_ray_worker():
+    from ray.runtime_context import get_runtime_context
+
     runtime_ctx = get_runtime_context()
     setup_tracing(runtime_ctx.get_worker_id())
 
@@ -82,6 +109,7 @@ def remote_trace(fn: Callable) -> Callable:
 
     try:
         checkpoints = current_profiler.get()._checkpoints
+        recorders = current_profiler.get()._recorders
     except LookupError:
         return fn
 
@@ -92,7 +120,7 @@ def remote_trace(fn: Callable) -> Callable:
 
         os.environ.update(context)
 
-        with Profiler(checkpoints, inherit_tracing_context()):
+        with Profiler(checkpoints, recorders, inherit_tracing_context()):
             return fn(*args, **kwargs)
 
     return remote_task
@@ -124,3 +152,83 @@ def iter_frames(
             current_api_level = (*outer_api_levels, frame.semantics.api_level)
             api_levels[span.context.span_id] = current_api_level
         yield outer_api_levels, frame, span
+
+
+def default_checkpoints():
+    import fed
+    import fed._private.fed_call_holder
+    import ray
+    import ray.actor
+    import ray.remote_function
+    import secretflow
+    import secretflow.distributed
+    import secretflow.preprocessing.binning.vert_woe_binning
+    import secretflow.preprocessing.binning.vert_woe_substitution
+    import secretflow.stats
+    from secretflow.device.proxy import _actor_wrapper
+
+    checkpoints = CheckpointCollection()
+    add = checkpoints.add_function
+
+    for fn in (
+        ray.remote_function.RemoteFunction._remote,
+        ray.actor.ActorClass._remote,
+        ray.actor.ActorMethod._remote,
+        ray.get,
+        ray.wait,
+        fed.get,
+        fed.send,
+        fed.recv,
+        fed._private.fed_call_holder.FedCallHolder.internal_remote,
+        secretflow.SPU.infeed_shares,
+        secretflow.SPU.outfeed_shares,
+    ):
+        add(fn, api_level=APILevel.IMPLEMENTATION)
+
+    for fn in (
+        LocalCallable(fn=secretflow.PYU.__call__, load_const=(1,)),
+        LocalCallable(fn=secretflow.SPU.__call__, load_const=(1,)),
+        LocalCallable(fn=_actor_wrapper, load_const=(1,)),
+        secretflow.device.kernels.pyu.pyu_to_pyu,
+        secretflow.device.kernels.pyu.pyu_to_spu,
+        secretflow.device.kernels.pyu.pyu_to_heu,
+        secretflow.device.kernels.spu.spu_to_pyu,
+        secretflow.device.kernels.spu.spu_to_spu,
+        secretflow.device.kernels.spu.spu_to_heu,
+        secretflow.device.kernels.heu.heu_to_pyu,
+        secretflow.device.kernels.heu.heu_to_spu,
+        secretflow.device.kernels.heu.heu_to_heu,
+        secretflow.reveal,
+    ):
+        add(fn, api_level=APILevel.INVARIANT)
+
+    for fn in (
+        secretflow.data.horizontal.HDataFrame.shape.fget,
+        secretflow.data.vertical.VDataFrame.shape.fget,
+        secretflow.data.ndarray.FedNdarray.shape.fget,
+        secretflow.preprocessing.binning.vert_woe_binning.VertWoeBinning.binning,
+        secretflow.preprocessing.binning.vert_woe_substitution.VertWOESubstitution.substitution,
+    ):
+        add(fn, api_level=APILevel.USERLAND)
+
+    return checkpoints
+
+
+def default_snapshot_rules() -> List[Type[ObjectTracer]]:
+    return [
+        ModuleTracer,
+        FunctionSnapshot,
+        FrameInfoSnapshot,
+        FrameSnapshot,
+        RemoteObjectSnapshot,
+        RemoteLocationSnapshot,
+        ListSnapshot,
+        DictSnapshot,
+        ObjectSnapshot,
+    ]
+
+
+def create_profiler():
+    checkpoints = default_checkpoints()
+    snapshot_rules = default_snapshot_rules()
+    return Profiler(checkpoints, snapshot_rules)

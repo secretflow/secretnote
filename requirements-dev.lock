@@ -215,6 +215,7 @@ termcolor==2.3.0
 terminado==0.17.1
 threadpoolctl==3.2.0
 tinycss2==1.2.1
+tokenize-rt==5.2.0
 toml==0.10.2
 tomli==2.0.1
 tomli-w==1.0.0

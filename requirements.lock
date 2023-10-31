@@ -9,7 +9,9 @@
 -e file:.
 -e file:pyprojects/secretnote
 -e file:pyprojects/spu-stubs
+asttokens==2.4.1
 deprecated==1.2.14
+executing==2.0.1
 importlib-metadata==6.8.0
 importlib-resources==6.1.0
 loguru==0.7.2
@@ -20,7 +22,10 @@ opentelemetry-sdk==1.20.0
 opentelemetry-semantic-conventions==0.41b0
 orjson==3.9.9
 packaging==23.2
+pure-eval==0.2.2
 pydantic==1.10.13
+six==1.16.0
+stack-data==0.6.3
 typing-extensions==4.8.0
 wrapt==1.15.0
 zipp==3.17.0

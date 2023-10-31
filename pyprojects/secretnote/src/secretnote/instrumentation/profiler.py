@@ -1,29 +1,82 @@
 import contextvars
-import inspect
 import sys
 from types import FrameType
-from typing import Any, Callable, List, Optional, Tuple, cast
-from weakref import WeakValueDictionary
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Type, cast
 
 from opentelemetry import trace
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
-from .checkpoint import DEFAULT_CHECKPOINTS, CheckpointCollection
+from secretnote.utils.pydantic import Reference, ReferenceMap
+
+from .checkpoint import CheckpointCollection
 from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME
 from .exporters import InMemorySpanExporter
-from .models import Checkpoint, TracedFrame
-from .snapshot import fingerprint, record, record_frame
+from .models import (
+    Checkpoint,
+    ObjectSnapshot,
+    ObjectTracer,
+    SnapshotType,
+    TracedFrame,
+)
+from .snapshot import fingerprint
+
+_NONE_REFERENCE = Reference(ref=fingerprint(None))
+
+
+def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
+    snapshots: Dict[str, SnapshotType] = {_NONE_REFERENCE.ref: ObjectSnapshot.none()}
+
+    def snapshot_tree(root: Any) -> Optional[Reference]:
+        for rule in tracers:
+            if not rule.typecheck(root):
+                continue
+
+            ref = Reference(ref=fingerprint(root))
+
+            if ref.ref in snapshots:
+                return ref
+
+            try:
+                snapshot = rule.trace(root)
+            except NotImplementedError:
+                return None
+
+            snapshots[ref.ref] = snapshot
+
+            for key, items in rule.tree(root).items():
+                if isinstance(items, Mapping):
+                    refs = {k: snapshot_tree(v) for k, v in items.items()}
+                    refs = {k: v for k, v in refs.items() if v is not None}
+                elif isinstance(items, Sequence):
+                    refs = [snapshot_tree(x) for x in items]
+                    refs = [x for x in refs if x is not None]
+                else:
+                    raise TypeError(f"Cannot snapshot {type(items)}")
+                collection = ReferenceMap.from_container(refs)
+                setattr(snapshot, key, collection)
+
+            return ref
+        return None
+
+    result = snapshot_tree(obj)
+
+    if result is None:
+        raise TypeError(f"Cannot snapshot {type(obj)}")
+
+    return result, snapshots
 
 
 class Profiler:
     def __init__(
         self,
-        checkpoints: CheckpointCollection = DEFAULT_CHECKPOINTS,
+        checkpoints: CheckpointCollection,
+        recorders: List[Type[ObjectTracer]],
         context: Optional[Context] = None,
     ):
         self._checkpoints = checkpoints
+        self._recorders = recorders
 
         self._tracer = trace.get_tracer(__name__)
         self._exporter: InMemorySpanExporter
@@ -31,7 +84,6 @@ class Profiler:
         self._parent_context = context
         self._ctx_stack: List[Tuple[Context, TracedFrame]] = []
         self._session_tokens: List[contextvars.Token] = []
-        self._retvals: WeakValueDictionary[str, Callable] = WeakValueDictionary()
 
     @property
     def exporter(self):
@@ -56,26 +108,35 @@ class Profiler:
             self._stack_pop(frame, arg)
             return
 
+    def _trace_objects(self, *objects: Any):
+        refs: List[Reference] = []
+        values: Dict[str, SnapshotType] = {}
+        for obj in objects:
+            ref, snapshots = trace_object(obj, self._recorders)
+            refs.append(ref)
+            values.update(snapshots)
+        return refs, values
+
     def _stack_push(self, frame: FrameType, checkpoint: Checkpoint):
         if self._ctx_stack:
             ctx = self._ctx_stack[-1][0]
         else:
             ctx = self._parent_context
 
-        if checkpoint.func:
-            snapshot = record_frame(frame, checkpoint.func)
-        elif func := self._retvals.get(fingerprint(frame.f_code)):
-            snapshot = record_frame(frame, func)
-        else:
-            snapshot = record_frame(frame, frame.f_code)
+        (func_ref, frame_ref), values = self._trace_objects(checkpoint.function, frame)
 
-        snapshot.semantics = checkpoint.semantics
+        result = TracedFrame(
+            semantics=checkpoint.semantics,
+            function=func_ref,
+            frame=frame_ref,
+            retval=_NONE_REFERENCE,
+            values=values,
+        )
 
-        span_name = snapshot.function.name
-        span = self._tracer.start_span(span_name, ctx)
+        span = self._tracer.start_span(checkpoint.name, ctx)
         ctx = trace.set_span_in_context(span, ctx)
 
-        self._ctx_stack.append((ctx, snapshot))
+        self._ctx_stack.append((ctx, result))
 
     def _stack_pop(self, frame: FrameType, retval: Any):
         if not self._ctx_stack:
@@ -83,18 +144,15 @@ class Profiler:
 
         ctx, call = self._ctx_stack.pop()
 
-        self._track_retval(retval)
-        call.return_value = record(retval)
+        (retval_ref,), values = self._trace_objects(retval)
+
+        call.retval = retval_ref
+        call.values.update(values)
 
         span = trace.get_current_span(ctx)
         payload = call.json(by_alias=True, exclude_none=True)
         span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
         span.end()
-
-    def _track_retval(self, retval: Any):
-        if not inspect.isfunction(retval):
-            return
-        self._retvals[fingerprint(retval.__code__)] = retval
 
     def start(self):
         self.exporter.clear()

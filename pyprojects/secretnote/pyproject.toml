@@ -15,6 +15,7 @@ dependencies = [
   "more-itertools>=10.1.0",
   "importlib-resources>=5.12",
   "networkx>=3.1",
+  "stack_data>=0.6.3",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
