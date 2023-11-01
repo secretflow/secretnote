@@ -34,8 +34,8 @@ alice_is_richer = alice_is_richer.to(devices(PYU, "alice"))
 alice_is_richer = secretflow.reveal(alice_is_richer)
 print(f"{alice_is_richer=}")
 
-balance_alice = secretflow.reveal(balance_alice)
-balance_bob = secretflow.reveal(balance_bob)
+results = {}
+results["alice"], results["bob"] = secretflow.reveal((balance_alice, balance_bob))
 
 print(f"{balance_alice=}")
 print(f"{balance_bob=}")

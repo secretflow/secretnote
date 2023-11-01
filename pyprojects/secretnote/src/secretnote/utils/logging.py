@@ -7,6 +7,8 @@ from typing import Optional, Union
 
 import loguru
 
+from .node import NODE_ENV
+
 IGNORED_ERRORS = (asyncio.TimeoutError,)
 
 
@@ -85,3 +87,8 @@ def configure_logging(
         ],
     )
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+
+
+def log_dev_exception(*args, **kwargs):
+    if NODE_ENV() == "development":
+        loguru.logger.exception(*args, **kwargs)

@@ -1,13 +1,29 @@
+import ast
 import contextvars
 import sys
 from types import FrameType
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Type, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    cast,
+)
 
+import stack_data.core
+from astunparse import unparse
+from more_itertools import first_true
 from opentelemetry import trace
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
+from secretnote.utils.logging import log_dev_exception
 from secretnote.utils.pydantic import Reference, ReferenceMap
 
 from .checkpoint import CheckpointCollection
@@ -20,52 +36,12 @@ from .models import (
     SnapshotType,
     TracedFrame,
 )
-from .snapshot import fingerprint
+from .snapshot import fingerprint, json_key
 
 _NONE_REFERENCE = Reference(ref=fingerprint(None))
 
 
-def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
-    snapshots: Dict[str, SnapshotType] = {_NONE_REFERENCE.ref: ObjectSnapshot.none()}
-
-    def snapshot_tree(root: Any) -> Optional[Reference]:
-        for rule in tracers:
-            if not rule.typecheck(root):
-                continue
-
-            ref = Reference(ref=fingerprint(root))
-
-            if ref.ref in snapshots:
-                return ref
-
-            try:
-                snapshot = rule.trace(root)
-            except NotImplementedError:
-                return None
-
-            snapshots[ref.ref] = snapshot
-
-            for key, items in rule.tree(root).items():
-                if isinstance(items, Mapping):
-                    refs = {k: snapshot_tree(v) for k, v in items.items()}
-                    refs = {k: v for k, v in refs.items() if v is not None}
-                elif isinstance(items, Sequence):
-                    refs = [snapshot_tree(x) for x in items]
-                    refs = [x for x in refs if x is not None]
-                else:
-                    raise TypeError(f"Cannot snapshot {type(items)}")
-                collection = ReferenceMap.from_container(refs)
-                setattr(snapshot, key, collection)
-
-            return ref
-        return None
-
-    result = snapshot_tree(obj)
-
-    if result is None:
-        raise TypeError(f"Cannot snapshot {type(obj)}")
-
-    return result, snapshots
+FinalizeSpan = Callable[[Optional[FrameType]], None]
 
 
 class Profiler:
@@ -82,8 +58,12 @@ class Profiler:
         self._exporter: InMemorySpanExporter
 
         self._parent_context = context
-        self._ctx_stack: List[Tuple[Context, TracedFrame]] = []
         self._session_tokens: List[contextvars.Token] = []
+
+        # most recent on the right
+        self._recent_stacks: List[Tuple[Context, TracedFrame]] = []
+        # most recent on the left
+        self._recent_returns: List[FinalizeSpan] = []
 
     @property
     def exporter(self):
@@ -118,8 +98,8 @@ class Profiler:
         return refs, values
 
     def _stack_push(self, frame: FrameType, checkpoint: Checkpoint):
-        if self._ctx_stack:
-            ctx = self._ctx_stack[-1][0]
+        if self._recent_stacks:
+            ctx = self._recent_stacks[-1][0]
         else:
             ctx = self._parent_context
 
@@ -130,37 +110,83 @@ class Profiler:
             function=func_ref,
             frame=frame_ref,
             retval=_NONE_REFERENCE,
-            values=values,
+            assignments=_NONE_REFERENCE,
+            variables=values,
         )
 
-        span = self._tracer.start_span(checkpoint.name, ctx)
+        span = self._tracer.start_span(result.get_function_name(), ctx)
         ctx = trace.set_span_in_context(span, ctx)
 
-        self._ctx_stack.append((ctx, result))
+        self._recent_stacks.append((ctx, result))
 
     def _stack_pop(self, frame: FrameType, retval: Any):
-        if not self._ctx_stack:
+        if not self._recent_stacks:
             return
 
-        ctx, call = self._ctx_stack.pop()
+        ctx, call = self._recent_stacks.pop()
 
         (retval_ref,), values = self._trace_objects(retval)
-
         call.retval = retval_ref
-        call.values.update(values)
+        call.variables.update(values)
 
-        span = trace.get_current_span(ctx)
-        payload = call.json(by_alias=True, exclude_none=True)
-        span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
-        span.end()
+        def end_current_span(f_back: Optional[FrameType]):
+            try:
+                if f_back and (named_values := trace_named_return(f_back, retval)):
+                    named_values = {k.strip(): v for k, v in named_values.items()}
+                    (refs,), values = self._trace_objects(named_values)
+                    call.assignments = refs
+                    call.variables.update(values)
+            except Exception as e:
+                log_dev_exception(e)
+            span = trace.get_current_span(ctx)
+            payload = call.json(by_alias=True, exclude_none=True)
+            span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
+            span.end()
+
+        self._recent_returns.append(end_current_span)
+
+        def end_remaining_spans(f_back: Optional[FrameType]):
+            for fn in self._recent_returns:
+                fn(f_back)
+            self._recent_returns.clear()
+            frame.f_trace_lines = False
+            frame.f_trace = self._trace_noop
+
+        def trace_line_in_outer_frame(frame: FrameType):
+            if frame.f_back:
+                frame.f_back.f_trace_lines = True
+                frame.f_back.f_trace = trace_next_assignments
+            else:
+                # no more outer frame, finalize spans
+                end_remaining_spans(None)
+
+        def trace_next_assignments(f_back: FrameType, event: str, arg: None):
+            if event == "return":
+                # bubble up to outer frame
+                trace_line_in_outer_frame(f_back)
+                return None
+
+            if event != "line":
+                # wait for next line trace
+                return trace_next_assignments
+
+            end_remaining_spans(f_back)
+
+        trace_line_in_outer_frame(frame)
+
+    def _trace_noop(self, frame: FrameType, event: str, arg: Any):
+        frame.f_trace_lines = False
+        return self._trace_noop
 
     def start(self):
         self.exporter.clear()
         self._session_tokens.append(current_profiler.set(self))
+        sys.settrace(self._trace_noop)
         sys.setprofile(self)
 
     def stop(self):
         sys.setprofile(None)
+        sys.settrace(None)
         if self._session_tokens:
             current_profiler.reset(self._session_tokens.pop())
 
@@ -171,6 +197,108 @@ class Profiler:
     def __exit__(self, *args):
         self.stop()
         return False
+
+
+def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
+    snapshots: Dict[str, SnapshotType] = {_NONE_REFERENCE.ref: ObjectSnapshot.none()}
+
+    def snapshot_tree(root: Any) -> Optional[Reference]:
+        for rule in tracers:
+            if not rule.typecheck(root):
+                continue
+
+            ref = Reference(ref=fingerprint(root))
+
+            if ref.ref in snapshots:
+                return ref
+
+            try:
+                snapshot = rule.trace(root)
+            except NotImplementedError:
+                return None
+
+            snapshots[ref.ref] = snapshot
+
+            for key, items in rule.tree(root).items():
+                if isinstance(items, Mapping):
+                    refs = {k: snapshot_tree(v) for k, v in items.items()}
+                    refs = {json_key(k): v for k, v in refs.items() if v is not None}
+                elif isinstance(items, Sequence):
+                    refs = [snapshot_tree(x) for x in items]
+                    refs = [x for x in refs if x is not None]
+                else:
+                    raise TypeError(f"Cannot snapshot {type(items)}")
+                collection = ReferenceMap.from_container(refs)
+                setattr(snapshot, key, collection)
+
+            return ref
+        return None
+
+    result = snapshot_tree(obj)
+
+    if result is None:
+        raise TypeError(f"Cannot snapshot {type(obj)}")
+
+    return result, snapshots
+
+
+def trace_named_return(frame: FrameType, retval: Any):
+    retval_type = type(retval)
+
+    info = stack_data.core.FrameInfo(frame)
+
+    if retval_type is tuple or retval_type is list:
+        # could be unpacking assignment, in which case there will be a different
+        # tuple in the parent frame, then we will have to compare by elements
+        #
+        # we limit the supporting types to vanilla tuple/list
+        # because we will need to iterate over it to determine item identity
+        # and we want to avoid side effects in custom iterables
+
+        def resolve_variables() -> Optional[Dict]:
+            retval_len = len(retval)
+
+            for expr, ast_nodes, value in cast(
+                List[stack_data.core.Variable],
+                info.variables,
+            ):
+                if value is retval:
+                    # if it wasn't actually unpacked, return the entire iterable
+                    return {expr: value}
+
+                if (
+                    isinstance(value, tuple)
+                    and len(value) == retval_len
+                    and all(a is b for a, b in zip(value, retval))
+                ):
+                    tuple_ast = cast(
+                        Optional[ast.Tuple],
+                        first_true(
+                            ast_nodes,
+                            pred=lambda x: isinstance(x, ast.Tuple),
+                        ),
+                    )
+
+                    if tuple_ast and len(tuple_ast.elts) == retval_len:
+                        # map expressions to values
+                        names = [unparse(x) for x in tuple_ast.elts]
+                        return {name: value for name, value in zip(names, retval)}
+
+            # can't find any corresponding value
+            # this can happen with unpacking assignment with stars
+            # (stack_data will refuse to parse the expression)
+            return None
+
+    else:
+        # resolve by identity
+
+        def resolve_variables() -> Optional[Dict]:
+            for expr, _, value in cast(List[stack_data.core.Variable], info.variables):
+                if value is retval:
+                    return {expr: value}
+            return None
+
+    return resolve_variables()
 
 
 current_profiler = contextvars.ContextVar[Profiler]("current_profiler")

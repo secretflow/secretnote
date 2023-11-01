@@ -30,7 +30,6 @@ from sklearn import linear_model
 from sklearn.preprocessing import StandardScaler
 
 from secretnote.formal.locations import OnDemandDevice
-from secretnote.instrumentation import APILevel, tracing_checkpoint
 
 devices = OnDemandDevice(globals())
 
@@ -46,7 +45,6 @@ class env:
 pyus = [env.alice, env.bob, env.carol, env.davy]
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def _build_splited_ds(pyus, x, y, parties):
     assert x.shape[1] >= parties
     assert len(pyus) >= parties
@@ -63,7 +61,6 @@ def _build_splited_ds(pyus, x, y, parties):
     return fed_x, fed_y
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def _run_ss(env, pyus, x, y, p, w, parties, reg: RegType):
     # weights to spu
     pyu_w = env.alice(lambda: np.array(w))()
@@ -89,7 +86,6 @@ def _run_ss(env, pyus, x, y, p, w, parties, reg: RegType):
     print(f"pvalues\n{pvalues}\np\n{p}\nabs_err\n{abs_err}\n")
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def _run_test(env, pyus, x, y, reg: RegType):
     scaler = StandardScaler()
     x = scaler.fit_transform(x)
@@ -122,7 +118,6 @@ def _run_test(env, pyus, x, y, reg: RegType):
     _run_ss(env, pyus, x, y, pvalues, weights, 3, reg)
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def test_linear_ds():
     ds = pd.read_csv(dataset("linear"))
     y = ds["y"].values
@@ -132,7 +127,6 @@ def test_linear_ds():
     _run_test(env, pyus, x, y, RegType.Linear)
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def test_breast_cancer_ds():
     from sklearn.datasets import load_breast_cancer
 
@@ -143,7 +137,6 @@ def test_breast_cancer_ds():
     _run_test(env, pyus, x, y, RegType.Linear)
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def test_ss_lr_logistic():
     ds = pd.read_csv(dataset("linear"))
     y = ds["y"].values
@@ -158,7 +151,6 @@ def test_ss_lr_logistic():
     print(f" test_ss_lr_logistic {pvalues}\n")
 
 
-@tracing_checkpoint(APILevel.USERLAND)
 def test_ss_lr_linear():
     ds = pd.read_csv(dataset("linear"))
     y = ds["y"].values

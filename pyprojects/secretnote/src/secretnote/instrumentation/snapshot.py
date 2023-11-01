@@ -5,7 +5,7 @@ from collections import defaultdict
 from contextlib import suppress
 from pprint import pformat
 from textwrap import dedent
-from types import CodeType, FrameType, FunctionType
+from types import CodeType, FrameType, FunctionType, ModuleType
 from typing import (
     Any,
     Callable,
@@ -17,6 +17,8 @@ from typing import (
     overload,
 )
 from weakref import WeakValueDictionary
+
+from opentelemetry import trace
 
 from secretnote.formal.symbols import LogicalLocation
 
@@ -33,11 +35,8 @@ class LifetimeIdentityTracker:
             return f"python/id/{hex(obj_id)}+{self.generations[obj_id]}"
         # first object with this ID, or ID reused
         # after a previous object was garbage collected
-        try:
-            self.refs[obj_id] = obj
-        except TypeError:
-            # cannot weakref this object
-            return f"python/transient/{hex(obj_id)}"
+        self.refs[obj_id] = obj
+        # will throw if object cannot be weakref'd
         self.generations[obj_id] += 1
         return f"python/id/{hex(obj_id)}+{self.generations[obj_id]}"
 
@@ -56,6 +55,7 @@ def logical_location(device: Any) -> LogicalLocation:
         kind = "PYU"
         parties = (device.party,)
         params = {}
+
     elif isinstance(device, SPU):
         kind = "SPU"
         parties = tuple(device.actors)
@@ -64,16 +64,20 @@ def logical_location(device: Any) -> LogicalLocation:
             "field": device.conf.field,
             "fxp_fraction_bits": device.conf.fxp_fraction_bits,
         }
+
     elif isinstance(device, HEU):
         kind = "HEU"
         parties = (device.sk_keeper_name(), *device.evaluator_names())
         params = {}
+
     elif isinstance(device, TEEU):
         kind = "TEEU"
         parties = (device.party,)
         params = {}
+
     else:
         raise TypeError(f"Unknown device type {type(device)}")
+
     return LogicalLocation(kind=kind, parties=parties, parameters=params)
 
 
@@ -104,10 +108,9 @@ def fingerprint(obj: Any) -> str:
         TEEUObject,
     )
 
-    if isinstance(obj, inspect.FrameInfo):
-        return fingerprint(obj.frame)
-    if isinstance(obj, FrameType):
-        return f"python/frame/id/{hex(id(obj))}/line/{obj.f_lineno}"
+    if obj is None:
+        return "python/none"
+
     if isinstance(obj, Device):
         return f"secretflow/location/{logical_location(obj).as_key()}"
     if isinstance(obj, ObjectRef):
@@ -122,7 +125,20 @@ def fingerprint(obj: Any) -> str:
         return f"secretflow/object/homomorphic/{fingerprint(obj.data)}"
     if isinstance(obj, TEEUObject):
         return f"secretflow/object/tee/{fingerprint(obj.data)}"
-    return id_tracker.fingerprint(obj)
+
+    try:
+        return id_tracker.fingerprint(obj)
+    except TypeError:
+        pass
+
+    span_id = hex(trace.get_current_span().get_span_context().span_id)
+    if isinstance(obj, FrameType):
+        obj_id = f"frame/{hex(id(obj))}/line/{obj.f_lineno}"
+    elif isinstance(obj, inspect.FrameInfo):
+        obj_id = f"frame/{hex(id(obj.frame))}/line/{obj.frame.f_lineno}"
+    else:
+        obj_id = f"id/{hex(id(obj))}"
+    return f"otel/span/{span_id}/transient/{obj_id}"
 
 
 @overload
@@ -167,6 +183,8 @@ def qualname_tuple(obj: Any) -> Tuple[Optional[str], Optional[str]]:
 
 
 def qualname(obj: Any) -> str:
+    if isinstance(obj, ModuleType):
+        return obj.__name__
     module_name, obj_name = qualname_tuple(obj)
     return f"{module_name or '<unknown_module>'}.{obj_name or '<unknown>'}"
 

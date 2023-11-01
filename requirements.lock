@@ -10,6 +10,7 @@
 -e file:pyprojects/secretnote
 -e file:pyprojects/spu-stubs
 asttokens==2.4.1
+astunparse==1.6.3
 deprecated==1.2.14
 executing==2.0.1
 importlib-metadata==6.8.0
@@ -26,6 +27,8 @@ pure-eval==0.2.2
 pydantic==1.10.13
 six==1.16.0
 stack-data==0.6.3
+tqdm==4.66.1
 typing-extensions==4.8.0
+wheel==0.41.3
 wrapt==1.15.0
 zipp==3.17.0

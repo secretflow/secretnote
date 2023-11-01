@@ -2,28 +2,34 @@ import abc
 import inspect
 from datetime import datetime
 from textwrap import dedent
-from types import FrameType, FunctionType, ModuleType
+from types import FrameType, FunctionType
 from typing import (
+    Any,
     Callable,
     Dict,
+    Iterable,
     List,
     Literal,
     Mapping,
     Optional,
     Sequence,
     Tuple,
+    Type,
+    TypeVar,
     Union,
 )
 
+import stack_data.core
 from opentelemetry.util.types import Attributes
 from pydantic import BaseModel, Field
-from typing_extensions import Annotated
+from typing_extensions import Annotated, override
 
 from secretnote.formal.symbols import LogicalLocation
 from secretnote.utils.pydantic import (
-    LookupProxy,
+    ProxiedModel,
     Reference,
     ReferenceMap,
+    to_flattened_pytree,
     update_forward_refs,
 )
 
@@ -37,6 +43,8 @@ from .snapshot import (
     to_string,
     type_annotation,
 )
+
+T = TypeVar("T", bound="SnapshotType")
 
 
 class ObjectTracer(abc.ABC):
@@ -55,7 +63,19 @@ class ObjectTracer(abc.ABC):
         return {}
 
 
-class ObjectSnapshot(ObjectTracer, LookupProxy):
+class NoneSnapshot(ObjectTracer, Reference, ProxiedModel):
+    kind: Literal["none"] = "none"
+
+    @classmethod
+    def typecheck(cls, x) -> bool:
+        return x is None
+
+    @classmethod
+    def trace(cls, x) -> "SnapshotType":
+        return NoneSnapshot(ref=fingerprint(x))
+
+
+class ObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["object"] = "object"
     type: str
     snapshot: str
@@ -66,14 +86,21 @@ class ObjectSnapshot(ObjectTracer, LookupProxy):
 
     @classmethod
     def trace(cls, x) -> "SnapshotType":
-        return ObjectSnapshot(type=qualname(type(x)), snapshot=to_string(x))
+        return ObjectSnapshot(
+            ref=fingerprint(x),
+            type=qualname(type(x)),
+            snapshot=to_string(x),
+        )
 
     @classmethod
     def none(cls):
         return cls.trace(None)
 
+    def __str__(self) -> str:
+        return self.snapshot
 
-class ListSnapshot(ObjectTracer, LookupProxy):
+
+class ListSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["list"] = "list"
     type: str
     snapshot: str
@@ -87,14 +114,32 @@ class ListSnapshot(ObjectTracer, LookupProxy):
 
     @classmethod
     def trace(cls, x) -> "SnapshotType":
-        return ListSnapshot(type=qualname(type(x)), snapshot=to_string(x))
+        return ListSnapshot(
+            ref=fingerprint(x),
+            type=qualname(type(x)),
+            snapshot=to_string(x),
+        )
 
     @classmethod
     def tree(cls, x) -> Dict[str, Union[Dict, List]]:
+        try:
+            # namedtuple
+            values = x._asdict()
+            assert isinstance(values, dict)
+            return {"values": {**values}}
+        except Exception:
+            pass
         return {"values": [*x]}
 
+    @override
+    def to_container(self, of_type: Type[T] = Any):
+        return [v for k, v in self.values.of_type(of_type)]
 
-class DictSnapshot(ObjectTracer, LookupProxy):
+    def __str__(self) -> str:
+        return self.snapshot
+
+
+class DictSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["dict"] = "dict"
     type: str
     snapshot: str
@@ -106,14 +151,25 @@ class DictSnapshot(ObjectTracer, LookupProxy):
 
     @classmethod
     def trace(cls, x) -> "SnapshotType":
-        return DictSnapshot(type=qualname(type(x)), snapshot=to_string(x))
+        return DictSnapshot(
+            ref=fingerprint(x),
+            type=qualname(type(x)),
+            snapshot=to_string(x),
+        )
 
     @classmethod
     def tree(cls, x) -> Dict[str, Union[Dict, List]]:
         return {"values": {**x}}
 
+    @override
+    def to_container(self, of_type: Type[T] = Any):
+        return {k: v for k, v in self.values.of_type(of_type)}
 
-class RemoteLocationSnapshot(ObjectTracer, LookupProxy):
+    def __str__(self) -> str:
+        return self.snapshot
+
+
+class RemoteLocationSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["remote_location"] = "remote_location"
     type: str
     location: LogicalLocation
@@ -129,12 +185,16 @@ class RemoteLocationSnapshot(ObjectTracer, LookupProxy):
         from .snapshot import logical_location
 
         return RemoteLocationSnapshot(
+            ref=fingerprint(x),
             type=qualname(type(x)),
             location=logical_location(x),
         )
 
+    def __str__(self) -> str:
+        return str(self.location)
 
-class RemoteObjectSnapshot(ObjectTracer, LookupProxy):
+
+class RemoteObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["remote_object"] = "remote_object"
     type: str
     location: LogicalLocation
@@ -160,9 +220,16 @@ class RemoteObjectSnapshot(ObjectTracer, LookupProxy):
             refs = (fingerprint(x.data),)
         else:
             raise TypeError(f"Unknown device object type {type(x)}")
-        location = logical_location(x.device)
-        type_ = qualname(type(x))
-        return RemoteObjectSnapshot(type=type_, location=location, refs=refs)
+
+        return RemoteObjectSnapshot(
+            ref=fingerprint(x),
+            type=qualname(type(x)),
+            location=logical_location(x.device),
+            refs=refs,
+        )
+
+    def __str__(self) -> str:
+        return f"{self.ref} @ {self.location}"
 
 
 class FunctionParameter(BaseModel):
@@ -175,8 +242,21 @@ class FunctionSignature(BaseModel):
     parameters: List[FunctionParameter] = []
     return_annotation: Optional[str] = None
 
+    def reconstruct(self) -> inspect.Signature:
+        return inspect.Signature(
+            parameters=[
+                inspect.Parameter(
+                    name=p.name,
+                    kind=p.kind,
+                    annotation=p.annotation,
+                )
+                for p in self.parameters
+            ],
+            return_annotation=self.return_annotation,
+        )
 
-class FunctionSnapshot(ObjectTracer, LookupProxy):
+
+class FunctionSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["function"] = "function"
     type: str
 
@@ -188,6 +268,7 @@ class FunctionSnapshot(ObjectTracer, LookupProxy):
     source: Optional[str] = None
     docstring: Optional[str] = None
 
+    default_args: ReferenceMap = ReferenceMap.empty_dict()
     closure_vars: ReferenceMap = ReferenceMap.empty_dict()
     global_vars: ReferenceMap = ReferenceMap.empty_dict()
 
@@ -212,6 +293,7 @@ class FunctionSnapshot(ObjectTracer, LookupProxy):
             sourcelines = firstlineno = None
 
         return FunctionSnapshot(
+            ref=fingerprint(func),
             type=qualname(type(func)),
             name=name or "<unknown>",
             module=module,
@@ -225,6 +307,11 @@ class FunctionSnapshot(ObjectTracer, LookupProxy):
     @classmethod
     def tree(cls, func: FunctionType) -> Dict[str, Union[Dict, List]]:
         return {
+            "default_args": {
+                k: p.default
+                for k, p in inspect.signature(func).parameters.items()
+                if p.default is not inspect.Parameter.empty
+            },
             "closure_vars": {**inspect.getclosurevars(func).nonlocals},
             "global_vars": find_globals(func, getattr(func, "__globals__", {})),
         }
@@ -242,8 +329,13 @@ class FunctionSnapshot(ObjectTracer, LookupProxy):
         return_type = type_annotation(sig.return_annotation)
         return FunctionSignature(parameters=params, return_annotation=return_type)
 
+    def __str__(self) -> str:
+        if self.module and self.name:
+            return f"{self.module}.{self.name}"
+        return self.name
 
-class FrameInfoSnapshot(ObjectTracer, LookupProxy):
+
+class FrameInfoSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["frame_info"] = "frame_info"
     type: str
     filename: str
@@ -262,6 +354,7 @@ class FrameInfoSnapshot(ObjectTracer, LookupProxy):
         else:
             code = "".join(f.code_context).strip()
         return FrameInfoSnapshot(
+            ref=fingerprint(f),
             type=qualname(type(f)),
             filename=source_path(f.filename),
             lineno=f.lineno,
@@ -270,15 +363,16 @@ class FrameInfoSnapshot(ObjectTracer, LookupProxy):
         )
 
 
-class FrameSnapshot(ObjectTracer, LookupProxy):
+class FrameSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["frame"] = "frame"
     type: str
 
-    function: ReferenceMap = ReferenceMap.empty_dict()
     local_vars: ReferenceMap = ReferenceMap.empty_dict()
     global_vars: ReferenceMap = ReferenceMap.empty_dict()
-    return_value: ReferenceMap = ReferenceMap.empty_list()
     outer_frames: ReferenceMap = ReferenceMap.empty_list()
+
+    module: Optional[str] = None
+    func: str
 
     @classmethod
     def typecheck(cls, x) -> bool:
@@ -286,7 +380,14 @@ class FrameSnapshot(ObjectTracer, LookupProxy):
 
     @classmethod
     def trace(cls, f: FrameType) -> "SnapshotType":
-        return FrameSnapshot(type=qualname(type(f)))
+        info = stack_data.core.FrameInfo(f)
+        module = inspect.getmodule(f.f_code)
+        return FrameSnapshot(
+            ref=fingerprint(f),
+            type=qualname(type(f)),
+            module=qualname(module),
+            func=info.executing.code_qualname(),
+        )
 
     @classmethod
     def tree(cls, f: FrameType) -> Dict[str, Union[Dict, List]]:
@@ -297,18 +398,9 @@ class FrameSnapshot(ObjectTracer, LookupProxy):
         }
 
 
-class ModuleTracer(ObjectTracer):
-    @classmethod
-    def typecheck(cls, x) -> bool:
-        return isinstance(x, ModuleType)
-
-    @classmethod
-    def trace(cls, x):
-        raise NotImplementedError
-
-
 SnapshotType = Annotated[
     Union[
+        NoneSnapshot,
         ObjectSnapshot,
         ListSnapshot,
         DictSnapshot,
@@ -333,22 +425,42 @@ class TracedFrame(BaseModel):
     function: Reference
     frame: Reference
     retval: Reference
+    assignments: Reference
 
-    values: Dict[str, SnapshotType]
+    variables: Dict[str, SnapshotType]
 
     def get_function(self):
-        return self.function.bind(FunctionSnapshot, self.values)
+        return self.function.bind(FunctionSnapshot, self.variables)
+
+    def get_function_name(self) -> str:
+        try:
+            func = self.get_function()
+            module = func.module
+            name = func.name
+        except TypeError:
+            info = self.get_frame()
+            module = info.module
+            name = info.func
+        if not module:
+            return name
+        return f"{module}.{name}"
 
     def get_frame(self):
-        return self.frame.bind(FrameSnapshot, self.values)
+        return self.frame.bind(FrameSnapshot, self.variables)
 
-    def get_retval(self):
-        return self.retval.bind(SnapshotType, self.values)
+    def iter_retvals(self) -> Iterable[Tuple[str, SnapshotType]]:
+        try:
+            assignments = self.assignments.bind(DictSnapshot, self.variables)
+            for key, value in assignments.values.of_type(SnapshotType):
+                yield key, value
+        except TypeError:
+            retval = self.retval.bind(SnapshotType, self.variables)
+            for key, value in to_flattened_pytree(retval):
+                yield key, value
 
 
 class Checkpoint(BaseModel):
     code_hash: str
-    name: str
     function: Optional[Callable]
     semantics: Semantics = Semantics()
 

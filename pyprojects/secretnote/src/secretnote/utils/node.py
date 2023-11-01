@@ -1,10 +1,18 @@
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Dict, Optional
 
 import importlib_resources
+
+
+def NODE_ENV():
+    try:
+        return os.environ["NODE_ENV"]
+    except KeyError:
+        return "production"
 
 
 class create_require:

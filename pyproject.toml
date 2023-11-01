@@ -3,6 +3,7 @@ authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
 classifiers = [
   "Private :: Do Not Upload",
 ]
+dependencies = []
 name = "monorepo"
 readme = "README.md"
 requires-python = ">=3.8, <3.9"
@@ -39,6 +40,8 @@ dev-dependencies = [
   "torch>=2.1.0",
   "uvicorn>=0.23.2",
   "snakeviz>=2.2.0",
+  "torchmetrics>=1.2.0",
+  "torchvision>=0.16.0",
 ]
 managed = true
 
@@ -58,6 +61,9 @@ target-versions = ["py38", "py39", "py310"]
 line-length = 88
 select = ["E", "F", "W", "B", "I"]
 src = ["pyprojects/*/src"]
+
+[tool.ruff.extend-per-file-ignores]
+"*.ipynb" = ["E402", "I001"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]

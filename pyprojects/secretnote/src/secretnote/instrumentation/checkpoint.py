@@ -4,7 +4,7 @@ from types import CodeType, FrameType
 from typing import Callable, Dict, Optional, TypeVar, Union
 
 from .models import Checkpoint, LocalCallable
-from .snapshot import hash_digest, qualname
+from .snapshot import hash_digest
 
 T = TypeVar("T", bound=Callable)
 
@@ -19,7 +19,6 @@ def checkpoint_from_callable(fn: QualifiedCallable):
         load_const = ()
 
     func = unwrap(func)
-    func_name = qualname(func)
 
     try:
         code = func.__code__
@@ -27,7 +26,6 @@ def checkpoint_from_callable(fn: QualifiedCallable):
         for const in load_const:
             code = code.co_consts[const]
             assert isinstance(code, CodeType)
-            func_name += f".<locals>.{code.co_name}"
 
     except IndexError as e:
         raise TypeError(
@@ -43,7 +41,6 @@ def checkpoint_from_callable(fn: QualifiedCallable):
     code_digest = hash_digest(code)
 
     return Checkpoint(
-        name=func_name,
         function=None if isinstance(fn, LocalCallable) else func,
         code_hash=code_digest,
     )

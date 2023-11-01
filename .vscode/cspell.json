@@ -15,6 +15,7 @@
     "cpus",
     "dagre",
     "dbaeumer",
+    "elts",
     "fdpexpect",
     "fdspawn",
     "getipython",
