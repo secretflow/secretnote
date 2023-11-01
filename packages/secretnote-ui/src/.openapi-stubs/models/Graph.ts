@@ -3,11 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { GraphEdge } from './GraphEdge';
-import type { GraphNode } from './GraphNode';
+import type { ArgumentEdge } from './ArgumentEdge';
+import type { FunctionNode } from './FunctionNode';
+import type { LocalObjectNode } from './LocalObjectNode';
+import type { ReferenceEdge } from './ReferenceEdge';
+import type { RemoteObjectNode } from './RemoteObjectNode';
+import type { ReturnEdge } from './ReturnEdge';
+import type { RevealEdge } from './RevealEdge';
+import type { TransformEdge } from './TransformEdge';
 
 export type Graph = {
-  nodes?: Array<GraphNode>;
-  edges?: Array<GraphEdge>;
+  nodes?: Array<(LocalObjectNode | RemoteObjectNode | FunctionNode)>;
+  edges?: Array<(ArgumentEdge | ReturnEdge | TransformEdge | ReferenceEdge | RevealEdge)>;
 };
 

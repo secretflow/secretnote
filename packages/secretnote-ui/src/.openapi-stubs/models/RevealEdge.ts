@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type UnboundSnapshot = {
-  kind?: 'unbound';
-  annotation?: string;
+export type RevealEdge = {
+  source: string;
+  target: string;
+  kind?: 'reveal';
+  name?: string;
 };
 

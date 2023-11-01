@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UnboundSnapshot } from './UnboundSnapshot';
+import type { FunctionParameter } from './FunctionParameter';
 
 export type FunctionSignature = {
-  parameters?: Record<string, UnboundSnapshot>;
-  return_annotation?: UnboundSnapshot;
+  parameters?: Array<FunctionParameter>;
+  return_annotation?: string;
 };
 

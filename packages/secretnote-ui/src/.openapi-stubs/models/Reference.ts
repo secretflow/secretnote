@@ -3,9 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Timeline } from './Timeline';
-
-export type Visualization = {
-  timeline: Timeline;
+export type Reference = {
+  ref: string;
 };
 

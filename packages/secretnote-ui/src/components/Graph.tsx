@@ -2,15 +2,15 @@ import { Graph as GraphProps } from '../.openapi-stubs';
 import { useEffect, useRef } from 'react';
 import G6 from '@antv/g6';
 import { GraphData } from '@antv/g6';
-import { useGetters } from '../utils';
 
 export function Graph({ nodes, edges }: GraphProps) {
   const container = useRef<HTMLDivElement>(null);
-  const { deref, numbering } = useGetters();
+
   useEffect(() => {
     if (!container.current) {
       return;
     }
+
     const graph = new G6.Graph({
       container: container.current,
       width: container.current.clientWidth,
@@ -32,34 +32,16 @@ export function Graph({ nodes, edges }: GraphProps) {
         },
       },
       modes: {
-        default: [
-          'drag-canvas',
-          { type: 'zoom-canvas', sensitivity: 2, minZoom: 0.5, maxZoom: 1.2 },
-        ],
+        default: [{ type: 'scroll-canvas' }],
       },
-      fitView: true,
-      fitViewPadding: 10,
+      minZoom: 0.8,
+      maxZoom: 2,
     });
-    const getLabel = (ref: string) => {
-      const value = deref({ id: ref });
-      if (!value) {
-        return ref;
-      }
-      switch (value.kind) {
-        case 'device':
-          return `${value.location.kind}(${value.location.parties.join(', ')})`;
-        case 'remote_object':
-          return `${value.location.kind[0]}(${numbering({ id: value.id })})`;
-        case 'function':
-          return value.name;
-        default:
-          return 'IO';
-      }
-    };
+
     const v =
       nodes?.map((node) => {
         switch (node.kind) {
-          case 'value':
+          case 'local':
             return {
               ...node,
               anchorPoints: [
@@ -68,25 +50,54 @@ export function Graph({ nodes, edges }: GraphProps) {
               ],
               type: 'circle',
               size: 40,
-              label: getLabel(node.ref),
+              label: `${node.data.name}`,
             };
-          case 'location':
+          case 'remote':
             return {
               ...node,
               anchorPoints: [
                 [0.5, 0],
                 [0.5, 1],
               ],
-              type: 'rect',
-              size: [120, 40],
-              label: getLabel(node.ref),
+              type: 'circle',
+              size: 40,
+              label: `${node.data.location.type[0]}${node.data.numbering}`,
             };
+          case 'function':
+            return {
+              ...node,
+              anchorPoints: [
+                [0, 0.5],
+                [0.5, 0],
+                [0.5, 1],
+                [1, 0.5],
+              ],
+              type: 'rect',
+              size: [200, 40],
+              label: node.data?.name || node.location.type,
+            };
+          default:
+            throw new Error(`Unknown node kind: ${node.kind}`);
         }
       }) ?? [];
-    const e = edges?.map((edge) => edge) ?? [];
+
+    const e =
+      edges?.map((edge) => {
+        switch (edge.kind) {
+          case 'argument':
+            return {
+              ...edge,
+              label: edge.name || '',
+            };
+          default:
+            return edge;
+        }
+      }) ?? [];
+
     const data: GraphData = { nodes: v, edges: e };
     graph.data(data);
     graph.render();
+
     const resizeObserver = new ResizeObserver(() => {
       if (!container.current) {
         return;
@@ -98,6 +109,7 @@ export function Graph({ nodes, edges }: GraphProps) {
       graph.destroy();
       resizeObserver.disconnect();
     };
-  }, [nodes, edges, deref, numbering]);
+  }, [nodes, edges]);
+
   return <div style={{ width: '100%', height: '600px' }} ref={container} />;
 }

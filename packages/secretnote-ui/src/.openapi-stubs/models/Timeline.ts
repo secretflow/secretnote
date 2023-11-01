@@ -3,22 +3,21 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DeviceSnapshot } from './DeviceSnapshot';
+import type { DictSnapshot } from './DictSnapshot';
+import type { Frame } from './Frame';
+import type { FrameInfoSnapshot } from './FrameInfoSnapshot';
 import type { FrameSnapshot } from './FrameSnapshot';
 import type { FunctionSnapshot } from './FunctionSnapshot';
-import type { LogicalLocation } from './LogicalLocation';
-import type { MappingSnapshot } from './MappingSnapshot';
+import type { Graph } from './Graph';
+import type { ListSnapshot } from './ListSnapshot';
+import type { NoneSnapshot } from './NoneSnapshot';
 import type { ObjectSnapshot } from './ObjectSnapshot';
+import type { RemoteLocationSnapshot } from './RemoteLocationSnapshot';
 import type { RemoteObjectSnapshot } from './RemoteObjectSnapshot';
-import type { SequenceSnapshot } from './SequenceSnapshot';
-import type { SnapshotRef } from './SnapshotRef';
-import type { TimelineSpan } from './TimelineSpan';
-import type { UnboundSnapshot } from './UnboundSnapshot';
 
 export type Timeline = {
-  locations?: Array<LogicalLocation>;
-  variables?: Record<string, Record<string, (SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>>;
-  object_refs?: Record<string, number>;
-  timeline?: Array<TimelineSpan>;
+  variables?: Record<string, (NoneSnapshot | ObjectSnapshot | ListSnapshot | DictSnapshot | RemoteObjectSnapshot | RemoteLocationSnapshot | FunctionSnapshot | FrameInfoSnapshot | FrameSnapshot)>;
+  timeline?: Array<Frame>;
+  graph: Graph;
 };
 

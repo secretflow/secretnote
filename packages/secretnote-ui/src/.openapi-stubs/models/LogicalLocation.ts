@@ -4,7 +4,8 @@
 /* eslint-disable */
 
 export type LogicalLocation = {
-  kind: string;
+  kind?: 'location';
+  type: string;
   parties: Array<string>;
   parameters?: Record<string, any>;
 };

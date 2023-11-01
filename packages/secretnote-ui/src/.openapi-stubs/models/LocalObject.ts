@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Timeline } from './Timeline';
-
-export type Visualization = {
-  timeline: Timeline;
+export type LocalObject = {
+  kind?: 'local_object';
+  ref: string;
+  name: string;
 };
 

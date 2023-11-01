@@ -21,24 +21,25 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
-from .checkpoint import APILevel, CheckpointCollection
+from .checkpoint import CheckpointGroup
 from .envvars import (
     OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME,
     OTEL_PYTHON_SECRETNOTE_W3C_TRACE,
 )
 from .exporters import InMemorySpanExporter, JSONLinesSpanExporter
 from .models import (
+    APILevel,
     DictSnapshot,
     FrameInfoSnapshot,
     FrameSnapshot,
     FunctionSnapshot,
     ListSnapshot,
-    LocalCallable,
     ObjectSnapshot,
     ObjectTracer,
     OTelSpanDict,
     RemoteLocationSnapshot,
     RemoteObjectSnapshot,
+    Semantics,
     TracedFrame,
 )
 from .profiler import Profiler
@@ -150,8 +151,8 @@ def default_checkpoints():
     import secretflow.stats
     from secretflow.device.proxy import _actor_wrapper
 
-    checkpoints = CheckpointCollection()
-    add = checkpoints.add_function
+    checkpoints = CheckpointGroup()
+    add_function = checkpoints.add_function
 
     for fn in (
         ray.remote_function.RemoteFunction._remote,
@@ -166,12 +167,9 @@ def default_checkpoints():
         secretflow.SPU.infeed_shares,
         secretflow.SPU.outfeed_shares,
     ):
-        add(fn, api_level=APILevel.IMPLEMENTATION)
+        add_function(fn, semantics=Semantics(api_level=APILevel.IMPLEMENTATION))
 
     for fn in (
-        LocalCallable(fn=secretflow.PYU.__call__, load_const=(1,)),
-        LocalCallable(fn=secretflow.SPU.__call__, load_const=(1,)),
-        LocalCallable(fn=_actor_wrapper, load_const=(1,)),
         secretflow.device.kernels.pyu.pyu_to_pyu,
         secretflow.device.kernels.pyu.pyu_to_spu,
         secretflow.device.kernels.pyu.pyu_to_heu,
@@ -183,16 +181,14 @@ def default_checkpoints():
         secretflow.device.kernels.heu.heu_to_heu,
         secretflow.reveal,
     ):
-        add(fn, api_level=APILevel.INVARIANT)
+        add_function(fn, semantics=Semantics(api_level=APILevel.INVARIANT))
 
-    for fn in (
-        secretflow.data.horizontal.HDataFrame.shape.fget,
-        secretflow.data.vertical.VDataFrame.shape.fget,
-        secretflow.data.ndarray.FedNdarray.shape.fget,
-        secretflow.preprocessing.binning.vert_woe_binning.VertWoeBinning.binning,
-        secretflow.preprocessing.binning.vert_woe_substitution.VertWOESubstitution.substitution,
+    for fn, *load_const in (
+        (secretflow.PYU.__call__, 1),
+        (secretflow.SPU.__call__, 1),
+        (_actor_wrapper, 1),
     ):
-        add(fn, api_level=APILevel.USERLAND)
+        add_function(fn, *load_const, semantics=Semantics(api_level=APILevel.INVARIANT))
 
     return checkpoints
 

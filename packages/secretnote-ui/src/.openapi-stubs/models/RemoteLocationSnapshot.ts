@@ -5,10 +5,14 @@
 
 import type { LogicalLocation } from './LogicalLocation';
 
-export type DeviceSnapshot = {
-  kind?: 'device';
+/**
+ * Helper class that provides a standard way to create an ABC using
+ * inheritance.
+ */
+export type RemoteLocationSnapshot = {
+  ref: string;
+  kind?: 'remote_location';
   type: string;
-  id: string;
   location: LogicalLocation;
 };
 

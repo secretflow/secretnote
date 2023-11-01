@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Timeline } from './Timeline';
-
-export type Visualization = {
-  timeline: Timeline;
+export type ReturnEdge = {
+  source: string;
+  target: string;
+  kind?: 'return';
+  assignment?: string;
 };
 

@@ -52,12 +52,12 @@ def logical_location(device: Any) -> LogicalLocation:
     from secretflow.device.device import HEU, PYU, SPU, TEEU
 
     if isinstance(device, PYU):
-        kind = "PYU"
+        type_ = "PYU"
         parties = (device.party,)
         params = {}
 
     elif isinstance(device, SPU):
-        kind = "SPU"
+        type_ = "SPU"
         parties = tuple(device.actors)
         params = {
             "protocol": device.conf.protocol,
@@ -66,19 +66,19 @@ def logical_location(device: Any) -> LogicalLocation:
         }
 
     elif isinstance(device, HEU):
-        kind = "HEU"
+        type_ = "HEU"
         parties = (device.sk_keeper_name(), *device.evaluator_names())
         params = {}
 
     elif isinstance(device, TEEU):
-        kind = "TEEU"
+        type_ = "TEEU"
         parties = (device.party,)
         params = {}
 
     else:
         raise TypeError(f"Unknown device type {type(device)}")
 
-    return LogicalLocation(kind=kind, parties=parties, parameters=params)
+    return LogicalLocation(type=type_, parties=parties, parameters=params)
 
 
 def find_globals(fn: Union[FunctionType, CodeType], ns: Dict):

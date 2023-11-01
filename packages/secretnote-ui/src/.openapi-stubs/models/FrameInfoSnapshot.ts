@@ -3,20 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ReferenceMap } from './ReferenceMap';
-
 /**
  * Helper class that provides a standard way to create an ABC using
  * inheritance.
  */
-export type FrameSnapshot = {
+export type FrameInfoSnapshot = {
   ref: string;
-  kind?: 'frame';
+  kind?: 'frame_info';
   type: string;
-  local_vars?: ReferenceMap;
-  global_vars?: ReferenceMap;
-  outer_frames?: ReferenceMap;
-  module?: string;
+  filename: string;
+  lineno: number;
   func: string;
+  code?: string;
 };
 

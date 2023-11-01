@@ -26,11 +26,11 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from secretnote.utils.logging import log_dev_exception
 from secretnote.utils.pydantic import Reference, ReferenceMap
 
-from .checkpoint import CheckpointCollection
+from .checkpoint import CheckpointGroup
 from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME
 from .exporters import InMemorySpanExporter
 from .models import (
-    Checkpoint,
+    FunctionCheckpoint,
     ObjectSnapshot,
     ObjectTracer,
     SnapshotType,
@@ -38,7 +38,7 @@ from .models import (
 )
 from .snapshot import fingerprint, json_key
 
-_NONE_REFERENCE = Reference(ref=fingerprint(None))
+_NULL_REFERENCE = Reference(ref=fingerprint(None))
 
 
 FinalizeSpan = Callable[[Optional[FrameType]], None]
@@ -47,7 +47,7 @@ FinalizeSpan = Callable[[Optional[FrameType]], None]
 class Profiler:
     def __init__(
         self,
-        checkpoints: CheckpointCollection,
+        checkpoints: CheckpointGroup,
         recorders: List[Type[ObjectTracer]],
         context: Optional[Context] = None,
     ):
@@ -77,7 +77,7 @@ class Profiler:
         return exporter
 
     def __call__(self, frame: FrameType, event: str, arg: Any):
-        if not (checkpoint := self._checkpoints.match(frame)):
+        if not (checkpoint := self._checkpoints.match_frame(frame)):
             return
 
         if event == "call":
@@ -97,24 +97,25 @@ class Profiler:
             values.update(snapshots)
         return refs, values
 
-    def _stack_push(self, frame: FrameType, checkpoint: Checkpoint):
+    def _stack_push(self, frame: FrameType, checkpoint: FunctionCheckpoint):
         if self._recent_stacks:
             ctx = self._recent_stacks[-1][0]
         else:
             ctx = self._parent_context
 
-        (func_ref, frame_ref), values = self._trace_objects(checkpoint.function, frame)
+        refs, values = self._trace_objects(checkpoint.function._origin, frame)
+        func_ref, frame_ref = refs
 
         result = TracedFrame(
-            semantics=checkpoint.semantics,
+            checkpoint=checkpoint,
             function=func_ref,
             frame=frame_ref,
-            retval=_NONE_REFERENCE,
-            assignments=_NONE_REFERENCE,
+            retval=_NULL_REFERENCE,
+            assignments=_NULL_REFERENCE,
             variables=values,
         )
 
-        span = self._tracer.start_span(result.get_function_name(), ctx)
+        span = self._tracer.start_span(result.function_name, ctx)
         ctx = trace.set_span_in_context(span, ctx)
 
         self._recent_stacks.append((ctx, result))
@@ -200,7 +201,7 @@ class Profiler:
 
 
 def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
-    snapshots: Dict[str, SnapshotType] = {_NONE_REFERENCE.ref: ObjectSnapshot.none()}
+    snapshots: Dict[str, SnapshotType] = {_NULL_REFERENCE.ref: ObjectSnapshot.none()}
 
     def snapshot_tree(root: Any) -> Optional[Reference]:
         for rule in tracers:

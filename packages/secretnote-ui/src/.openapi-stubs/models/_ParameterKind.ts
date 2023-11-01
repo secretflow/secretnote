@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type SnapshotRef = {
-  kind?: 'ref';
-  id: string;
-};
-
+/**
+ * An enumeration.
+ */
+export type _ParameterKind = 0 | 1 | 2 | 3 | 4;

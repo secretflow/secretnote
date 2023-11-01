@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type GraphNode = {
-  id: string;
-  epoch: number;
-  kind: 'value' | 'location';
-  ref: string;
+export type TransformEdge = {
+  source: string;
+  target: string;
+  kind?: 'transform';
 };
 

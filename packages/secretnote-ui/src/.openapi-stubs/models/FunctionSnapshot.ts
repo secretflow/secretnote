@@ -3,21 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DeviceSnapshot } from './DeviceSnapshot';
-import type { FrameSnapshot } from './FrameSnapshot';
 import type { FunctionSignature } from './FunctionSignature';
-import type { MappingSnapshot } from './MappingSnapshot';
-import type { ObjectSnapshot } from './ObjectSnapshot';
-import type { RemoteObjectSnapshot } from './RemoteObjectSnapshot';
-import type { SequenceSnapshot } from './SequenceSnapshot';
-import type { SnapshotRef } from './SnapshotRef';
-import type { UnboundSnapshot } from './UnboundSnapshot';
+import type { ReferenceMap } from './ReferenceMap';
 
+/**
+ * Helper class that provides a standard way to create an ABC using
+ * inheritance.
+ */
 export type FunctionSnapshot = {
+  ref: string;
   kind?: 'function';
   type: string;
-  id: string;
-  hash: string;
   module?: string;
   name: string;
   signature?: FunctionSignature;
@@ -25,7 +21,8 @@ export type FunctionSnapshot = {
   firstlineno?: number;
   source?: string;
   docstring?: string;
-  closure_vars: Record<string, (SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>;
-  global_vars: Record<string, (SnapshotRef | UnboundSnapshot | RemoteObjectSnapshot | DeviceSnapshot | FunctionSnapshot | MappingSnapshot | SequenceSnapshot | ObjectSnapshot | FrameSnapshot)>;
+  default_args?: ReferenceMap;
+  closure_vars?: ReferenceMap;
+  global_vars?: ReferenceMap;
 };
 

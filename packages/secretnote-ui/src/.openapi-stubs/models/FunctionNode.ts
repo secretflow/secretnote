@@ -3,17 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { LocalObject } from './LocalObject';
 import type { LogicalLocation } from './LogicalLocation';
 
-/**
- * Helper class that provides a standard way to create an ABC using
- * inheritance.
- */
-export type RemoteObjectSnapshot = {
-  ref: string;
-  kind?: 'remote_object';
-  type: string;
+export type FunctionNode = {
+  id: string;
+  epoch: number;
+  order?: number;
+  kind?: 'function';
+  data?: LocalObject;
   location: LogicalLocation;
-  refs: Array<string>;
 };
 

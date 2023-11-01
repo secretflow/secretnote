@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type GraphEdge = {
+export type ReferenceEdge = {
   source: string;
   target: string;
-  kind: 'identity' | 'transform';
-  label: string;
+  kind?: 'reference';
 };
 

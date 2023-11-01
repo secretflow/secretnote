@@ -5,15 +5,11 @@
 
 import type { LogicalLocation } from './LogicalLocation';
 
-/**
- * Helper class that provides a standard way to create an ABC using
- * inheritance.
- */
-export type RemoteObjectSnapshot = {
-  ref: string;
+export type RemoteObject = {
   kind?: 'remote_object';
-  type: string;
+  numbering?: number;
+  ref: string;
+  name: string;
   location: LogicalLocation;
-  refs: Array<string>;
 };
 

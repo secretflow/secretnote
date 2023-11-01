@@ -1,8 +1,9 @@
 import abc
 import inspect
 from datetime import datetime
+from enum import IntEnum
 from textwrap import dedent
-from types import FrameType, FunctionType
+from types import CodeType, FrameType, FunctionType
 from typing import (
     Any,
     Callable,
@@ -21,7 +22,7 @@ from typing import (
 
 import stack_data.core
 from opentelemetry.util.types import Attributes
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 from typing_extensions import Annotated, override
 
 from secretnote.formal.symbols import LogicalLocation
@@ -36,6 +37,7 @@ from secretnote.utils.pydantic import (
 from .snapshot import (
     find_globals,
     fingerprint,
+    hash_digest,
     logical_location,
     qualname,
     qualname_tuple,
@@ -45,6 +47,12 @@ from .snapshot import (
 )
 
 T = TypeVar("T", bound="SnapshotType")
+
+
+class APILevel(IntEnum):
+    IMPLEMENTATION = 10
+    INVARIANT = 20
+    USERLAND = 90
 
 
 class ObjectTracer(abc.ABC):
@@ -414,13 +422,65 @@ SnapshotType = Annotated[
 ]
 
 
+class FunctionInfo(BaseModel):
+    code_hash: str
+    module: str
+    name: str
+
+    _origin: Optional[Callable] = PrivateAttr(default=None)
+
+    @property
+    def function_name(self) -> str:
+        return f"{self.module}.{self.name}"
+
+    @classmethod
+    def from_static(cls, f: Callable, *load_const: int):
+        f = inspect.unwrap(f)
+
+        module, name = qualname_tuple(f)
+        module = module or "<unknown_module>"
+        name = name or "<unknown>"
+
+        try:
+            code = f.__code__
+            for const in load_const:
+                code = code.co_consts[const]
+                assert isinstance(code, CodeType)
+                name += f".<locals>.{code.co_name}"
+        except IndexError as e:
+            raise TypeError(
+                f"unsupported callable {f}:"
+                f" index {load_const} out of range in co_consts"
+            ) from e
+        except (AttributeError, TypeError, AssertionError) as e:
+            raise TypeError(
+                f"unsupported callable {f}: cannot access code object"
+            ) from e
+
+        info = FunctionInfo(code_hash=hash_digest(code), module=module, name=name)
+
+        if not load_const:
+            info._origin = f
+
+        return info
+
+
 class Semantics(BaseModel):
     api_level: Optional[int] = None
     description: Optional[str] = None
 
 
-class TracedFrame(BaseModel):
+class FunctionCheckpoint(BaseModel):
+    function: FunctionInfo
     semantics: Semantics = Semantics()
+
+    @property
+    def function_name(self) -> str:
+        return self.function.function_name
+
+
+class TracedFrame(BaseModel):
+    checkpoint: FunctionCheckpoint
 
     function: Reference
     frame: Reference
@@ -429,10 +489,8 @@ class TracedFrame(BaseModel):
 
     variables: Dict[str, SnapshotType]
 
-    def get_function(self):
-        return self.function.bind(FunctionSnapshot, self.variables)
-
-    def get_function_name(self) -> str:
+    @property
+    def function_name(self) -> str:
         try:
             func = self.get_function()
             module = func.module
@@ -444,6 +502,9 @@ class TracedFrame(BaseModel):
         if not module:
             return name
         return f"{module}.{name}"
+
+    def get_function(self):
+        return self.function.bind(FunctionSnapshot, self.variables)
 
     def get_frame(self):
         return self.frame.bind(FrameSnapshot, self.variables)
@@ -457,17 +518,6 @@ class TracedFrame(BaseModel):
             retval = self.retval.bind(SnapshotType, self.variables)
             for key, value in to_flattened_pytree(retval):
                 yield key, value
-
-
-class Checkpoint(BaseModel):
-    code_hash: str
-    function: Optional[Callable]
-    semantics: Semantics = Semantics()
-
-
-class LocalCallable(BaseModel):
-    fn: Callable
-    load_const: Tuple[int, ...] = ()
 
 
 class OTelSpanContextDict(BaseModel):

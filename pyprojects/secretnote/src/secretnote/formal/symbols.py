@@ -1,33 +1,33 @@
-from typing import Any, Dict, List, Literal, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 
 class LogicalLocation(BaseModel):
-    numbering: int = 0
+    kind: Literal["location"] = "location"
 
-    kind: str
+    type: str
     parties: Tuple[str, ...]
     parameters: Dict[str, Any] = {}
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, type(self))
-            and self.kind == other.kind
+            and self.type == other.type
             and self.parameters == other.parameters
             and self.parties == other.parties
         )
 
     def __hash__(self) -> int:
-        return hash((self.kind, self.parties, *self.parameters.items()))
+        return hash((self.type, self.parties, *self.parameters.items()))
 
     def __str__(self) -> str:
-        return f"{self.kind}[{', '.join(self.parties)}]"
+        return f"{self.type}[{', '.join(self.parties)}]"
 
     def as_key(self) -> str:
         args = [
-            self.kind,
+            self.type,
             *self.parties,
             *[f"{k}={v}" for k, v in self.parameters.items()],
         ]
@@ -35,7 +35,9 @@ class LogicalLocation(BaseModel):
 
 
 class RemoteObject(BaseModel):
-    numbering: int = 0
+    kind: Literal["remote_object"] = "remote_object"
+
+    numbering: int = -1
     ref: str
     name: str
     location: LogicalLocation
@@ -51,15 +53,17 @@ class RemoteObject(BaseModel):
         return hash((self.numbering, self.ref))
 
     def __str__(self) -> str:
-        if self.numbering == 0:
-            return f"{self.location.kind[0]}({self.ref[-7:]})"
-        return f"{self.location.kind[0]}({self.numbering})"
+        if self.numbering == -1:
+            return f"{self.location.type[0]}({self.ref[-7:]})"
+        return f"{self.location.type[0]}({self.numbering})"
 
     def as_key(self):
         return self.ref
 
 
 class LocalObject(BaseModel):
+    kind: Literal["local_object"] = "local_object"
+
     ref: str
     name: str
 
@@ -80,11 +84,11 @@ class LocalObject(BaseModel):
 
 class ExecExpression(BaseModel):
     kind: Literal["exec"] = "exec"
-    function: LocalObject
+    function: Optional[LocalObject]
     location: LogicalLocation
-    boundvars: List[Union[LocalObject, RemoteObject]]
-    freevars: List[Union[LocalObject, RemoteObject]]
-    results: List[Union[LocalObject, RemoteObject]]
+    boundvars: List[Union[LocalObject, RemoteObject]] = []
+    freevars: List[Union[LocalObject, RemoteObject]] = []
+    results: List[Union[LocalObject, RemoteObject]] = []
 
     def __str__(self) -> str:
         invariants = []
@@ -102,12 +106,19 @@ class ExecExpression(BaseModel):
         result_str = ", ".join(map(str, self.results))
 
         location_str = str(self.location)
-        label = self.function.name
+        label = self.function.name if self.function else "?"
 
         return (
-            f"{result_str} := {location_str}. let {invariant_str} in exec({label})"
+            f"{result_str} ::= {location_str}. let {invariant_str} in {label}"
             f" | ({static_args_str}) + ({freevars_str})"
         )
+
+    def objects(self):
+        if self.function:
+            yield self.function
+        yield from self.boundvars
+        yield from self.freevars
+        yield from self.results
 
 
 class MoveExpression(BaseModel):
@@ -117,6 +128,10 @@ class MoveExpression(BaseModel):
 
     def __str__(self):
         return f"{self.target} <~~ {self.source} / move to {self.target.location}"
+
+    def objects(self):
+        yield self.source
+        yield self.target
 
 
 class RevealExpression(BaseModel):
@@ -129,8 +144,22 @@ class RevealExpression(BaseModel):
         inputs = ", ".join(map(str, self.items))
         return f"{output} <== reveal {inputs}"
 
+    def objects(self):
+        yield from self.items
+        yield from self.results
+
 
 ExpressionType = Annotated[
     Union[ExecExpression, MoveExpression, RevealExpression],
+    Field(discriminator="kind"),
+]
+
+ObjectSymbolType = Annotated[
+    Union[RemoteObject, LocalObject],
+    Field(discriminator="kind"),
+]
+
+SymbolType = Annotated[
+    Union[LogicalLocation, ObjectSymbolType],
     Field(discriminator="kind"),
 ]
