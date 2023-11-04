@@ -1,8 +1,11 @@
-<div id="{{ element_id }}"></div>
-<script type="module">
-  import * as ui from '{{ script_uri }}';
-  const Component = ui['{{ component }}'];
-  const elem = document.getElementById('{{ element_id }}');
-  const props = JSON.parse(atob('{{ encoded_props }}'));
-  ui.render({ elem, Component, props });
+<script>
+  (() => {
+    const elem = document.createElement('div');
+    document.currentScript.parentNode.appendChild(elem);
+    import('{{ script_uri }}').then((ui) => {
+      const Component = ui['{{ component }}'];
+      const props = JSON.parse(atob('{{ encoded_props }}'));
+      ui.render({ elem, Component, props });
+    });
+  })();
 </script>

@@ -11,7 +11,8 @@ export type FunctionNode = {
   epoch: number;
   order?: number;
   kind?: 'function';
-  data?: LocalObject;
+  function: LocalObject;
+  stackframe?: LocalObject;
   location: LogicalLocation;
 };
 

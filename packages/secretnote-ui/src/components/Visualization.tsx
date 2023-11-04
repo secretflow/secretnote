@@ -1,6 +1,12 @@
-import { Visualization as VisualizationProps } from '../.openapi-stubs';
-import { Graph } from './Graph';
+import type { Visualization as VisualizationProps } from '../.openapi-stubs';
+
+import { DataProvider } from './DataProvider';
+import { ExecutionGraph } from './ExecutionGraph';
 
 export function Visualization({ timeline }: VisualizationProps) {
-  return <Graph {...timeline.graph} />;
+  return (
+    <DataProvider timeline={timeline}>
+      <ExecutionGraph {...timeline.graph} />
+    </DataProvider>
+  );
 }

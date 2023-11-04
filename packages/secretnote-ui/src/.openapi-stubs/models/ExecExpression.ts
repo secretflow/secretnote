@@ -9,7 +9,7 @@ import type { RemoteObject } from './RemoteObject';
 
 export type ExecExpression = {
   kind?: 'exec';
-  function?: LocalObject;
+  function: LocalObject;
   location: LogicalLocation;
   boundvars?: Array<(LocalObject | RemoteObject)>;
   freevars?: Array<(LocalObject | RemoteObject)>;

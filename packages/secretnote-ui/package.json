@@ -24,8 +24,14 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@antv/algorithm": "^0.1.26",
     "@antv/g6": "^4.8.23",
-    "styled-components": "^6.1.0"
+    "@antv/graphlib": "^2.0.2",
+    "color": "^4.2.3",
+    "d3": "^7.8.5",
+    "lodash": "^4.17.21",
+    "styled-components": "^6.1.0",
+    "yaml": "^2.3.4"
   },
   "peerDependencies": {
     "antd": "^5.10.2",
@@ -40,6 +46,9 @@
     "@storybook/react": "^7.5.1",
     "@storybook/react-vite": "^7.5.1",
     "@storybook/testing-library": "^0.2.2",
+    "@types/color": "^3.0.5",
+    "@types/d3": "^7.4.2",
+    "@types/lodash": "^4.14.200",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

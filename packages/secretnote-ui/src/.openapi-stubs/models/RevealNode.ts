@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type LocalObject = {
-  kind?: 'local_object';
-  ref: string;
-  name?: string;
+export type RevealNode = {
+  id: string;
+  epoch: number;
+  order?: number;
+  kind?: 'reveal';
 };
 

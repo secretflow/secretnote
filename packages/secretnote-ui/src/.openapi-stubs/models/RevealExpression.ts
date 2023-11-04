@@ -8,7 +8,7 @@ import type { RemoteObject } from './RemoteObject';
 
 export type RevealExpression = {
   kind?: 'reveal';
-  items: Array<RemoteObject>;
+  items: Array<(LocalObject | RemoteObject)>;
   results: Array<LocalObject>;
 };
 

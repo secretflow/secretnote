@@ -14,6 +14,7 @@ export type FunctionSnapshot = {
   ref: string;
   kind?: 'function';
   type: string;
+  bytecode_hash?: string;
   module?: string;
   name: string;
   signature?: FunctionSignature;

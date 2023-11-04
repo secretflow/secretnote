@@ -9,7 +9,7 @@ export type RemoteObject = {
   kind?: 'remote_object';
   numbering?: number;
   ref: string;
-  name: string;
   location: LogicalLocation;
+  name?: string;
 };
 

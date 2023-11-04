@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type LocalObject = {
-  kind?: 'local_object';
-  ref: string;
-  name?: string;
+export type ValidationError = {
+  loc: Array<(string | number)>;
+  msg: string;
+  type: string;
 };
 

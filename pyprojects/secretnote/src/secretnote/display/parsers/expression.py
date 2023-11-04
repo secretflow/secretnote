@@ -31,7 +31,7 @@ from secretnote.instrumentation.models import (
     SnapshotType,
     TracedFrame,
 )
-from secretnote.utils.pydantic import to_flattened_pytree
+from secretnote.utils.pydantic import like_pytree
 
 from .base import Parser
 
@@ -65,11 +65,28 @@ def _get_parameters(
     for name, item in arguments.items():
         param = sig.parameters[name]
         if param.kind == param.VAR_POSITIONAL:
-            params.update({f"{name}[{i}]": item for i, item in enumerate(item)})
+            params.update(
+                {
+                    f"{name}[{index}]{subkey}": subitem
+                    for index, item in enumerate(item)
+                    for subkey, subitem in like_pytree(item, SnapshotType)
+                }
+            )
         elif param.kind == param.VAR_KEYWORD:
-            params.update({k: item for k, item in item.items()})
+            params.update(
+                {
+                    f"{name}{key}{subkey}": subitem
+                    for key, item in item.items()
+                    for subkey, subitem in like_pytree(item, SnapshotType)
+                }
+            )
         else:
-            params.update({name: item})
+            params.update(
+                {
+                    f"{name}{key}": subitem
+                    for key, subitem in like_pytree(item, SnapshotType)
+                }
+            )
     return params
 
 
@@ -87,8 +104,6 @@ def _create_object(
 
 
 def _create_object(obj, name=None):
-    if name is None:
-        name = str(obj)
     if isinstance(obj, RemoteObjectSnapshot):
         return RemoteObject(name=name, ref=obj.ref, location=obj.location)
     return LocalObject(ref=obj.ref, name=name)
@@ -140,10 +155,12 @@ def _create_exec_expr(
 
 
 @parser.parse(secretflow.PYU.__call__, 1)
-def _(frame: TracedFrame):
+def parse_pyu_call(frame: TracedFrame):
     data = frame.get_frame()
-    return _create_exec_expr(
-        func=data.local_vars[SnapshotType, "fn"],
+    func = data.local_vars[SnapshotType, "fn"]
+
+    expr = _create_exec_expr(
+        func=func,
         location=data.local_vars[RemoteLocationSnapshot, "self"].location,
         args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
         kwargs=data.local_vars[DictSnapshot, "kwargs"]
@@ -152,9 +169,19 @@ def _(frame: TracedFrame):
         retvals=frame.iter_retvals(),
     )
 
+    if func.bytecode_hash == frame.well_known.identity_function:
+        try:
+            source = first(expr.boundvars)
+            target = cast(RemoteObject, first(expr.results))
+            return MoveExpression(source=source, target=target)
+        except ValueError:
+            pass
+
+    return expr
+
 
 @parser.parse(secretflow.SPU.__call__, 1)
-def _(frame: TracedFrame):
+def parse_spu_call(frame: TracedFrame):
     data = frame.get_frame()
     return _create_exec_expr(
         func=data.local_vars[SnapshotType, "func"],
@@ -176,22 +203,28 @@ def _(frame: TracedFrame):
 @parser.parse(secretflow.device.kernels.heu.heu_to_pyu)
 @parser.parse(secretflow.device.kernels.heu.heu_to_spu)
 @parser.parse(secretflow.device.kernels.heu.heu_to_heu)
-def _(frame: TracedFrame):
+def parse_data_conversion(frame: TracedFrame):
     data = frame.get_frame()
 
     source = data.local_vars[RemoteObjectSnapshot, "self"]
-    _, target = cast(Tuple[str, RemoteObjectSnapshot], first(frame.iter_retvals()))
+    target_name, target = cast(
+        Tuple[str, RemoteObjectSnapshot],
+        first(frame.iter_retvals()),
+    )
 
-    return MoveExpression(source=_create_object(source), target=_create_object(target))
+    return MoveExpression(
+        source=_create_object(source),
+        target=_create_object(target, target_name),
+    )
 
 
 @parser.parse(secretflow.reveal)
-def _(frame: TracedFrame):
+def parse_reveal(frame: TracedFrame):
     expr = RevealExpression(items=[], results=[])
 
     inputs = frame.get_frame().local_vars[SnapshotType, "func_or_object"]
 
-    for key, item in to_flattened_pytree(inputs):
+    for key, item in like_pytree(inputs, SnapshotType):
         expr.items.append(_create_object(item, key))
 
     for key, item in frame.iter_retvals():

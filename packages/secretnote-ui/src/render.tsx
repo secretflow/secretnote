@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 export function render({
@@ -9,5 +10,9 @@ export function render({
   Component: React.FC;
   props?: Record<string, unknown>;
 }) {
-  createRoot(elem).render(<Component {...props} />);
+  createRoot(elem).render(
+    <StrictMode>
+      <Component {...props} />
+    </StrictMode>,
+  );
 }

@@ -5,7 +5,7 @@ from collections import defaultdict
 from contextlib import suppress
 from pprint import pformat
 from textwrap import dedent
-from types import CodeType, FrameType, FunctionType, ModuleType
+from types import CodeType, FrameType, FunctionType, MethodType, ModuleType
 from typing import (
     Any,
     Callable,
@@ -57,11 +57,13 @@ def logical_location(device: Any) -> LogicalLocation:
         params = {}
 
     elif isinstance(device, SPU):
+        from libspu.spu_pb2 import FieldType, ProtocolKind
+
         type_ = "SPU"
         parties = tuple(device.actors)
         params = {
-            "protocol": device.conf.protocol,
-            "field": device.conf.field,
+            "protocol": ProtocolKind.Name(device.conf.protocol),
+            "field": FieldType.Name(device.conf.field),
             "fxp_fraction_bits": device.conf.fxp_fraction_bits,
         }
 
@@ -81,7 +83,7 @@ def logical_location(device: Any) -> LogicalLocation:
     return LogicalLocation(type=type_, parties=parties, parameters=params)
 
 
-def find_globals(fn: Union[FunctionType, CodeType], ns: Dict):
+def find_globals(fn: Union[FunctionType, MethodType, CodeType], ns: Dict):
     global_vars = {}
     # https://stackoverflow.com/a/61964607/22226623
     for inst in dis.get_instructions(fn):
@@ -161,6 +163,12 @@ def hash_digest(obj):
         return f"python/hash/{hex(hash(obj))}"
     except Exception:
         return None
+
+
+def bytecode_hash(f: Any) -> str:
+    if not inspect.isfunction(f):
+        raise TypeError(f"Expected Python function, got {type(f)}")
+    return hash_digest(f.__code__.co_code)
 
 
 def json_key(obj: Any, key_fn: Callable[[Any], str] = fingerprint):

@@ -1,8 +1,6 @@
-import uuid
 from base64 import b64encode
 
 from IPython.core.display import HTML
-from IPython.display import display
 from jinja2 import Template, select_autoescape
 from pydantic import BaseModel
 
@@ -26,17 +24,13 @@ def render(elem: BaseModel):
     component_name = type(elem).__name__
     props = elem.json(by_alias=True, exclude_none=True)
     encoded_props = b64encode(props.encode("utf-8")).decode("utf-8")
-
     template = Template(
         require.resolve("./templates/component.html").read_text(),
         autoescape=select_autoescape(["html", "xml"], default_for_string=True),
     )
-    element_id = f"elem-{uuid.uuid4()}"
-
     result = template.render(
         component=component_name,
         script_uri=get_ui_bundle(),
-        element_id=element_id,
         encoded_props=encoded_props,
     )
-    display(HTML(result))
+    return HTML(result)

@@ -10,4 +10,4 @@ def visualize_run(profiler: Profiler):
     for span in profiler.exporter.iter_spans():
         timeline.feed(span)
     timeline.digest()
-    render(Visualization(timeline=timeline.export()))
+    return render(Visualization(timeline=timeline.export()))

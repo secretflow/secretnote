@@ -5,6 +5,6 @@ from .models import Visualization
 app = FastAPI()
 
 
-@app.get("/visualize")
-async def visualize() -> Visualization:
+@app.post("/visualize")
+async def visualize(data: Visualization) -> None:
     ...

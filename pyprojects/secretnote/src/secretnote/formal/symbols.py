@@ -39,8 +39,9 @@ class RemoteObject(BaseModel):
 
     numbering: int = -1
     ref: str
-    name: str
     location: LogicalLocation
+
+    name: Optional[str] = None
 
     def __eq__(self, other: object) -> bool:
         return (
@@ -63,9 +64,8 @@ class RemoteObject(BaseModel):
 
 class LocalObject(BaseModel):
     kind: Literal["local_object"] = "local_object"
-
     ref: str
-    name: str
+    name: Optional[str] = None
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, type(self)) and self.ref == other.ref
@@ -84,7 +84,7 @@ class LocalObject(BaseModel):
 
 class ExecExpression(BaseModel):
     kind: Literal["exec"] = "exec"
-    function: Optional[LocalObject]
+    function: LocalObject
     location: LogicalLocation
     boundvars: List[Union[LocalObject, RemoteObject]] = []
     freevars: List[Union[LocalObject, RemoteObject]] = []
@@ -123,7 +123,7 @@ class ExecExpression(BaseModel):
 
 class MoveExpression(BaseModel):
     kind: Literal["move"] = "move"
-    source: RemoteObject
+    source: Union[RemoteObject, LocalObject]
     target: RemoteObject
 
     def __str__(self):
@@ -136,7 +136,7 @@ class MoveExpression(BaseModel):
 
 class RevealExpression(BaseModel):
     kind: Literal["reveal"] = "reveal"
-    items: List[RemoteObject]
+    items: List[Union[RemoteObject, LocalObject]]
     results: List[LocalObject]
 
     def __str__(self) -> str:

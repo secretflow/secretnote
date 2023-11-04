@@ -111,17 +111,17 @@ class TimelineParser:
             for obj in frame.expression.objects():
                 self.add_object(obj)
 
-            graph_state = GraphState(
+            state = GraphState(
+                frame=frame.frame,
                 state=self.data_graph,
                 epoch=frame.epoch,
                 next_expr=frame.expression,
             )
-            graph_delta = parse_graph(graph_state)
-            if graph_delta:
-                for node in graph_delta.nodes:
-                    self.data_graph.add_node(node.id, **node.dict())
-                for edge in graph_delta.edges:
-                    self.data_graph.add_edge(edge.source, edge.target, **edge.dict())
+            parse_graph(state)
+            for node in state.changes.nodes:
+                self.data_graph.add_node(node.id, **node.dict())
+            for edge in state.changes.edges:
+                self.data_graph.add_edge(edge.source, edge.target, **edge.dict())
 
     def export(self) -> Timeline:
         timeline: List[Frame] = []

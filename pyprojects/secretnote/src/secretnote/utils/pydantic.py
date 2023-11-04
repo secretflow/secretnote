@@ -39,7 +39,7 @@ def orjson_dumps(v, *, default):
     return orjson.dumps(v, default=default, option=option).decode()
 
 
-def is_type(obj: Any, annotation: Type[T]) -> TypeGuard[T]:
+def is_of_type(obj: Any, annotation: Type[T]) -> TypeGuard[T]:
     def extract_types(annotation) -> Tuple:
         origin = annotation
         while True:
@@ -58,26 +58,34 @@ def is_type(obj: Any, annotation: Type[T]) -> TypeGuard[T]:
     return isinstance(obj, types)
 
 
-def to_container(ref: "ProxiedModel"):
+def to_container(ref: "ProxiedModel", *, container_t=(list, dict, tuple)):
     def reconstruct(root: ProxiedModel):
         try:
             container = root.to_container()
         except (AttributeError, NotImplementedError):
             return root
-        if isinstance(container, dict):
+        if isinstance(container, dict) and dict in container_t:
             return {k: reconstruct(v) for k, v in container.items()}
-        if isinstance(container, list):
+        if isinstance(container, list) and list in container_t:
             return [reconstruct(v) for v in container]
-        if isinstance(container, tuple):
+        if isinstance(container, tuple) and tuple in container_t:
             return tuple(reconstruct(v) for v in container)
         return container
 
     return reconstruct(ref)
 
 
-def to_flattened_pytree(ref: "ProxiedModel"):
-    flattened, tree = jax.tree_util.tree_flatten_with_path(to_container(ref))
-    return ((jax.tree_util.keystr(path), value) for path, value in flattened)
+def like_pytree(
+    ref: "ProxiedModel",
+    of_type: Type[T],
+    *,
+    container_t=(list, dict, tuple),
+) -> Iterable[Tuple[str, T]]:
+    container = to_container(ref, container_t=container_t)
+    flattened, tree = jax.tree_util.tree_flatten_with_path(container)
+    for path, value in flattened:
+        if is_of_type(value, of_type):
+            yield (jax.tree_util.keystr(path), value)
 
 
 class ORJSONConfig:
@@ -104,11 +112,12 @@ class Reference(BaseModel):
     def bind(self, types: Type[T], lookup: Mapping[str, "ProxiedModel"]) -> T:
         item = lookup[self.ref]
 
-        if not is_type(item, types):
-            raise TypeError(f"Expected {types}, got {type(item)}")
+        if not is_of_type(item, types):
+            raise TypeError(f"Expected {types}, got {type(item)}: {item}")
 
         if isinstance(item, ProxiedModel):
             item._lookup = lookup
+
         return cast(types, item)
 
 
@@ -131,9 +140,9 @@ class ReferenceMap(ProxiedModel, Mapping):
             ref = self.__root__[key]
             value = self._lookup[ref.ref]
             value._lookup = self._lookup
-            if is_type(value, types):
+            if is_of_type(value, types):
                 return value
-            raise TypeError(f"Expected {types}, got {type(value)}")
+            raise TypeError(f"Expected {types}, got {type(value)}: {value}")
         except (LookupError, TypeError) as e:
             raise KeyError(item) from e
 
@@ -145,7 +154,7 @@ class ReferenceMap(ProxiedModel, Mapping):
 
     def of_type(self, types: Type[T]) -> Iterable[Tuple[Any, T]]:
         for key, value in self.items():
-            if is_type(value, types):
+            if is_of_type(value, types):
                 yield key, cast(T, value)
 
     def __len__(self):

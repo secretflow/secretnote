@@ -1,9 +1,10 @@
 import abc
 import inspect
+from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
 from textwrap import dedent
-from types import CodeType, FrameType, FunctionType
+from types import CodeType, FrameType
 from typing import (
     Any,
     Callable,
@@ -30,11 +31,12 @@ from secretnote.utils.pydantic import (
     ProxiedModel,
     Reference,
     ReferenceMap,
-    to_flattened_pytree,
+    like_pytree,
     update_forward_refs,
 )
 
 from .snapshot import (
+    bytecode_hash,
     find_globals,
     fingerprint,
     hash_digest,
@@ -105,7 +107,7 @@ class ObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
         return cls.trace(None)
 
     def __str__(self) -> str:
-        return self.snapshot
+        return f"{type(self)}[{self.snapshot}]"
 
 
 class ListSnapshot(ObjectTracer, Reference, ProxiedModel):
@@ -144,7 +146,7 @@ class ListSnapshot(ObjectTracer, Reference, ProxiedModel):
         return [v for k, v in self.values.of_type(of_type)]
 
     def __str__(self) -> str:
-        return self.snapshot
+        return f"{type(self)}[{self.snapshot}]"
 
 
 class DictSnapshot(ObjectTracer, Reference, ProxiedModel):
@@ -174,7 +176,7 @@ class DictSnapshot(ObjectTracer, Reference, ProxiedModel):
         return {k: v for k, v in self.values.of_type(of_type)}
 
     def __str__(self) -> str:
-        return self.snapshot
+        return f"{type(self)}[{self.snapshot}]"
 
 
 class RemoteLocationSnapshot(ObjectTracer, Reference, ProxiedModel):
@@ -245,6 +247,11 @@ class FunctionParameter(BaseModel):
     kind: inspect._ParameterKind
     annotation: Optional[str] = None
 
+    def __str__(self) -> str:
+        if self.annotation is None:
+            return self.name
+        return f"{self.name}: {self.annotation}"
+
 
 class FunctionSignature(BaseModel):
     parameters: List[FunctionParameter] = []
@@ -263,10 +270,17 @@ class FunctionSignature(BaseModel):
             return_annotation=self.return_annotation,
         )
 
+    def __str__(self) -> str:
+        params = ", ".join(map(str, self.parameters))
+        if self.return_annotation is None:
+            return f"({params})"
+        return f"({params}) -> {self.return_annotation}"
+
 
 class FunctionSnapshot(ObjectTracer, Reference, ProxiedModel):
     kind: Literal["function"] = "function"
     type: str
+    bytecode_hash: Optional[str] = None
 
     module: Optional[str] = None
     name: str
@@ -282,12 +296,16 @@ class FunctionSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     @classmethod
     def typecheck(cls, x) -> bool:
-        return inspect.isfunction(x)
+        return inspect.isroutine(x)
 
     @classmethod
-    def trace(cls, func: FunctionType) -> "SnapshotType":
+    def trace(cls, func: Callable) -> "SnapshotType":
         module, name = qualname_tuple(func)
-        signature = cls._signature(inspect.signature(func, follow_wrapped=False))
+
+        try:
+            signature = cls._signature(inspect.signature(func, follow_wrapped=False))
+        except Exception:
+            signature = None
 
         try:
             filename = source_path(inspect.getsourcefile(func))
@@ -300,9 +318,15 @@ class FunctionSnapshot(ObjectTracer, Reference, ProxiedModel):
         except Exception:
             sourcelines = firstlineno = None
 
+        try:
+            code_hash = bytecode_hash(func)
+        except TypeError:
+            code_hash = None
+
         return FunctionSnapshot(
             ref=fingerprint(func),
             type=qualname(type(func)),
+            bytecode_hash=code_hash,
             name=name or "<unknown>",
             module=module,
             filename=filename,
@@ -313,7 +337,9 @@ class FunctionSnapshot(ObjectTracer, Reference, ProxiedModel):
         )
 
     @classmethod
-    def tree(cls, func: FunctionType) -> Dict[str, Union[Dict, List]]:
+    def tree(cls, func: Callable) -> Dict[str, Union[Dict, List]]:
+        if not inspect.isfunction(func) or not inspect.ismethod(func):
+            return {}
         return {
             "default_args": {
                 k: p.default
@@ -338,9 +364,12 @@ class FunctionSnapshot(ObjectTracer, Reference, ProxiedModel):
         return FunctionSignature(parameters=params, return_annotation=return_type)
 
     def __str__(self) -> str:
-        if self.module and self.name:
-            return f"{self.module}.{self.name}"
-        return self.name
+        if not self.signature:
+            return f"{self.type} {self.name}, in {self.module}, file {self.filename}"
+        return (
+            f"{self.type} {self.name}{self.signature},"
+            f" in {self.module}, file {self.filename}"
+        )
 
 
 class FrameInfoSnapshot(ObjectTracer, Reference, ProxiedModel):
@@ -479,6 +508,11 @@ class FunctionCheckpoint(BaseModel):
         return self.function.function_name
 
 
+@dataclass
+class WellKnownValues:
+    identity_function: str = bytecode_hash(lambda x: x)
+
+
 class TracedFrame(BaseModel):
     checkpoint: FunctionCheckpoint
 
@@ -488,6 +522,7 @@ class TracedFrame(BaseModel):
     assignments: Reference
 
     variables: Dict[str, SnapshotType]
+    well_known: WellKnownValues = WellKnownValues()
 
     @property
     def function_name(self) -> str:
@@ -516,7 +551,7 @@ class TracedFrame(BaseModel):
                 yield key, value
         except TypeError:
             retval = self.retval.bind(SnapshotType, self.variables)
-            for key, value in to_flattened_pytree(retval):
+            for key, value in like_pytree(retval, SnapshotType):
                 yield key, value
 
 
