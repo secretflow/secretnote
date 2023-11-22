@@ -25,3 +25,6 @@ pnpm-lock.yaml
 
 # symlinks
 .github/pull_request_template.md
+
+# template
+**/template
