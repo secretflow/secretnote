@@ -1,25 +1,13 @@
 {
-  "name": "@secretflow/notebook-pyproject-spu-stubs",
+  "name": "spu-stubs",
   "private": true,
   "files": [],
   "version": "0.0.0",
   "scripts": {
-    "build": "hatch clean && hatch build -t sdist -t wheel",
-    "test:pytest": "pytest",
-    "lint:black": "black --check src tests",
-    "lint:ruff": "ruff check src tests",
-    "lint:pyright": "pyright src",
-    "release": ": hatch publish ./dist"
-  },
-  "nx": {
-    "$schema": "https://cdn.jsdelivr.net/npm/nx@16.7.0/schemas/project-schema.json",
-    "targets": {
-      "build": {
-        "inputs": [
-          ":default",
-          ":python"
-        ]
-      }
-    }
+    "build:hatch": "python -m hatch clean && python -m hatch build -t sdist -t wheel",
+    "format:black": "python -m black --check src",
+    "lint:ruff": "python -m ruff check src",
+    "publish:hatch": "python -m hatch publish ./dist",
+    "typecheck:pyright": "pyright --project ../.. src"
   }
 }

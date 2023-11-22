@@ -5,6 +5,8 @@ import { dependencies, peerDependencies } from './package.json';
 
 const isDev = process.env['NODE_ENV'] === 'development';
 
+const define = { 'process.env.NODE_ENV': JSON.stringify(process.env['NODE_ENV']) };
+
 export default defineConfig(({ mode }) => {
   let dependencyConfig;
 
@@ -15,7 +17,7 @@ export default defineConfig(({ mode }) => {
         target: 'ES2015',
         sourcemap: isDev ? 'inline' : false,
       },
-      define: { 'process.env.NODE_ENV': JSON.stringify(process.env['NODE_ENV']) },
+      define,
       resolve: {
         alias: Object.fromEntries(
           [...Object.entries(peerDependencies), ...Object.entries(dependencies)].map(
@@ -39,7 +41,13 @@ export default defineConfig(({ mode }) => {
       },
     });
   } else {
-    throw new Error(`Invalid build mode: ${mode}`);
+    dependencyConfig = defineConfig({
+      build: {
+        outDir: 'dist/bundled',
+        sourcemap: false,
+      },
+      define,
+    });
   }
 
   return mergeConfig(

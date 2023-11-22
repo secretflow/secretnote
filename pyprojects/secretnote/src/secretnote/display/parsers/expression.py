@@ -10,7 +10,6 @@ from typing import (
     overload,
 )
 
-import secretflow
 from more_itertools import first
 
 from secretnote.formal.symbols import (
@@ -50,8 +49,14 @@ class ExpressionParser(Parser[TracedFrame, Options, ExpressionType]):
     def parse(self, func: Callable, *load_const: int):
         return super().parse((func, load_const))
 
+    _did_setup = False
 
-parser = ExpressionParser()
+    def __call__(self, data: TracedFrame):
+        if not self._did_setup:
+            _setup()
+            self._did_setup = True
+
+        return super().__call__(data)
 
 
 def _get_parameters(
@@ -154,80 +159,84 @@ def _create_exec_expr(
     return expr
 
 
-@parser.parse(secretflow.PYU.__call__, 1)
-def parse_pyu_call(frame: TracedFrame):
-    data = frame.get_frame()
-    func = data.local_vars[SnapshotType, "fn"]
-
-    expr = _create_exec_expr(
-        func=func,
-        location=data.local_vars[RemoteLocationSnapshot, "self"].location,
-        args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
-        kwargs=data.local_vars[DictSnapshot, "kwargs"]
-        .to_container(SnapshotType)
-        .items(),
-        retvals=frame.iter_retvals(),
-    )
-
-    if func.bytecode_hash == frame.well_known.identity_function:
-        try:
-            source = first(expr.boundvars)
-            target = cast(RemoteObject, first(expr.results))
-            return MoveExpression(source=source, target=target)
-        except ValueError:
-            pass
-
-    return expr
+parser = ExpressionParser()
 
 
-@parser.parse(secretflow.SPU.__call__, 1)
-def parse_spu_call(frame: TracedFrame):
-    data = frame.get_frame()
-    return _create_exec_expr(
-        func=data.local_vars[SnapshotType, "func"],
-        location=data.local_vars[RemoteLocationSnapshot, "self"].location,
-        args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
-        kwargs=data.local_vars[DictSnapshot, "kwargs"]
-        .to_container(SnapshotType)
-        .items(),
-        retvals=frame.iter_retvals(),
-    )
+# FIXME: This is solely to avoid importing secretflow at the top level
+def _setup():
+    import secretflow
 
+    @parser.parse(secretflow.PYU.__call__, 1)
+    def parse_pyu_call(frame: TracedFrame):
+        data = frame.get_frame()
+        func = data.local_vars[SnapshotType, "fn"]
 
-@parser.parse(secretflow.device.kernels.pyu.pyu_to_pyu)
-@parser.parse(secretflow.device.kernels.pyu.pyu_to_spu)
-@parser.parse(secretflow.device.kernels.pyu.pyu_to_heu)
-@parser.parse(secretflow.device.kernels.spu.spu_to_pyu)
-@parser.parse(secretflow.device.kernels.spu.spu_to_spu)
-@parser.parse(secretflow.device.kernels.spu.spu_to_heu)
-@parser.parse(secretflow.device.kernels.heu.heu_to_pyu)
-@parser.parse(secretflow.device.kernels.heu.heu_to_spu)
-@parser.parse(secretflow.device.kernels.heu.heu_to_heu)
-def parse_data_conversion(frame: TracedFrame):
-    data = frame.get_frame()
+        expr = _create_exec_expr(
+            func=func,
+            location=data.local_vars[RemoteLocationSnapshot, "self"].location,
+            args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
+            kwargs=data.local_vars[DictSnapshot, "kwargs"]
+            .to_container(SnapshotType)
+            .items(),
+            retvals=frame.iter_retvals(),
+        )
 
-    source = data.local_vars[RemoteObjectSnapshot, "self"]
-    target_name, target = cast(
-        Tuple[str, RemoteObjectSnapshot],
-        first(frame.iter_retvals()),
-    )
+        if func.bytecode_hash == frame.well_known.identity_function:
+            try:
+                source = first(expr.boundvars)
+                target = cast(RemoteObject, first(expr.results))
+                return MoveExpression(source=source, target=target)
+            except ValueError:
+                pass
 
-    return MoveExpression(
-        source=_create_object(source),
-        target=_create_object(target, target_name),
-    )
+        return expr
 
+    @parser.parse(secretflow.SPU.__call__, 1)
+    def parse_spu_call(frame: TracedFrame):
+        data = frame.get_frame()
+        return _create_exec_expr(
+            func=data.local_vars[SnapshotType, "func"],
+            location=data.local_vars[RemoteLocationSnapshot, "self"].location,
+            args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
+            kwargs=data.local_vars[DictSnapshot, "kwargs"]
+            .to_container(SnapshotType)
+            .items(),
+            retvals=frame.iter_retvals(),
+        )
 
-@parser.parse(secretflow.reveal)
-def parse_reveal(frame: TracedFrame):
-    expr = RevealExpression(items=[], results=[])
+    @parser.parse(secretflow.device.kernels.pyu.pyu_to_pyu)
+    @parser.parse(secretflow.device.kernels.pyu.pyu_to_spu)
+    @parser.parse(secretflow.device.kernels.pyu.pyu_to_heu)
+    @parser.parse(secretflow.device.kernels.spu.spu_to_pyu)
+    @parser.parse(secretflow.device.kernels.spu.spu_to_spu)
+    @parser.parse(secretflow.device.kernels.spu.spu_to_heu)
+    @parser.parse(secretflow.device.kernels.heu.heu_to_pyu)
+    @parser.parse(secretflow.device.kernels.heu.heu_to_spu)
+    @parser.parse(secretflow.device.kernels.heu.heu_to_heu)
+    def parse_data_conversion(frame: TracedFrame):
+        data = frame.get_frame()
 
-    inputs = frame.get_frame().local_vars[SnapshotType, "func_or_object"]
+        source = data.local_vars[RemoteObjectSnapshot, "self"]
+        target_name, target = cast(
+            Tuple[str, RemoteObjectSnapshot],
+            first(frame.iter_retvals()),
+        )
 
-    for key, item in like_pytree(inputs, SnapshotType):
-        expr.items.append(_create_object(item, key))
+        return MoveExpression(
+            source=_create_object(source),
+            target=_create_object(target, target_name),
+        )
 
-    for key, item in frame.iter_retvals():
-        expr.results.append(_create_object(item, key))
+    @parser.parse(secretflow.reveal)
+    def parse_reveal(frame: TracedFrame):
+        expr = RevealExpression(items=[], results=[])
 
-    return expr
+        inputs = frame.get_frame().local_vars[SnapshotType, "func_or_object"]
+
+        for key, item in like_pytree(inputs, SnapshotType):
+            expr.items.append(_create_object(item, key))
+
+        for key, item in frame.iter_retvals():
+            expr.results.append(_create_object(item, key))
+
+        return expr

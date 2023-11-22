@@ -3,7 +3,7 @@ from typing import Dict, Type, Union, overload
 from pydantic import BaseModel
 from secretflow import HEU, PYU, SPU
 
-SupportedDevices = Union[Type[PYU], Type[SPU]]
+SupportedDevices = Union[Type[PYU], Type[SPU], Type[HEU]]
 
 
 class OnDemandDevice:
@@ -19,7 +19,7 @@ class OnDemandDevice:
         ...
 
     @overload
-    def __call__(self, kind: Type[HEU], private: str, *public: str) -> HEU:
+    def __call__(self, kind: Type[HEU], party: str, *parties: str) -> HEU:
         ...
 
     def __call__(self, kind: SupportedDevices, party: str, *parties: str):

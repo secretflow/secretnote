@@ -262,13 +262,21 @@ export function ExecutionGraph(data: GraphProps) {
       />
       <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
         <Card size="small" style={{ fontSize: '.8rem' }}>
+          <ConfigProvider theme={{ token: { marginLG: 8 } }}>
+            <span
+              style={{ fontWeight: 700, backgroundColor: '#f04654', color: '#ffffff' }}
+            >
+              RESEARCH PREVIEW
+            </span>
+            <Divider />
+          </ConfigProvider>
           <Legend graph={graph} colorizer={colorizer} />
           <ConfigProvider theme={{ token: { marginLG: 8 } }}>
             <Divider />
           </ConfigProvider>
           <Form.Item
             name="tooltipEnabled"
-            label="Tooltip on hover"
+            label="Tooltip"
             style={{
               margin: 0,
               height: 20,

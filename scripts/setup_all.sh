@@ -14,4 +14,4 @@ $(dirname $0)/setup_python.sh
 
 # Run setup tasks
 
-pnpm exec nx run-many -t setup
+pnpm run ci:setup

@@ -50,13 +50,30 @@
   // See https://nx.dev/reference/nx-json#target-defaults
   // The actual commands are defined in the `scripts` section in each package's package.json
   "targetDefaults": {
-    "setup": {
-      "outputs": ["{projectRoot}/dist", "{projectRoot}/.dumi/tmp"],
-      "dependsOn": ["^setup"]
-    },
-    "build": {
+    "setup:tsup": {
+      "inputs": [":default", ":tsc"],
       "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^setup:tsup"]
+    },
+    "build:vite": {
+      "inputs": [":default", ":tsc"],
+      "outputs": ["{projectRoot}/dist", "{projectRoot}/build"],
+      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
+    },
+    "build:umi": {
+      "inputs": [":default", ":tsc"],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
+    },
+    "build:tsup": {
+      "inputs": [":default", ":tsc"],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
+    },
+    "build:hatch": {
+      "inputs": [":default", ":python"],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
     },
     "lint:eslint": {
       "inputs": [":default", ":eslint"]
@@ -64,20 +81,17 @@
     "lint:stylelint": {
       "inputs": [":default", ":stylelint"]
     },
-    "lint:prettier": {
-      "inputs": [":default", ":prettier"]
-    },
-    "lint:tsc": {
+    "typecheck:tsc": {
       "inputs": [":default", ":tsc"]
     },
-    "lint:black": {
-      "inputs": [":python"]
-    },
-    "lint:pyright": {
-      "inputs": [":python"]
+    "format:black": {
+      "inputs": [":default", ":python"]
     },
     "lint:ruff": {
-      "inputs": [":python", ":ruff"]
+      "inputs": [":default", ":python", ":ruff"]
+    },
+    "typecheck:pyright": {
+      "inputs": [":default", ":python"]
     },
     "test:vitest": {
       "inputs": [":default", ":vitest"]
@@ -85,8 +99,8 @@
     "test:pytest": {
       "inputs": [":default", ":python"]
     },
-    "release": {
-      "dependsOn": ["^build", "^release", "build"]
+    "publish:hatch": {
+      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
     }
   },
   "tasksRunnerOptions": {
@@ -95,18 +109,20 @@
       "options": {
         "parallel": 6,
         "cacheableOperations": [
-          "setup",
-          "build",
+          "build:hatch",
+          "build:tsup",
+          "build:umi",
+          "build:vite",
+          "format:black",
+          "format:prettier",
           "lint:eslint",
-          "lint:stylelint",
-          "lint:prettier",
-          "lint:tsc",
-          "lint:black",
           "lint:ruff",
-          "lint",
-          "test:vitest",
+          "lint:stylelint",
+          "setup:tsup",
           "test:pytest",
-          "test"
+          "test:vitest",
+          "typecheck:pyright",
+          "typecheck:tsc"
         ]
       }
     }

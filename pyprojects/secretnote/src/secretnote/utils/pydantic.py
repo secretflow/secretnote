@@ -24,19 +24,30 @@ T = TypeVar("T")
 TypedKey = Tuple[Type[T], Any]
 
 
-def update_forward_refs(global_ns: Dict[str, Any]):
-    for v in global_ns.values():
-        try:
-            is_model = issubclass(v, BaseModel)
-        except TypeError:
-            continue
-        if is_model:
-            v.update_forward_refs()
+def update_forward_refs(global_ns: Dict):
+    models: Dict[str, Type[BaseModel]] = {}
+
+    def collect_models(**items: Any):
+        for k, v in items.items():
+            try:
+                is_model = issubclass(v, BaseModel)
+            except TypeError:
+                continue
+            if is_model:
+                models[k] = v
+            try:
+                collect_models(**vars(v))
+            except TypeError:
+                continue
+
+    collect_models(**global_ns)
+
+    for v in models.values():
+        v.update_forward_refs()
 
 
 def orjson_dumps(v, *, default):
-    option = orjson.OPT_NON_STR_KEYS
-    return orjson.dumps(v, default=default, option=option).decode()
+    return orjson.dumps(v, default=default, option=orjson.OPT_NON_STR_KEYS).decode()
 
 
 def is_of_type(obj: Any, annotation: Type[T]) -> TypeGuard[T]:

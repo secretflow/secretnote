@@ -8,13 +8,13 @@ from secretnote.utils.node import create_require
 
 require = create_require(
     __package__,
-    "@secretflow/secretnote-ui/browser",
+    "@secretflow/secretnote-ui/bundled",
     "./templates/component.html",
 )
 
 
 def get_ui_bundle() -> str:
-    bundle = require.resolve("@secretflow/secretnote-ui/browser").read_text()
+    bundle = require.resolve("@secretflow/secretnote-ui/bundled").read_text()
     bundle = b64encode(bundle.encode("utf-8")).decode("utf-8")
     bundle_data_uri = f"data:text/javascript;base64,{bundle}"
     return bundle_data_uri

@@ -14,7 +14,7 @@ dependencies = [
   "opentelemetry-sdk>=1.20.0",
   "more-itertools>=10.1.0",
   "importlib-resources>=5.12",
-  "networkx>=3.1",
+  "networkx>=2.8.8",
   "stack_data>=0.6.3",
   "astunparse>=1.6.3",
   "tqdm>=4.66.1",
@@ -24,7 +24,7 @@ description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
 name = "secretnote"
 readme = "README.md"
-requires-python = ">=3.8, <3.9"
+requires-python = ">=3.8, <3.12"
 
 [project.scripts]
 
@@ -41,7 +41,7 @@ path = "package.json"
 pattern = '"version": "(?P<version>[^"]+)"'
 
 [tool.hatch.build]
-artifacts = []
+artifacts = ["*.js", "*.json", "*.html"]
 directory = "dist"
 only-include = ["src", "package.json"]
 

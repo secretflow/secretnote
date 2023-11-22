@@ -14,12 +14,13 @@ from typing import (
 )
 
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.environment_variables import OTEL_SERVICE_NAME
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+
+from secretnote.utils.warnings import development_preview_warning
 
 from .checkpoint import CheckpointGroup
 from .envvars import (
@@ -49,10 +50,17 @@ from .snapshot import (
 
 
 def setup_tracing(service_name: Optional[str] = None):
+    current_provider = trace.get_tracer_provider()
+
+    if not isinstance(current_provider, trace.ProxyTracerProvider):
+        # already initialized
+        return
+
     if service_name:
         os.environ[OTEL_SERVICE_NAME] = name = service_name
     else:
         name = os.environ.get(OTEL_SERVICE_NAME, "unknown service")
+
     resource = Resource(attributes={SERVICE_NAME: name})
     provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(provider)
@@ -66,6 +74,8 @@ def setup_tracing_in_ray_worker():
 
 
 def setup_debug_exporter():
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
     provider = cast(TracerProvider, trace.get_tracer_provider())
     processor = SimpleSpanProcessor(
         OTLPSpanExporter(endpoint="localhost:4317", insecure=True)
@@ -243,6 +253,8 @@ def default_snapshot_rules() -> List[Type[ObjectTracer]]:
 
 
 def create_profiler():
+    development_preview_warning()
+    setup_tracing()
     checkpoints = default_checkpoints()
     snapshot_rules = default_snapshot_rules()
     return Profiler(checkpoints, snapshot_rules)

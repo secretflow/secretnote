@@ -17,8 +17,8 @@
     "repo-utils": "./bin/cli.mjs"
   },
   "scripts": {
-    "setup": "tsup",
-    "build": "tsup",
+    "setup:tsup": "tsup",
+    "build:tsup": "tsup",
     "lint:eslint": "eslint src",
     "typecheck:tsc": "tsc --noEmit"
   },

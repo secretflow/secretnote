@@ -1,6 +1,7 @@
 module.exports = {
   root: true,
 
+  env: { browser: true, es2020: true },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -11,14 +12,7 @@ module.exports = {
   ],
   plugins: ['import'],
 
-  env: {
-    node: true,
-  },
-  settings: {
-    react: {
-      version: '18',
-    },
-  },
+  ignorePatterns: ['dist', '.eslintrc.*'],
 
   rules: {
     // common pitfalls

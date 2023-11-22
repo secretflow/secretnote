@@ -83,8 +83,9 @@
     "tsconfig.json": "jsonc"
   },
   "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.include": ["pyprojects/**", "examples/**"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-issue-config.json": ".github/ISSUE_TEMPLATE/config.yml"
-  }
+  "python.testing.pytestArgs": ["pyprojects"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

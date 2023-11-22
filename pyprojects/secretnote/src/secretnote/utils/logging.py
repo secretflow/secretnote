@@ -22,7 +22,7 @@ class InterceptHandler(logging.Handler):
 
         # Find caller from where originated the logged message
         frame, depth = logging.currentframe().f_back, 2
-        while frame.f_code.co_filename == logging.__file__:
+        while frame and frame.f_code.co_filename == logging.__file__:
             frame = frame.f_back
             depth += 1
 

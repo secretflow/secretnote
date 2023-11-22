@@ -38,9 +38,6 @@ from .models import (
 )
 from .snapshot import fingerprint, json_key
 
-_NULL_REFERENCE = Reference(ref=fingerprint(None))
-
-
 FinalizeSpan = Callable[[Optional[FrameType]], None]
 
 
@@ -110,8 +107,8 @@ class Profiler:
             checkpoint=checkpoint,
             function=func_ref,
             frame=frame_ref,
-            retval=_NULL_REFERENCE,
-            assignments=_NULL_REFERENCE,
+            retval=Reference(ref=fingerprint(None)),
+            assignments=Reference(ref=fingerprint(None)),
             variables=values,
         )
 
@@ -199,9 +196,16 @@ class Profiler:
         self.stop()
         return False
 
+    def visualize(self):
+        from secretnote.display.app import visualize_run
+
+        return visualize_run(self)
+
 
 def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
-    snapshots: Dict[str, SnapshotType] = {_NULL_REFERENCE.ref: ObjectSnapshot.none()}
+    snapshots: Dict[str, SnapshotType] = {
+        Reference(ref=fingerprint(None)).ref: ObjectSnapshot.none()
+    }
 
     def snapshot_tree(root: Any) -> Optional[Reference]:
         for rule in tracers:
