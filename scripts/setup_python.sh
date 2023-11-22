@@ -29,4 +29,4 @@ if test -z $CI && ! python -c "import sys; exit(int(sys.prefix == sys.base_prefi
   echo -e $COLOR_ORANGE"Not using a virtualenv. This is not recommended."$COLOR_RESET
 fi
 
-python -m pip install -r requirements.lock -r requirements-dev.lock
+python -m pip install -r requirements-dev.lock
