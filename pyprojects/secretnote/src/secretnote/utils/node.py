@@ -47,11 +47,13 @@ class create_require:
         return importlib_resources.files(self._source_package)
 
     @property
-    def node_modules(self):
-        return self.source_package.joinpath("node_modules")
+    def dist_dir(self):
+        return self.source_package.joinpath("dist")
 
     def _resolve_all(self):
-        resolved_files: Dict[str, Path] = {}
+        files_node_require: Dict[str, Path] = {}
+        files_find_static: Dict[str, Path] = {}
+
         err_node_require: Optional[str] = None
         err_find_static: Optional[str] = None
 
@@ -72,16 +74,16 @@ class create_require:
         # Example, if `package` is `foo.bar` and is on path `/path/to/foo/bar`,
         # the we are looking for `/path/to/foo/bar/node_modules/resources.json`.
         try:
-            node_modules = self.node_modules
-            with importlib_resources.as_file(self.node_modules) as path:
+            dist_dir = self.dist_dir
+            with importlib_resources.as_file(dist_dir) as path:
                 if not path.is_dir():
-                    raise FileNotFoundError(f"{node_modules} does not exist")
+                    raise FileNotFoundError(f"{dist_dir} does not exist")
                 with open(path.joinpath("resources.json")) as f:
                     content = json.load(f)
-                    resolved_files = {
+                    files_find_static = {
                         k: path.joinpath(v).resolve() for k, v in content.items()
                     }
-            if unresolved := set(specifiers) - set(resolved_files.keys()):
+            if unresolved := set(specifiers) - set(files_find_static.keys()):
                 raise KeyError(f"Failed to resolve these specifiers: {[*unresolved]}")
         except Exception as e:
             err_find_static = str(e)
@@ -103,7 +105,7 @@ class create_require:
                     text=True,
                     check=True,
                 )
-            resolved_files = {
+            files_node_require = {
                 k: Path(v).resolve()
                 for k, v in zip(specifiers, result.stdout.strip().splitlines())
             }
@@ -120,7 +122,8 @@ class create_require:
             )
             raise RuntimeError(error)
 
-        self._resolved_files = resolved_files
+        # prefer Node resolution
+        self._resolved_files = files_node_require or files_find_static
 
 
 def find_package_json(path: Path) -> Tuple[Path, PackageJSON]:
@@ -142,7 +145,7 @@ def find_all_files(path: Path) -> Iterable[Path]:
 
 
 def copy_static_files(require: create_require):
-    with importlib_resources.as_file(require.node_modules) as root:
+    with importlib_resources.as_file(require.dist_dir) as root:
         shutil.rmtree(root, ignore_errors=True)
 
         resources: Dict[str, str] = {}
@@ -164,7 +167,7 @@ def copy_static_files(require: create_require):
         for package_dir, package_json in packages.items():
             target_root = root.joinpath(package_json.name)
 
-            for file in package_json.files:
+            for file in [*package_json.files, "package.json"]:
                 source = package_dir.joinpath(file)
                 target = target_root.joinpath(file)
                 if not source.exists():

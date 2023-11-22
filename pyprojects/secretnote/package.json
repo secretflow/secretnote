@@ -9,9 +9,10 @@
     "lint:ruff": "python -m ruff check src tests",
     "publish:hatch": "python -m hatch publish ./dist",
     "test:pytest": "python -m pytest",
-    "typecheck:pyright": "pyright --project ../.. src test"
+    "typecheck:pyright": "pyright --project ../.. src tests"
   },
   "devDependencies": {
+    "@secretflow/secretnote": "workspace:^",
     "@secretflow/secretnote-ui": "workspace:^"
   }
 }

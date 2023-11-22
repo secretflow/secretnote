@@ -156,8 +156,6 @@ def default_checkpoints():
     import ray.remote_function
     import secretflow
     import secretflow.distributed
-    import secretflow.preprocessing.binning.vert_woe_binning
-    import secretflow.preprocessing.binning.vert_woe_substitution
     import secretflow.stats
     from secretflow.device.proxy import _actor_wrapper
 

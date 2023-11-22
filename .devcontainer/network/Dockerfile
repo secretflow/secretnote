@@ -1,4 +1,4 @@
-FROM secretflow/secretflow-lite-anolis8:latest
+FROM secretflow/secretflow-lite-anolis8:1.1.0b0
 
 ARG DEFAULT_USER=vscode
 
@@ -18,6 +18,7 @@ WORKDIR /home/${DEFAULT_USER}
 
 COPY .devcontainer/network/requirements.txt .
 RUN pip install -r requirements.txt
+RUN pip install secretnote --index=https://artifacts.antgroup-inc.cn/artifact/repositories/simple-dev/
 
 RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 

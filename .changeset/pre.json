@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "dev",
+  "initialVersions": {
+    "@secretflow/repo-utils": "0.1.0",
+    "secretnote": "0.0.0",
+    "spu-stubs": "0.0.0"
+  },
+  "changesets": ["blue-crabs-argue"]
+}

@@ -3,11 +3,11 @@ authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
 classifiers = [
   "Development Status :: 1 - Planning",
   "License :: OSI Approved :: Apache Software License",
-  "Private :: Do Not Upload",
 ]
 dependencies = []
 description = "Type stubs for SPU"
 dynamic = ["version"]
+license = "Apache-2.0"
 name = "spu-stubs"
 readme = "README.md"
 requires-python = ">=3.8, <3.12"
@@ -27,7 +27,7 @@ path = "package.json"
 pattern = '"version": "(?P<version>[^"]+)"'
 
 [tool.hatch.build]
-artifacts = ["*.pyi"]
+artifacts = ["*.pyi", "py.typed"]
 dev-mode-dirs = ["src"] # make stubs discoverable thru editable install
 directory = "dist"
 only-include = ["src", "package.json"]

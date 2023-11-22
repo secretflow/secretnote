@@ -1,0 +1,68 @@
+.secretnote-node {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  padding-right: 24px;
+  float: right;
+
+  .ant-avatar-group .ant-badge:not(:first-child) {
+    margin-left: -8px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    color: var(--mana-secretnote-icon-color);
+
+    svg {
+      transition: color 0.3s;
+    }
+
+    &:hover svg {
+      color: #40a9ff;
+    }
+  }
+}
+
+.secretnote-node-description {
+  .ant-btn {
+    padding: 0;
+  }
+
+  .ant-descriptions-header {
+    margin-bottom: 14px;
+  }
+
+  .ant-descriptions-item {
+    padding-bottom: 8px;
+  }
+
+  .ant-typography {
+    margin-bottom: 0;
+
+    &.ant-typography-edit-content {
+      margin-left: 8px;
+    }
+  }
+}
+
+.secretnote-node-popover {
+  .ant-popover-arrow {
+    display: none;
+  }
+
+  .ant-popover-inner-content {
+    padding: 24px;
+  }
+}
+
+.secretnote-add-node {
+  width: 400px;
+  height: 145px;
+
+  label {
+    color: var(--mana-secretnote-text-color) !important;
+  }
+}

@@ -264,9 +264,16 @@ export function ExecutionGraph(data: GraphProps) {
         <Card size="small" style={{ fontSize: '.8rem' }}>
           <ConfigProvider theme={{ token: { marginLG: 8 } }}>
             <span
-              style={{ fontWeight: 700, backgroundColor: '#f04654', color: '#ffffff' }}
+              style={{
+                fontWeight: 700,
+                backgroundColor: '#f04654',
+                color: '#ffffff',
+                display: 'inline-block',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '0.2rem',
+              }}
             >
-              RESEARCH PREVIEW
+              THIS IS A DEVELOPER PREVIEW
             </span>
             <Divider />
           </ConfigProvider>

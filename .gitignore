@@ -136,7 +136,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-# .python-version
+.python-version
 
 # Env files
 .env.*
@@ -302,6 +302,11 @@ dist
 # Dumi
 **/.dumi/tmp
 **/.dumi/tmp-production
+
+# Umi
+.umi/
+.umi-production/
+.umi-test/
 
 # macOS stuff
 .DS_Store

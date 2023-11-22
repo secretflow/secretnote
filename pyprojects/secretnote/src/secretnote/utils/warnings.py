@@ -3,10 +3,9 @@ import warnings
 
 def development_preview_warning():
     warnings.warn(
-        "\nTHIS IS A RESEARCH PREVIEW 🧪🧪🧪"
-        "\nNo guarantee is made about the correctness, completeness,"
-        "\nusefulness, or performance of this feature,"
-        "and API may change without prior notice.",
+        "\n🟡 THIS IS A DEVELOPER PREVIEW 🧪🧪🧪"
+        "\nAPI may change without prior notice. No guarantee is made about the"
+        " correctness, completeness, performance, or usefulness of this feature.",
         FutureWarning,
         stacklevel=2,
     )

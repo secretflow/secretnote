@@ -1,5 +1,5 @@
 {
-  "name": "repo-utils",
+  "name": "@secretflow/repo-utils",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -17,7 +17,6 @@
     "repo-utils": "./bin/cli.mjs"
   },
   "scripts": {
-    "setup:tsup": "tsup",
     "build:tsup": "tsup",
     "lint:eslint": "eslint src",
     "typecheck:tsc": "tsc --noEmit"

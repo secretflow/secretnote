@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/devcontainers/base:bullseye
 
 ARG FNM_VERSION=1.35.1
 ARG RYE_VERSION=0.15.1
-ARG NODE_VERSION=16.20
+ARG NODE_VERSION=18.18
 
 RUN apt-get update \
   && apt-get install -y \

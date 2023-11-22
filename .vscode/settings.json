@@ -87,5 +87,6 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "python.testing.pytestArgs": ["pyprojects"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "stylelint.stylelintPath": "node_modules/stylelint"
 }
