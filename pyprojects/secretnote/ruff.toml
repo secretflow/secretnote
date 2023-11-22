@@ -1,0 +1,3 @@
+exclude = [
+    "jupyter_server_config.py"
+]

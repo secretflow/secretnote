@@ -10,7 +10,7 @@
     "postinstall": "is-ci || husky install",
     "changeset": "changeset",
     "clean": "git clean -fX .",
-    "lint:prettier": "prettier --check --ignore-unknown .",
+    "lint:prettier": "prettier --check --write --ignore-unknown .",
     "ci:javascript": "nx run-many -t lint:prettier -t lint:eslint -t lint:stylelint -t typecheck:tsc -t test:vitest",
     "ci:python": "nx run-many -t lint:black -t lint:ruff -t test:pytest -t typecheck:pyright",
     "ci:release": "nx run-many --nx-bail -t release"
@@ -56,7 +56,7 @@
     "stylelint-order": "^6.0.3",
     "ts-node": "^10.9.1",
     "tsup": "^6.7.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.2.2",
     "vitest": "^0.32.4"
   },
   "engines": {

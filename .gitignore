@@ -308,3 +308,8 @@ dist
 
 # Personalization
 .vscode/launch.json
+
+#umi
+.umi/
+.umi-production/
+.umi-test/

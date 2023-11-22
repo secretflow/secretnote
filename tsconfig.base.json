@@ -21,7 +21,7 @@
 
     /* modules */
     "module": "ESNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
 
     /* features */
