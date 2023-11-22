@@ -4,7 +4,7 @@ import { createViewPreference, ManaModule } from '@difizen/mana-app';
 import { PreviewLayoutArea } from '@/modules/layout';
 import { SecretNoteServerModule } from '@/modules/server';
 
-// import { CsvPreview } from './csv-preview-contrib';
+import { CsvPreview } from './csv-preview-contrib';
 import { ExtraView } from './extra-view';
 import { LogPreview } from './log-preview-contrib';
 import { FilePreviewView } from './preview-view';
@@ -33,7 +33,7 @@ export const FilePreviewModule = ManaModule.create()
   .register(
     FileService,
     FilePreviewView,
-    // CsvPreview,
+    CsvPreview,
     LogPreview,
     createViewPreference({
       slot: PreviewLayoutArea.main,

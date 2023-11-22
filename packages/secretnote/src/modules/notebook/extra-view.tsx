@@ -6,6 +6,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import type { UploadProps } from 'antd';
 import { message, Modal, Space, Tooltip, Upload } from 'antd';
 import { Plus, Upload as UploadIcon } from 'lucide-react';
@@ -20,7 +21,7 @@ export const ExtraComponent = () => {
   const uploadFile = async (file: File) => {
     const content = await readFile(file);
     await instance.notebookFileService.uploadFile(file.name, content);
-    message.success('Notebook uploaded.');
+    message.success(l10n.t('Notebook 上传成功'));
   };
 
   const props: UploadProps = {
@@ -29,11 +30,13 @@ export const ExtraComponent = () => {
       const isExisted = await instance.notebookFileService.isFileExisted(file.name);
       if (isExisted) {
         Modal.confirm({
-          title: 'Upload Notebook',
+          title: l10n.t('上传 Notebook'),
           centered: true,
-          content: `The notebook ${file.name} is existed. Do you want to overwrite it?`,
-          okText: 'Overwrite',
-          cancelText: 'Cancel',
+          content: l10n.t('Notebook {name} 已经存在，是否覆盖它？', {
+            name: file.name,
+          }),
+          okText: l10n.t('覆盖'),
+          cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
             await uploadFile(file);
@@ -51,14 +54,14 @@ export const ExtraComponent = () => {
 
   return (
     <Space style={{ display: 'flex', alignItems: 'center' }}>
-      <Tooltip title="Upload a new notebook">
+      <Tooltip title={l10n.t('上传 Notebook')}>
         <span onClick={(e) => e.stopPropagation()}>
           <Upload {...props}>
             <UploadIcon size={14} />
           </Upload>
         </span>
       </Tooltip>
-      <Tooltip title="Create a new notebook">
+      <Tooltip title={l10n.t('新建 Notebook')}>
         <Plus
           size={14}
           onClick={(e) => {

@@ -62,10 +62,10 @@ export const downloadFileByBlob = (url: string, filename = '', method = 'GET') =
   getBlob(url, method)
     .then((blob: Blob) => {
       saveAs(blob, filename);
-      return true;
+      return;
     })
     .catch(() => {
-      // ignore
+      //
     });
 };
 

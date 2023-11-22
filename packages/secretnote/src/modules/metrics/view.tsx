@@ -1,5 +1,6 @@
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { Badge, Drawer } from 'antd';
 
 import { Smoothie } from '@/components/smoothie';
@@ -33,18 +34,18 @@ const MetricsComponent = (props: ModalItemProps<void>) => {
       mask={false}
       afterOpenChange={afterOpenChange}
       destroyOnClose={true}
-      title="Kernel Usage"
+      title={l10n.t('资源消耗')}
     >
       <div className="secretnote-kernel-status">
         {metrics.map((item) => (
           <div key={item.kernel.id} className="kernel-status-item">
             <div className="server-name">{item.server.name}:</div>
             <div className="metrics-item">
-              <span className="label">Name:</span>
+              <span className="label">{l10n.t('名称')}:</span>
               <span>{item.kernel.name}</span>
             </div>
             <div className="metrics-item">
-              <span className="label">Status:</span>
+              <span className="label">{l10n.t('状态')}:</span>
               <Badge color={item.kernel.statusColor} text={item.kernel.statusText} />
             </div>
             <div className="metrics-item">

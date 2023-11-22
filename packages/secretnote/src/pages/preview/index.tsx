@@ -1,3 +1,4 @@
+import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 
 import { FilePreviewModule } from '@/modules/file';

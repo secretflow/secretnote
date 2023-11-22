@@ -1,154 +1,164 @@
-import type { ISpecModels } from '@difizen/libro-jupyter';
-import { KernelSpecRestAPI, ServerConnection, URL } from '@difizen/libro-jupyter';
-import {
-  Deferred,
-  Emitter,
-  inject,
-  prop,
-  singleton,
-  StorageService,
-} from '@difizen/mana-app';
+import { ServerConnection, URL } from '@difizen/libro-jupyter';
+import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
 import { uuid } from '@/utils';
 
-import type { IServer, StatusChangeAttr } from './protocol';
+import type { IServer } from './protocol';
 import { ServerStatus } from './protocol';
-
-const host = location.host;
-const defaultServer = {
-  id: '1e1e72d3-844e-4ada-966e-d56bb5f217ed',
-  master: true,
-  name: 'Alice (You)',
-  settings: { baseUrl: `http://${host}/`, wsUrl: `ws://${host}/` },
-  status: ServerStatus.closed,
-};
 
 @singleton()
 export class SecretNoteServerManager {
   @prop()
   servers: IServer[] = [];
 
-  protected kernelSpecRestAPI: KernelSpecRestAPI;
-  protected storageService: StorageService;
   protected serverConnection: ServerConnection;
-
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
   readonly onServerAdded = this.onServerAddedEmitter.event;
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
-  protected readonly onServerChangedEmitter = new Emitter<{
-    pre: StatusChangeAttr;
-    cur: StatusChangeAttr;
-  }>();
-  readonly onServerChanged = this.onServerChangedEmitter.event;
 
-  get ready() {
-    return Promise.all(this.servers.map((s) => s.ready.promise));
-  }
-
-  constructor(
-    @inject(KernelSpecRestAPI) kernelSpecRestAPI: KernelSpecRestAPI,
-    @inject(StorageService) storageService: StorageService,
-    @inject(ServerConnection) serverConnection: ServerConnection,
-  ) {
-    this.kernelSpecRestAPI = kernelSpecRestAPI;
-    this.storageService = storageService;
+  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
-    this.deserialize();
+    this.getServerList();
   }
 
-  async startServices() {
-    this.servers.forEach((s) => {
-      if (s.status !== ServerStatus.running) {
-        this.startService(s);
+  async getServerList() {
+    const url = this.serverConnection.settings.baseUrl + 'api/nodes';
+    const init = { method: 'GET' };
+    try {
+      const response = await this.serverConnection.makeRequest(url, init);
+      if (response.status === 200) {
+        const data = (await response.json()) as IServer[];
+        for (const item of data) {
+          const spec = await this.getServerSpec(item);
+          if (spec) {
+            item.status = ServerStatus.running;
+            item.kernelspec = spec;
+          } else {
+            item.status = ServerStatus.error;
+          }
+        }
+        this.servers = data;
+        return data;
       }
-    });
+    } catch (e) {
+      console.log(e);
+    }
+    return [];
   }
 
   async addServer(server: Partial<IServer>) {
     const newServer = {
       id: uuid(),
-      name: server.name || 'New Server',
-      master: false,
-      settings: server.settings || {},
+      name: server.name || 'Someone',
+      address: server.address || '',
       status: ServerStatus.closed,
-      ready: new Deferred<ISpecModels>(),
+      kernelspec: undefined,
     };
-    const spec = await this.startService(newServer);
+    const spec = await this.getServerSpec(newServer);
     if (spec) {
-      this.servers.push(newServer);
-      this.serialize();
-      this.onServerAddedEmitter.fire(newServer);
-      return newServer;
+      try {
+        const url = this.serverConnection.settings.baseUrl + 'api/nodes';
+        const init = {
+          method: 'POST',
+          body: JSON.stringify({
+            id: newServer.id,
+            name: newServer.name,
+            address: newServer.address,
+          }),
+        };
+        const response = await this.serverConnection.makeRequest(url, init);
+        if (response.status === 200) {
+          newServer.status = ServerStatus.running;
+          newServer.kernelspec = spec;
+          this.servers.push(newServer);
+          this.onServerAddedEmitter.fire(newServer);
+          return newServer;
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
   async deleteServer(id: string) {
-    const index = this.servers.findIndex((s) => s.id === id);
-    if (index !== -1) {
-      const server = this.servers.splice(index, 1);
-      await this.serialize();
-      this.onServerDeletedEmitter.fire(server[0]);
+    const index = this.servers.findIndex((server) => server.id === id);
+    if (index === -1) {
+      return;
+    }
+    try {
+      const url = this.serverConnection.settings.baseUrl + 'api/nodes/' + id;
+      const init = {
+        method: 'DELETE',
+      };
+      const response = await this.serverConnection.makeRequest(url, init);
+      if (response.status === 204) {
+        const server = this.servers[index];
+        this.servers.splice(index, 1);
+        this.onServerAddedEmitter.fire(server);
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
 
-  async changeServer(id: string, server: Partial<IServer>) {
-    const index = this.servers.findIndex((s) => s.id === id);
-    if (index !== -1) {
-      this.servers[index] = { ...this.servers[index], ...server };
-      await this.serialize();
+  async updateServer(id: string, server: Partial<IServer>) {
+    try {
+      const url = this.serverConnection.settings.baseUrl + 'api/nodes/' + id;
+      const init = {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: server.name,
+          address: server.address,
+        }),
+      };
+      const response = await this.serverConnection.makeRequest(url, init);
+      if (response.status === 200) {
+        this.servers = this.servers.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              ...server,
+            };
+          }
+          return item;
+        });
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
 
-  getServerById(id: string): IServer | undefined {
-    return this.servers.find((s) => s.id === id);
-  }
-
-  protected async startService(server: IServer) {
-    const previousStatus = server.status;
-    const spec = await this.getServerSpec(server);
-    if (spec) {
-      server.status = ServerStatus.running;
-      server.kernelspec = spec;
-      server.ready.resolve(spec);
-    } else {
-      server.status = ServerStatus.error;
-      server.ready.reject();
-    }
-    this.onServerChangedEmitter.fire({
-      pre: { id: server.id, name: server.name, status: previousStatus },
-      cur: { id: server.id, name: server.name, status: server.status },
-    });
-
-    return spec;
-  }
-
-  protected async deserialize() {
-    const services = await this.storageService.getData<IServer[]>('servers');
-    if (services) {
-      this.servers = services.map((item) => ({
-        ...item,
-        status: ServerStatus.closed,
-        ready: new Deferred<ISpecModels>(),
-      }));
-    } else {
-      this.servers = [{ ...defaultServer, ready: new Deferred<ISpecModels>() }];
+  async getServerDetail(id: string): Promise<IServer | undefined> {
+    try {
+      const url = this.serverConnection.settings.baseUrl + 'api/nodes/' + id;
+      const init = {
+        method: 'GET',
+      };
+      const response = await this.serverConnection.makeRequest(url, init);
+      if (response.status === 200) {
+        const data = (await response.json()) as IServer[];
+        if (data.length === 1) {
+          return data[0];
+        }
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
 
-  protected async serialize() {
-    await this.storageService.setData(
-      'servers',
-      this.servers.map((s) => ({
-        ...s,
-        ready: undefined,
-        status: ServerStatus.closed,
-      })),
-    );
+  getServerSettings(server: IServer) {
+    return {
+      baseUrl: `http://${server.address}/`,
+      wsUrl: `ws://${server.address}/`,
+    };
   }
 
-  protected async getServerSpec(server: IServer) {
-    const settings = { ...this.serverConnection.settings, ...server.settings };
+  private async getServerSpec(server: IServer) {
+    const settings = {
+      ...this.serverConnection.settings,
+      ...this.getServerSettings(server),
+    };
     const url = URL.join(settings.baseUrl, 'api/kernelspecs');
 
     try {

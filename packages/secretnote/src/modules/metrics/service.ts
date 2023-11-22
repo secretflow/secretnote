@@ -256,9 +256,7 @@ export class MetricsService {
 
   private getSettings(server: IServer) {
     const settings = { ...this.serverConnection.settings };
-    if (server.settings.baseUrl) {
-      settings.baseUrl = server.settings.baseUrl;
-    }
+    settings.baseUrl = this.serverManager.getServerSettings(server).baseUrl;
     return settings;
   }
 

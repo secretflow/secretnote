@@ -1,5 +1,4 @@
-import type { ISettings, ISpecModels } from '@difizen/libro-jupyter';
-import type { Deferred } from '@difizen/mana-app';
+import type { ISpecModels } from '@difizen/libro-jupyter';
 
 export enum ServerStatus {
   closed = 'closed',
@@ -10,10 +9,8 @@ export enum ServerStatus {
 export interface IServer {
   id: string;
   name: string;
-  master: boolean;
-  settings: Partial<ISettings>;
+  address: string;
   status: ServerStatus;
-  ready: Deferred<ISpecModels>;
   kernelspec?: ISpecModels;
 }
 

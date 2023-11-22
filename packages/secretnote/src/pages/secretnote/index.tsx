@@ -1,14 +1,14 @@
+import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 
 import { EditorModule } from '@/modules/editor';
 import { FileModule } from '@/modules/file';
-import { IntegrationModule } from '@/modules/integration';
 import { LayoutModule } from '@/modules/layout';
 import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { MetricsModule } from '@/modules/metrics';
 import { NodeModule } from '@/modules/node';
 import { NotebookModule } from '@/modules/notebook';
-// import { SQLEditorModule } from '@/modules/sql-editor';
+import { SnippetModule } from '@/modules/snippet';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
@@ -31,9 +31,10 @@ const App = (): JSX.Element => {
         FileModule,
         MetricsModule,
         // SQLEditorModule,
-        IntegrationModule,
+        // IntegrationModule,
         MarkdownCellModule,
         WelcomeModule,
+        SnippetModule,
       ]}
     />
   );

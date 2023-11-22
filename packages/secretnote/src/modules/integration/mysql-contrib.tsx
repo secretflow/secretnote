@@ -1,6 +1,7 @@
 import { concatMultilineString } from '@difizen/libro-jupyter';
 import type { ModalItemProps } from '@difizen/mana-app';
 import { ModalContribution, singleton, useInject } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { Form, Input, message, Modal, Space } from 'antd';
 import { useEffect } from 'react';
 
@@ -45,7 +46,11 @@ const ConfigPanel = (props: ModalItemProps<Integration['attrs']>) => {
           message.error(getErrorMessage(code));
         } else {
           await service.getIntegrations();
-          message.success(`${editMode ? 'Update' : 'Add'} successfully.`);
+          if (editMode) {
+            message.success('更新成功');
+          } else {
+            message.success('添加成功');
+          }
           close();
         }
         return code;
@@ -57,10 +62,9 @@ const ConfigPanel = (props: ModalItemProps<Integration['attrs']>) => {
 
   return (
     <Modal
-      className="secretnote-antd-modal"
       open={visible}
       destroyOnClose={true}
-      title="Connect to MySQL"
+      title={l10n.t('连接到 {name}', { name: 'MySQL' })}
       onOk={() => add()}
       onCancel={() => {
         close();
@@ -75,48 +79,48 @@ const ConfigPanel = (props: ModalItemProps<Integration['attrs']>) => {
         initialValues={{ hostname: '127.0.0.1', port: '3306' }}
       >
         <Form.Item
-          label="Integration name"
+          label={l10n.t('集成名称')}
           name="name"
-          rules={[{ required: true, message: 'Integration name is required' }]}
+          rules={[{ required: true, message: l10n.t('请输入集成名称') }]}
         >
           <Input maxLength={16} disabled={editMode} />
         </Form.Item>
-        <Form.Item label="Address">
+        <Form.Item label={l10n.t('地址')}>
           <Space.Compact>
             <Form.Item
               name="hostname"
               noStyle
-              rules={[{ required: true, message: 'Hostname is required' }]}
+              rules={[{ required: true, message: l10n.t('请输入 IP') }]}
             >
               <Input maxLength={16} />
             </Form.Item>
             <Form.Item
               name="port"
               noStyle
-              rules={[{ required: true, message: 'Port is required' }]}
+              rules={[{ required: true, message: l10n.t('请输入端口') }]}
             >
               <Input maxLength={8} style={{ width: '30%' }} />
             </Form.Item>
           </Space.Compact>
         </Form.Item>
         <Form.Item
-          label="Username"
+          label={l10n.t('用户名')}
           name="username"
-          rules={[{ required: true, message: 'Username is required' }]}
+          rules={[{ required: true, message: l10n.t('请输入用户名') }]}
         >
           <Input maxLength={16} />
         </Form.Item>
         <Form.Item
-          label="Password"
+          label={l10n.t('密码')}
           name="password"
-          rules={[{ required: true, message: 'Password is required' }]}
+          rules={[{ required: true, message: l10n.t('请输入密码') }]}
         >
           <Input type="password" maxLength={16} />
         </Form.Item>
         <Form.Item
-          label="Database"
+          label={l10n.t('数据库')}
           name="database"
-          rules={[{ required: true, message: 'Database is required' }]}
+          rules={[{ required: true, message: l10n.t('请输入数据库名称') }]}
         >
           <Input placeholder="default_db" />
         </Form.Item>

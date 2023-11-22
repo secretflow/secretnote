@@ -52,7 +52,9 @@ export class SecretNoteKernelManager {
   }
 
   async createKernelConnections(fileInfo: IContentsModel) {
-    const servers = this.serverManager.servers;
+    const servers = (await this.serverManager.getServerList()).filter(
+      (s) => s.status === 'running',
+    );
     const kernelConnections: IKernelConnection[] = [];
     const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
       this.storedKey(fileInfo),
@@ -70,7 +72,7 @@ export class SecretNoteKernelManager {
         if (isAlive) {
           connection = await this.connectToKernel({
             ...options,
-            serverSettings: s.settings,
+            serverSettings: this.serverManager.getServerSettings(s),
           });
         } else {
           await this.removeStoredSession(fileInfo, hit);
@@ -148,7 +150,7 @@ export class SecretNoteKernelManager {
   getServerByKernelConnection(connection: IKernelConnection): IServer | undefined {
     const serverId = this.kernelConnection2Server.get(connection.id);
     if (serverId) {
-      return this.serverManager.getServerById(serverId);
+      return this.serverManager.servers.find((s) => s.id === serverId);
     }
   }
 
@@ -166,7 +168,7 @@ export class SecretNoteKernelManager {
         path: fileInfo.path,
         type: fileInfo.type,
       } as ISessionOptions,
-      server.settings,
+      this.serverManager.getServerSettings(server),
     );
 
     if (!newSession || !newSession.kernel) {
@@ -188,7 +190,7 @@ export class SecretNoteKernelManager {
 
     const kernelConnection = await this.connectToKernel({
       ...options,
-      serverSettings: server.settings,
+      serverSettings: this.serverManager.getServerSettings(server),
     });
 
     return kernelConnection;
@@ -201,7 +203,10 @@ export class SecretNoteKernelManager {
 
   protected async isKernelAlive(id: string, server: IServer): Promise<boolean> {
     try {
-      const data = await this.kernelRestAPI.getKernelModel(id, server.settings);
+      const data = await this.kernelRestAPI.getKernelModel(
+        id,
+        this.serverManager.getServerSettings(server),
+      );
       return !!data;
     } catch {
       return false;

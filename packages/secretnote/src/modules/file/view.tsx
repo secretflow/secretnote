@@ -6,6 +6,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import type { UploadProps } from 'antd';
 import { message, Modal, Space, Tree, Upload } from 'antd';
 import type { DataNode } from 'antd/es/tree';
@@ -47,19 +48,19 @@ export const FileComponent = () => {
     switch (key) {
       case 'copy':
         fileService.copyPath(node);
-        message.success('Path copied to clipboard.');
+        message.success(l10n.t('路径已经复制到剪切板'));
         break;
       case 'delete':
         Modal.confirm({
-          title: 'Delete File?',
+          title: l10n.t('删除文件'),
           centered: true,
-          content: `The file ${node.title} will be deleted.`,
-          okText: 'Delete File',
-          cancelText: 'Cancel',
+          content: l10n.t('文件 {name} 将被删除', { name: node.title as string }),
+          okText: l10n.t('删除文件'),
+          cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
             await fileService.deleteFile(node);
-            message.success('File deleted.');
+            message.success(l10n.t('文件已经删除'));
             return close(Promise.resolve);
           },
         });
@@ -82,7 +83,7 @@ export const FileComponent = () => {
       message.error(getErrorMessage(code));
     } else {
       await fileService.getFileTree();
-      message.success('File uploaded.');
+      message.success(l10n.t('文件上传成功'));
     }
   };
 
@@ -93,11 +94,11 @@ export const FileComponent = () => {
         const isExisted = await fileService.isFileExist(nodeData, file.name);
         if (isExisted) {
           Modal.confirm({
-            title: 'Upload File',
+            title: l10n.t('上传文件'),
             centered: true,
-            content: `The file ${file.name} is existed. Do you want to overwrite it?`,
+            content: l10n.t('文件 {name} 已经存在，是否覆盖？', { name: file.name }),
             okText: 'Overwrite',
-            cancelText: 'Cancel',
+            cancelText: l10n.t('取消'),
             okType: 'danger',
             async onOk(close) {
               await uploadFile(nodeData, file);
@@ -112,7 +113,7 @@ export const FileComponent = () => {
       },
       fileList: [],
     };
-    return <Upload {...props}>Upload to folder</Upload>;
+    return <Upload {...props}>{l10n.t('上传到文件夹')}</Upload>;
   };
 
   const getFileIcon = (nodeData: DataNode) => {
@@ -134,15 +135,15 @@ export const FileComponent = () => {
       { key: 'upload', label: uploadRender(nodeData), icon: <UploadIcon size={12} /> },
     ];
     const dataMenuItems: Menu[] = [
-      { key: 'view', label: 'View', icon: <Link size={12} /> },
+      { key: 'view', label: l10n.t('查看'), icon: <Link size={12} /> },
       {
         key: 'copy',
-        label: 'Copy path to clipboard',
+        label: l10n.t('复制路径到剪切板'),
         icon: <ClipboardCopy size={12} />,
       },
-      { key: 'download', label: 'Download', icon: <Download size={12} /> },
+      { key: 'download', label: l10n.t('下载'), icon: <Download size={12} /> },
       { type: 'divider' },
-      { key: 'delete', label: 'Delete', icon: <Trash size={12} />, danger: true },
+      { key: 'delete', label: l10n.t('删除'), icon: <Trash size={12} />, danger: true },
     ];
 
     return (
@@ -166,6 +167,9 @@ export const FileComponent = () => {
   return (
     <DirectoryTree
       blockNode
+      onSelect={() => {
+        // do nothing
+      }}
       treeData={fileService.fileTree}
       className="secretnote-file-tree"
       switcherIcon={<ChevronDown size={12} />}
@@ -182,7 +186,7 @@ export class FileView extends BaseView implements SideBarContribution {
   readonly fileService: FileService;
 
   key = fileViewKey;
-  label = 'Files';
+  label = l10n.t('文件');
   order = 2;
   defaultOpen = true;
   view = FileComponent;

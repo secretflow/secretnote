@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { IContentsModel } from '@difizen/libro-jupyter';
+import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
 import { ContentsManager } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
@@ -22,6 +22,9 @@ export class NotebookFileService {
 
   @prop()
   currentNotebookFile: IContentsModel | null = null;
+
+  @prop()
+  currentLibroView: LibroView | null = null;
 
   @prop()
   renameNotebookFile: { path: string; name: string } | null = null;

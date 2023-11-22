@@ -20,7 +20,6 @@ import {
 import { inject, transient, view, ViewOption } from '@difizen/mana-app';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
-import { uuid } from '@/utils';
 
 @transient()
 @view('libro-output-area')
@@ -64,7 +63,6 @@ export class SecretNoteOutputArea extends LibroOutputArea {
           const output: IOutput = {
             ...msg.content,
             output_type: msg.header.msg_type,
-            _outputId: uuid(),
           };
           this.addOutput(connection, output);
         }
@@ -88,7 +86,6 @@ export class SecretNoteOutputArea extends LibroOutputArea {
             output_type: 'display_data',
             data: page.data as IMimeBundle,
             metadata: {},
-            _outputId: uuid(),
           };
           this.addOutput(connection, output);
         }
@@ -122,7 +119,11 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   }
 
   async flushOutputs() {
-    const outputs = Object.values(this.connectionId2Message).flat();
+    const connectionNum = Object.keys(this.connectionId2Message).length;
+    let outputs = Object.values(this.connectionId2Message).flat();
+    if (connectionNum < 2) {
+      outputs = outputs.filter((output) => !output.breakFlag);
+    }
     this.outputs.forEach((output) => {
       output.dispose();
     });
@@ -140,7 +141,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
         'text/html': `<h4>${name}'s Output:</h4>`,
       },
       metadata: {},
-      _outputId: uuid(),
+      breakFlag: true,
     };
     return output;
   }

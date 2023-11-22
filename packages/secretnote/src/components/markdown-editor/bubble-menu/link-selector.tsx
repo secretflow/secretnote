@@ -1,3 +1,4 @@
+import { l10n } from '@difizen/mana-l10n';
 import type { Editor } from '@tiptap/core';
 import classnames from 'classnames';
 import { Check, Trash } from 'lucide-react';
@@ -37,7 +38,7 @@ export const LinkSelector: FC<LinkSelectorProps> = ({ editor, isOpen, setIsOpen 
             'link-selector-blue': editor.isActive('link'),
           })}
         >
-          Link
+          {l10n.t('链接')}
         </p>
       </button>
       {isOpen && (
@@ -54,7 +55,7 @@ export const LinkSelector: FC<LinkSelectorProps> = ({ editor, isOpen, setIsOpen 
           <input
             ref={inputRef}
             type="text"
-            placeholder="Paste a link"
+            placeholder={l10n.t('粘贴链接')}
             className="link-selector-input"
             defaultValue={editor.getAttributes('link').href || ''}
           />

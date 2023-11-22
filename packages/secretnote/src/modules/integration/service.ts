@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { Contribution } from '@difizen/mana-app';
+import type { Contribution } from '@difizen/mana-app';
 import { contrib, inject, prop, singleton, StorageService } from '@difizen/mana-app';
 
 import { ERROR_CODE } from '@/utils';

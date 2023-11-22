@@ -7,6 +7,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { Tooltip } from 'antd';
 import { Plus } from 'lucide-react';
 
@@ -20,7 +21,7 @@ export const ExtraComponent = () => {
   return (
     <DropdownMenu
       icon={
-        <Tooltip title="Create a new integration">
+        <Tooltip title={l10n.t('新建集成')}>
           <Plus size={14} />
         </Tooltip>
       }

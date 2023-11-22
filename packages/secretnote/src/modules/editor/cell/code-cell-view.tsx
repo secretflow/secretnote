@@ -1,10 +1,6 @@
 import type {
-  CompletionProvider,
-  CompletionProviderOption,
   ExecutionMeta,
   KernelMessage,
-  TooltipProvider,
-  TooltipProviderOption,
   CellViewOptions,
 } from '@difizen/libro-jupyter';
 import {
@@ -24,6 +20,7 @@ import {
   ViewManager,
   ViewOption,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { message } from 'antd';
 import { forwardRef } from 'react';
 
@@ -86,63 +83,6 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
       this.getExecutionParty() || this.allExecutionParty.map((item) => item.key);
   }
 
-  tooltipProvider: TooltipProvider = async (option: TooltipProviderOption) => {
-    const cellContent = this.model.value;
-    const kernelConnection = getOrigin(
-      (this.parent.model as SecretNoteModel).kernelConnection,
-    );
-    if (!kernelConnection) {
-      message.error('Kernel Connection 还没有建立');
-      return null;
-    }
-    const reply = await kernelConnection.requestInspect({
-      code: cellContent,
-      cursor_pos: option.cursorPosition,
-      detail_level: 1,
-    });
-
-    const value = reply.content;
-
-    if (value.status !== 'ok' || !value.found) {
-      return null;
-    }
-    return value.data['text/plain'] as string;
-  };
-
-  completionProvider: CompletionProvider = async (option: CompletionProviderOption) => {
-    const cellContent = this.model.value;
-    const kernelConnection = getOrigin(
-      (this.parent.model as SecretNoteModel).kernelConnection,
-    );
-
-    if (!kernelConnection) {
-      message.error('Kernel Connection 还没有建立');
-      throw new Error('Kernel Connection 还没有建立');
-    }
-
-    const reply = await kernelConnection.requestComplete({
-      code: cellContent,
-      cursor_pos: option.cursorPosition,
-    });
-
-    const value = reply.content;
-
-    if (value.status === 'abort') {
-      throw new Error('abort');
-    }
-
-    if (value.status === 'error') {
-      throw new Error(value.ename);
-    }
-
-    return {
-      matches: value.matches,
-      cursor_start: value.cursor_start,
-      cursor_end: value.cursor_end,
-      metadata: value.metadata,
-    };
-  };
-
   async run() {
     const libroModel = this.parent.model as SecretNoteModel;
     const cellModel = this.model;
@@ -152,16 +92,33 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     }
 
     let kernelConnections = getOrigin(libroModel.kernelConnections);
+
+    // 没有可用的 Kernel 连接
     if (kernelConnections.length === 0) {
-      message.info('No available kernel connection.');
+      message.info(l10n.t('没有可用的 Kernel 连接'));
       return false;
     }
+
     kernelConnections = kernelConnections.filter((connection) => {
       const server = this.kernelManager.getServerByKernelConnection(connection);
-      return server && this.executionParty.includes(server.id);
+      return (
+        server && server.status === 'running' && this.executionParty.includes(server.id)
+      );
     });
     if (kernelConnections.length === 0) {
-      message.info('Please select a node to run.');
+      message.info(l10n.t('请选择一个执行节点'));
+      return false;
+    }
+    if (kernelConnections.length !== this.executionParty.length) {
+      message.info(l10n.t('有的 Kernel 连接不可用'));
+      return false;
+    }
+
+    const hasDisposedConnection = kernelConnections.some((item) => {
+      return item.isDisposed;
+    });
+    if (hasDisposedConnection) {
+      message.error(l10n.t('有的 Kernel 连接已经被销毁'));
       return false;
     }
 

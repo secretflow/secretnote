@@ -7,6 +7,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { message, Modal } from 'antd';
 import { PenLine, Trash } from 'lucide-react';
 
@@ -87,7 +88,7 @@ export const integrationViewKey = 'integration';
 @view('secretnote-integration-view')
 export class IntegrationView extends BaseView implements SideBarContribution {
   key = integrationViewKey;
-  label = 'Integrations';
+  label = l10n.t('集成');
   order = 3;
   defaultOpen = false;
   view = IntegrationComponent;

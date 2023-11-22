@@ -6,6 +6,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import {
   Avatar,
   Badge,
@@ -39,20 +40,20 @@ const getNodeStatus = (
     return {
       status: 'success',
       badgeStatus: 'success',
-      text: 'Online',
+      text: l10n.t('在线'),
     };
   }
   if (status === ServerStatus.error) {
     return {
       status: 'error',
       badgeStatus: 'error',
-      text: 'Offline',
+      text: l10n.t('离线'),
     };
   }
   return {
     status: 'default',
     badgeStatus: 'default',
-    text: 'Offline',
+    text: l10n.t('离线'),
   };
 };
 
@@ -64,7 +65,7 @@ const NodeDetails = (props: { node: Node }) => {
 
   const deleteNode = async (id: string) => {
     await instance.service.deleteNode(id);
-    message.success('Delete successfully.');
+    message.success(l10n.t('删除成功'));
   };
 
   const onChangeNodeName = async (n: Node, name: string) => {
@@ -74,8 +75,8 @@ const NodeDetails = (props: { node: Node }) => {
 
   return (
     <div className="secretnote-node-description">
-      <Descriptions title="Node Information" column={1}>
-        <Descriptions.Item label="Name">
+      <Descriptions title={l10n.t('节点信息')} column={1}>
+        <Descriptions.Item label={l10n.t('名称')}>
           <Paragraph
             editable={{
               onChange: (str: string) => onChangeNodeName(node, str),
@@ -85,21 +86,19 @@ const NodeDetails = (props: { node: Node }) => {
             {editableStr}
           </Paragraph>
         </Descriptions.Item>
-        <Descriptions.Item label="Address">{node.address}</Descriptions.Item>
-        <Descriptions.Item label="Status">
+        <Descriptions.Item label={l10n.t('地址')}>{node.address}</Descriptions.Item>
+        <Descriptions.Item label={l10n.t('状态')}>
           <Badge status={status} text={text} />
         </Descriptions.Item>
       </Descriptions>
-      {!node.master && (
-        <Button
-          type="link"
-          onClick={() => {
-            deleteNode(node.id);
-          }}
-        >
-          Delete
-        </Button>
-      )}
+      <Button
+        type="link"
+        onClick={() => {
+          deleteNode(node.id);
+        }}
+      >
+        {l10n.t('删除')}
+      </Button>
     </div>
   );
 };
@@ -121,8 +120,9 @@ export const NodeComponent = () => {
         } else {
           setAddFormVisible(false);
           form.resetFields();
-          message.success('Node add successfully.');
+          message.success(l10n.t('节点添加成功'));
         }
+
         setAddLoading(false);
         return code;
       })
@@ -142,24 +142,24 @@ export const NodeComponent = () => {
         initialValues={{ name: '', address: '' }}
       >
         <Form.Item
-          label="Name"
+          label={l10n.t('名称')}
           name="name"
           rules={[
-            { required: true, message: 'Please input name' },
-            { max: 16, message: 'Name is too long' },
+            { required: true, message: l10n.t('请输入名称') },
+            { max: 16, message: l10n.t('名称过长') },
           ]}
         >
-          <Input placeholder="Bob" />
+          <Input placeholder="Alice" />
         </Form.Item>
         <Form.Item
-          label="Address"
+          label={l10n.t('地址')}
           name="address"
           rules={[
-            { required: true, message: 'Please input address' },
-            { max: 100, message: 'Address is too long' },
+            { required: true, message: l10n.t('请输入地址') },
+            { max: 100, message: l10n.t('地址过长') },
           ]}
         >
-          <Input placeholder="127.0.0.1:8889" />
+          <Input placeholder="127.0.0.1:8888" />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
           <Space>
@@ -171,7 +171,7 @@ export const NodeComponent = () => {
               }}
               loading={addLoading}
             >
-              Add
+              {l10n.t('添加')}
             </Button>
           </Space>
         </Form.Item>

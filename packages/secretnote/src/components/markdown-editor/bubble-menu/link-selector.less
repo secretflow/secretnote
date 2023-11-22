@@ -7,9 +7,9 @@
   }
 
   .link-selector-underline {
+    margin-left: 8px;
     text-decoration: underline;
     text-decoration-color: #d1d5db;
-    margin-left: 8px;
   }
 
   .link-selector-blue {
@@ -18,15 +18,16 @@
 
   .link-selector-button {
     display: flex;
-    align-items: center;
     height: 100%;
+    align-items: center;
     padding: 6px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #4a5568;
     border-right: 1px solid #e5e7eb;
     border-left: 1px solid #e5e7eb;
     background-color: #fff;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    text-wrap: nowrap;
 
     &:hover {
       background-color: #f5f5f4;
@@ -39,27 +40,28 @@
 
   .link-selector-form {
     position: fixed;
-    top: 100%;
     z-index: 99999;
-    margin-top: 4px;
+    top: 100%;
     display: flex;
-    align-items: center;
-    width: 240px;
     overflow: hidden;
-    border-radius: 4px;
-    border: 1px solid #c8c8c8;
-    background-color: #fff;
+    width: 240px;
+    align-items: center;
     padding: 4px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #c8c8c8;
+    border-radius: 4px;
+    margin-top: 4px;
     animation-duration: 0.5s;
     animation-name: fade-in;
     animation-name: slide-in-from-top-1;
+    background-color: #fff;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
   }
 
   @keyframes fade-in {
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -69,6 +71,7 @@
     from {
       transform: translateY(-100%);
     }
+
     to {
       transform: translateY(0);
     }
@@ -76,20 +79,20 @@
 
   .link-selector-input {
     flex: 1;
-    background-color: #fff;
     padding: 4px;
+    border: none;
+    background-color: #fff;
     font-size: 14px;
     outline: none;
-    border: none;
   }
 
   .buttonLink {
     display: flex;
     align-items: center;
-    border-radius: 2px;
     padding: 4px;
-    transition-property: all;
+    border-radius: 2px;
     transition-duration: 0.3s;
+    transition-property: all;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
@@ -99,14 +102,14 @@
 
   .check {
     display: flex;
-    align-items: center;
     height: 24px;
-    border-radius: 2px;
+    align-items: center;
     padding: 4px;
-    color: #6b7280;
+    border-radius: 2px;
     background-color: #fff;
-    transition-property: all;
+    color: #6b7280;
     transition-duration: 0.3s;
+    transition-property: all;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
@@ -115,7 +118,7 @@
   }
 
   .trash {
-    height: 16px;
     width: 16px;
+    height: 16px;
   }
 }

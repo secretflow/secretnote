@@ -5,6 +5,7 @@ import type { DataNode } from 'antd/es/tree';
 
 import { downloadFileByUrl as download, ERROR_CODE } from '@/utils';
 
+import type { IServer } from '../server';
 import { SecretNoteServerManager } from '../server';
 
 export const BASE_PATH = '/';
@@ -23,10 +24,14 @@ export class FileService {
   ) {
     this.contentsManager = contentsManager;
     this.serverManager = serverManager;
+    this.serverManager.onServerAdded(this.onServerChanged.bind(this));
+    this.serverManager.onServerDeleted(this.onServerChanged.bind(this));
   }
 
   async getFileTree() {
-    const servers = this.serverManager.servers;
+    const servers = (await this.serverManager.getServerList()).filter(
+      (s) => s.status === 'running',
+    );
     const fileTree: DataNode[] = [];
 
     for (const server of servers) {
@@ -38,7 +43,7 @@ export class FileService {
 
       try {
         const list = await this.contentsManager.get(BASE_PATH, {
-          baseUrl: server.settings.baseUrl,
+          baseUrl: this.getBaseUrl(server),
           content: true,
         });
 
@@ -69,12 +74,12 @@ export class FileService {
 
   async isFileExist(nodeData: DataNode, name: string): Promise<boolean> {
     const serverId = nodeData.key as string;
-    const server = this.serverManager.getServerById(serverId);
+    const server = await this.serverManager.getServerDetail(serverId);
     if (!server) {
       return false;
     }
     const list = await this.contentsManager.get(BASE_PATH, {
-      baseUrl: server.settings.baseUrl,
+      baseUrl: this.getBaseUrl(server),
       content: true,
     });
 
@@ -83,11 +88,11 @@ export class FileService {
 
   async uploadFile(nodeData: DataNode, name: string, content: string) {
     const serverId = nodeData.key as string;
-    const server = this.serverManager.getServerById(serverId);
+    const server = await this.serverManager.getServerDetail(serverId);
     if (!server) {
       return ERROR_CODE.SERVER_NOT_FOUND;
     }
-    const baseUrl = server.settings.baseUrl;
+    const baseUrl = this.getBaseUrl(server);
     const path = `${BASE_PATH}/${name}`;
     await this.contentsManager.save(path, {
       content,
@@ -103,10 +108,10 @@ export class FileService {
 
   async downloadFile(nodeData: DataNode) {
     const { serverId, path } = this.parseNodeKey(nodeData.key as string);
-    const server = this.serverManager.getServerById(serverId);
+    const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.getDownloadUrl(path, {
-        baseUrl: server.settings.baseUrl,
+        baseUrl: this.getBaseUrl(server),
       });
       download(data, nodeData.title as string);
     }
@@ -117,19 +122,19 @@ export class FileService {
       return;
     }
     const { serverId, path } = this.parseNodeKey(nodeData.key as string);
-    const server = this.serverManager.getServerById(serverId);
+    const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
-      await this.contentsManager.delete(path, { baseUrl: server.settings.baseUrl });
+      await this.contentsManager.delete(path, { baseUrl: this.getBaseUrl(server) });
       await this.getFileTree();
     }
   }
 
   async getFileContent(serverId: string, path: string) {
     const decodedPath = decodeURIComponent(path);
-    const server = this.serverManager.getServerById(serverId);
+    const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.get(decodedPath, {
-        baseUrl: server.settings.baseUrl,
+        baseUrl: this.getBaseUrl(server),
         content: true,
       });
       return data;
@@ -173,5 +178,13 @@ export class FileService {
   private isFileVisible(path: string) {
     const ext = this.getFileExtByPath(path);
     return FILE_EXTS.includes(`.${ext}`);
+  }
+
+  private getBaseUrl(server: IServer) {
+    return this.serverManager.getServerSettings(server).baseUrl;
+  }
+
+  private onServerChanged() {
+    this.getFileTree();
   }
 }

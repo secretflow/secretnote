@@ -21,9 +21,9 @@ import { useConfetti } from '@/components/confetti';
 import { ShViewer } from '@/components/sh-viewer';
 
 import './index.less';
-import { WelcomeService } from './service';
 
 interface DescriptionProps {
+  finished?: boolean;
   done: (step: number) => void;
 }
 
@@ -31,20 +31,28 @@ const PrepareNodeDes = (props: DescriptionProps) => {
   return (
     <div className="step">
       <div className="text">
-        First we install secretflow and secretnote on two machines and start secretnote.
+        首先需要在两台机器 alice 和 bob 上分别安装 secretflow 和 secretnote，并启动
+        secretnote。最简单的方式是使用 docker image。
+      </div>
+      <ShViewer code={['docker run -it secretflow/secretnote']} />
+      <div className="text">
+        也可以使用 pip 安装 secretflow 和 secretnote，然后执行 secretnote 命令，请注意
+        python 版本需要是 3.8。
       </div>
       <ShViewer
         code={['pip install –U secretflow', 'pip install secretnote', 'secretnote']}
       />
       <div className="text">
-        When the secretnote command is executed, the web page opens automatically, and
-        we can add another node by clicking the plus sign in the upper right corner of
-        the web page of one node.
+        部署成功后，我们可以在一台网络和 alice 和 bob 互通的机器上，安装
+        secretnote，并且启动，启动后自动打开 Web
+        页面，在页面右上角将之前部署的两个节点添加进来。
       </div>
       <img src={addNodeImgUrl} alt="add node" style={{ margin: 0 }} />
-      <Button type="link" onClick={() => props.done(0)}>
-        Done
-      </Button>
+      {!props.finished && (
+        <Button type="link" onClick={() => props.done(0)}>
+          完成
+        </Button>
+      )}
     </div>
   );
 };
@@ -53,8 +61,7 @@ const PrepareDatasetDes = (props: DescriptionProps) => {
   return (
     <div className="step">
       <div className="text">
-        Then, we need a dataset for constructing vertical partitioned scenarios. Both
-        datasets can be downloaded by clicking on the two links below.
+        我们需要一个数据集来构建垂直分区的场景。可以点击下面的两个链接下载数据集。
       </div>
       <div className="links">
         <a className="link" href={aliceCsv} download="iris_alice.csv">
@@ -64,11 +71,13 @@ const PrepareDatasetDes = (props: DescriptionProps) => {
           iris_bob.csv
         </a>
       </div>
-      <div className="text">We can then upload the two datasets to each node.</div>
+      <div className="text">下载后分别上传到两个节点上。</div>
       <img src={uploadFileImgUrl} alt="upload file" />
-      <Button type="link" onClick={() => props.done(1)}>
-        Done
-      </Button>
+      {!props.finished && (
+        <Button type="link" onClick={() => props.done(1)}>
+          完成
+        </Button>
+      )}
     </div>
   );
 };
@@ -77,8 +86,7 @@ const RunningNotebookDes = (props: DescriptionProps) => {
   return (
     <div className="step">
       <div className="text">
-        Let&apos;s download the following sample code and import it into the notebook
-        list.
+        我们继续点击下面的链接下载一份示例代码，然后导入到 Notebook 列表中。
       </div>
       <div className="links">
         <a className="link" href={psiSample} download="psi.ipynb">
@@ -86,19 +94,16 @@ const RunningNotebookDes = (props: DescriptionProps) => {
         </a>
       </div>
       <div className="text">
-        After importing the notebook and opening the notebook file, we can operate the
-        secretnote editor in the right panel the same way we operate the jupyter
-        notebook.
-      </div>
-      <div className="text">
-        It should be noted that our python cell can select multiple nodes to execute,
-        and the output of multiple parties will be summarized and displayed after
-        execution. This brings great convenience to secretflow.
+        Notebook 的操作方式和 Jupyter Notebook
+        一致，并且在此基础上做了许多针对性的功能优化，比如 Python
+        单元格可以选择多个节点同时去执行，然后将执行结果汇总起来输出。这给隐语多控制器执行的开发模式带来了较大的便利。
       </div>
       <img src={pythonCellImgUrl} alt="python cell" style={{ width: 660 }} />
-      <Button type="link" onClick={() => props.done(2)}>
-        Done
-      </Button>
+      {!props.finished && (
+        <Button type="link" onClick={() => props.done(2)}>
+          完成
+        </Button>
+      )}
     </div>
   );
 };
@@ -107,14 +112,14 @@ const CheckResultDes = (props: DescriptionProps) => {
   return (
     <div className="step">
       <div className="text">
-        After executing the above example, the resulting files are generated on both
-        nodes, and we can refresh the list of files to see them and view the file
-        details.
+        完成执行后，刷新文件列表，会看到新生成的隐私求交结果文件，右键打开文件详情就可以校验结果。
       </div>
       <img src={viewFileImgUrl} alt="view file" />
-      <Button type="link" onClick={() => props.done(3)}>
-        Done
-      </Button>
+      {!props.finished && (
+        <Button type="link" onClick={() => props.done(3)}>
+          完成
+        </Button>
+      )}
     </div>
   );
 };
@@ -143,9 +148,21 @@ export const WelcomeComponent = () => {
     <div className="secretnote-welcome-page">
       <div className="process">
         <div className="header">
-          <div className="title">Welcome to SecretNote.</div>
+          <div className="title">欢迎使用 SecretNote</div>
           <div className="subtitle">
-            Here&apos;s how to running a psi on spu with secretnote in four easy steps.
+            SecretNote 是专为隐语开发者打造的高级工具套件，以 Notebook
+            的形式呈现，支持多节点代码执行和文件管理，提供运行状态追踪能力，并且支持组件快捷研发，能极大地提升开发者的效率和工作体验。
+          </div>
+          <div className="subtitle">
+            下面是一个在两方节点上执行
+            <a
+              href="https://www.secretflow.org.cn/docs/secretflow/latest/zh-Hans/tutorial/PSI_On_SPU"
+              target="_blank"
+              rel="noreferrer"
+            >
+              &nbsp;SPU 隐私求交&nbsp;
+            </a>
+            的示例，请跟随示例一步步熟悉 secretnote 吧！
           </div>
         </div>
         <Progress
@@ -162,20 +179,28 @@ export const WelcomeComponent = () => {
           status="process"
           items={[
             {
-              title: <div className="step-title">Preparing Node</div>,
-              description: <PrepareNodeDes done={done} />,
+              title: <div className="step-title">准备节点</div>,
+              description: (
+                <PrepareNodeDes finished={instance.currentStep > 0} done={done} />
+              ),
             },
             {
-              title: <div className="step-title">Preparing Dataset</div>,
-              description: <PrepareDatasetDes done={done} />,
+              title: <div className="step-title">准备数据</div>,
+              description: (
+                <PrepareDatasetDes finished={instance.currentStep > 1} done={done} />
+              ),
             },
             {
-              title: <div className="step-title">Running PSI</div>,
-              description: <RunningNotebookDes done={done} />,
+              title: <div className="step-title">运行 Notebook</div>,
+              description: (
+                <RunningNotebookDes finished={instance.currentStep > 2} done={done} />
+              ),
             },
             {
-              title: <div className="step-title">Check Result</div>,
-              description: <CheckResultDes done={done} />,
+              title: <div className="step-title">验证结果</div>,
+              description: (
+                <CheckResultDes finished={instance.currentStep > 3} done={done} />
+              ),
             },
           ]}
         />
@@ -188,7 +213,6 @@ export const WelcomeComponent = () => {
 @view('secretnote-welcome-view')
 export class WelcomeView extends BaseView {
   view = WelcomeComponent;
-  readonly service: WelcomeService;
   protected storageService: StorageService;
 
   @prop()
@@ -197,12 +221,8 @@ export class WelcomeView extends BaseView {
   @prop()
   finished = false;
 
-  constructor(
-    @inject(WelcomeService) service: WelcomeService,
-    @inject(StorageService) storageService: StorageService,
-  ) {
+  constructor(@inject(StorageService) storageService: StorageService) {
     super();
-    this.service = service;
     this.storageService = storageService;
     this.getCurrentStep();
   }

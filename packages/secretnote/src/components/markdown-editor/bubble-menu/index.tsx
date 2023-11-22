@@ -1,3 +1,4 @@
+import { l10n } from '@difizen/mana-l10n';
 import type { BubbleMenuProps } from '@tiptap/react';
 import { BubbleMenu, isNodeSelection } from '@tiptap/react';
 import classnames from 'classnames';
@@ -18,6 +19,7 @@ import { NodeSelector } from './node-selector';
 
 export interface BubbleMenuItem {
   name: string;
+  label: string;
   isActive: () => boolean;
   command: () => void;
   icon: typeof BoldIcon;
@@ -31,30 +33,35 @@ const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   const items: BubbleMenuItem[] = [
     {
       name: 'bold',
+      label: l10n.t('粗体'),
       isActive: () => editor.isActive('bold'),
       command: () => editor.chain().focus().toggleBold().run(),
       icon: BoldIcon,
     },
     {
       name: 'italic',
+      label: l10n.t('斜体'),
       isActive: () => editor.isActive('italic'),
       command: () => editor.chain().focus().toggleItalic().run(),
       icon: ItalicIcon,
     },
     {
       name: 'underline',
+      label: l10n.t('下划线'),
       isActive: () => editor.isActive('underline'),
       command: () => editor.chain().focus().toggleUnderline().run(),
       icon: UnderlineIcon,
     },
     {
       name: 'strike',
+      label: l10n.t('删除线'),
       isActive: () => editor.isActive('strike'),
       command: () => editor.chain().focus().toggleStrike().run(),
       icon: StrikethroughIcon,
     },
     {
       name: 'code',
+      label: l10n.t('行内代码'),
       isActive: () => editor.isActive('code'),
       command: () => editor.chain().focus().toggleCode().run(),
       icon: CodeIcon,

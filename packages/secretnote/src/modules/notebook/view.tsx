@@ -7,6 +7,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import type { InputRef } from 'antd';
 import { Input, message, Modal, Popover } from 'antd';
 import classnames from 'classnames';
@@ -33,17 +34,17 @@ export const NotebookFileComponent = () => {
         break;
       case 'delete':
         Modal.confirm({
-          title: 'Delete Notebook?',
+          title: l10n.t('删除 Notebook'),
           centered: true,
-          content: `The notebook ${notebookFileService.getFileNameWithoutExt(
-            file.name,
-          )} will be deleted.`,
-          okText: 'Delete Notebook',
-          cancelText: 'Cancel',
+          content: l10n.t('Notebook {name} 将被删除', {
+            name: notebookFileService.getFileNameWithoutExt(file.name),
+          }),
+          okText: l10n.t('删除 Notebook'),
+          cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
             await notebookFileService.deleteFile(file);
-            message.success('Notebook deleted.');
+            message.success(l10n.t('Notebook 删除成功'));
             return close(Promise.resolve);
           },
         });
@@ -115,17 +116,17 @@ export const NotebookFileComponent = () => {
             <span>{notebookFileService.getFileNameWithoutExt(file.name)}</span>
             <DropdownMenu
               items={[
-                { key: 'rename', label: 'Rename', icon: <PenLine size={12} /> },
-                { key: 'copy', label: 'Duplicate', icon: <Copy size={12} /> },
+                { key: 'rename', label: l10n.t('重命名'), icon: <PenLine size={12} /> },
+                { key: 'copy', label: l10n.t('复制'), icon: <Copy size={12} /> },
                 {
                   key: 'export',
-                  label: 'Export as .ipynb',
+                  label: l10n.t('导出为 .ipynb 文件'),
                   icon: <ArrowRightFromLine size={12} />,
                 },
                 { type: 'divider' },
                 {
                   key: 'delete',
-                  label: 'Delete',
+                  label: l10n.t('删除'),
                   icon: <Trash size={12} />,
                   danger: true,
                 },

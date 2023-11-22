@@ -13,6 +13,7 @@ import {
   ToolbarContribution,
   useInject,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { AreaChart } from 'lucide-react';
 
 import { MetricsModal } from './view';
@@ -72,7 +73,7 @@ export class MetricsToolbarContribution
       icon: MetricsIcon,
       command: MetricsPanelOpenCommand.id,
       order: 'a',
-      tooltip: '查看状态',
+      tooltip: l10n.t('查看状态'),
     });
   }
 

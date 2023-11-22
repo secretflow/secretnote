@@ -1,8 +1,7 @@
-import { inject, prop, singleton } from '@difizen/mana-app';
-import { Modal } from 'antd';
+import { inject, singleton } from '@difizen/mana-app';
 
-import type { StatusChangeAttr } from '@/modules/server';
-import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
+import type { ServerStatus } from '@/modules/server';
+import { SecretNoteServerManager } from '@/modules/server';
 import { ERROR_CODE, randomHex } from '@/utils';
 
 export interface Node {
@@ -11,32 +10,23 @@ export interface Node {
   color: string;
   address: string;
   status: ServerStatus;
-  master: boolean;
 }
 
 export type ServerStatusTag = 'processing' | 'default' | 'error' | 'success';
+const NODE_COLOR = randomHex();
 
 @singleton()
 export class NodeService {
   protected readonly serverManager: SecretNoteServerManager;
 
-  @prop()
-  nodes: Node[] = [];
-
   constructor(@inject(SecretNoteServerManager) serverManager: SecretNoteServerManager) {
     this.serverManager = serverManager;
-    this.serverManager.onServerChanged(this.onNodeStatusChanged.bind(this));
-    this.getNodes();
   }
 
-  getNodes() {
-    this.nodes = this.serverManager.servers.map((server) => ({
-      id: server.id,
-      name: server.name,
-      color: randomHex(),
-      address: this.parseAddress(server.settings.baseUrl || ''),
-      status: server.status,
-      master: server.master,
+  get nodes() {
+    return this.serverManager.servers.map((server) => ({
+      ...server,
+      color: NODE_COLOR,
     }));
   }
 
@@ -51,19 +41,10 @@ export class NodeService {
 
     const newServer = await this.serverManager.addServer({
       name,
-      settings: { ...this.formatAddress(address) },
+      address,
     });
 
     if (newServer) {
-      this.nodes.push({
-        id: newServer.id,
-        name: newServer.name,
-        color: randomHex(),
-        address: this.parseAddress(newServer.settings.baseUrl || ''),
-        status: ServerStatus.running,
-        master: false,
-      });
-
       return ERROR_CODE.NO_ERROR;
     }
 
@@ -72,44 +53,10 @@ export class NodeService {
 
   async deleteNode(id: string) {
     await this.serverManager.deleteServer(id);
-    this.nodes = this.nodes.filter((node) => node.id !== id);
   }
 
   async updateNodeName(id: string, name: string) {
-    await this.serverManager.changeServer(id, { name });
-    this.nodes = this.nodes.map((node) => {
-      if (node.id === id) {
-        return {
-          ...node,
-          name,
-        };
-      }
-      return node;
-    });
-  }
-
-  protected onNodeStatusChanged({
-    pre,
-    cur,
-  }: {
-    pre: StatusChangeAttr;
-    cur: StatusChangeAttr;
-  }) {
-    this.nodes = this.nodes.map((node) => {
-      if (node.id === cur.id) {
-        return {
-          ...node,
-          status: cur.status || node.status,
-        };
-      }
-      return node;
-    });
-    if (pre.status === ServerStatus.running && cur.status === ServerStatus.error) {
-      Modal.error({
-        title: 'Connection failed',
-        content: `${cur.name} is offline, which will cause code running on ${cur.name} to fail directly.`,
-      });
-    }
+    await this.serverManager.updateServer(id, { name });
   }
 
   protected checkName(name: string) {
@@ -128,16 +75,5 @@ export class NodeService {
 
   protected normalizedAddress(address: string) {
     return address.replace('localhost', '127.0.0.1');
-  }
-
-  protected parseAddress(url: string) {
-    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-  }
-
-  protected formatAddress(address: string) {
-    return {
-      baseUrl: `http://${address}/`,
-      wsUrl: `ws://${address}/`,
-    };
   }
 }

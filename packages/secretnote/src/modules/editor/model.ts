@@ -13,7 +13,6 @@ import {
   prop,
   transient,
 } from '@difizen/mana-app';
-import { message } from 'antd';
 import debounce from 'lodash.debounce';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
@@ -36,6 +35,9 @@ export class SecretNoteModel extends LibroModel {
   @prop()
   kernelConnections: IKernelConnection[] = [];
 
+  @prop()
+  lspEnabled = true;
+
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {
       return item.status === 'idle';
@@ -43,10 +45,7 @@ export class SecretNoteModel extends LibroModel {
   }
 
   get kernelConnection() {
-    return this.kernelConnections.find((item) => {
-      const server = this.kernelManager.getServerByKernelConnection(item);
-      return server && server.master;
-    });
+    return this.kernelConnections[0];
   }
 
   constructor(
@@ -73,7 +72,6 @@ export class SecretNoteModel extends LibroModel {
     if (!fileInfo) {
       return;
     }
-    await this.serverManager.ready;
     const connections = this.kernelManager.getKernelConnections(fileInfo);
     if (connections.length > 0) {
       this.kernelConnections = connections;
@@ -151,22 +149,6 @@ export class SecretNoteModel extends LibroModel {
   }
 
   canRun() {
-    const serverNum = this.serverManager.servers.length;
-    const connectionNum = this.kernelConnections.length;
-    const hasDisposedConnection = this.kernelConnections.some((item) => {
-      return item.isDisposed;
-    });
-
-    if (connectionNum < serverNum) {
-      message.error('Some Kernel Connection Not Created');
-      return false;
-    }
-
-    if (hasDisposedConnection) {
-      message.error('Some Kernel Connection Disposed');
-      return false;
-    }
-
     return true;
   }
 

@@ -6,6 +6,7 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { message, Tooltip } from 'antd';
 import { RefreshCw } from 'lucide-react';
 
@@ -15,13 +16,13 @@ export const ExtraComponent = () => {
   const instance = useInject<ExtraView>(ViewInstance);
 
   return (
-    <Tooltip title="Refresh files">
+    <Tooltip title={l10n.t('刷新')}>
       <RefreshCw
         size={14}
         onClick={(e) => {
           e.stopPropagation();
           instance.fileService.getFileTree();
-          message.success('File list refreshed.');
+          message.success(l10n.t('文件列表已刷新'));
         }}
       />
     </Tooltip>
