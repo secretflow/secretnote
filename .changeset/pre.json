@@ -1,6 +1,6 @@
 {
   "mode": "pre",
-  "tag": "dev",
+  "tag": "dev.0",
   "initialVersions": {
     "@secretflow/repo-utils": "0.1.0",
     "secretnote": "0.0.0",
