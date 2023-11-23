@@ -6,7 +6,10 @@ export default defineConfig({
   publicPath: '/secretnote/',
   favicons: ['/secretnote/favicon.svg'],
   exportStatic: {},
-  routes: [{ path: '/', component: 'secretnote' }],
+  routes: [
+    { path: '/', component: 'secretnote' },
+    { path: '/preview', component: 'preview' },
+  ],
   // devtool: 'source-map',
   writeToDisk: true,
   headScripts: [

@@ -1,4 +1,4 @@
-FROM secretflow/secretflow-lite-anolis8:1.1.0b0
+FROM secretflow/secretflow-anolis8:1.1.0b0
 
 ARG DEFAULT_USER=vscode
 

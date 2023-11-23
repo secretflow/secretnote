@@ -106,6 +106,7 @@ export const NotebookFileComponent = () => {
               renameFile();
             }
           }}
+          arrow={false}
         >
           <li
             onClick={() => notebookFileService.openFile(file)}

@@ -1,3 +1,4 @@
+import { FileReader as CsvFileReader } from '@kanaries/web-data-loader';
 import { dsvFormat } from 'd3-dsv';
 
 const getBlob = (url: string, method = 'GET'): Promise<Blob> => {
@@ -49,6 +50,19 @@ export async function readFile(file: File): Promise<string> {
     } catch (e) {
       reject(e);
     }
+  });
+}
+
+export async function readCsvFile(file: File): Promise<unknown> {
+  return await CsvFileReader.csvReader({
+    file: file,
+    config: {
+      type: 'reservoirSampling',
+      size: 400,
+    },
+    onLoading: (value) => {
+      console.log(`upload progress ${(value * 100).toFixed(2) + '%'}`);
+    },
   });
 }
 

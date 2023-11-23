@@ -5,7 +5,9 @@
   font-size: 12px;
 
   .ant-tree-treenode {
-    padding: 2px 0 4px;
+    &::before {
+      top: -3px !important;
+    }
 
     &:hover::before {
       background-color: var(--mana-secretnote-li-hover-background) !important;

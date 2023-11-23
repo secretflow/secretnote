@@ -16,7 +16,7 @@ const CodeBlock = (props: IProps) => {
   return (
     <CodeMirror
       ref={ref}
-      style={{ ...style }}
+      style={{ padding: 0, fontSize: 12, ...style }}
       value={code}
       theme={githubLight}
       extensions={[python()]}

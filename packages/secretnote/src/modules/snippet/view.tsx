@@ -46,7 +46,7 @@ export const SnippetComponent = () => {
     return (
       <Popover
         placement="rightTop"
-        showArrow={false}
+        arrow={false}
         overlayStyle={{ maxWidth: 630, paddingTop: 0 }}
         overlayInnerStyle={{ padding: 0 }}
         content={<CodeBlock code={nodeData.code} />}
