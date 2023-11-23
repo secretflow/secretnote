@@ -1,7 +1,7 @@
 {
   "name": "notebook",
   "build": {
-    "dockerfile": "./Dockerfile"
+    "dockerfile": "../docker/devcontainer.Dockerfile"
   },
   "mounts": [
     {

@@ -8,6 +8,9 @@ COLOR_RESET='\033[0m'
 
 if type "rye" &> /dev/null; then
   echo -e $COLOR_BLUE"Setting up Python environment using Rye"$COLOR_RESET
+  if [[ ! -z $PYTHON_VERSION ]]; then
+    rye pin $PYTHON_VERSION
+  fi
   rye sync --no-lock
   exit $?
 fi
