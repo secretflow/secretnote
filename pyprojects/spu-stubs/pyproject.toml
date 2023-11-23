@@ -7,9 +7,10 @@ classifiers = [
 dependencies = []
 description = "Type stubs for SPU"
 dynamic = ["version"]
+license = "Apache-2.0"
 name = "spu-stubs"
 readme = "README.md"
-requires-python = ">=3.8, <3.9"
+requires-python = ">=3.8, <3.12"
 
 [project.scripts]
 

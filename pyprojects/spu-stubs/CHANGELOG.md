@@ -1,4 +1,4 @@
-# @secretflow/notebook-pyproject-spu-stubs
+# spu-stubs
 
 ## 0.0.1-dev.0
 

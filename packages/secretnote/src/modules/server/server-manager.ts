@@ -42,7 +42,7 @@ export class SecretNoteServerManager {
         return data;
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     return [];
   }
@@ -76,7 +76,7 @@ export class SecretNoteServerManager {
           return newServer;
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
   }
@@ -98,7 +98,7 @@ export class SecretNoteServerManager {
         this.onServerAddedEmitter.fire(server);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
@@ -125,7 +125,7 @@ export class SecretNoteServerManager {
         });
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
@@ -143,7 +143,7 @@ export class SecretNoteServerManager {
         }
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 

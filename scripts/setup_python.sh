@@ -8,6 +8,9 @@ COLOR_RESET='\033[0m'
 
 if type "rye" &> /dev/null; then
   echo -e $COLOR_BLUE"Setting up Python environment using Rye"$COLOR_RESET
+  if [[ ! -z $PYTHON_VERSION ]]; then
+    rye pin $PYTHON_VERSION
+  fi
   rye sync --no-lock
   exit $?
 fi
@@ -29,4 +32,4 @@ if test -z $CI && ! python -c "import sys; exit(int(sys.prefix == sys.base_prefi
   echo -e $COLOR_ORANGE"Not using a virtualenv. This is not recommended."$COLOR_RESET
 fi
 
-python -m pip install -r requirements.lock -r requirements-dev.lock
+python -m pip install -r requirements-dev.lock

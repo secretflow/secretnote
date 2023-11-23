@@ -15,80 +15,66 @@
   // ${projectRoot} = root of package in which the task is defined
   "namedInputs": {
     ":default": ["{projectRoot}/**/*"],
-    ":eslint": [
-      "{workspaceRoot}/.eslintrc.{js,cjs}",
-      "{workspaceRoot}/.eslintrc.*.{js,cjs}",
-      "{workspaceRoot}/.eslintignore",
-      "{workspaceRoot}/.remarkrc.mjs",
-      "{projectRoot}/.eslintrc.{js,cjs}"
-    ],
+    ":eslint": ["{workspaceRoot}/.eslintrc.*", "{workspaceRoot}/.eslintignore"],
     ":stylelint": [
-      "{workspaceRoot}/.stylelintrc.{js,cjs}",
-      "{workspaceRoot}/.stylelintignore",
-      "{projectRoot}/.stylelint.{js,cjs}"
+      "{workspaceRoot}/.stylelintrc.*",
+      "{workspaceRoot}/.stylelintignore"
     ],
-    ":prettier": [
-      "{workspaceRoot}/.prettierrc.json",
-      "{workspaceRoot}/.prettierignore"
-    ],
-    ":tsc": [
-      "{workspaceRoot}/tsconfig.json",
-      "{workspaceRoot}/tsconfig.*.json",
-      "{projectRoot}/**/tsconfig.json",
-      "{projectRoot}/**/tsconfig.*.json"
-    ],
-    ":vitest": [
-      "{workspaceRoot}/vitest.config.mts",
-      "{workspaceRoot}/vitest.config.mjs"
-    ]
+    ":prettier": ["{workspaceRoot}/.prettierrc.*", "{workspaceRoot}/.prettierignore"],
+    ":tsc": ["{workspaceRoot}/tsconfig.*"],
+    ":vitest": ["{workspaceRoot}/vitest.config.*", "{workspaceRoot}/vitest.config.mjs"],
+    ":python": ["{workspaceRoot}/pyproject.toml"]
   },
   // targetDefaults configure default options for each task
   // such as inputs, outputs and dependencies
   // See https://nx.dev/reference/nx-json#target-defaults
   // The actual commands are defined in the `scripts` section in each package's package.json
   "targetDefaults": {
-    "setup": {
-      "inputs": [":default", ":tsc"],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^setup"]
-    },
-    "build": {
-      "inputs": [":default", ":tsc"],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build"]
-    },
-    "release": {
-      "dependsOn": ["^build", "^release", "build"]
-    },
     "lint:eslint": {
       "inputs": [":default", ":eslint"]
     },
     "lint:stylelint": {
       "inputs": [":default", ":stylelint"]
     },
-    "lint:prettier": {
+    "format:black": {
+      "inputs": [":default", ":python"]
+    },
+    "format:prettier": {
       "inputs": [":default", ":prettier"]
     },
-    "lint:tsc": {
-      "inputs": [":default", ":tsc"]
-    },
-    "lint:black": {
-      "inputs": [":default"]
-    },
-    "lint:pyright": {
-      "inputs": [":default"]
-    },
     "lint:ruff": {
-      "inputs": [":default"]
+      "inputs": [":default", ":python"]
+    },
+    "typecheck:tsc": {
+      "inputs": ["^:default", ":default", ":tsc"]
+    },
+    "typecheck:pyright": {
+      "inputs": ["^:default", ":default", ":python"]
     },
     "test:vitest": {
-      "inputs": [":default", ":vitest"],
+      "inputs": ["^:default", ":default", ":vitest"],
       "outputs": ["{projectRoot}/coverage"]
     },
     "test:pytest": {
-      "inputs": [":default"],
-      "outputs": ["{projectRoot}/coverage"]
-    }
+      "inputs": ["^:default", ":default", ":python"]
+    },
+    "setup:umi": {
+      "inputs": [":default", ":tsc"],
+      "outputs": ["{projectRoot}/src/.umi"]
+    },
+    "build": {
+      "inputs": ["^:default", ":default", ":tsc", ":python"],
+      "outputs": ["{projectRoot}/build", "{projectRoot}/dist"],
+      "dependsOn": ["^build"]
+    },
+    "publish": {
+      "dependsOn": ["^build", "build", "^publish"]
+    },
+    "ci:setup": {},
+    "ci:javascript": {},
+    "ci:python": {},
+    "ci:publish": {},
+    "dev": {}
   },
   "tasksRunnerOptions": {
     "default": {
@@ -96,17 +82,17 @@
       "options": {
         "parallel": 8,
         "cacheableOperations": [
-          "setup",
           "build",
+          "format:black",
+          "format:prettier",
           "lint:eslint",
-          "lint:stylelint",
-          "lint:prettier",
-          "lint:tsc",
-          "lint:black",
-          "lint:pyright",
           "lint:ruff",
+          "lint:stylelint",
+          "setup:umi",
+          "test:pytest",
           "test:vitest",
-          "test:pytest"
+          "typecheck:pyright",
+          "typecheck:tsc"
         ]
       }
     }

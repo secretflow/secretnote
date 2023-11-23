@@ -6,7 +6,7 @@ classifiers = [
 dependencies = []
 name = "monorepo"
 readme = "README.md"
-requires-python = ">=3.8, <3.9"
+requires-python = ">=3.8, <3.12"
 version = "0.0.0"
 
 [project.scripts]
@@ -20,19 +20,30 @@ members = ["pyprojects/*"]
 
 [tool.rye]
 dev-dependencies = [
-  "black>=23.7.0",
+  "black[jupyter]>=23.7.0",
+  "datamodel-code-generator>=0.22.1",
+  "fastapi<0.100",
   "hatch>=1.7.0",
   "ipython>=8.12.2",
+  "jupyter-lsp>=2.2.0",
   "jupyterlab>=4.0.5",
   "logging_tree>=1.9",
+  "matplotlib>=3.7.3",
   "mypy>=1.5.1",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.20.0",
+  "pandas>=1.5.3, <2.0.0",
   "pip>=23.2.1",
   "pytest>=7.4.0",
-  "ray[default]~=2.2.0",
   "ruff>=0.0.284",
-  "secretflow-lite==1.1.0b0",
+  "secretflow-lite>=1.1.0b0",
   "setuptools>=68.2.2",
-  "nbclient>=0.8.0",
+  "snakeviz>=2.2.0",
+  "statsmodels>=0.14.0",
+  "torch>=2.1.0",
+  "torchmetrics>=1.2.0",
+  "torchvision>=0.16.0",
+  "transformers>=4.31.0",
+  "uvicorn>=0.23.2",
 ]
 managed = true
 
@@ -40,9 +51,10 @@ managed = true
 allow-direct-references = true
 
 [tool.black]
-extend-exclude = """
+force-exclude = """
 _pb2\\.pyi?
 | _pb2_grpc\\.pyi?
+| secretnote/proto
 """
 line-length = 88
 target-versions = ["py38", "py39", "py310"]
@@ -51,6 +63,9 @@ target-versions = ["py38", "py39", "py310"]
 line-length = 88
 select = ["E", "F", "W", "B", "I"]
 src = ["pyprojects/*/src"]
+
+[tool.ruff.extend-per-file-ignores]
+"*.ipynb" = ["E402", "I001"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]

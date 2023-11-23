@@ -1,6 +1,6 @@
 ---
-'@secretflow/notebook-pyproject-secretnote': patch
-'@secretflow/notebook-pyproject-spu-stubs': patch
+'secretnote': patch
+'spu-stubs': patch
 ---
 
 Initial publish

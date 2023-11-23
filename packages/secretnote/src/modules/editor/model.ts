@@ -77,9 +77,8 @@ export class SecretNoteModel extends LibroModel {
       this.kernelConnections = connections;
       this.kernelConnecting = false;
     } else {
-      this.kernelConnections = await this.kernelManager.createKernelConnections(
-        fileInfo,
-      );
+      this.kernelConnections =
+        await this.kernelManager.createKernelConnections(fileInfo);
       this.kernelConnecting = false;
     }
   }

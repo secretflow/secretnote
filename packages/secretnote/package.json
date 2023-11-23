@@ -1,14 +1,27 @@
 {
-  "name": "secretnote",
-  "version": "1.0.1",
-  "private": false,
+  "name": "@secretflow/secretnote",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
   "author": "vectorse@126.com",
+  "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
+  "bugs": "https://github.com/secretflow/secretnote/issues",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./index.html": {
+      "require": "./dist/index.html",
+      "default": "./dist/index.html"
+    }
+  },
   "scripts": {
-    "dev": "umi dev",
+    "setup:umi": "umi setup",
+    "lint:eslint": "eslint src",
+    "lint:stylelint": "stylelint 'src/**/*.{css,less}'",
+    "format:black": "python -m black --check src",
     "build": "umi build",
-    "postinstall": "umi setup",
-    "setup": "umi setup",
-    "start": "npm run dev"
+    "dev": "umi dev"
   },
   "dependencies": {
     "umi": "^4.0.86",
@@ -67,5 +80,13 @@
     "@types/react-dom": "^18.2.13",
     "babel-plugin-parameter-decorator": "^1.0.16",
     "babel-plugin-transform-typescript-metadata": "^0.3.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }

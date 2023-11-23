@@ -8,4 +8,10 @@ module.exports = {
     'selector-class-pattern': null,
     'no-invalid-double-slash-comments': null,
   },
+  overrides: [
+    {
+      files: ['*.less', '**/*.less'],
+      customSyntax: 'postcss-less',
+    },
+  ],
 };

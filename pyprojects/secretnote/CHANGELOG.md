@@ -1,4 +1,4 @@
-# @secretflow/notebook-pyproject-secretnote
+# secretnote
 
 ## 0.0.1-dev.0
 

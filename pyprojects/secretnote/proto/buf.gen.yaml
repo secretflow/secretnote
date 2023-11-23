@@ -1,0 +1,5 @@
+version: v1
+plugins:
+  - plugin: buf.build/community/chrusty-jsonschema:v1.4.1
+    opt: prefix_schema_files_with_package
+    out: generated/proto/jsonschema

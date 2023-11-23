@@ -1,23 +1,42 @@
 [project]
-authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
+authors = [
+  {name = "wenyu.jqq", email = "wenyu.jqq@antgroup.com"},
+  {name = "Tony Wu", email = "tonywu6@protonmail.com"},
+]
 classifiers = [
-  "Development Status :: 1 - Planning",
+  "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: Apache Software License",
 ]
 dependencies = [
+  "astunparse>=1.6.3",
+  "importlib-resources>=5.12",
+  "ipykernel>=6.24.0",
+  "ipython-sql~=0.5",
+  "ipywidgets>=8.1.1",
+  "jupyter-resource-usage~=1.0",
+  "jupyter-server~=2.7",
   "loguru>=0.7.2",
+  "more-itertools>=10.1.0",
+  "networkx>=2.8.8",
+  "opentelemetry-api>=1.20.0",
+  "opentelemetry-sdk>=1.20.0",
+  "orjson>=3.9.9",
   "packaging>=23.1",
   "pydantic>=1.10, <2",
-  "spu-stubs>=0.0.0",
-  "ruamel.yaml>=0.17.32",
+  "pymysql~=1.1",
+  "ray[default]~=2.6.3", # FIXME: ideally from upstream
+  "stack_data>=0.6.3",
+  "tqdm>=4.66.1",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
+license = "Apache-2.0"
 name = "secretnote"
 readme = "README.md"
-requires-python = ">=3.8, <3.9"
+requires-python = ">=3.8, <3.12"
 
 [project.scripts]
+secretnote = "secretnote.server.app:SecretNoteApp.launch_instance"
 
 [build-system]
 build-backend = "hatchling.build"
@@ -32,7 +51,7 @@ path = "package.json"
 pattern = '"version": "(?P<version>[^"]+)"'
 
 [tool.hatch.build]
-artifacts = []
+artifacts = ["src/secretnote/**/dist/**/*"]
 directory = "dist"
 only-include = ["src", "package.json"]
 
@@ -41,3 +60,9 @@ sources = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+
+[tool.ruff]
+extend = "../../pyproject.toml"
+
+[tool.ruff.extend-per-file-ignores]
+"src/secretnote/proto/**/*" = ["E501", "I001"]

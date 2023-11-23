@@ -16,6 +16,7 @@
 - [ ] Type stubs: SecretFlow, SPU, HEU
 - [ ] Unified configuration (Pydantic)
   - [ ] Pydantic-Protobuf interop
+  - [ ] Endpoint Projection (choreographic)
 
 ## 本地开发
 

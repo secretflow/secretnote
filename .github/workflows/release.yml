@@ -10,7 +10,7 @@ permissions: {}
 jobs:
   changesets:
     # prevents this action from running on forks
-    if: github.repository == 'secretflow/notebook'
+    if: github.repository == 'secretflow/secretnote'
 
     name: Changesets
     uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main

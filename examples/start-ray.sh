@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 ray start --block --head --port 32400 \
-  --dashboard-port 8265 \
+  --dashboard-port 8266 \
   --include-dashboard True &
 PID1=$!
 
 ray start --block --head --port 32401 \
-  --dashboard-port 8266 \
+  --dashboard-port 8267 \
   --include-dashboard True &
 PID2=$!
 

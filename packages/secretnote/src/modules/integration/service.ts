@@ -76,9 +76,8 @@ export class IntegrationService {
   }
 
   protected async deserialize() {
-    const integrations = await this.storageService.getData<Integration[]>(
-      'integrations',
-    );
+    const integrations =
+      await this.storageService.getData<Integration[]>('integrations');
     if (integrations) {
       this.integrations = integrations;
     }

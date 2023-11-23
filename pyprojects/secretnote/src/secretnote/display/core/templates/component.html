@@ -1,0 +1,11 @@
+<script>
+  (() => {
+    const elem = document.createElement('div');
+    document.currentScript.parentNode.appendChild(elem);
+    import('{{ script_uri }}').then((ui) => {
+      const Component = ui['{{ component }}'];
+      const props = JSON.parse(atob('{{ encoded_props }}'));
+      ui.render({ elem, Component, props });
+    });
+  })();
+</script>

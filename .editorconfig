@@ -16,5 +16,11 @@ indent_size = 4
 [*.ipynb]
 indent_size = 4
 
+[*.bazel]
+indent_size = 4
+
+[*.BUILD]
+indent_size = 4
+
 [Makefile]
 indent_style = tab

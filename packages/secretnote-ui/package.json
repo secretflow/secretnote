@@ -1,0 +1,81 @@
+{
+  "name": "@secretflow/secretnote-ui",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "author": "Tony Wu <tonywu6@protonmail.com>",
+  "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote-ui",
+  "bugs": "https://github.com/secretflow/secretnote/issues",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "default": "./dist/esm/index.js"
+    },
+    "./bundled": {
+      "import": "./dist/esm-bundled/index.js",
+      "default": "./dist/esm-bundled/index.js"
+    },
+    "./browser": {
+      "import": "./dist/browser/index.js",
+      "default": "./dist/browser/index.js"
+    }
+  },
+  "scripts": {
+    "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "typecheck:tsc": "tsc --noEmit",
+    "build": "vite build --mode=esm && vite build --mode=browser && vite build --mode=esm-bundled",
+    "dev": "NODE_ENV=development vite build --mode=development --watch"
+  },
+  "dependencies": {
+    "@antv/algorithm": "^0.1.26",
+    "@antv/g6": "^4.8.23",
+    "@antv/graphlib": "^2.0.2",
+    "color": "^4.2.3",
+    "d3": "^7.8.5",
+    "lodash": "^4.17.21",
+    "styled-components": "^6.1.0",
+    "yaml": "^2.3.4"
+  },
+  "peerDependencies": {
+    "antd": "^5.10.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.5.1",
+    "@storybook/addon-interactions": "^7.5.1",
+    "@storybook/addon-links": "^7.5.1",
+    "@storybook/blocks": "^7.5.1",
+    "@storybook/react": "^7.5.1",
+    "@storybook/react-vite": "^7.5.1",
+    "@storybook/testing-library": "^0.2.2",
+    "@types/color": "^3.0.5",
+    "@types/d3": "^7.4.2",
+    "@types/lodash": "^4.14.200",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "eslint-plugin-storybook": "^0.6.15",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.5.1",
+    "vite": "^4.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
+  }
+}

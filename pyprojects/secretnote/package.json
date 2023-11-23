@@ -2,13 +2,18 @@
   "name": "secretnote",
   "private": true,
   "files": [],
-  "version": "0.0.1-dev.0",
+  "version": "0.0.0",
   "scripts": {
-    "build": "hatch clean && hatch build -t sdist -t wheel",
-    "test:pytest": "pytest",
-    "lint:black": "black --check src tests",
-    "lint:ruff": "ruff check src tests",
-    "lint:pyright": "pyright src",
-    "release": "hatch publish ./dist"
+    "format:black": "python -m black --check src tests",
+    "lint:ruff": "python -m ruff check src tests",
+    "publish": "python -m hatch publish ./dist",
+    "test:pytest": "python -m pytest",
+    "typecheck:pyright": "pyright --project ../.. src tests",
+    "dev": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --no-browser",
+    "build": "python scripts/copy_static_files.py && python -m hatch clean && python -m hatch build -t sdist -t wheel"
+  },
+  "devDependencies": {
+    "@secretflow/secretnote": "workspace:^",
+    "@secretflow/secretnote-ui": "workspace:^"
   }
 }

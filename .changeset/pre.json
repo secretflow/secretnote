@@ -2,9 +2,9 @@
   "mode": "pre",
   "tag": "dev",
   "initialVersions": {
-    "tsup-utils": "0.1.0",
-    "@secretflow/notebook-pyproject-secretnote": "0.0.0",
-    "@secretflow/notebook-pyproject-spu-stubs": "0.0.0"
+    "@secretflow/repo-utils": "0.1.0",
+    "secretnote": "0.0.0",
+    "spu-stubs": "0.0.0"
   },
   "changesets": ["blue-crabs-argue"]
 }
