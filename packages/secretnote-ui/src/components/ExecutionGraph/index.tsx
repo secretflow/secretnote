@@ -273,7 +273,7 @@ export function ExecutionGraph(data: GraphProps) {
                 borderRadius: '0.2rem',
               }}
             >
-              THIS IS A DEVELOPER PREVIEW
+              DEVELOPER PREVIEW
             </span>
             <Divider />
           </ConfigProvider>

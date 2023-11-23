@@ -17,9 +17,9 @@
     "repo-utils": "./bin/cli.mjs"
   },
   "scripts": {
-    "build:tsup": "tsup",
     "lint:eslint": "eslint src",
-    "typecheck:tsc": "tsc --noEmit"
+    "typecheck:tsc": "tsc --noEmit",
+    "build": "tsup"
   },
   "publishConfig": {
     "access": "public"
@@ -40,5 +40,10 @@
   "devDependencies": {
     "@types/node": "^18.16.19",
     "@types/validate-npm-package-name": "^4.0.0"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }

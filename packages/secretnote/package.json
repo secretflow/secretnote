@@ -17,12 +17,11 @@
   },
   "scripts": {
     "setup:umi": "umi setup",
-    "build:umi": "umi build",
     "lint:eslint": "eslint src",
     "lint:stylelint": "stylelint 'src/**/*.{css,less}'",
     "format:black": "python -m black --check src",
-    "dev": "umi dev",
-    "start": "umi dev"
+    "build": "umi build",
+    "dev": "umi dev"
   },
   "dependencies": {
     "umi": "^4.0.86",
@@ -84,5 +83,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }

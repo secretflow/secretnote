@@ -8,47 +8,52 @@ const isDev = process.env['NODE_ENV'] === 'development';
 const define = { 'process.env.NODE_ENV': JSON.stringify(process.env['NODE_ENV']) };
 
 export default defineConfig(({ mode }) => {
-  let dependencyConfig;
-
-  if (mode === 'browser') {
-    dependencyConfig = defineConfig({
-      build: {
-        outDir: 'dist/browser',
-        target: 'ES2015',
-        sourcemap: isDev ? 'inline' : false,
-      },
-      define,
-      resolve: {
-        alias: Object.fromEntries(
-          [...Object.entries(peerDependencies), ...Object.entries(dependencies)].map(
-            ([k, v]) => [k, `https://esm.sh/${k}@${v}`],
-          ),
-        ),
-      },
-    });
-  } else if (mode === 'esm') {
-    dependencyConfig = defineConfig({
-      build: {
-        outDir: 'dist/esm',
-        rollupOptions: {
-          external: [
-            ...Object.keys(peerDependencies),
-            ...Object.keys(dependencies),
-            'react/jsx-runtime',
-          ],
-        },
-        sourcemap: true,
-      },
-    });
-  } else {
-    dependencyConfig = defineConfig({
-      build: {
-        outDir: 'dist/bundled',
-        sourcemap: false,
-      },
-      define,
-    });
-  }
+  const dependencyConfig = (() => {
+    switch (mode) {
+      case 'browser':
+      case 'deno':
+      case 'development':
+        // zero bundle for <script type="module">
+        return defineConfig({
+          build: {
+            outDir: 'dist/browser',
+            target: 'ES2015',
+          },
+          define,
+          resolve: {
+            alias: Object.fromEntries(
+              [
+                ...Object.entries(peerDependencies),
+                ...Object.entries(dependencies),
+              ].map(([k, v]) => [k, `https://esm.sh/${k}@${v}`]),
+            ),
+          },
+        });
+      case 'esm':
+        // standard ES module
+        return defineConfig({
+          build: {
+            outDir: 'dist/esm',
+            rollupOptions: {
+              external: [
+                ...Object.keys(peerDependencies),
+                ...Object.keys(dependencies),
+              ].map((k) => new RegExp(`^${k}(/|$)`)),
+            },
+          },
+        });
+      case 'esm-bundled':
+      case 'production':
+        return defineConfig({
+          build: {
+            outDir: 'dist/esm-bundled',
+          },
+          define,
+        });
+      default:
+        throw new Error(`Unsupported mode "${mode}. See vite.config.ts"`);
+    }
+  })();
 
   return mergeConfig(
     defineConfig({
@@ -64,7 +69,7 @@ export default defineConfig(({ mode }) => {
           },
         },
         minify: process.env['NODE_ENV'] === 'production' ? 'esbuild' : false,
-        sourcemap: true,
+        sourcemap: isDev ? 'inline' : false,
       },
     }),
     dependencyConfig,

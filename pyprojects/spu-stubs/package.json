@@ -4,10 +4,10 @@
   "files": [],
   "version": "0.0.0",
   "scripts": {
-    "build:hatch": "python -m hatch clean && python -m hatch build -t sdist -t wheel",
     "format:black": "python -m black --check src tests",
     "lint:ruff": "python -m ruff check src tests",
-    "publish:hatch": "python -m hatch publish ./dist",
-    "typecheck:pyright": "pyright --project ../.. src tests"
+    "publish": "python -m hatch publish ./dist",
+    "typecheck:pyright": "pyright --project ../.. src tests",
+    "build": "python -m hatch clean && python -m hatch build -t sdist -t wheel"
   }
 }

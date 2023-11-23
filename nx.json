@@ -15,102 +15,66 @@
   // ${projectRoot} = root of package in which the task is defined
   "namedInputs": {
     ":default": ["{projectRoot}/**/*"],
-    ":eslint": [
-      "{workspaceRoot}/.eslintrc.{js,cjs}",
-      "{workspaceRoot}/.eslintrc.*.{js,cjs}",
-      "{workspaceRoot}/.eslintignore",
-      "{workspaceRoot}/.remarkrc.mjs",
-      "{projectRoot}/.eslintrc.{js,cjs}"
-    ],
+    ":eslint": ["{workspaceRoot}/.eslintrc.*", "{workspaceRoot}/.eslintignore"],
     ":stylelint": [
-      "{workspaceRoot}/.stylelintrc.{js,cjs}",
-      "{workspaceRoot}/.stylelintignore",
-      "{projectRoot}/.stylelint.{js,cjs}"
+      "{workspaceRoot}/.stylelintrc.*",
+      "{workspaceRoot}/.stylelintignore"
     ],
-    ":prettier": [
-      "{workspaceRoot}/.prettierrc.json",
-      "{workspaceRoot}/.prettierignore"
-    ],
-    ":tsc": [
-      "{workspaceRoot}/tsconfig.json",
-      "{workspaceRoot}/tsconfig.*.json",
-      "{projectRoot}/**/tsconfig.json",
-      "{projectRoot}/**/tsconfig.*.json"
-    ],
-    ":vitest": [
-      "{workspaceRoot}/vitest.config.mts",
-      "{workspaceRoot}/vitest.config.mjs"
-    ],
-    ":python": [
-      "{workspaceRoot}/pyproject.toml",
-      "{workspaceRoot}/.python-version",
-      "{projectRoot}/**/*.{py,pyi}"
-    ],
-    ":ruff": ["{projectRoot}/ruff.toml"],
-    ":umi": ["{projectRoot}/.umirc.ts"]
+    ":prettier": ["{workspaceRoot}/.prettierrc.*", "{workspaceRoot}/.prettierignore"],
+    ":tsc": ["{workspaceRoot}/tsconfig.*"],
+    ":vitest": ["{workspaceRoot}/vitest.config.*", "{workspaceRoot}/vitest.config.mjs"],
+    ":python": ["{workspaceRoot}/pyproject.toml"]
   },
   // targetDefaults configure default options for each task
   // such as inputs, outputs and dependencies
   // See https://nx.dev/reference/nx-json#target-defaults
   // The actual commands are defined in the `scripts` section in each package's package.json
   "targetDefaults": {
-    "setup:umi": {
-      "inputs": [":default", ":tsc", ":umi"],
-      "outputs": ["{projectRoot}/src/.umi"]
-    },
-    "build:vite": {
-      "inputs": [":default", ":tsc"],
-      "outputs": ["{projectRoot}/dist", "{projectRoot}/build"],
-      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
-    },
-    "build:umi": {
-      "inputs": [":default", ":tsc", ":umi"],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
-    },
-    "build:tsup": {
-      "inputs": [":default", ":tsc"],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
-    },
-    "build:hatch": {
-      "inputs": [":default", ":python"],
-      "outputs": ["{projectRoot}/dist"],
-      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
-    },
     "lint:eslint": {
       "inputs": [":default", ":eslint"]
     },
     "lint:stylelint": {
       "inputs": [":default", ":stylelint"]
     },
-    "typecheck:tsc": {
-      "inputs": [":default", ":tsc"]
-    },
     "format:black": {
       "inputs": [":default", ":python"]
     },
-    "lint:ruff": {
-      "inputs": [":default", ":python", ":ruff"]
+    "format:prettier": {
+      "inputs": [":default", ":prettier"]
     },
-    "typecheck:pyright": {
+    "lint:ruff": {
       "inputs": [":default", ":python"]
     },
+    "typecheck:tsc": {
+      "inputs": ["^:default", ":default", ":tsc"]
+    },
+    "typecheck:pyright": {
+      "inputs": ["^:default", ":default", ":python"]
+    },
     "test:vitest": {
-      "inputs": [":default", ":vitest"],
+      "inputs": ["^:default", ":default", ":vitest"],
       "outputs": ["{projectRoot}/coverage"]
     },
     "test:pytest": {
-      "inputs": [":default", ":python"]
+      "inputs": ["^:default", ":default", ":python"]
     },
-    "publish:hatch": {
-      "dependsOn": ["^build:vite", "^build:tsup", "^build:hatch", "^build:umi"]
+    "setup:umi": {
+      "inputs": [":default", ":tsc"],
+      "outputs": ["{projectRoot}/src/.umi"]
     },
-    "format:prettier": {},
+    "build": {
+      "inputs": ["^:default", ":default", ":tsc", ":python"],
+      "outputs": ["{projectRoot}/build", "{projectRoot}/dist"],
+      "dependsOn": ["^build"]
+    },
+    "publish": {
+      "dependsOn": ["^build", "build", "^publish"]
+    },
     "ci:setup": {},
     "ci:javascript": {},
     "ci:python": {},
-    "ci:publish": {}
+    "ci:publish": {},
+    "dev": {}
   },
   "tasksRunnerOptions": {
     "default": {
@@ -118,11 +82,7 @@
       "options": {
         "parallel": 8,
         "cacheableOperations": [
-          // not cacheable due to unpredictable artifact outputs
-          // "build:hatch",
-          "build:tsup",
-          "build:umi",
-          "build:vite",
+          "build",
           "format:black",
           "format:prettier",
           "lint:eslint",

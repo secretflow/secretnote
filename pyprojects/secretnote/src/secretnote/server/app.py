@@ -8,8 +8,6 @@ from .node.handler import nodes_handlers
 
 require = create_require(__package__, "@secretflow/secretnote/index.html")
 
-STATIC_PATH = require.package("@secretflow/secretnote/index.html").joinpath("dist")
-
 
 class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     # -------------- Required traits --------------
@@ -17,11 +15,16 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
 
     load_other_extensions = True
 
-    static_paths = [STATIC_PATH]
-    template_paths = [STATIC_PATH]
-
     extension_url = "/secretnote/"
     static_url_prefix = "/secretnote/"
+
+    @property
+    def static_paths(self):
+        return [require.package("@secretflow/secretnote/index.html").joinpath("dist")]
+
+    @property
+    def template_paths(self):
+        return self.static_paths
 
     def initialize_handlers(self):
         routes = [

@@ -12,21 +12,23 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.js"
+      "import": "./dist/esm/index.js",
+      "default": "./dist/esm/index.js"
+    },
+    "./bundled": {
+      "import": "./dist/esm-bundled/index.js",
+      "default": "./dist/esm-bundled/index.js"
     },
     "./browser": {
       "import": "./dist/browser/index.js",
       "default": "./dist/browser/index.js"
-    },
-    "./bundled": {
-      "import": "./dist/bundled/index.js",
-      "default": "./dist/bundled/index.js"
     }
   },
   "scripts": {
-    "build:vite": "vite build --mode=esm && vite build --mode=browser && vite build --mode=bundled",
     "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "typecheck:tsc": "tsc --noEmit"
+    "typecheck:tsc": "tsc --noEmit",
+    "build": "vite build --mode=esm && vite build --mode=browser && vite build --mode=esm-bundled",
+    "dev": "NODE_ENV=development vite build --mode=development --watch"
   },
   "dependencies": {
     "@antv/algorithm": "^0.1.26",
@@ -70,5 +72,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }
