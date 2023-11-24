@@ -8,7 +8,10 @@ def get_version() -> str:
         from secretnote._resources import require
 
         return require.package.info.version
-    except ImportError:
+    except Exception:
+        pass
+
+    try:
         # for distribution, during which dependencies are not installed
         # read from ./dist/resources.json
 
@@ -16,3 +19,6 @@ def get_version() -> str:
 
         with open(resources, "r") as file:
             return json.load(file)["root"]["version"]
+    except Exception:
+        # could happen during repo bootstrapping
+        return "0.0.0"
