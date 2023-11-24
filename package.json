@@ -10,6 +10,7 @@
     "postinstall": "is-ci || husky install",
     "changeset": "changeset",
     "clean": "git clean -fX .",
+    "dev:all": "nx run-many -t dev",
     "format:black": "python -m black --check examples",
     "format:prettier": "prettier --check --ignore-unknown .",
     "ci:setup": "nx run-many -p tag:postinstall -t setup:umi -t build",

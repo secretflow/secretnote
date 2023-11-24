@@ -12,15 +12,18 @@ export default defineConfig({
   ],
   // devtool: 'source-map',
   writeToDisk: true,
-  headScripts: [
-    `(${(() => {
-      // https://github.com/jupyter-server/jupyter_server/blob/8e5d7668aea4eb4d6ca1767566f4ffcbc4bc49bf/jupyter_server/templates/page.html#L25
-      window.addEventListener('DOMContentLoaded', () => {
-        document.body.dataset['jupyterApiToken'] =
-          '{% if logged_in and token %}{{token | urlencode}}{% endif %}';
-      });
-    }).toString()})()`,
-  ],
+  headScripts:
+    process.env.NODE_ENV !== 'development'
+      ? [
+          `(${(() => {
+            // https://github.com/jupyter-server/jupyter_server/blob/8e5d7668aea4eb4d6ca1767566f4ffcbc4bc49bf/jupyter_server/templates/page.html#L25
+            window.addEventListener('DOMContentLoaded', () => {
+              document.body.dataset['jupyterApiToken'] =
+                '{% if logged_in and token %}{{token | urlencode}}{% endif %}';
+            });
+          }).toString()})()`,
+        ]
+      : false,
   proxy: {
     '/api': {
       target: 'http://localhost:8888/',
