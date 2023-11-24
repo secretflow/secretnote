@@ -30,22 +30,21 @@ interface DescriptionProps {
 const PrepareNodeDes = (props: DescriptionProps) => {
   return (
     <div className="step">
-      <div className="text">
-        首先需要在两台机器 alice 和 bob 上分别安装 secretflow 和 secretnote，并启动
-        secretnote。最简单的方式是使用 docker image。
-      </div>
+      <div className="text">最简单的方式就是使用 docker image 启动两个计算节点。</div>
       <ShViewer code={['docker run -it secretflow/secretnote']} />
       <div className="text">
-        也可以使用 pip 安装 secretflow 和 secretnote，然后执行 secretnote 命令，请注意
-        python 版本需要是 3.8。
-      </div>
-      <ShViewer
-        code={['pip install –U secretflow', 'pip install secretnote', 'secretnote']}
-      />
-      <div className="text">
-        部署成功后，我们可以在一台网络和 alice 和 bob 互通的机器上，安装
-        secretnote，并且启动，启动后自动打开 Web
-        页面，在页面右上角将之前部署的两个节点添加进来。
+        启动成功后，我们可以打开地址
+        <a
+          className="link"
+          href="http://127.0.0.1:8090"
+          target="_blank"
+          rel="noreferrer"
+        >
+          127.0.0.1:8090
+        </a>
+        访问 secretnote
+        页面并在右上角节点管理区域将两个节点添加进来。(两个节点地址默认为 127.0.0.1:8090
+        和 127.0.0.1:8092)。
       </div>
       <img src={addNodeImgUrl} alt="add node" style={{ margin: 0 }} />
       {!props.finished && (
@@ -179,7 +178,7 @@ export const WelcomeComponent = () => {
           status="process"
           items={[
             {
-              title: <div className="step-title">准备节点</div>,
+              title: <div className="step-title">准备环境</div>,
               description: (
                 <PrepareNodeDes finished={instance.currentStep > 0} done={done} />
               ),

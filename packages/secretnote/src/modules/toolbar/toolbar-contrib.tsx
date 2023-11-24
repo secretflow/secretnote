@@ -3,6 +3,7 @@ import type { ToolbarRegistry } from '@difizen/mana-app';
 import { singleton, ToolbarContribution } from '@difizen/mana-app';
 
 import { SideToolbarRunItem } from './side-toolbar-run-item';
+import './index.less';
 
 @singleton({ contrib: ToolbarContribution })
 export class SecretNoteToolbarContribution implements ToolbarContribution {

@@ -191,6 +191,7 @@ export const NodeComponent = () => {
             overlayStyle={{ width: 280, paddingTop: 0 }}
             trigger="click"
             placement="bottomLeft"
+            arrow={false}
           >
             <Badge status={getNodeStatus(item).badgeStatus} dot offset={[-28, 4]}>
               <Avatar
@@ -217,6 +218,7 @@ export const NodeComponent = () => {
           form.resetFields();
           setAddFormVisible(visible);
         }}
+        arrow={false}
       >
         <Button
           icon={<Plus size={16} />}

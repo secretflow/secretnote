@@ -67,7 +67,7 @@ profiler.visualize()
 
 ### Environment and dependency versioning
 
-SecretFlow has many platform-specific dependencies. As this project is in early stage, we do not yet guarantee that this project will work in all environments, or even that installing will succeed.
+SecretFlow has many platform-specific dependencies. As this project is in early stage, we do not yet guarantee that this project will work in all environments, or even that installation will succeed.
 
 For best results, install this project in a clean Python environment.
 
