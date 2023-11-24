@@ -8,7 +8,6 @@ export enum PreviewLayoutArea {
 }
 
 const PreviewLayout: React.FC = () => {
-  console.log('xxx');
   return (
     <BoxPanel direction="top-to-bottom" className="secretnote-page">
       <BoxPanel.Pane defaultSize={48} className="secretnote-page-header">

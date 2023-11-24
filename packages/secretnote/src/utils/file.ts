@@ -61,6 +61,7 @@ export async function readCsvFile(file: File): Promise<unknown> {
       size: 400,
     },
     onLoading: (value) => {
+      // eslint-disable-next-line no-console
       console.log(`upload progress ${(value * 100).toFixed(2) + '%'}`);
     },
   });

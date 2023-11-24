@@ -19,7 +19,6 @@
     "setup:umi": "umi setup",
     "lint:eslint": "eslint src",
     "lint:stylelint": "stylelint 'src/**/*.{css,less}'",
-    "format:black": "python -m black --check src",
     "build": "umi build",
     "dev": "umi dev"
   },
