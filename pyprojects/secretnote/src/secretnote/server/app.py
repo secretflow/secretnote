@@ -1,5 +1,6 @@
-from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
+import sys  # noqa: I001
 
+from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 from secretnote.utils.node import create_require
 
 from . import JUPYTER_SERVER_EXTENSION_MODULE
@@ -51,3 +52,21 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         """
 
         return JUPYTER_SERVER_EXTENSION_MODULE
+
+    @classmethod
+    def launch(self, argv=None):
+        if argv is None:
+            args = sys.argv[1:]  # slice out extension config.
+        else:
+            args = argv
+
+        self.launch_instance(
+            [
+                "--ServerApp.token=''",
+                "--ServerApp.allow_origin=*",
+                "--ServerApp.allow_remote_access=True",
+                "--ServerApp.disable_check_xsrf=True",
+                "--ServerApp.ip=*",
+                *args,
+            ]
+        )
