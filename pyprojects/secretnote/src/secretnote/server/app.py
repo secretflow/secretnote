@@ -1,12 +1,10 @@
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 
-from secretnote.utils.node import create_require
+from secretnote._resources import require
 
 from . import JUPYTER_SERVER_EXTENSION_MODULE
 from .handlers import SinglePageApplicationHandler
 from .node.handler import nodes_handlers
-
-require = create_require(__package__, "@secretflow/secretnote/index.html")
 
 
 class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
@@ -20,7 +18,8 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
 
     @property
     def static_paths(self):
-        return [require.package("@secretflow/secretnote/index.html").joinpath("dist")]
+        package = require.package_of("@secretflow/secretnote/index.html")
+        return [package.path.joinpath("dist")]
 
     @property
     def template_paths(self):

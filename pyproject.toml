@@ -28,22 +28,14 @@ dev-dependencies = [
   "jupyter-lsp>=2.2.0",
   "jupyterlab>=4.0.5",
   "logging_tree>=1.9",
-  "matplotlib>=3.7.3",
   "mypy>=1.5.1",
-  "opentelemetry-exporter-otlp-proto-grpc>=1.20.0",
-  "pandas>=1.5.3, <2.0.0",
   "pip>=23.2.1",
   "pytest>=7.4.0",
   "ruff>=0.0.284",
-  "secretflow-lite>=1.1.0b0",
   "setuptools>=68.2.2",
   "snakeviz>=2.2.0",
-  "statsmodels>=0.14.0",
-  "torch>=2.1.0",
-  "torchmetrics>=1.2.0",
-  "torchvision>=0.16.0",
-  "transformers>=4.31.0",
   "uvicorn>=0.23.2",
+  "pytest-cov>=4.1.0",
 ]
 managed = true
 

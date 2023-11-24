@@ -60,19 +60,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
   },
-  "black-formatter.args": ["--config", "pyproject.toml"],
-  "cSpell.allowCompoundWords": true,
-  "cSpell.enabled": true,
-  "editor.formatOnSave": true,
-  "editor.insertSpaces": true,
-  "editor.rulers": [88],
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "mdx"
-  ],
   "files.associations": {
     "**/tooling/tsconfig/*.json": "jsonc",
     "**/tooling/tsconfig/package.json": "json",
@@ -82,10 +69,28 @@
     "tsconfig.*.json": "jsonc",
     "tsconfig.json": "jsonc"
   },
+  "cSpell.allowCompoundWords": true,
+  "cSpell.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.rulers": [88],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "mdx"
+  ],
+  "black-formatter.args": ["--config", "pyproject.toml"],
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.include": ["pyprojects/**", "examples/**"],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "python.testing.pytestArgs": ["pyprojects"],
+  "python.testing.pytestArgs": [
+    "pyprojects",
+    "--cov=secretnote",
+    "--cov-report=xml:coverage.xml",
+    "--cov-report=html"
+  ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
 }

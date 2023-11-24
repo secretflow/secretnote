@@ -311,9 +311,6 @@ dist
 # macOS stuff
 .DS_Store
 
-# Personalization
-.vscode/launch.json
-
 # gitignore template for Bazel build system
 # website: https://bazel.build/
 

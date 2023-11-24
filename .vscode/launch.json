@@ -1,0 +1,26 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SecretNote: Server",
+      "type": "python",
+      "request": "launch",
+      // python -m secretnote.server
+      "module": "secretnote.server",
+      "justMyCode": false,
+      "cwd": "${workspaceFolder}/pyprojects/secretnote"
+    },
+    {
+      "name": "Pytest",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-s", "-v", "--no-cov", "-Werror", "pyprojects"],
+      "justMyCode": false,
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

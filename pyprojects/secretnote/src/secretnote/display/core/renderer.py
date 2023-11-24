@@ -4,13 +4,7 @@ from IPython.core.display import HTML
 from jinja2 import Template, select_autoescape
 from pydantic import BaseModel
 
-from secretnote.utils.node import create_require
-
-require = create_require(
-    __package__,
-    "@secretflow/secretnote-ui/bundled",
-    "./templates/component.html",
-)
+from secretnote._resources import require
 
 
 def get_ui_bundle() -> str:
@@ -25,7 +19,7 @@ def render(elem: BaseModel):
     props = elem.json(by_alias=True, exclude_none=True)
     encoded_props = b64encode(props.encode("utf-8")).decode("utf-8")
     template = Template(
-        require.resolve("./templates/component.html").read_text(),
+        require.resolve("./templates/component.html", __package__).read_text(),
         autoescape=select_autoescape(["html", "xml"], default_for_string=True),
     )
     result = template.render(
