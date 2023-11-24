@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 import loguru
 
-from .node import NODE_ENV
+from .node.env import NODE_ENV
 
 IGNORED_ERRORS = (asyncio.TimeoutError,)
 

@@ -27,6 +27,7 @@ dependencies = [
   "ray[default]~=2.6.3", # FIXME: ideally from upstream
   "stack_data>=0.6.3",
   "tqdm>=4.66.1",
+  "rich>=13.7.0",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
@@ -42,16 +43,30 @@ secretnote = "secretnote.server.app:SecretNoteApp.launch"
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
+[tool.rye]
+dev-dependencies = [
+  "matplotlib>=3.7.3",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.20.0",
+  "pandas>=1.5.3, <2.0.0",
+  "secretflow-lite==1.2.0b0", # FIXME: actually impossible to write a more relaxed constraint without also depending on dev releases
+  "statsmodels>=0.14.0",
+  "torch>=2.1.0",
+  "torchmetrics>=1.2.0",
+  "torchvision>=0.16.0",
+  "transformers>=4.31.0",
+]
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.version]
-path = "package.json"
-# regex to match "version" in package.json
-pattern = '"version": "(?P<version>[^"]+)"'
+expression = "__version__"
+path = "./src/secretnote/__init__.py"
+search-paths = ["./src"]
+source = "code"
 
 [tool.hatch.build]
-artifacts = ["src/secretnote/**/dist/**/*"]
+artifacts = ["src/secretnote/**/dist/**/*", "*.js", "*.cjs"]
 directory = "dist"
 only-include = ["src", "package.json"]
 

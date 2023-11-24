@@ -6,7 +6,7 @@ COLOR_BLUE='\033[0;34m'
 COLOR_CYAN='\033[0;36m'
 COLOR_RESET='\033[0m'
 
-if type "rye" &> /dev/null; then
+if type "rye" &>/dev/null; then
   echo -e $COLOR_BLUE"Setting up Python environment using Rye"$COLOR_RESET
   if [[ ! -z $PYTHON_VERSION ]]; then
     rye pin $PYTHON_VERSION
@@ -17,7 +17,7 @@ fi
 
 echo "Setting up Python environment"
 
-if ! type "python" &> /dev/null; then
+if ! type "python" &>/dev/null; then
   echo -e $COLOR_ORANGE"Python not found, aborting ..."$COLOR_RESET
   exit 1
 fi

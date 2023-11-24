@@ -1,8 +1,11 @@
 {
   "name": "secretnote",
   "private": true,
-  "files": [],
+  "files": [
+    "static"
+  ],
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "format:black": "python -m black --check src tests",
     "lint:ruff": "python -m ruff check src tests",

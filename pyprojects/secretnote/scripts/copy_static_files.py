@@ -1,7 +1,13 @@
-import secretnote.display.core.renderer
-import secretnote.server.app
-from secretnote.utils.node import copy_static_files
+import rich
+from importlib_resources import as_file
+
+from secretnote.utils.path import path_to_tree
 
 if __name__ == "__main__":
-    copy_static_files(secretnote.display.core.renderer.require)
-    copy_static_files(secretnote.server.app.require)
+    from secretnote._resources import require
+
+    require.export()
+
+    rich.print("Exported assets:")
+    with as_file(require.dist_dir) as path:
+        rich.print(path_to_tree(path))
