@@ -14,8 +14,8 @@
     "format:black": "python -m black --check examples",
     "format:prettier": "prettier --check --ignore-unknown .",
     "ci:setup": "nx run-many -p tag:postinstall -t setup:umi -t build",
-    "ci:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
-    "ci:python": "nx run-many -t format:black -t lint:ruff -t test:pytest -t typecheck:pyright",
+    "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
+    "ci:check:python": "nx run-many -t format:black -t lint:ruff -t test:pytest -t typecheck:pyright",
     "ci:build": "nx run-many -t build",
     "ci:publish": "nx run-many --nx-bail -t build && changeset publish && nx run-many --nx-bail -t publish"
   },
