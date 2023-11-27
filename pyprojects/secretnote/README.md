@@ -21,8 +21,14 @@
 
 **Please read our [note about dependencies](#environment-and-dependency-versioning) first.**
 
+We recommend installing in a clean Python environment.
+
 ```bash
-pip install 'secretflow==1.2.0b0' 'secretnote==0.1.0.dev0'
+python --version
+# Python 3.8.18
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install 'secretflow==1.2.0b0' 'secretnote==0.1.0.dev0'
 ```
 
 ## Start
@@ -54,11 +60,11 @@ secretnote --ServerApp.port 8889
 ```python
 from secretnote.instrumentation.sdk import create_profiler
 
-profiler = create_profiler()
-
-with profiler.start():
+with create_profiler() as profiler:
     # SecretFlow code here
-    result = spu(fit)(...)
+    weights = alice(...)(...)
+    bias = bob(...)(...)
+    result = spu(...)(...)
 
 profiler.visualize()
 ```
@@ -67,9 +73,11 @@ profiler.visualize()
 
 ### Environment and dependency versioning
 
+_For best results, install this project in a clean Python environment._
+
 SecretFlow has many platform-specific dependencies. As this project is in early stage, we do not yet guarantee that this project will work in all environments, or even that installation will succeed.
 
-For best results, install this project in a clean Python environment.
+Supported Python versions match those of [SecretFlow], currently only Python 3.8.
 
 To see versions of commonly used dependencies, run `python -m secretnote.utils.version`:
 

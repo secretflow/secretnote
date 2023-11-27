@@ -9,29 +9,27 @@ on:
       - synchronize
   workflow_call:
 
-permissions:
-  contents: read
-  actions: read # required by nrwl/nx-set-shas
-
 jobs:
   ci-javascript:
     name: 'CI: JavaScript'
     uses: secretflow/web-ci/.github/workflows/ci-javascript.yml@main
     with:
       node-version: ${{ matrix.node-version }}
-      python-version: '3.8'
+      python-version: ${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
         node-version: ['18', '20']
+        python-version: ['3.8']
 
   ci-python:
     name: 'CI: Python'
     uses: secretflow/web-ci/.github/workflows/ci-python.yml@main
     with:
-      node-version: '18'
+      node-version: ${{ matrix.node-version }}
       python-version: ${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
+        node-version: ['18']
         python-version: ['3.8']

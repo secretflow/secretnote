@@ -1,5 +1,4 @@
 // @ts-check
-
 import { createRequire } from 'node:module';
 import * as process from 'node:process';
 import * as readline from 'node:readline';
@@ -14,7 +13,6 @@ const rl = readline.createInterface({ input: process.stdin });
  * @property {string} cwd
  * @property {Record<string, string>} resolved
  * @property {string[]} errors
- * @null
  */
 
 /** @type {ResolutionInfo} */
@@ -46,7 +44,7 @@ for await (const identifier of rl) {
   }
 }
 
-console.log(JSON.stringify(info, null, 2));
+process.stdout.write(JSON.stringify(info, null, 2));
 
 if (Object.keys(info.errors).length) {
   process.exit(2);
