@@ -262,7 +262,8 @@ function distance(x1: number, y1: number, x2: number, y2: number): number {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
-// Thank you GPT (and Desmos)
+// https://www.desmos.com/calculator/fjaz7sv20l
+// https://chat.openai.com/share/1f0e4621-9c46-491b-92c1-c62c798f46b8
 function textRotation(x1: number, y1: number, x2: number, y2: number): number {
   const dx = x2 - x1;
   const dy = y2 - y1;

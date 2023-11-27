@@ -25,9 +25,9 @@ dependencies = [
   "pydantic>=1.10, <2",
   "pymysql~=1.1",
   "ray[default]~=2.6.3", # FIXME: ideally from upstream
+  "rich>=13.7.0",
   "stack_data>=0.6.3",
   "tqdm>=4.66.1",
-  "rich>=13.7.0",
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]
@@ -41,7 +41,7 @@ secretnote = "secretnote.server.app:SecretNoteApp.launch"
 
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling"]
+requires = ["hatchling", "packaging>=23.1"]
 
 [tool.rye]
 dev-dependencies = [

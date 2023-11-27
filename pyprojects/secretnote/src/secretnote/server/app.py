@@ -54,13 +54,13 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         return JUPYTER_SERVER_EXTENSION_MODULE
 
     @classmethod
-    def launch(self, argv=None):
+    def launch(cls, argv=None):
         if argv is None:
             args = sys.argv[1:]  # slice out extension config.
         else:
             args = argv
 
-        self.launch_instance(
+        cls.launch_instance(
             [
                 "--ServerApp.token=''",
                 "--ServerApp.allow_origin=*",
