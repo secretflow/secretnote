@@ -63,6 +63,10 @@ class Profiler:
         self._recent_returns: List[FinalizeSpan] = []
 
     @property
+    def checkpoints(self):
+        return self._checkpoints
+
+    @property
     def exporter(self):
         try:
             exporter = self._exporter
@@ -89,7 +93,7 @@ class Profiler:
         refs: List[Reference] = []
         values: Dict[str, SnapshotType] = {}
         for obj in objects:
-            ref, snapshots = trace_object(obj, self._recorders)
+            ref, snapshots = _trace_object(obj, self._recorders)
             refs.append(ref)
             values.update(snapshots)
         return refs, values
@@ -117,7 +121,7 @@ class Profiler:
 
         self._recent_stacks.append((ctx, result))
 
-    def _stack_pop(self, frame: FrameType, retval: Any):
+    def _stack_pop(self, f_current: FrameType, retval: Any):
         if not self._recent_stacks:
             return
 
@@ -129,7 +133,7 @@ class Profiler:
 
         def end_current_span(f_back: Optional[FrameType]):
             try:
-                if f_back and (named_values := trace_named_return(f_back, retval)):
+                if f_back and (named_values := _trace_named_return(f_back, retval)):
                     named_values = {k.strip(): v for k, v in named_values.items()}
                     (refs,), values = self._trace_objects(named_values)
                     call.assignments = refs
@@ -147,13 +151,13 @@ class Profiler:
             for fn in self._recent_returns:
                 fn(f_back)
             self._recent_returns.clear()
-            frame.f_trace_lines = False
-            frame.f_trace = self._trace_noop
 
-        def trace_line_in_outer_frame(frame: FrameType):
-            if frame.f_back:
-                frame.f_back.f_trace_lines = True
-                frame.f_back.f_trace = trace_next_assignments
+        def trace_line_in_outer_frame(f_outer: FrameType):
+            f_outer.f_trace_lines = False
+            f_outer.f_trace = None
+            if f_outer.f_back:
+                f_outer.f_back.f_trace_lines = True
+                f_outer.f_back.f_trace = trace_next_assignments
             else:
                 # no more outer frame, finalize spans
                 end_remaining_spans(None)
@@ -170,7 +174,7 @@ class Profiler:
 
             end_remaining_spans(f_back)
 
-        trace_line_in_outer_frame(frame)
+        trace_line_in_outer_frame(f_current)
 
     def _trace_noop(self, frame: FrameType, event: str, arg: Any):
         frame.f_trace_lines = False
@@ -196,13 +200,8 @@ class Profiler:
         self.stop()
         return False
 
-    def visualize(self):
-        from secretnote.display.app import visualize_run
 
-        return visualize_run(self)
-
-
-def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
+def _trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
     snapshots: Dict[str, SnapshotType] = {
         Reference(ref=fingerprint(None)).ref: ObjectSnapshot.none()
     }
@@ -247,7 +246,7 @@ def trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
     return result, snapshots
 
 
-def trace_named_return(frame: FrameType, retval: Any):
+def _trace_named_return(frame: FrameType, retval: Any):
     retval_type = type(retval)
 
     info = stack_data.core.FrameInfo(frame)

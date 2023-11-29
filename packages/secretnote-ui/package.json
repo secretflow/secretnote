@@ -28,7 +28,8 @@
     "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck:tsc": "tsc --noEmit",
     "build": "vite build --mode=esm && vite build --mode=browser && vite build --mode=esm-bundled",
-    "dev": "NODE_ENV=development vite build --mode=development --watch"
+    "dev": "NODE_ENV=development vite build --mode=browser --watch",
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@antv/algorithm": "^0.1.26",
@@ -37,6 +38,7 @@
     "color": "^4.2.3",
     "d3": "^7.8.5",
     "lodash": "^4.17.21",
+    "react-router": "^6.20.0",
     "styled-components": "^6.1.0",
     "yaml": "^2.3.4"
   },

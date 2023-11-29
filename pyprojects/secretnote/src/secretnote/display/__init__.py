@@ -1,3 +1,3 @@
-from .app import visualize_run
+from .app import visualize
 
-__all__ = ["visualize_run"]
+__all__ = ["visualize"]

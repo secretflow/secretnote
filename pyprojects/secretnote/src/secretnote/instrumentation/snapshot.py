@@ -102,6 +102,7 @@ def find_globals(fn: Union[FunctionType, MethodType, CodeType], ns: Dict):
 def fingerprint(obj: Any) -> str:
     from fed import FedObject
     from ray import ObjectRef
+    from secretflow.data import Partition
     from secretflow.device.device import (
         Device,
         HEUObject,
@@ -118,7 +119,20 @@ def fingerprint(obj: Any) -> str:
     if isinstance(obj, ObjectRef):
         return f"ray/objectref/{obj}"
     if isinstance(obj, FedObject):
-        return f"rayfed/{fingerprint(obj.get_ray_object_ref())}"
+        # FIXME:
+        ref = obj.get_ray_object_ref()
+        if ref:
+            return f"rayfed/known/{fingerprint(ref)}"
+        else:
+            return f"rayfed/exotic/{obj.get_fed_task_id()}"
+    if isinstance(obj, Partition):
+        # FIXME:
+        idx = obj.agent_idx
+        device = obj.device
+        if isinstance(idx, PYUObject):
+            return f"secretflow/partition/known/{fingerprint(idx)}"
+        else:
+            return f"secretflow/partition/exotic/{fingerprint(device)}:{idx.idx}"
     if isinstance(obj, PYUObject):
         return f"secretflow/object/python/{fingerprint(obj.data)}"
     if isinstance(obj, SPUObject):
@@ -176,6 +190,8 @@ def json_key(obj: Any, key_fn: Callable[[Any], str] = fingerprint):
         return None
     if isinstance(obj, (str, int, float, bool)):
         return obj
+    if isinstance(obj, LogicalLocation):  # FIXME:
+        return obj.as_key()
     return key_fn(obj)
 
 

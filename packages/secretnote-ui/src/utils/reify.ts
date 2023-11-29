@@ -1,4 +1,4 @@
-import type { Reference, ReferenceMap, Timeline } from '../.openapi-stubs';
+import type { Reference, ReferenceMap, VisualizationProps } from '../.openapi-stubs';
 
 type TaggedUnion<Tag extends string> = { kind?: Tag };
 
@@ -34,7 +34,7 @@ export type DeferredRecord<T, U extends TaggedUnion<string>> = T extends infer T
 export type Reified<T, U extends TaggedUnion<string>> = StaticRecord<T> &
   DeferredRecord<T, U>;
 
-export type SnapshotType = NonNullable<Timeline['variables']>[string];
+export type SnapshotType = NonNullable<VisualizationProps['variables']>[string];
 
 export type SnapshotDiscriminator = NonNullable<SnapshotType['kind']>;
 

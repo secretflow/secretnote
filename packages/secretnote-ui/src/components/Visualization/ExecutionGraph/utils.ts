@@ -4,7 +4,7 @@ import type * as graphlib from '@antv/graphlib';
 import { Graph as PureGraph } from '@antv/graphlib';
 import isEqual from 'lodash/isEqual';
 
-import type { Graph, LogicalLocation } from '../../.openapi-stubs';
+import type { DependencyGraph, LogicalLocation } from '@/.openapi-stubs';
 
 import type {
   GraphUtils,
@@ -12,8 +12,8 @@ import type {
   TrustedNode,
   TrustedEdge,
   TrustedModel,
-  GraphNodeType,
-  GraphEdgeType,
+  DependencyGraphNodeType,
+  DependencyGraphEdgeType,
 } from './types';
 import { isTrusted } from './types';
 
@@ -68,7 +68,7 @@ export function registerShapes({
   nodes.forEach((node) => registerNode(shapeIdentifier('node', node), node));
   edges.forEach((edge) => registerEdge(shapeIdentifier('edge', edge), edge));
 
-  return function fromGraph(graph: Graph, _utils: GraphUtils): G6.GraphData {
+  return function fromGraph(graph: DependencyGraph, _utils: GraphUtils): G6.GraphData {
     return {
       nodes:
         graph.nodes?.map(
@@ -137,7 +137,7 @@ export function recursive<
 }
 
 export function completePartition(
-  graph: graphlib.Graph<GraphNodeType, GraphEdgeType>,
+  graph: graphlib.Graph<DependencyGraphNodeType, DependencyGraphEdgeType>,
   matched: Set<graphlib.ID>,
 ) {
   [...matched].forEach((v) =>
@@ -161,7 +161,7 @@ export function completePartition(
 }
 
 export type PartitionFunction = (
-  graph: graphlib.Graph<GraphNodeType, GraphEdgeType>,
+  graph: graphlib.Graph<DependencyGraphNodeType, DependencyGraphEdgeType>,
   id: graphlib.ID,
 ) => Set<graphlib.ID>;
 
@@ -192,18 +192,19 @@ export const partitionByEntityType: PartitionFunction = (graph, id) => {
 export const partitionByLocation: PartitionFunction = (graph, id) => {
   const byLocation: (
     location: LogicalLocation,
-  ) => (v: graphlib.Node<GraphNodeType>) => boolean = (location) => (node) => {
-    switch (node.data.kind) {
-      case 'function':
-        return isEqual(node.data.location, location);
-      case 'remote':
-        return isEqual(node.data.data.location, location);
-      case 'local':
-        return graph.getSuccessors(node.id).some((v) => byLocation(location)(v));
-      default:
-        return false;
-    }
-  };
+  ) => (v: graphlib.Node<DependencyGraphNodeType>) => boolean =
+    (location) => (node) => {
+      switch (node.data.kind) {
+        case 'function':
+          return isEqual(node.data.location, location);
+        case 'remote':
+          return isEqual(node.data.data.location, location);
+        case 'local':
+          return graph.getSuccessors(node.id).some((v) => byLocation(location)(v));
+        default:
+          return false;
+      }
+    };
   const matched = new Set(
     (() => {
       const node = graph.getNode(id);

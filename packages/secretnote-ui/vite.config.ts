@@ -1,3 +1,5 @@
+import path from 'path';
+
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig, mergeConfig } from 'vite';
 
@@ -12,7 +14,6 @@ export default defineConfig(({ mode }) => {
     switch (mode) {
       case 'browser':
       case 'deno':
-      case 'development':
         // zero bundle for <script type="module">
         return defineConfig({
           build: {
@@ -29,6 +30,7 @@ export default defineConfig(({ mode }) => {
             ),
           },
         });
+      case 'development':
       case 'esm':
         // standard ES module
         return defineConfig({
@@ -58,6 +60,11 @@ export default defineConfig(({ mode }) => {
   return mergeConfig(
     defineConfig({
       plugins: [react()],
+      resolve: {
+        alias: {
+          '@': path.resolve(__dirname, './src'),
+        },
+      },
       build: {
         lib: {
           entry: './src/index.ts',

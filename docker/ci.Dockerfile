@@ -38,7 +38,8 @@ RUN eval $(fnm env) \
   && pnpm run bootstrap
 
 RUN eval $(fnm env) \
-  && pnpm run ci:javascript \
-  && pnpm run ci:python
+  && pnpm run ci:check:javascript \
+  && pnpm run ci:check:python \
+  && pnpm run ci:build
 
 ENTRYPOINT [ "/bin/bash" ]

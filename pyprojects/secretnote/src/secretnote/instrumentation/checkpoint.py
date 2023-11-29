@@ -26,3 +26,6 @@ class CheckpointGroup:
             return fn
 
         return decorator
+
+    def clear(self):
+        self.checkpoints.clear()

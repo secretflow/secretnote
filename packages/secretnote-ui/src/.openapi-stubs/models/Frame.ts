@@ -19,7 +19,7 @@ export type Frame = {
   function?: Reference;
   frame?: Reference;
   retval?: Reference;
-  expression?: (ExecExpression | MoveExpression | RevealExpression);
+  expressions?: Array<(ExecExpression | MoveExpression | RevealExpression)>;
   inner_frames?: Array<Frame>;
 };
 

@@ -1,6 +1,6 @@
 import abc
 import inspect
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from datetime import datetime
 from enum import IntEnum
 from textwrap import dedent
@@ -157,7 +157,7 @@ class DictSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     @classmethod
     def typecheck(cls, x):
-        return isinstance(x, Mapping)
+        return isinstance(x, Mapping) or is_dataclass(x) and not isinstance(x, type)
 
     @classmethod
     def trace(cls, x) -> "SnapshotType":
@@ -168,8 +168,10 @@ class DictSnapshot(ObjectTracer, Reference, ProxiedModel):
         )
 
     @classmethod
-    def tree(cls, x) -> Dict[str, Union[Dict, List]]:
-        return {"values": {**x}}
+    def tree(cls, x: dict) -> Dict[str, Union[Dict, List]]:
+        if is_dataclass(x):
+            return {"values": {f.name: getattr(x, f.name, None) for f in fields(x)}}
+        return {"values": {k: v for k, v in x.items()}}
 
     @override
     def to_container(self, of_type: Type[T] = Any):
@@ -212,12 +214,14 @@ class RemoteObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     @classmethod
     def typecheck(cls, x) -> bool:
+        from secretflow.data.core import Partition  # FIXME:
         from secretflow.device.device import DeviceObject
 
-        return isinstance(x, DeviceObject)
+        return isinstance(x, (DeviceObject, Partition))
 
     @classmethod
     def trace(cls, x):
+        from secretflow.data.core import Partition  # FIXME:
         from secretflow.device.device import HEUObject, PYUObject, SPUObject, TEEUObject
 
         if isinstance(x, PYUObject):
@@ -228,18 +232,60 @@ class RemoteObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
             refs = (fingerprint(x.data),)
         elif isinstance(x, TEEUObject):
             refs = (fingerprint(x.data),)
+        elif isinstance(x, Partition):
+            refs = (fingerprint(x.agent_idx),)
         else:
             raise TypeError(f"Unknown device object type {type(x)}")
 
         return RemoteObjectSnapshot(
             ref=fingerprint(x),
             type=qualname(type(x)),
-            location=logical_location(x.device),
+            location=logical_location(x.device),  # FIXME: device comes from union type
             refs=refs,
         )
 
     def __str__(self) -> str:
         return f"{self.ref} @ {self.location}"
+
+
+class ObjectFederationSnapshot(ObjectTracer, Reference, ProxiedModel):
+    kind: Literal["federated_object"] = "federated_object"
+    type: str
+    federation: ReferenceMap = ReferenceMap.empty_list()
+
+    @classmethod
+    def typecheck(cls, x) -> bool:
+        from secretflow.data.horizontal import HDataFrame
+        from secretflow.data.ndarray import FedNdarray
+        from secretflow.data.vertical import VDataFrame
+
+        if isinstance(x, (VDataFrame, HDataFrame, FedNdarray)):
+            return True
+
+        return False
+
+    @classmethod
+    def trace(cls, x):
+        return ObjectFederationSnapshot(ref=fingerprint(x), type=qualname(type(x)))
+
+    @classmethod
+    def tree(cls, x) -> Dict[str, Union[Dict, List]]:
+        # FIXME: clean up
+        from secretflow.data.horizontal import HDataFrame
+        from secretflow.data.ndarray import FedNdarray
+        from secretflow.data.vertical import VDataFrame
+
+        if isinstance(x, (VDataFrame, HDataFrame, FedNdarray)):
+            return {"federation": [p for p in x.partitions.values()]}
+        if isinstance(x, dict):
+            return {"federation": list(x.values())}
+        return {"federation": []}
+
+    @override
+    def to_container(self) -> List[Tuple[LogicalLocation, RemoteObjectSnapshot]]:
+        return [
+            (v.location, v) for k, v in self.federation.of_type(RemoteObjectSnapshot)
+        ]
 
 
 class FunctionParameter(BaseModel):
@@ -443,6 +489,7 @@ SnapshotType = Annotated[
         DictSnapshot,
         RemoteObjectSnapshot,
         RemoteLocationSnapshot,
+        ObjectFederationSnapshot,
         FunctionSnapshot,
         FrameInfoSnapshot,
         FrameSnapshot,

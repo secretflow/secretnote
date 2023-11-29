@@ -3,21 +3,22 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { DependencyGraph } from './DependencyGraph';
 import type { DictSnapshot } from './DictSnapshot';
 import type { Frame } from './Frame';
 import type { FrameInfoSnapshot } from './FrameInfoSnapshot';
 import type { FrameSnapshot } from './FrameSnapshot';
 import type { FunctionSnapshot } from './FunctionSnapshot';
-import type { Graph } from './Graph';
 import type { ListSnapshot } from './ListSnapshot';
 import type { NoneSnapshot } from './NoneSnapshot';
+import type { ObjectFederationSnapshot } from './ObjectFederationSnapshot';
 import type { ObjectSnapshot } from './ObjectSnapshot';
 import type { RemoteLocationSnapshot } from './RemoteLocationSnapshot';
 import type { RemoteObjectSnapshot } from './RemoteObjectSnapshot';
 
-export type Timeline = {
-  variables?: Record<string, (NoneSnapshot | ObjectSnapshot | ListSnapshot | DictSnapshot | RemoteObjectSnapshot | RemoteLocationSnapshot | FunctionSnapshot | FrameInfoSnapshot | FrameSnapshot)>;
-  timeline?: Array<Frame>;
-  graph: Graph;
+export type VisualizationProps = {
+  variables: Record<string, (NoneSnapshot | ObjectSnapshot | ListSnapshot | DictSnapshot | RemoteObjectSnapshot | RemoteLocationSnapshot | ObjectFederationSnapshot | FunctionSnapshot | FrameInfoSnapshot | FrameSnapshot)>;
+  frames: Array<Frame>;
+  dependencies: DependencyGraph;
 };
 

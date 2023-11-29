@@ -3,15 +3,16 @@ import { Card, ConfigProvider, Divider, Form, Switch } from 'antd';
 import type { MouseEventHandler, MutableRefObject } from 'react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { Graph as GraphProps, LogicalLocation } from '../../.openapi-stubs';
-import { useDataProvider } from '../DataProvider/utils';
+import type { DependencyGraph, LogicalLocation } from '@/.openapi-stubs';
+
+import { useVisualizationData } from '../VisualizationContext/utils';
 
 import type { Colorizer } from './colorization';
 import { colorizeByLocation, recolorOnHover, useColorizer } from './colorization';
 import { LocationColorizer } from './colorization';
 import { setupG6 } from './shapes';
 import { tooltip } from './tooltip';
-import { isTrusted, type GraphNodeType } from './types';
+import { isTrusted, type DependencyGraphNodeType } from './types';
 import { partitionByEntityType, partitionByLocation } from './utils';
 
 type GraphRef = MutableRefObject<G6.Graph | undefined>;
@@ -61,7 +62,7 @@ function Legend({
         }
         const target = graph.current.getNodes().find((v) => {
           const model = v.getModel();
-          if (!isTrusted<GraphNodeType>(model)) {
+          if (!isTrusted<DependencyGraphNodeType>(model)) {
             return false;
           }
           switch (model.data.kind) {
@@ -130,7 +131,7 @@ function Legend({
 }
 
 function useExecutionGraph() {
-  const { reify } = useDataProvider();
+  const { reify } = useVisualizationData();
 
   const colorizer = useColorizer(defaultColorizer);
 
@@ -159,7 +160,7 @@ function useExecutionGraph() {
       height: containerRef.current.clientHeight,
       layout: {
         type: 'dagre',
-        ranksepFunc: (node: { data: GraphNodeType }) => {
+        ranksepFunc: (node: { data: DependencyGraphNodeType }) => {
           if (node.data?.kind === 'reveal' || node.data?.kind === 'remote') {
             return 2.5;
           }
@@ -240,15 +241,19 @@ function useExecutionGraph() {
     graph: graphRef,
     colorizer,
     tooltipEnabled: tooltipEnabledRef,
-    load: (data: GraphProps) => {
+    load: (data: DependencyGraph = { nodes: [], edges: [] }) => {
       graphRef.current?.data(fromGraph(data, { reify, colorize: colorizer.colorize }));
       graphRef.current?.render();
     },
   };
 }
 
-export function ExecutionGraph(data: GraphProps) {
+export function ExecutionGraph() {
   const { container, load, graph, colorizer, tooltipEnabled } = useExecutionGraph();
+
+  const {
+    props: { dependencies: data },
+  } = useVisualizationData();
 
   useEffect(() => {
     load(data);
@@ -292,6 +297,7 @@ export function ExecutionGraph(data: GraphProps) {
               fontSize: '.8rem',
             }}
             colon={false}
+            valuePropName="checked"
           >
             <Switch
               size="small"
