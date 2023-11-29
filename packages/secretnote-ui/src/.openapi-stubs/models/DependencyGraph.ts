@@ -13,8 +13,8 @@ import type { RevealEdge } from './RevealEdge';
 import type { RevealNode } from './RevealNode';
 import type { TransformEdge } from './TransformEdge';
 
-export type Graph = {
-  nodes?: Array<(LocalObjectNode | RemoteObjectNode | FunctionNode | RevealNode)>;
-  edges?: Array<(ArgumentEdge | ReturnEdge | TransformEdge | ReferenceEdge | RevealEdge)>;
+export type DependencyGraph = {
+  nodes: Array<(LocalObjectNode | RemoteObjectNode | FunctionNode | RevealNode)>;
+  edges: Array<(ArgumentEdge | ReturnEdge | TransformEdge | ReferenceEdge | RevealEdge)>;
 };
 

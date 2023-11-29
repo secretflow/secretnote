@@ -49,13 +49,7 @@ class ExpressionParser(Parser[TracedFrame, Options, ExpressionType]):
     def parse(self, func: Callable, *load_const: int):
         return super().parse((func, load_const))
 
-    _did_setup = False
-
     def __call__(self, data: TracedFrame):
-        if not self._did_setup:
-            _setup()
-            self._did_setup = True
-
         return super().__call__(data)
 
 
@@ -159,12 +153,10 @@ def _create_exec_expr(
     return expr
 
 
-parser = ExpressionParser()
-
-
-# FIXME: This is solely to avoid importing secretflow at the top level
-def _setup():
+def create_parser():
     import secretflow
+
+    parser = ExpressionParser()
 
     @parser.parse(secretflow.PYU.__call__, 1)
     def parse_pyu_call(frame: TracedFrame):
@@ -185,16 +177,17 @@ def _setup():
             try:
                 source = first(expr.boundvars)
                 target = cast(RemoteObject, first(expr.results))
-                return MoveExpression(source=source, target=target)
+                yield MoveExpression(source=source, target=target)
+                return
             except ValueError:
                 pass
 
-        return expr
+        yield expr
 
     @parser.parse(secretflow.SPU.__call__, 1)
     def parse_spu_call(frame: TracedFrame):
         data = frame.get_frame()
-        return _create_exec_expr(
+        yield _create_exec_expr(
             func=data.local_vars[SnapshotType, "func"],
             location=data.local_vars[RemoteLocationSnapshot, "self"].location,
             args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
@@ -222,7 +215,7 @@ def _setup():
             first(frame.iter_retvals()),
         )
 
-        return MoveExpression(
+        yield MoveExpression(
             source=_create_object(source),
             target=_create_object(target, target_name),
         )
@@ -239,4 +232,6 @@ def _setup():
         for key, item in frame.iter_retvals():
             expr.results.append(_create_object(item, key))
 
-        return expr
+        yield expr
+
+    return parser

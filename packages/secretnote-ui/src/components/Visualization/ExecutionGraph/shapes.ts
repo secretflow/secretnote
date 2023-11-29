@@ -3,8 +3,8 @@ import type {
   ReturnEdge,
   RevealEdge,
   TransformEdge,
-} from '../../.openapi-stubs';
-import { truncate, truncateLines, wrap } from '../../utils/string';
+} from '@/.openapi-stubs';
+import { truncate, truncateLines, wrap } from '@/utils/string';
 
 import { defineShape, registerShapes } from './utils';
 

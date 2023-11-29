@@ -2,13 +2,9 @@ import type * as G6 from '@antv/g6';
 import * as d3 from 'd3';
 import YAML from 'yaml';
 
-import type {
-  RemoteObjectNode,
-  LocalObjectNode,
-  FunctionNode,
-} from '../../.openapi-stubs';
-import type { SnapshotReifier } from '../../utils/reify';
-import { wrap } from '../../utils/string';
+import type { RemoteObjectNode, LocalObjectNode, FunctionNode } from '@/.openapi-stubs';
+import type { SnapshotReifier } from '@/utils/reify';
+import { wrap } from '@/utils/string';
 
 import { isTrusted } from './types';
 
@@ -78,6 +74,7 @@ function codeBlock<T>(
     .style('overflow', 'auto')
     .style('white-space', 'pre')
     .style('word-break', 'break-all')
+    .style('margin', 0)
     .text(value);
 }
 

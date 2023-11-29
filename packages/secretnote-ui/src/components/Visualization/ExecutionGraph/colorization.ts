@@ -3,7 +3,7 @@ import type * as graphlib from '@antv/graphlib';
 import Color from 'color';
 import { useCallback, useMemo, useState } from 'react';
 
-import type { LogicalLocation } from '../../.openapi-stubs';
+import type { LogicalLocation } from '@/.openapi-stubs';
 
 import type { TrustedModel } from './types';
 import { isTrusted } from './types';

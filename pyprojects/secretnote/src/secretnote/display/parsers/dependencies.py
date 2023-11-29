@@ -36,75 +36,75 @@ from .base import Parser
 M = TypeVar("M", bound=BaseModel)
 T = TypeVar("T")
 
-V = TypeVar("V", bound="GraphNodeType")
-E = TypeVar("E", bound="GraphEdgeType")
+V = TypeVar("V", bound="DependencyGraphNodeType")
+E = TypeVar("E", bound="DependencyGraphEdgeType")
 
 TExpression = TypeVar("TExpression", bound=ExpressionType)
 TObjectNode = TypeVar("TObjectNode", bound="ObjectNodeType")
 
 
-class GraphNode(BaseModel):
+class DependencyNode(BaseModel):
     id: str
     epoch: int
     order: int = 0
 
 
-class GraphEdge(BaseModel):
+class DependencyEdge(BaseModel):
     source: str
     target: str
 
 
-class LocalObjectNode(GraphNode):
+class LocalObjectNode(DependencyNode):
     kind: Literal["local"] = "local"
     data: LocalObject
 
 
-class RemoteObjectNode(GraphNode):
+class RemoteObjectNode(DependencyNode):
     kind: Literal["remote"] = "remote"
     data: RemoteObject
 
 
-class FunctionNode(GraphNode):
+class FunctionNode(DependencyNode):
     kind: Literal["function"] = "function"
     function: LocalObject
     stackframe: Optional[LocalObject]
     location: LogicalLocation
 
 
-class RevealNode(GraphNode):
+class RevealNode(DependencyNode):
     kind: Literal["reveal"] = "reveal"
 
 
-class ArgumentEdge(GraphEdge):
+class ArgumentEdge(DependencyEdge):
     kind: Literal["argument"] = "argument"
     name: Optional[str] = None
 
 
-class ReturnEdge(GraphEdge):
+class ReturnEdge(DependencyEdge):
     kind: Literal["return"] = "return"
     assignment: Optional[str] = None
 
 
-class TransformEdge(GraphEdge):
+class TransformEdge(DependencyEdge):
     kind: Literal["transform"] = "transform"
     destination: LogicalLocation
 
 
-class ReferenceEdge(GraphEdge):
+class ReferenceEdge(DependencyEdge):
     kind: Literal["reference"] = "reference"
 
 
-class RevealEdge(GraphEdge):
+class RevealEdge(DependencyEdge):
     kind: Literal["reveal"] = "reveal"
     name: Optional[str] = None
 
 
 ObjectNodeType = Union[LocalObjectNode, RemoteObjectNode]
-GraphNodeType = Annotated[
+DependencyGraphNodeType = Annotated[
     Union[ObjectNodeType, FunctionNode, RevealNode],
     Field(discriminator="kind"),
 ]
-GraphEdgeType = Annotated[
+DependencyGraphEdgeType = Annotated[
     Union[ArgumentEdge, ReturnEdge, TransformEdge, ReferenceEdge, RevealEdge],
     Field(discriminator="kind"),
 ]
@@ -112,9 +112,9 @@ GraphEdgeType = Annotated[
 T = Tuple[str, int]
 
 
-class Graph(BaseModel):
-    nodes: List[GraphNodeType] = []
-    edges: List[GraphEdgeType] = []
+class DependencyGraph(BaseModel):
+    nodes: List[DependencyGraphNodeType]
+    edges: List[DependencyGraphEdgeType]
 
 
 class NodePosition(TypedDict):
@@ -130,7 +130,9 @@ class GraphState(Generic[TExpression]):
     epoch: int
     next_expr: TExpression
     counter: int = 0
-    changes: Graph = field(default_factory=Graph)
+    changes: DependencyGraph = field(
+        default_factory=lambda: DependencyGraph(nodes=[], edges=[])
+    )
 
     def next_position(self, key: str) -> NodePosition:
         self.counter += 1
@@ -144,7 +146,7 @@ class GraphState(Generic[TExpression]):
         self.changes.nodes.append(node)
         return node
 
-    def add_edge(self, edge: GraphEdgeType) -> GraphEdgeType:
+    def add_edge(self, edge: DependencyGraphEdgeType) -> DependencyGraphEdgeType:
         self.changes.edges.append(edge)
         return edge
 
@@ -188,7 +190,7 @@ class GraphState(Generic[TExpression]):
             return last_node
 
 
-class GraphParser(Parser[GraphState, Type[ExpressionType], None]):
+class DependencyGraphParser(Parser[GraphState, Type[ExpressionType], None]):
     def rule_name(self, expr_type: Type[ExpressionType]) -> str:
         return expr_type.__name__
 
@@ -196,72 +198,80 @@ class GraphParser(Parser[GraphState, Type[ExpressionType], None]):
         return type(data.next_expr).__name__
 
 
-parser = GraphParser()
+def create_parser():
+    parser = DependencyGraphParser()
 
+    @parser.parse(ExecExpression)
+    def parse_exec(self: GraphState[ExecExpression]):
+        expr = self.next_expr
 
-@parser.parse(ExecExpression)
-def parse_exec(self: GraphState[ExecExpression]):
-    expr = self.next_expr
+        args: List[ObjectNodeType] = []
+        arg_names: List[Union[str, None]] = []
 
-    args: List[ObjectNodeType] = []
-    arg_names: List[Union[str, None]] = []
+        for obj in chain(expr.boundvars, expr.freevars):
+            arg_names.append(obj.name)
+            if isinstance(obj, LocalObject):
+                args.append(self.add_node(self.create_object_node(obj)))
+            else:
+                args.append(self.reference_or_add_object(self.create_object_node(obj)))
 
-    for obj in chain(expr.boundvars, expr.freevars):
-        arg_names.append(obj.name)
-        if isinstance(obj, LocalObject):
-            args.append(self.add_node(self.create_object_node(obj)))
-        else:
-            args.append(self.reference_or_add_object(self.create_object_node(obj)))
-
-    func = FunctionNode(
-        **self.next_position(expr.location.as_key()),
-        function=expr.function,
-        stackframe=LocalObject(ref=self.frame.ref) if self.frame else None,
-        location=expr.location,
-    )
-    self.changes.nodes.append(func)
-
-    for obj, name in zip(args, arg_names):
-        self.add_edge(ArgumentEdge(source=obj.id, target=func.id, name=name))
-
-    for obj in expr.results:
-        node = self.add_node(self.create_object_node(obj))
-        self.add_edge(ReturnEdge(source=func.id, target=node.id, assignment=obj.name))
-
-
-@parser.parse(MoveExpression)
-def parse_move(self: GraphState[MoveExpression]):
-    expr = self.next_expr
-
-    if expr.source == expr.target:
-        return
-
-    source = self.reference_or_add_object(self.create_object_node(expr.source))
-    target = self.add_node(self.create_object_node(expr.target))
-
-    self.add_edge(
-        TransformEdge(
-            source=source.id,
-            target=target.id,
-            destination=expr.target.location,
+        func = FunctionNode(
+            **self.next_position(expr.location.as_key()),
+            function=expr.function,
+            stackframe=LocalObject(ref=self.frame.ref) if self.frame else None,
+            location=expr.location,
         )
-    )
+        self.changes.nodes.append(func)
 
+        for obj, name in zip(args, arg_names):
+            self.add_edge(ArgumentEdge(source=obj.id, target=func.id, name=name))
 
-@parser.parse(RevealExpression)
-def parse_reveal(self: GraphState[RevealExpression]):
-    expr = self.next_expr
+        for obj in expr.results:
+            node = self.add_node(self.create_object_node(obj))
+            self.add_edge(
+                ReturnEdge(source=func.id, target=node.id, assignment=obj.name)
+            )
 
-    args: List[ObjectNodeType] = []
+        yield
 
-    for item in expr.items:
-        args.append(self.reference_or_add_object(self.create_object_node(item)))
+    @parser.parse(MoveExpression)
+    def parse_move(self: GraphState[MoveExpression]):
+        expr = self.next_expr
 
-    reveal = self.add_node(RevealNode(**self.next_position("reveal")))
+        if expr.source == expr.target:
+            return
 
-    for node in args:
-        self.add_edge(RevealEdge(source=node.id, target=reveal.id))
+        source = self.reference_or_add_object(self.create_object_node(expr.source))
+        target = self.add_node(self.create_object_node(expr.target))
 
-    for result in expr.results:
-        node = self.add_node(self.create_object_node(result))
-        self.add_edge(RevealEdge(source=reveal.id, target=node.id))
+        self.add_edge(
+            TransformEdge(
+                source=source.id,
+                target=target.id,
+                destination=expr.target.location,
+            )
+        )
+
+        yield
+
+    @parser.parse(RevealExpression)
+    def parse_reveal(self: GraphState[RevealExpression]):
+        expr = self.next_expr
+
+        args: List[ObjectNodeType] = []
+
+        for item in expr.items:
+            args.append(self.reference_or_add_object(self.create_object_node(item)))
+
+        reveal = self.add_node(RevealNode(**self.next_position("reveal")))
+
+        for node in args:
+            self.add_edge(RevealEdge(source=node.id, target=reveal.id))
+
+        for result in expr.results:
+            node = self.add_node(self.create_object_node(result))
+            self.add_edge(RevealEdge(source=reveal.id, target=node.id))
+
+        yield
+
+    return parser

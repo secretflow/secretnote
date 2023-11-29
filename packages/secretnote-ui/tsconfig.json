@@ -1,8 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "build"
+    "outDir": "build",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["./src/**/*", "./src/.openapi-stubs/**/*"],
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.tsx",
+    "./src/.openapi-stubs/**/*.ts",
+    "./src/**/*.story.json"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

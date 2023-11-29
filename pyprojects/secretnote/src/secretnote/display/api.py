@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 
-from .models import Visualization
+from .models import VisualizationProps
 
 app = FastAPI()
 
 
 @app.post("/visualize")
-async def visualize(data: Visualization) -> None:
+async def visualize(data: VisualizationProps) -> None:
     ...
