@@ -1,10 +1,19 @@
+from typing import Dict, List, Tuple, Type
+
 import tornado
-from jupyter_server.base.handlers import FileFindHandler
+from jupyter_server.base.handlers import FileFindHandler, JupyterHandler
 from jupyter_server.extension.handler import (
     ExtensionHandlerJinjaMixin,
     ExtensionHandlerMixin,
 )
 from tornado import web
+
+from secretnote._resources import require
+
+
+def static_paths():
+    package = require.package_of("@secretflow/secretnote/index.html")
+    return [package.path.joinpath("dist")]
 
 
 class SinglePageApplicationHandler(
@@ -26,3 +35,19 @@ class SinglePageApplicationHandler(
         except web.HTTPError:
             self.clear()
             self.write(self.render_template("index.html"))
+
+
+single_page_static_path = static_paths()
+
+pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
+    (
+        r"/secretnote/preview(.*)",
+        SinglePageApplicationHandler,
+        {"path": single_page_static_path},
+    ),
+    (
+        r"/secretnote(.*)",
+        SinglePageApplicationHandler,
+        {"path": single_page_static_path},
+    ),
+]

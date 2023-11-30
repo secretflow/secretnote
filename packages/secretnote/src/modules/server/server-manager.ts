@@ -1,8 +1,6 @@
 import { ServerConnection, URL } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { uuid } from '@/utils';
-
 import type { IServer } from './protocol';
 import { ServerStatus } from './protocol';
 
@@ -30,6 +28,11 @@ export class SecretNoteServerManager {
       if (response.status === 200) {
         const data = (await response.json()) as IServer[];
         for (const item of data) {
+          /**
+           * For historical reasons, the server id front-end uses a string and the server returns an int,
+           * preserving the distinction for now
+           */
+          item.id = item.id.toString();
           const spec = await this.getServerSpec(item);
           if (spec) {
             item.status = ServerStatus.running;
@@ -49,7 +52,6 @@ export class SecretNoteServerManager {
 
   async addServer(server: Partial<IServer>) {
     const newServer = {
-      id: uuid(),
       name: server.name || 'Someone',
       address: server.address || '',
       status: ServerStatus.closed,
@@ -62,7 +64,6 @@ export class SecretNoteServerManager {
         const init = {
           method: 'POST',
           body: JSON.stringify({
-            id: newServer.id,
             name: newServer.name,
             address: newServer.address,
           }),
@@ -71,8 +72,13 @@ export class SecretNoteServerManager {
         if (response.status === 200) {
           newServer.status = ServerStatus.running;
           newServer.kernelspec = spec;
-          this.servers.push(newServer);
-          this.onServerAddedEmitter.fire(newServer);
+          const data = await response.json();
+          const added = {
+            ...newServer,
+            id: data.id,
+          };
+          this.servers.push(added);
+          this.onServerAddedEmitter.fire(added);
           return newServer;
         }
       } catch (e) {
@@ -147,14 +153,14 @@ export class SecretNoteServerManager {
     }
   }
 
-  getServerSettings(server: IServer) {
+  getServerSettings(server: Partial<IServer>) {
     return {
       baseUrl: `http://${server.address}/`,
       wsUrl: `ws://${server.address}/`,
     };
   }
 
-  private async getServerSpec(server: IServer) {
+  private async getServerSpec(server: Partial<IServer>) {
     const settings = {
       ...this.serverConnection.settings,
       ...this.getServerSettings(server),

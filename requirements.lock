@@ -131,7 +131,6 @@ six==1.16.0
 smart-open==6.4.0
 sniffio==1.3.0
 soupsieve==2.5
-sqlalchemy==2.0.23
 sqlparse==0.4.4
 stack-data==0.6.3
 terminado==0.18.0
@@ -153,3 +152,8 @@ widgetsnbextension==4.0.9
 wrapt==1.16.0
 yarl==1.9.3
 zipp==3.17.0
+dataset==1.6.2
+alembic==1.12.1
+sqlalchemy==1.4.50
+banal==1.0.6
+mako==1.3.0
