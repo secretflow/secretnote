@@ -1,6 +1,5 @@
 from typing import Dict, List, Tuple, Type
 
-import tornado
 from jupyter_server.base.handlers import FileFindHandler, JupyterHandler
 from jupyter_server.extension.handler import (
     ExtensionHandlerJinjaMixin,
@@ -21,7 +20,7 @@ class SinglePageApplicationHandler(
     ExtensionHandlerMixin,
     FileFindHandler,
 ):
-    @tornado.web.authenticated
+    @web.authenticated
     async def get(self, path: str = "/"):
         """Serve static content, emulating a typical single-page application.
 

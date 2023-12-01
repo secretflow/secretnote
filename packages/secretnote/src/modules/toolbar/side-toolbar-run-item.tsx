@@ -17,7 +17,7 @@ export const SideToolbarRunItem = () => {
   if (isKernelIdle) {
     return (
       <Tooltip
-        placement="right"
+        placement="left"
         autoAdjustOverflow={false}
         overlayClassName="libro-tooltip-placement-right"
         title={
@@ -28,6 +28,7 @@ export const SideToolbarRunItem = () => {
         }
       >
         <PlayCircle
+          size={16}
           onClick={() => command.executeCommand(NotebookCommands.RunCell.id)}
         />
       </Tooltip>
@@ -40,7 +41,7 @@ export const SideToolbarRunItem = () => {
       placement="right"
       title={l10n.t('kernel准备中，无法执行')}
     >
-      <PlayCircle />
+      <PlayCircle size={16} color="#bfbfbf" />
     </Tooltip>
   );
 };

@@ -18,13 +18,14 @@ import {
   Popover,
   Space,
   Typography,
+  Select,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import { ERROR_CODE, getErrorMessage, invert } from '@/utils';
+import { invert } from '@/utils';
 
-import { ServerStatus } from '../server';
+import { ServerStatus, ServerTypeMap } from '../server';
 
 import './index.less';
 import type { Node, ServerStatusTag } from './service';
@@ -64,13 +65,25 @@ const NodeDetails = (props: { node: Node }) => {
   const [editableStr, setEditableStr] = useState(node.name);
 
   const deleteNode = async (id: string) => {
-    await instance.service.deleteNode(id);
-    message.success(l10n.t('删除成功'));
+    try {
+      await instance.service.deleteNode(id);
+      message.success(l10n.t('删除成功'));
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+      }
+    }
   };
 
   const onChangeNodeName = async (n: Node, name: string) => {
-    await instance.service.updateNodeName(n.id, name);
-    setEditableStr(name);
+    try {
+      await instance.service.updateNodeName(n.id, name);
+      setEditableStr(name);
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+      }
+    }
   };
 
   return (
@@ -87,6 +100,9 @@ const NodeDetails = (props: { node: Node }) => {
           </Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label={l10n.t('地址')}>{node.address}</Descriptions.Item>
+        <Descriptions.Item label={l10n.t('类型')}>
+          {ServerTypeMap[node.type]}
+        </Descriptions.Item>
         <Descriptions.Item label={l10n.t('状态')}>
           <Badge status={status} text={text} />
         </Descriptions.Item>
@@ -114,17 +130,19 @@ export const NodeComponent = () => {
       .validateFields()
       .then(async (values) => {
         setAddLoading(true);
-        const code = await instance.service.addNode(values);
-        if (code !== ERROR_CODE.NO_ERROR) {
-          message.error(getErrorMessage(code));
-        } else {
+        try {
+          await instance.service.addNode(values);
           setAddFormVisible(false);
           form.resetFields();
           message.success(l10n.t('节点添加成功'));
+        } catch (e) {
+          if (e instanceof Error) {
+            message.error(e.message);
+          }
+        } finally {
+          setAddLoading(false);
         }
-
-        setAddLoading(false);
-        return code;
+        return;
       })
       .catch(() => {
         //
@@ -139,7 +157,7 @@ export const NodeComponent = () => {
         requiredMark={false}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
-        initialValues={{ name: '', address: '' }}
+        initialValues={{ name: '', address: '', type: 'common' }}
       >
         <Form.Item
           label={l10n.t('名称')}
@@ -161,7 +179,19 @@ export const NodeComponent = () => {
         >
           <Input placeholder="127.0.0.1:8888" />
         </Form.Item>
-        <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+        <Form.Item
+          label={l10n.t('类型')}
+          name="type"
+          rules={[{ required: true, message: l10n.t('请选择节点类型') }]}
+        >
+          <Select
+            options={[
+              { label: l10n.t('通用'), value: 'common' },
+              { label: 'SCQL', value: 'scql' },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Space>
             <Button
               type="primary"
@@ -188,7 +218,7 @@ export const NodeComponent = () => {
             content={<NodeDetails node={item} />}
             title=""
             overlayClassName="secretnote-node-popover"
-            overlayStyle={{ width: 280, paddingTop: 0 }}
+            overlayStyle={{ width: 280 }}
             trigger="click"
             placement="bottomLeft"
             arrow={false}
@@ -210,7 +240,7 @@ export const NodeComponent = () => {
         content={addNodeFormContent}
         title=""
         overlayClassName="secretnote-node-popover"
-        overlayStyle={{ width: 446, paddingTop: 0 }}
+        overlayStyle={{ width: 446 }}
         trigger="click"
         placement="bottomLeft"
         open={addFormVisible}

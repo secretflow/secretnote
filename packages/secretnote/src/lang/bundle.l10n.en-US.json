@@ -316,5 +316,8 @@
   "密码": "Password",
   "请输入密码": "Password is required",
   "数据库": "Database",
-  "请输入数据库名称": "Database is required"
+  "请输入数据库名称": "Database is required",
+  "类型": "Type",
+  "请选择节点类型": "Please select a node type",
+  "通用": "Common"
 }

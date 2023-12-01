@@ -1,14 +1,16 @@
 import { inject, singleton } from '@difizen/mana-app';
+import { message } from 'antd';
 
-import type { ServerStatus } from '@/modules/server';
+import type { ServerStatus, ServerType } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
-import { ERROR_CODE, randomHex } from '@/utils';
+import { randomHex } from '@/utils';
 
 export interface Node {
   id: string;
   name: string;
   color: string;
   address: string;
+  type: ServerType;
   status: ServerStatus;
 }
 
@@ -30,25 +32,20 @@ export class NodeService {
     }));
   }
 
-  async addNode({ name, address }: { name: string; address: string }) {
-    if (!this.checkName(name)) {
-      return ERROR_CODE.NODE_NAME_ALREADY_EXISTED;
-    }
-
-    if (!this.checkAddress(address)) {
-      return ERROR_CODE.NODE_ADDRESS_ALREADY_EXISTED;
-    }
-
-    const newServer = await this.serverManager.addServer({
+  async addNode({
+    name,
+    address,
+    type,
+  }: {
+    name: string;
+    address: string;
+    type: ServerType;
+  }) {
+    await this.serverManager.addServer({
       name,
       address,
+      type,
     });
-
-    if (newServer) {
-      return ERROR_CODE.NO_ERROR;
-    }
-
-    return ERROR_CODE.NODE_OFFLINE;
   }
 
   async deleteNode(id: string) {
