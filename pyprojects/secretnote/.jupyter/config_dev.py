@@ -1,4 +1,3 @@
-import subprocess
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -18,11 +17,7 @@ c.ServerApp.disable_check_xsrf = True
 
 c.ServerApp.token = ""
 
-c.ServerApp.root_dir = subprocess.run(
-    ["git", "rev-parse", "--show-toplevel"],
-    capture_output=True,
-    text=True,
-).stdout.strip()
+c.ServerApp.root_dir = "../../.secretnote"
 
 c.LanguageServerManager.language_servers = {
     "pyright-extended": {

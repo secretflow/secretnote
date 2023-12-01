@@ -1,12 +1,12 @@
-import sys  # noqa: I001
+import sys
 
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 
 from secretnote._resources import require
 
 from . import JUPYTER_SERVER_EXTENSION_MODULE
-from .handlers import SinglePageApplicationHandler
-from .node.handler import nodes_handlers
+from .services.nodes.handlers import nodes_handlers
+from .services.pages.handlers import pages_handlers
 
 
 class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
@@ -30,16 +30,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     def initialize_handlers(self):
         routes = [
             *nodes_handlers,
-            (
-                r"/secretnote/preview(.*)",
-                SinglePageApplicationHandler,
-                {"path": self.static_paths},
-            ),
-            (
-                r"/secretnote(.*)",
-                SinglePageApplicationHandler,
-                {"path": self.static_paths},
-            ),
+            *pages_handlers,
         ]
         self.handlers.extend(routes)
 

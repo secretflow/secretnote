@@ -1,7 +1,9 @@
 from collections import deque
+from os import makedirs, path
 from pathlib import Path
 from typing import Deque, Iterable, Tuple
 
+from jupyter_core import paths
 from rich.tree import Tree
 
 
@@ -24,3 +26,10 @@ def path_to_tree(root: Path) -> Tree:
             subtree = parent.add(item.name)
             queue.append((subtree, item))
     return tree
+
+
+def get_db_path():
+    jupyter_config_dir = paths.jupyter_config_dir()
+    if not path.exists(jupyter_config_dir):
+        makedirs(jupyter_config_dir)
+    return f"sqlite:///{jupyter_config_dir}/secretnote.db"
