@@ -13,6 +13,7 @@ import { inject, singleton, StorageService } from '@difizen/mana-app';
 
 import { SecretNoteServerManager } from '@/modules/server';
 import type { IServer } from '@/modules/server';
+import { getServerUrl } from '@/utils';
 
 interface StoredSessionInfo {
   sessionId: string;
@@ -72,7 +73,7 @@ export class SecretNoteKernelManager {
         if (isAlive) {
           connection = await this.connectToKernel({
             ...options,
-            serverSettings: this.serverManager.getServerSettings(s),
+            serverSettings: getServerUrl(s),
           });
         } else {
           await this.removeStoredSession(fileInfo, hit);
@@ -168,7 +169,7 @@ export class SecretNoteKernelManager {
         path: fileInfo.path,
         type: fileInfo.type,
       } as ISessionOptions,
-      this.serverManager.getServerSettings(server),
+      getServerUrl(server),
     );
 
     if (!newSession || !newSession.kernel) {
@@ -190,7 +191,7 @@ export class SecretNoteKernelManager {
 
     const kernelConnection = await this.connectToKernel({
       ...options,
-      serverSettings: this.serverManager.getServerSettings(server),
+      serverSettings: getServerUrl(server),
     });
 
     return kernelConnection;
@@ -203,10 +204,7 @@ export class SecretNoteKernelManager {
 
   protected async isKernelAlive(id: string, server: IServer): Promise<boolean> {
     try {
-      const data = await this.kernelRestAPI.getKernelModel(
-        id,
-        this.serverManager.getServerSettings(server),
-      );
+      const data = await this.kernelRestAPI.getKernelModel(id, getServerUrl(server));
       return !!data;
     } catch {
       return false;

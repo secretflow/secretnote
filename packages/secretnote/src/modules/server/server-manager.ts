@@ -1,8 +1,10 @@
 import { ServerConnection, URL } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
+import { RequestService } from '@/utils';
+
 import type { IServer } from './protocol';
-import { ServerStatus } from './protocol';
+import { ServerStatus, ServerType } from './protocol';
 
 @singleton()
 export class SecretNoteServerManager {
@@ -10,80 +12,74 @@ export class SecretNoteServerManager {
   servers: IServer[] = [];
 
   protected serverConnection: ServerConnection;
+  protected requestService: RequestService;
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
   readonly onServerAdded = this.onServerAddedEmitter.event;
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
 
-  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
+  constructor(
+    @inject(ServerConnection) serverConnection: ServerConnection,
+    @inject(RequestService) requestService: RequestService,
+  ) {
     this.serverConnection = serverConnection;
+    this.requestService = requestService;
     this.getServerList();
   }
 
   async getServerList() {
-    const url = this.serverConnection.settings.baseUrl + 'api/nodes';
+    const url = 'api/nodes';
     const init = { method: 'GET' };
-    try {
-      const response = await this.serverConnection.makeRequest(url, init);
-      if (response.status === 200) {
-        const data = (await response.json()) as IServer[];
-        for (const item of data) {
-          /**
-           * For historical reasons, the server id front-end uses a string and the server returns an int,
-           * preserving the distinction for now
-           */
-          item.id = item.id.toString();
-          const spec = await this.getServerSpec(item);
-          if (spec) {
-            item.status = ServerStatus.running;
-            item.kernelspec = spec;
-          } else {
-            item.status = ServerStatus.error;
-          }
-        }
-        this.servers = data;
-        return data;
+    const data = (await this.requestService.request(url, init)) as IServer[];
+    for (const item of data) {
+      /**
+       * For historical reasons, the server id front-end uses a string
+       * and the server returns an int, preserving the distinction for now
+       */
+      item.id = item.id.toString();
+      const spec = await this.getServerSpec(item);
+      if (spec) {
+        item.status = ServerStatus.running;
+        item.kernelspec = spec;
+      } else {
+        item.status = ServerStatus.error;
       }
-    } catch (e) {
-      console.error(e);
     }
-    return [];
+    this.servers = data;
+    return data;
   }
 
   async addServer(server: Partial<IServer>) {
     const newServer = {
       name: server.name || 'Someone',
       address: server.address || '',
+      type: server.type || ServerType.common,
       status: ServerStatus.closed,
       kernelspec: undefined,
     };
-    const spec = await this.getServerSpec(newServer);
+    const spec = await this.getServerSpec(newServer as IServer);
     if (spec) {
-      try {
-        const url = this.serverConnection.settings.baseUrl + 'api/nodes';
-        const init = {
-          method: 'POST',
-          body: JSON.stringify({
-            name: newServer.name,
-            address: newServer.address,
-          }),
-        };
-        const response = await this.serverConnection.makeRequest(url, init);
-        if (response.status === 200) {
-          newServer.status = ServerStatus.running;
-          newServer.kernelspec = spec;
-          const data = await response.json();
-          const added = {
-            ...newServer,
-            id: data.id,
-          };
-          this.servers.push(added);
-          this.onServerAddedEmitter.fire(added);
-          return newServer;
-        }
-      } catch (e) {
-        console.error(e);
-      }
+      const url = 'api/nodes';
+      const init = {
+        method: 'POST',
+        body: JSON.stringify({
+          name: newServer.name,
+          address: newServer.address,
+          type: newServer.type,
+        }),
+      };
+      const data = await this.requestService.request(url, init);
+      newServer.status = ServerStatus.running;
+      newServer.kernelspec = spec;
+      const added = {
+        ...newServer,
+        id: data.id,
+      };
+      this.servers.push(added);
+      this.onServerAddedEmitter.fire(added);
+      return added;
+    } else {
+      throw new Error('cannot connect to the node.');
     }
   }
 
@@ -92,89 +88,55 @@ export class SecretNoteServerManager {
     if (index === -1) {
       return;
     }
-    try {
-      const url = this.serverConnection.settings.baseUrl + 'api/nodes/' + id;
-      const init = {
-        method: 'DELETE',
-      };
-      const response = await this.serverConnection.makeRequest(url, init);
-      if (response.status === 204) {
-        const server = this.servers[index];
-        this.servers.splice(index, 1);
-        this.onServerAddedEmitter.fire(server);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    const url = 'api/nodes/' + id;
+    const init = {
+      method: 'DELETE',
+    };
+    await this.requestService.request(url, init);
+    const server = this.servers[index];
+    this.servers.splice(index, 1);
+    this.onServerAddedEmitter.fire(server);
   }
 
   async updateServer(id: string, server: Partial<IServer>) {
-    try {
-      const url = this.serverConnection.settings.baseUrl + 'api/nodes/' + id;
-      const init = {
-        method: 'PATCH',
-        body: JSON.stringify({
-          name: server.name,
-          address: server.address,
-        }),
-      };
-      const response = await this.serverConnection.makeRequest(url, init);
-      if (response.status === 200) {
-        this.servers = this.servers.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              ...server,
-            };
-          }
-          return item;
-        });
+    const url = 'api/nodes/' + id;
+    const init = {
+      method: 'PATCH',
+      body: JSON.stringify({
+        name: server.name,
+        address: server.address,
+        type: server.type,
+      }),
+    };
+    await this.requestService.request(url, init);
+    this.servers = this.servers.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          ...server,
+        };
       }
-    } catch (e) {
-      console.error(e);
-    }
+      return item;
+    });
   }
 
   async getServerDetail(id: string): Promise<IServer | undefined> {
-    try {
-      const url = this.serverConnection.settings.baseUrl + 'api/nodes/' + id;
-      const init = {
-        method: 'GET',
-      };
-      const response = await this.serverConnection.makeRequest(url, init);
-      if (response.status === 200) {
-        const data = (await response.json()) as IServer[];
-        if (data.length === 1) {
-          return data[0];
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    const url = 'api/nodes/' + id;
+    const init = {
+      method: 'GET',
+    };
+    const data = (await this.requestService.request(url, init)) as IServer;
+    return data;
   }
 
-  getServerSettings(server: Partial<IServer>) {
-    return {
-      baseUrl: `http://${server.address}/`,
-      wsUrl: `ws://${server.address}/`,
-    };
-  }
-
-  private async getServerSpec(server: Partial<IServer>) {
-    const settings = {
-      ...this.serverConnection.settings,
-      ...this.getServerSettings(server),
-    };
-    const url = URL.join(settings.baseUrl, 'api/kernelspecs');
-
+  private async getServerSpec(server: IServer) {
+    const url = 'api/kernelspecs';
     try {
-      const response = await this.serverConnection.makeRequest(url, {}, settings);
-      if (response.status === 200) {
-        const data = await response.json();
-        return data;
-      }
+      const data = await this.requestService.request(url, {}, server);
+      return data;
     } catch (e) {
-      // pass
+      // eslint-disable-next-line no-console
+      console.log(e);
     }
   }
 }

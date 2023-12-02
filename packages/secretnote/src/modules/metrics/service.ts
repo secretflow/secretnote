@@ -6,6 +6,7 @@ import { Poll } from '@lumino/polling';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager } from '@/modules/server';
 import type { IServer } from '@/modules/server';
+import { RequestService } from '@/utils';
 
 import { NotebookFileService } from '../notebook';
 
@@ -44,6 +45,7 @@ export class MetricsService {
   protected readonly kernelManager: SecretNoteKernelManager;
   protected readonly serverConnection: ServerConnection;
   protected readonly notebookFileService: NotebookFileService;
+  protected readonly requestService: RequestService;
 
   @prop()
   metrics: MetricsItem[] = [];
@@ -56,11 +58,13 @@ export class MetricsService {
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
     @inject(ServerConnection) serverConnection: ServerConnection,
     @inject(NotebookFileService) notebookFileService: NotebookFileService,
+    @inject(RequestService) requestService: RequestService,
   ) {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.serverConnection = serverConnection;
     this.notebookFileService = notebookFileService;
+    this.requestService = requestService;
     this.notebookFileService.onNotebookFileChanged(() => {
       this.refresh();
     });
@@ -69,7 +73,7 @@ export class MetricsService {
       auto: false,
       factory: () => this.getMetrics(),
       frequency: {
-        interval: 2 * 1000,
+        interval: 4 * 1000,
         backoff: true,
         max: 300 * 1000,
       },
@@ -171,22 +175,20 @@ export class MetricsService {
   }
 
   async getServerStatus(server: IServer): Promise<ServerStatus> {
-    const settings = this.getSettings(server);
-    const url = this.getUrl(settings.baseUrl, '/api/metrics/v1');
-    const init = { method: 'GET' };
     try {
-      const response = await this.serverConnection.makeRequest(url, init, settings);
-      if (response.status === 200) {
-        const data = await response.json();
-        return {
-          cpu: data.cpu_percent,
-          memory: data.rss,
-          cpuText: `${data.cpu_percent} %`,
-          memoryText: this.humanFileSize(data.rss),
-        };
-      }
+      const url = '/api/metrics/v1';
+      const init = { method: 'GET' };
+      const data = await this.requestService.request(url, init, server);
+
+      return {
+        cpu: data.cpu_percent,
+        memory: data.rss,
+        cpuText: `${data.cpu_percent} %`,
+        memoryText: this.humanFileSize(data.rss),
+      };
     } catch (e) {
-      // pass
+      // eslint-disable-next-line no-console
+      console.log(e);
     }
     return {
       cpu: 0,
@@ -203,36 +205,29 @@ export class MetricsService {
     const { model, status } = kernelConnection;
     const { id, name } = model;
     const options = server.kernelspec ? Object.keys(server.kernelspec.kernelspecs) : [];
-    const init = { method: 'GET' };
-    const settings = this.getSettings(server);
-    const url = this.getUrl(
-      settings.baseUrl,
-      '/api/metrics/v1/kernel_usage/get_usage',
-      id,
-    );
     try {
-      const response = await this.serverConnection.makeRequest(url, init, settings);
-      if (response.status === 200) {
-        const data = await response.json();
-        const { cpu, memory, pid, cpuText, memoryText } = this.parseKernelStatus(data);
-        const { color, text_zh } = kernelStatus[status];
+      const url = '/api/metrics/v1/kernel_usage/get_usage/' + id;
+      const init = { method: 'GET' };
+      const data = await this.requestService.request(url, init, server);
+      const { cpu, memory, pid, cpuText, memoryText } = this.parseKernelStatus(data);
+      const { color, text_zh } = kernelStatus[status];
 
-        return {
-          id,
-          name,
-          pid,
-          status,
-          statusText: text_zh,
-          statusColor: color,
-          cpu,
-          memory,
-          options,
-          cpuText,
-          memoryText,
-        };
-      }
+      return {
+        id,
+        name,
+        pid,
+        status,
+        statusText: text_zh,
+        statusColor: color,
+        cpu,
+        memory,
+        options,
+        cpuText,
+        memoryText,
+      };
     } catch (e) {
-      // pass
+      // eslint-disable-next-line no-console
+      console.log(e);
     }
     return {
       id,
@@ -247,17 +242,6 @@ export class MetricsService {
       cpuText: 'N/A',
       memoryText: 'N/A',
     };
-  }
-
-  private getUrl(baseUrl: string, url: string, ...args: string[]) {
-    const parts = args.map((path) => URL.encodeParts(path));
-    return URL.join(baseUrl, url, ...parts);
-  }
-
-  private getSettings(server: IServer) {
-    const settings = { ...this.serverConnection.settings };
-    settings.baseUrl = this.serverManager.getServerSettings(server).baseUrl;
-    return settings;
   }
 
   private humanFileSize(size: number) {

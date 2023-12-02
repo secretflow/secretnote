@@ -5,14 +5,18 @@
   font-size: 12px;
 
   .ant-tree-treenode {
-    padding: 2px 0 4px;
-
     &:hover::before {
       background-color: var(--mana-secretnote-li-hover-background) !important;
     }
 
     .ant-tree-switcher {
-      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.ant-tree-switcher_close {
+        transform: rotate(-90deg);
+      }
     }
   }
 
@@ -24,7 +28,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-right: 4px;
+    padding: 1px 4px 1px 1px;
     color: var(--mana-secretnote-text-color);
 
     .lucide {
