@@ -8,27 +8,6 @@ from tornado import web
 from .manager import node_manager
 
 
-class NodeRootHandler(APIHandler):
-    @web.authenticated
-    def get(self):
-        nodes = node_manager.get_nodes()
-        self.finish(json.dumps(nodes, default=json_default))
-
-    @web.authenticated
-    async def post(self):
-        model = self.get_json_body()
-
-        if model is None:
-            raise web.HTTPError(400, "no request body provided.")
-
-        try:
-            node_id = node_manager.add_node(model)
-        except Exception as e:
-            raise web.HTTPError(400, str(e))  # noqa: B904
-
-        self.finish(json.dumps({**model, "id": node_id}, default=json_default))
-
-
 class NodeHandler(APIHandler):
     @web.authenticated
     async def get(self, node_id):
@@ -60,7 +39,6 @@ class NodeHandler(APIHandler):
 
 _node_id_regex = r"(?P<node_id>\d+)"
 
-nodes_handlers: List[Tuple[str, Type[JupyterHandler]]] = [
-    (rf"/api/nodes/{_node_id_regex}", NodeHandler),
-    (r"/api/nodes", NodeRootHandler),
+broker_handlers: List[Tuple[str, Type[JupyterHandler]]] = [
+    (r"/api/broker", NodeHandler),
 ]
