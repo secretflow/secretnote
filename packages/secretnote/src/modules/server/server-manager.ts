@@ -1,4 +1,4 @@
-import { ServerConnection, URL } from '@difizen/libro-jupyter';
+import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
 import { RequestService } from '@/utils';
