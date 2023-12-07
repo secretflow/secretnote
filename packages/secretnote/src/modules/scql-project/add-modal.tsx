@@ -67,7 +67,7 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
           <Input maxLength={16} disabled={editMode} />
         </Form.Item>
         <Form.Item label="Description" name="description" required={false}>
-          <Input.TextArea rows={5} placeholder="请输入简短的描述" />
+          <Input.TextArea rows={3} placeholder="请输入简短的描述" />
         </Form.Item>
       </Form>
     </Modal>

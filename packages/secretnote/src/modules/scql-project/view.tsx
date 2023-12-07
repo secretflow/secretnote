@@ -34,7 +34,7 @@ export const ProjectComponent = () => {
         <Input
           placeholder="Filter name"
           prefix={<Search color="#5b768f" size={16} />}
-          style={{ width: 320 }}
+          style={{ width: 280 }}
           value={searchWords}
           onChange={(e) => setSearchWords(e.target.value)}
           allowClear
@@ -69,11 +69,13 @@ export const ProjectComponent = () => {
               title: 'Description',
               dataIndex: 'description',
               key: 'description',
+              render: (description: string) => description || '-',
             },
             {
               title: 'Action',
               dataIndex: 'action',
               key: 'action',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               render: (_: any, record: Project) => (
                 <Button type="link" onClick={() => enterProject(record.id)}>
                   Enter

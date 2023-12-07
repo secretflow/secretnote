@@ -17,6 +17,12 @@ export interface Invitation {
   project: string;
 }
 
+export enum Respond {
+  Pending = 0,
+  Accepted = 1,
+  Declined = -1,
+}
+
 @singleton()
 export class ProjectService {
   protected readonly requestService: RequestService;

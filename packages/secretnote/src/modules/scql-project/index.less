@@ -13,6 +13,10 @@
     color: var(--mana-secretnote-text-color);
     font-size: 12px;
 
+    .ant-table-cell {
+      padding: 12px 16px;
+    }
+
     .ant-table-cell-row-hover {
       background-color: var(--mana-secretnote-sidebar-background);
     }
@@ -27,17 +31,46 @@
   float: right;
 }
 
-.notification-list {
-  .ant-table .ant-table-content {
-    color: var(--mana-secretnote-text-color);
-    font-size: 12px;
+.secretnote-notification-box {
+  min-height: 160px;
+  max-height: 500px;
 
-    .ant-table-cell-row-hover {
-      background-color: var(--mana-secretnote-sidebar-background);
-    }
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
 
-    .ant-table-cell {
-      background-color: #fff;
+    li {
+      display: flex;
+      height: 40px;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      color: var(--mana-secretnote-text-color);
+
+      .action {
+        display: flex;
+        margin-left: 8px;
+
+        button {
+          padding: 4px;
+          font-size: 12px;
+        }
+      }
     }
+  }
+}
+
+.secretnote-notification-popover {
+  .ant-tabs-tab-btn {
+    color: #000 !important;
+  }
+
+  .ant-tabs-ink-bar {
+    background-color: var(--mana-secretnote-text-color) !important;
+  }
+
+  .ant-tabs-nav {
+    margin-bottom: 0;
   }
 }
