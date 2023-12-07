@@ -8,6 +8,7 @@ import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { MetricsModule } from '@/modules/metrics';
 import { NodeModule } from '@/modules/node';
 import { NotebookModule } from '@/modules/notebook';
+import { RequestModule } from '@/modules/request';
 import { SnippetModule } from '@/modules/snippet';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
@@ -24,6 +25,7 @@ const App = (): JSX.Element => {
         LayoutModule,
         ThemeModule,
         StorageModule,
+        RequestModule,
         EditorModule,
         NotebookModule,
         NodeModule,

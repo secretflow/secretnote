@@ -1,7 +1,5 @@
-import { ServerConnection, URL } from '@difizen/libro-jupyter';
+import { ServerConnection } from '@difizen/libro-jupyter';
 import { inject, singleton } from '@difizen/mana-app';
-
-import type { IServer } from '@/modules/server';
 
 export class ResponseError extends Error {
   response: Response;
@@ -39,8 +37,14 @@ export class RequestService {
     this.serverConnection = serverConnection;
   }
 
-  async request(url: string, init: RequestInit, server?: IServer) {
-    const settings = this.getSettings(server);
+  async request(url: string, init: RequestInit, address?: string) {
+    const settings = { ...this.serverConnection.settings };
+
+    if (address) {
+      settings.baseUrl = `http://${address}/`;
+      settings.wsUrl = `ws://${address}/`;
+    }
+
     const response = await this.serverConnection.makeRequest(
       this.getUrl(settings.baseUrl, url),
       init,
@@ -60,23 +64,7 @@ export class RequestService {
     throw err;
   }
 
-  private getSettings(server?: IServer) {
-    const settings = {
-      ...this.serverConnection.settings,
-      ...(server && getServerUrl(server)),
-    };
-    return settings;
-  }
-
-  private getUrl(baseUrl: string, url: string, ...args: string[]) {
-    const parts = args.map((path) => URL.encodeParts(path));
-    return URL.join(baseUrl, url, ...parts);
+  private getUrl(baseUrl: string, url: string) {
+    return baseUrl + url;
   }
 }
-
-export const getServerUrl = (server: IServer) => {
-  return {
-    baseUrl: `http://${server.address}/`,
-    wsUrl: `ws://${server.address}/`,
-  };
-};

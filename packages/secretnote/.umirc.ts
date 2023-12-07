@@ -9,6 +9,8 @@ export default defineConfig({
   routes: [
     { path: '/', component: 'secretnote' },
     { path: '/preview', component: 'preview' },
+    { path: '/scql/project', component: 'scql-project' },
+    { path: '/scql/project/:id', component: 'scql-workspace' },
   ],
   // devtool: 'source-map',
   writeToDisk: true,

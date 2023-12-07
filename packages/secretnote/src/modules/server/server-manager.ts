@@ -1,7 +1,7 @@
 import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { RequestService } from '@/utils';
+import { RequestService } from '@/modules/request';
 
 import type { IServer } from './protocol';
 import { ServerStatus, ServerType } from './protocol';
@@ -132,11 +132,18 @@ export class SecretNoteServerManager {
   private async getServerSpec(server: IServer) {
     const url = 'api/kernelspecs';
     try {
-      const data = await this.requestService.request(url, {}, server);
+      const data = await this.requestService.request(url, {}, server.address);
       return data;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
+  }
+
+  getServerUrl(server: IServer) {
+    return {
+      baseUrl: `http://${server.address}/`,
+      wsUrl: `ws://${server.address}/`,
+    };
   }
 }

@@ -4,9 +4,7 @@ import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
 import { downloadFileByUrl as download, ERROR_CODE } from '@/utils';
-import { getServerUrl } from '@/utils';
 
-import type { IServer } from '../server';
 import { SecretNoteServerManager } from '../server';
 
 export const BASE_PATH = '/';
@@ -44,7 +42,7 @@ export class FileService {
 
       try {
         const list = await this.contentsManager.get(BASE_PATH, {
-          baseUrl: getServerUrl(server).baseUrl,
+          baseUrl: this.serverManager.getServerUrl(server).baseUrl,
           content: true,
         });
 
@@ -81,7 +79,7 @@ export class FileService {
       return false;
     }
     const list = await this.contentsManager.get(BASE_PATH, {
-      baseUrl: getServerUrl(server).baseUrl,
+      baseUrl: this.serverManager.getServerUrl(server).baseUrl,
       content: true,
     });
 
@@ -94,7 +92,7 @@ export class FileService {
     if (!server) {
       return ERROR_CODE.SERVER_NOT_FOUND;
     }
-    const baseUrl = getServerUrl(server).baseUrl;
+    const baseUrl = this.serverManager.getServerUrl(server).baseUrl;
     const path = `${BASE_PATH}/${name}`;
     await this.contentsManager.save(path, {
       content,
@@ -113,7 +111,7 @@ export class FileService {
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.getDownloadUrl(path, {
-        baseUrl: getServerUrl(server).baseUrl,
+        baseUrl: this.serverManager.getServerUrl(server).baseUrl,
       });
       download(data, nodeData.title as string);
     }
@@ -127,7 +125,7 @@ export class FileService {
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       await this.contentsManager.delete(path, {
-        baseUrl: getServerUrl(server).baseUrl,
+        baseUrl: this.serverManager.getServerUrl(server).baseUrl,
       });
       await this.getFileTree();
     }
@@ -138,7 +136,7 @@ export class FileService {
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.get(decodedPath, {
-        baseUrl: getServerUrl(server).baseUrl,
+        baseUrl: this.serverManager.getServerUrl(server).baseUrl,
         content: true,
       });
       return data;

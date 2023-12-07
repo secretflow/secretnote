@@ -5,6 +5,7 @@ from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinja
 from secretnote._resources import require
 
 from . import JUPYTER_SERVER_EXTENSION_MODULE
+from .services.broker.handlers import broker_handlers
 from .services.nodes.handlers import nodes_handlers
 from .services.pages.handlers import pages_handlers
 
@@ -30,6 +31,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     def initialize_handlers(self):
         routes = [
             *nodes_handlers,
+            *broker_handlers,
             *pages_handlers,
         ]
         self.handlers.extend(routes)

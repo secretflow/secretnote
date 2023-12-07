@@ -1,10 +1,11 @@
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 
-import { FilePreviewModule } from '@/modules/file';
 import { PreviewLayoutModule } from '@/modules/layout';
 import { RequestModule } from '@/modules/request';
+import { SCQLProjectModule } from '@/modules/scql-project';
 import { StorageModule } from '@/modules/storage';
+import { ThemeModule } from '@/modules/theme';
 
 const App = (): JSX.Element => {
   return (
@@ -14,9 +15,10 @@ const App = (): JSX.Element => {
       modules={[
         ManaAppPreset,
         StorageModule,
+        ThemeModule,
         RequestModule,
         PreviewLayoutModule,
-        FilePreviewModule,
+        SCQLProjectModule,
       ]}
     />
   );

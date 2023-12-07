@@ -1,12 +1,12 @@
 import type { IKernelConnection, KernelMessage } from '@difizen/libro-jupyter';
-import { kernelStatus, ServerConnection, URL } from '@difizen/libro-jupyter';
+import { kernelStatus, ServerConnection } from '@difizen/libro-jupyter';
 import { getOrigin, inject, prop, singleton } from '@difizen/mana-app';
 import { Poll } from '@lumino/polling';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
+import { RequestService } from '@/modules/request';
 import { SecretNoteServerManager } from '@/modules/server';
 import type { IServer } from '@/modules/server';
-import { RequestService } from '@/utils';
 
 import { NotebookFileService } from '../notebook';
 
@@ -178,7 +178,7 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1';
       const init = { method: 'GET' };
-      const data = await this.requestService.request(url, init, server);
+      const data = await this.requestService.request(url, init, server.address);
 
       return {
         cpu: data.cpu_percent,
@@ -208,7 +208,7 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1/kernel_usage/get_usage/' + id;
       const init = { method: 'GET' };
-      const data = await this.requestService.request(url, init, server);
+      const data = await this.requestService.request(url, init, server.address);
       const { cpu, memory, pid, cpuText, memoryText } = this.parseKernelStatus(data);
       const { color, text_zh } = kernelStatus[status];
 
