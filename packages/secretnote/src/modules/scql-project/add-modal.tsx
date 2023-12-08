@@ -47,6 +47,7 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
       open={visible}
       destroyOnClose={true}
       title="New Project"
+      okText="Create Project"
       onOk={() => add()}
       onCancel={() => {
         close();
@@ -55,7 +56,7 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
       <Form
         form={form}
         autoComplete="off"
-        requiredMark={false}
+        requiredMark={true}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         style={{ marginTop: 24 }}
@@ -65,10 +66,19 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
           name="name"
           rules={[{ required: true, message: '请输入项目名称' }]}
         >
-          <Input maxLength={16} disabled={editMode} />
+          <Input
+            maxLength={16}
+            disabled={editMode}
+            placeholder="请输入英文、数字或者下划线"
+            allowClear
+          />
         </Form.Item>
         <Form.Item label="Description" name="description" required={false}>
-          <Input.TextArea rows={3} placeholder="请输入简短的描述" />
+          <Input.TextArea
+            rows={3}
+            placeholder="请输入英文、数字或者下划线"
+            allowClear
+          />
         </Form.Item>
       </Form>
     </Modal>

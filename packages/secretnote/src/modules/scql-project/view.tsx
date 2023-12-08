@@ -9,7 +9,7 @@ import {
   ModalContribution,
 } from '@difizen/mana-app';
 import { Table, Input, Button } from 'antd';
-import { Search } from 'lucide-react';
+import { Search, KanbanSquare, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { history } from 'umi';
 
@@ -47,12 +47,20 @@ export const ProjectComponent = () => {
         <Table
           dataSource={filteredProjects}
           rowKey="id"
-          pagination={false}
+          pagination={
+            filteredProjects.length > 15 ? { pageSize: 10, size: 'small' } : false
+          }
           columns={[
             {
               title: 'Name',
               dataIndex: 'name',
               key: 'name',
+              render: (name: string) => (
+                <span className="project-name">
+                  <KanbanSquare size={14} style={{ marginRight: 8 }} />
+                  <span>{name}</span>
+                </span>
+              ),
             },
             {
               title: 'Host',
@@ -77,9 +85,11 @@ export const ProjectComponent = () => {
               key: 'action',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               render: (_: any, record: Project) => (
-                <Button type="link" onClick={() => enterProject(record.id)}>
-                  Enter
-                </Button>
+                <ExternalLink
+                  size={16}
+                  cursor="pointer"
+                  onClick={() => enterProject(record.id)}
+                />
               ),
             },
           ]}

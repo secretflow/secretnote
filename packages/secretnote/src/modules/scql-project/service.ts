@@ -62,13 +62,16 @@ export class ProjectService {
       }),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.projects = projectList.map((item: any) => ({
+    const projects = projectList.map((item: any) => ({
       id: item.project_id,
       name: item.name || item.project_id,
       description: item.description,
       creator: item.creator,
       members: item.members,
     }));
+    projects.sort((a: Project, b: Project) => a.name.localeCompare(b.name));
+    this.projects = projects;
+
     return this.projects;
   }
 
