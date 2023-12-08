@@ -70,6 +70,18 @@ export class DataTableService {
       }),
     });
     if (tables) {
+      if (tables.length === 0) {
+        this.dataTables = [
+          {
+            key: party,
+            title: party,
+            isLeaf: false,
+            editable: true,
+            children: [],
+          },
+        ];
+        return;
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tables.forEach((item: any) => {
         const node = treeNodes.find((n) => n.key === item.table_owner);

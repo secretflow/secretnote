@@ -1,0 +1,43 @@
+.libro-e2-editor-container {
+  padding: 12px 0 18px;
+  background: var(--mana-libro-input-background) !important;
+
+  .libro-sql-editor {
+    background: var(--mana-libro-input-background) !important;
+
+    .monaco-editor-background,
+    .margin {
+      background: var(--mana-libro-input-background) !important;
+    }
+
+    .current-line-margin,
+    .current-line-both {
+      border: unset !important;
+      background: var(--mana-libro-editor-activeline-color) !important;
+    }
+
+    .editor-scrollable {
+      left: 56px !important;
+    }
+
+    .margin,
+    .current-line-margin {
+      width: 56px !important;
+    }
+
+    .line-numbers {
+      width: 32px !important;
+      padding-left: 16px;
+      color: var(--mana-libro-editor-gutter-number-color) !important;
+      font-family: Menlo-Regular, consolas, 'DejaVu Sans Mono', monospace !important;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 20px;
+      text-align: right !important;
+    }
+
+    .cursors-layer .cursor {
+      background-color: var(--mana-libro-editor-cursor-color);
+    }
+  }
+}

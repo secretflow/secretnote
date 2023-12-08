@@ -118,6 +118,19 @@ class BrokerHandler(APIHandler):
             address=host,
         )
 
+    async def query(self, model, host):
+        project_id = model.get("project_id", None)
+        query = model.get("query", None)
+
+        if (project_id is None) or (query is None):
+            raise Exception("no project_id or query.")
+
+        return await broker_manager.query(
+            project_id=project_id,
+            query=query,
+            address=host,
+        )
+
     @web.authenticated
     async def post(self):
         model = self.get_json_body()
@@ -129,6 +142,7 @@ class BrokerHandler(APIHandler):
             raise web.HTTPError(400, "no action provided.")
 
         host = self.get_config("host")
+
         if host is None:
             raise web.HTTPError(400, "no host provided.")
 
@@ -161,6 +175,8 @@ class BrokerHandler(APIHandler):
                 result = await self.get_table_ccl(model, host)
             elif action == "grantCCL":
                 result = await self.grant_ccl(model, host)
+            elif action == "query":
+                result = await self.query(model, host)
             else:
                 raise Exception("unknown action: {}".format(action))
         except Exception as e:

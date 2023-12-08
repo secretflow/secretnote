@@ -248,15 +248,13 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    def revoke_ccl(
-        self, ccl_list: List[Any], address: str, project_id=global_project_id
-    ):
+    async def revoke_ccl(self, project_id: str, ccl_list: List[Any], address: str):
         url = f"{address}{BROKER_SERVICE_PATH['revoke_ccl']}"
         body = {
             "project_id": project_id,
             "column_control_list": ccl_list,
         }
-        response = self.request(
+        response = await self.request(
             url=url,
             method="POST",
             body=body,
@@ -266,13 +264,13 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    def query(self, query: str, address: str, project_id=global_project_id):
+    async def query(self, project_id: str, query: str, address: str):
         url = f"{address}{BROKER_SERVICE_PATH['query']}"
         body = {
             "project_id": project_id,
             "query": query,
         }
-        response = self.request(
+        response = await self.request(
             url=url,
             method="POST",
             body=body,

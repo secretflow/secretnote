@@ -15,8 +15,10 @@ import {
   Tabs,
   type TabsProps,
   Divider,
+  Tooltip,
+  Avatar,
 } from 'antd';
-import { Bell } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 
 import './index.less';
 import { ProjectService, Respond } from './service';
@@ -52,7 +54,7 @@ export const InvitationNotificationComponent = () => {
               {pending.map((item) => (
                 <li key={item.id}>
                   <span>
-                    {`${item.inviter} invites you to participate in the ${item.project} project altogether.`}
+                    {`${item.inviter} invites you to participate in the project ${item.project}.`}
                   </span>
                   <Divider
                     type="vertical"
@@ -91,13 +93,20 @@ export const InvitationNotificationComponent = () => {
               {archived.map((item) => (
                 <li key={item.id}>
                   <span>
-                    {`${item.inviter} invites you to participate in the ${item.project} project altogether.`}
+                    {`${item.inviter} invites you to participate in the project ${item.project}.`}
                   </span>
                   <Divider
                     type="vertical"
                     style={{ height: '1em', borderInlineStart: '1px solid #d6dee6' }}
                   />
-                  <span className="action">{Respond[item.accepted]}</span>
+                  <span
+                    className="action"
+                    style={{
+                      color: item.accepted === Respond.Accepted ? 'green' : 'orange',
+                    }}
+                  >
+                    {Respond[item.accepted]}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -124,9 +133,21 @@ export const InvitationNotificationComponent = () => {
         overlayClassName="secretnote-notification-popover"
       >
         <Badge count={pending.length} size="small">
-          <Bell color="#182431" size={18} cursor="pointer" />
+          <Bell color="#40566c" size={18} cursor="pointer" />
         </Badge>
       </Popover>
+      <Tooltip title={instance.service.platformInfo.party}>
+        <Avatar
+          style={{
+            backgroundColor: '#87d068',
+            marginTop: -2,
+            marginLeft: 8,
+            cursor: 'pointer',
+          }}
+          icon={<User size={12} color="#fff" />}
+          size="small"
+        />
+      </Tooltip>
     </div>
   );
 };
@@ -143,6 +164,7 @@ export class InvitationNotificationView extends BaseView {
   }
 
   onViewMount(): void {
+    this.service.getPlatformInfo();
     this.service.getInvitationList();
   }
 }

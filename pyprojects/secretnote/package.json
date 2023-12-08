@@ -11,8 +11,8 @@
     "lint:ruff": "python -m ruff check src tests",
     "test:pytest": "python -m pytest",
     "typecheck:pyright": "pyright --project ../.. src tests",
-    "dev": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --no-browser --party=alice --host=http://127.0.0.1:8091 --type=scql",
-    "dev2": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --no-browser --party=bob --host=http://127.0.0.1:8092 --type=scql",
+    "dev": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --party=alice --host=http://127.0.0.1:8091 --type=scql",
+    "dev2": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --party=bob --host=http://127.0.0.1:8092 --type=scql",
     "build": "python scripts/copy_static_files.py && python -m hatch clean && python -m hatch build -t sdist -t wheel",
     "publish": "python -m hatch publish ./dist"
   },

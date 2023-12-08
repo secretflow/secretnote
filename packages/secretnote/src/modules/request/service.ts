@@ -35,6 +35,10 @@ export class RequestService {
 
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
+    this.serverConnection.updateSettings({
+      baseUrl: `http://${location.host}/`,
+      wsUrl: `ws://${location.host}/`,
+    });
   }
 
   async request(url: string, init: RequestInit, address?: string) {

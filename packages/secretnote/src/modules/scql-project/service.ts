@@ -23,6 +23,11 @@ export enum Respond {
   Declined = -1,
 }
 
+export interface PlatformInfo {
+  party: string;
+  host: string;
+}
+
 @singleton()
 export class ProjectService {
   protected readonly requestService: RequestService;
@@ -31,9 +36,22 @@ export class ProjectService {
   projects: Project[] = [];
   @prop()
   invitationList: Invitation[] = [];
+  @prop()
+  platformInfo: PlatformInfo = { party: '', host: '' };
 
   constructor(@inject(RequestService) requestService: RequestService) {
     this.requestService = requestService;
+  }
+
+  async getPlatformInfo() {
+    const platformInfo = await this.requestService.request('api/broker', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'getPlatformInfo',
+      }),
+    });
+    this.platformInfo = platformInfo;
+    return platformInfo;
   }
 
   async getProjectList() {
