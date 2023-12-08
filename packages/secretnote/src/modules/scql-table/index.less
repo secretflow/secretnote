@@ -1,0 +1,116 @@
+.secretnote-data-table-tree {
+  padding-left: 12px;
+  background-color: var(--mana-secretnote-sidebar-background);
+  color: var(--mana-secretnote-text-color);
+  font-size: 12px;
+
+  .ant-tree-treenode {
+    &:hover::before {
+      background-color: var(--mana-secretnote-li-hover-background) !important;
+    }
+
+    .ant-tree-switcher {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.ant-tree-switcher_close {
+        transform: rotate(-90deg);
+      }
+    }
+  }
+
+  .ant-tree-switcher-noop {
+    width: 0;
+  }
+
+  .secretnote-tree-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px 2px 1px;
+    color: var(--mana-secretnote-text-color);
+
+    .title {
+      display: flex;
+      align-items: center;
+    }
+
+    .ant-dropdown-trigger {
+      visibility: hidden;
+    }
+
+    &:hover .ant-dropdown-trigger {
+      visibility: visible;
+    }
+
+    .ant-space-item {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .ant-tree-treenode-selected {
+    .ant-tree-switcher {
+      color: var(--mana-secretnote-text-color) !important;
+    }
+
+    &::before {
+      background-color: var(--mana-secretnote-li-hover-background) !important;
+    }
+
+    .ant-tree-node-selected {
+      color: var(--mana-secretnote-text-color) !important;
+    }
+  }
+}
+
+.secretnote-table-columns {
+  .ant-form-item {
+    margin-bottom: 8px;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+}
+
+.secret-table-detail-popover {
+  .ant-descriptions-item {
+    padding-bottom: 12px !important;
+  }
+}
+
+.secretnote-ccl-table {
+  .ant-select-selector {
+    border: none;
+
+    .ant-select-selection-item {
+      color: var(--mana-secretnote-text-color);
+      font-size: 12px;
+    }
+  }
+
+  .ant-table .ant-table-content {
+    color: var(--mana-secretnote-text-color);
+    font-size: 12px;
+
+    .ant-table-cell {
+      padding: 12px 16px;
+    }
+
+    .ant-table-cell-row-hover {
+      background-color: var(--mana-secretnote-sidebar-background);
+    }
+  }
+}
+
+.secret-note-ccl-select {
+  .ant-select-item-option-content {
+    color: var(--mana-secretnote-text-color);
+    font-size: 12px;
+  }
+}

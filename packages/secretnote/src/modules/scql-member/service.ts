@@ -39,6 +39,17 @@ export class MemberService {
     return this.members;
   }
 
+  async inviteMember(name: string) {
+    await this.requestService.request('api/broker', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'inviteMember',
+        project_id: this.getProjectId(),
+        invitee: name,
+      }),
+    });
+  }
+
   getProjectId() {
     const list = history.location.pathname.split('/');
     return list[list.length - 1];

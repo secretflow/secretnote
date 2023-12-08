@@ -33,7 +33,7 @@ export const InvitationNotificationComponent = () => {
   const handleInvitation = async (id: string, accepted: boolean) => {
     try {
       await instance.service.processInvitation(id, accepted);
-      message.success(`${accepted ? 'Accept' : 'Decline'}successfully.`);
+      message.success(`${accepted ? 'Accept' : 'Decline'} successfully.`);
     } catch (err) {
       if (err instanceof Error) {
         message.error(err.message);

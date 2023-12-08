@@ -6,6 +6,7 @@ import { LayoutModule } from '@/modules/layout';
 import { NotebookModule } from '@/modules/notebook';
 import { RequestModule } from '@/modules/request';
 import { SCQLMemberModule } from '@/modules/scql-member';
+import { SCQLDataTableModule } from '@/modules/scql-table';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 
@@ -23,6 +24,7 @@ const App = (): JSX.Element => {
         NotebookModule,
         EditorModule,
         SCQLMemberModule,
+        SCQLDataTableModule,
       ]}
     />
   );

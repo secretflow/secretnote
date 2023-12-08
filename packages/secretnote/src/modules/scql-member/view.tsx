@@ -7,17 +7,7 @@ import {
   ViewInstance,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import {
-  Avatar,
-  Button,
-  Tooltip,
-  Form,
-  Input,
-  message,
-  Popover,
-  Space,
-  Select,
-} from 'antd';
+import { Avatar, Button, Tooltip, Form, Input, message, Popover, Space } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -32,16 +22,16 @@ export const MemberComponent = () => {
   const [addLoading, setAddLoading] = useState(false);
   const instance = useInject<MemberView>(ViewInstance);
 
-  const addNode = () => {
+  const addMember = () => {
     form
       .validateFields()
       .then(async (values) => {
         setAddLoading(true);
         try {
-          await instance.service.addNode(values);
+          await instance.service.inviteMember(values.name);
           setAddFormVisible(false);
           form.resetFields();
-          message.success(l10n.t('节点添加成功'));
+          message.success('Invitations have been sent out.');
         } catch (e) {
           if (e instanceof Error) {
             message.error(e.message);
@@ -64,39 +54,16 @@ export const MemberComponent = () => {
         requiredMark={false}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
-        initialValues={{ name: '', address: '', type: 'common' }}
       >
         <Form.Item
-          label={l10n.t('名称')}
+          label="Name"
           name="name"
           rules={[
-            { required: true, message: l10n.t('请输入名称') },
+            { required: true, message: '请输入邀请者名称' },
             { max: 16, message: l10n.t('名称过长') },
           ]}
         >
-          <Input placeholder="Alice" />
-        </Form.Item>
-        <Form.Item
-          label={l10n.t('地址')}
-          name="address"
-          rules={[
-            { required: true, message: l10n.t('请输入地址') },
-            { max: 100, message: l10n.t('地址过长') },
-          ]}
-        >
-          <Input placeholder="127.0.0.1:8888" />
-        </Form.Item>
-        <Form.Item
-          label={l10n.t('类型')}
-          name="type"
-          rules={[{ required: true, message: l10n.t('请选择节点类型') }]}
-        >
-          <Select
-            options={[
-              { label: l10n.t('通用'), value: 'common' },
-              { label: 'SCQL', value: 'scql' },
-            ]}
-          />
+          <Input style={{ width: 280 }} />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Space>
@@ -104,11 +71,11 @@ export const MemberComponent = () => {
               type="primary"
               htmlType="submit"
               onClick={() => {
-                addNode();
+                addMember();
               }}
               loading={addLoading}
             >
-              {l10n.t('添加')}
+              邀请
             </Button>
           </Space>
         </Form.Item>
@@ -132,7 +99,7 @@ export const MemberComponent = () => {
       <Popover
         content={addNodeFormContent}
         title=""
-        overlayStyle={{ width: 446 }}
+        overlayStyle={{ width: 400 }}
         trigger="click"
         placement="bottomLeft"
         open={addFormVisible}
@@ -140,6 +107,7 @@ export const MemberComponent = () => {
           form.resetFields();
           setAddFormVisible(visible);
         }}
+        overlayClassName="secretnote-member-popover"
         arrow={false}
       >
         <Button

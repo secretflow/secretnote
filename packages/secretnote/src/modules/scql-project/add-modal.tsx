@@ -55,9 +55,10 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
       <Form
         form={form}
         autoComplete="off"
-        requiredMark={true}
+        requiredMark={false}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
+        style={{ marginTop: 24 }}
       >
         <Form.Item
           label="Name"

@@ -42,14 +42,8 @@ class BrokerManager:
             )
             response = await http_client.fetch(http_request)
             return json.loads(response.body)
-        except http_client.HTTPError as e:
-            # HTTPError is raised for non-200 responses; the response
-            # can be found in e.response.
-            print("Error: " + str(e))
         except Exception as e:
-            # Other errors are possible, such as IOError.
             print("Error: " + str(e))
-        http_client.close()
 
     def get_request_status(self, response):
         code = 0
@@ -148,7 +142,7 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    def invite_member(self, invitee: str, address: str, project_id=global_project_id):
+    async def invite_member(self, project_id: str, invitee: str, address: str):
         url = f"{address}{BROKER_SERVICE_PATH['invite_member']}"
         body = {
             "project_id": project_id,
@@ -156,7 +150,8 @@ class BrokerManager:
             "postscript": "",
             "method": "PUSH",
         }
-        response = self.request(
+        print(body)
+        response = await self.request(
             url=url,
             method="POST",
             body=body,
@@ -168,36 +163,10 @@ class BrokerManager:
 
         return response
 
-    def create_table(
-        self,
-        table_name: str,
-        ref_table: str,
-        columns: List[Any],
-        address: str,
-        project_id=global_project_id,
-    ):
-        url = f"{address}{BROKER_SERVICE_PATH['create_table']}"
-        body = {
-            "project_id": project_id,
-            "table_name": table_name,
-            "ref_table": ref_table,
-            "db_type": "mysql",
-            "columns": columns,
-        }
-        response = self.request(
-            url=url,
-            method="POST",
-            body=body,
-        )
-        code, message = self.get_request_status(response)
-
-        if code != 0:
-            raise Exception(message)
-
-    def get_table_list(self, address: str, project_id=global_project_id):
+    async def get_table_list(self, project_id: str, address: str):
         url = f"{address}{BROKER_SERVICE_PATH['list_tables']}"
         body = {"project_id": project_id, "names": []}
-        response = self.request(
+        response = await self.request(
             url=url,
             method="POST",
             body=body,
@@ -209,10 +178,18 @@ class BrokerManager:
 
         return response.get("tables", [])
 
-    def delete_table(self, table_name: str, address: str, project_id=global_project_id):
-        url = f"{address}{BROKER_SERVICE_PATH['drop_table']}"
-        body = {"project_id": project_id, "table_name": table_name}
-        response = self.request(
+    async def create_table(
+        self,
+        project_id,
+        table: Dict,
+        address: str,
+    ):
+        url = f"{address}{BROKER_SERVICE_PATH['create_table']}"
+        body = {
+            "project_id": project_id,
+            **table,
+        }
+        response = await self.request(
             url=url,
             method="POST",
             body=body,
@@ -222,15 +199,46 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    def grant_ccl(
-        self, ccl_list: List[Any], address: str, project_id=global_project_id
+    async def delete_table(self, project_id: str, table_name: str, address: str):
+        url = f"{address}{BROKER_SERVICE_PATH['drop_table']}"
+        body = {"project_id": project_id, "table_name": table_name}
+        response = await self.request(
+            url=url,
+            method="POST",
+            body=body,
+        )
+        code, message = self.get_request_status(response)
+
+        if code != 0:
+            raise Exception(message)
+
+    async def get_ccl_list(
+        self,
+        project_id,
+        table_name: List[str],
+        address: str,
     ):
+        url = f"{address}{BROKER_SERVICE_PATH['show_ccl']}"
+        body = {"project_id": project_id, "tables": table_name, "dest_parties": []}
+        response = await self.request(
+            url=url,
+            method="POST",
+            body=body,
+        )
+        code, message = self.get_request_status(response)
+
+        if code != 0:
+            raise Exception(message)
+
+        return response.get("column_control_list", [])
+
+    async def grant_ccl(self, project_id: str, ccl_list: List[Any], address: str):
         url = f"{address}{BROKER_SERVICE_PATH['grant_ccl']}"
         body = {
             "project_id": project_id,
             "column_control_list": ccl_list,
         }
-        response = self.request(
+        response = await self.request(
             url=url,
             method="POST",
             body=body,
@@ -257,27 +265,6 @@ class BrokerManager:
 
         if code != 0:
             raise Exception(message)
-
-    def get_ccl_list(
-        self,
-        party: List[str],
-        table_name: List[str],
-        address: str,
-        project_id=global_project_id,
-    ):
-        url = f"{address}{BROKER_SERVICE_PATH['show_ccl']}"
-        body = {"project_id": project_id, "tables": table_name, "dest_parties": party}
-        response = self.request(
-            url=url,
-            method="POST",
-            body=body,
-        )
-        code, message = self.get_request_status(response)
-
-        if code != 0:
-            raise Exception(message)
-
-        return response.get("column_control_list", [])
 
     def query(self, query: str, address: str, project_id=global_project_id):
         url = f"{address}{BROKER_SERVICE_PATH['query']}"

@@ -15,6 +15,10 @@ interface IProps {
 function DropdownMenu(props: IProps) {
   const { items, onClick, icon, trigger } = props;
 
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
     <Dropdown
       placement="bottomLeft"
