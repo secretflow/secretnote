@@ -22,6 +22,7 @@ export class MemberService {
   }
 
   async getMemberList() {
+    const { party } = await this.getPlatformInfo();
     const project = await this.requestService.request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
@@ -31,7 +32,7 @@ export class MemberService {
     });
     if (project) {
       this.members = project.members.map((item: string) => ({
-        name: item,
+        name: item === party ? `${item} (you)` : item,
         creator: item === project.creator,
         color: randomHex(),
       }));
@@ -48,6 +49,16 @@ export class MemberService {
         invitee: name,
       }),
     });
+  }
+
+  async getPlatformInfo() {
+    const platformInfo = await this.requestService.request('api/broker', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'getPlatformInfo',
+      }),
+    });
+    return platformInfo;
   }
 
   getProjectId() {

@@ -21,6 +21,7 @@ export const MemberComponent = () => {
   const [addFormVisible, setAddFormVisible] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const instance = useInject<MemberView>(ViewInstance);
+  const formValues = Form.useWatch([], form);
 
   const addMember = () => {
     form
@@ -54,28 +55,33 @@ export const MemberComponent = () => {
         requiredMark={false}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
+        style={{ display: 'flex' }}
       >
         <Form.Item
-          label="Name"
+          label=""
           name="name"
           rules={[
             { required: true, message: '请输入邀请者名称' },
             { max: 16, message: l10n.t('名称过长') },
           ]}
         >
-          <Input style={{ width: 280 }} />
+          <Input
+            style={{ width: 256 }}
+            maxLength={16}
+            placeholder="Add name to add member"
+          />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Space>
             <Button
-              type="primary"
               htmlType="submit"
               onClick={() => {
                 addMember();
               }}
+              disabled={formValues && !formValues.name}
               loading={addLoading}
             >
-              邀请
+              Invite
             </Button>
           </Space>
         </Form.Item>
@@ -87,8 +93,11 @@ export const MemberComponent = () => {
     <div className="secretnote-scql-member">
       <Avatar.Group>
         {instance.service.members.map((item) => (
-          <Tooltip key={item.name} title={item.name}>
-            <Avatar shape="square" style={{ backgroundColor: item.color }}>
+          <Tooltip key={item.name} title={`${item.name}`}>
+            <Avatar
+              shape="square"
+              style={{ backgroundColor: item.color, cursor: 'pointer' }}
+            >
               <span style={{ color: invert(item.color) }}>
                 {item.name.slice(0, 1).toUpperCase()}
               </span>
@@ -99,7 +108,7 @@ export const MemberComponent = () => {
       <Popover
         content={addNodeFormContent}
         title=""
-        overlayStyle={{ width: 400 }}
+        overlayStyle={{ width: 372 }}
         trigger="click"
         placement="bottomLeft"
         open={addFormVisible}
@@ -107,7 +116,6 @@ export const MemberComponent = () => {
           form.resetFields();
           setAddFormVisible(visible);
         }}
-        overlayClassName="secretnote-member-popover"
         arrow={false}
       >
         <Button

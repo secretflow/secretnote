@@ -147,7 +147,7 @@ export const FileComponent = () => {
     ];
 
     return (
-      <div className="secretnote-tree-title">
+      <div className="ant-tree-title-content">
         <span>
           <Space>
             {getFileIcon(nodeData)}

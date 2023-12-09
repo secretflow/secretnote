@@ -97,7 +97,7 @@ export const DataTableComponent = () => {
       : [];
 
     const title = (
-      <div className="secretnote-tree-title">
+      <div className="ant-tree-title-content">
         <span className="title">
           <Space>
             {isLeaf && <TableProperties size={16} />}
@@ -124,6 +124,7 @@ export const DataTableComponent = () => {
         overlayStyle={{ maxWidth: 360 }}
         overlayClassName="secret-table-detail-popover"
         content={<DataTableDetails data={nodeData.data} />}
+        trigger="click"
       >
         {title}
       </Popover>
