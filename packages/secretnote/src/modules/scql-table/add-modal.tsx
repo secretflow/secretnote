@@ -24,7 +24,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
       .then(async (values) => {
         try {
           await service.addDataTable(values);
-          message.success('添加成功');
+          message.success('Add table successfully.');
           close();
         } catch (e) {
           if (e instanceof Error) {
@@ -51,19 +51,12 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
       <Form
         form={form}
         autoComplete="off"
-        requiredMark={false}
+        requiredMark={true}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         style={{ marginTop: 24, maxHeight: 500, overflowY: 'auto' }}
         initialValues={{ dbType: 'mysql' }}
       >
-        <Form.Item
-          label="表名称"
-          name="tableName"
-          rules={[{ required: true, message: '请输入表名称' }]}
-        >
-          <Input maxLength={16} disabled={editMode} />
-        </Form.Item>
         <Form.Item
           label="数据库类型"
           name="dbType"
@@ -72,13 +65,20 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
           <Input maxLength={16} disabled={editMode} placeholder="mysql" />
         </Form.Item>
         <Form.Item
+          label="表名称"
+          name="tableName"
+          rules={[{ required: true, message: '请输入表名称' }]}
+        >
+          <Input maxLength={16} disabled={editMode} />
+        </Form.Item>
+        <Form.Item
           label="关联表"
           name="refTable"
           rules={[{ required: true, message: '请输入关联表' }]}
         >
           <Input maxLength={32} disabled={editMode} />
         </Form.Item>
-        <Form.Item label="数据列" className="secretnote-table-columns">
+        <Form.Item label="数据列" className="secretnote-table-columns" required>
           <Form.List name="columns">
             {(fields, { add, remove }) => (
               <>
@@ -102,6 +102,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
                     >
                       <Select
                         style={{ width: 140 }}
+                        placeholder="Data Type"
                         options={[
                           { label: 'int', value: 'int' },
                           { label: 'string', value: 'string' },

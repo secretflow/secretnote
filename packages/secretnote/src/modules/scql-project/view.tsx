@@ -9,7 +9,7 @@ import {
   ModalContribution,
 } from '@difizen/mana-app';
 import { Table, Input, Button } from 'antd';
-import { Search, KanbanSquare, ExternalLink } from 'lucide-react';
+import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { history } from 'umi';
 
@@ -43,7 +43,7 @@ export const ProjectComponent = () => {
           Add New Project
         </Button>
       </div>
-      <div>
+      <div className="content">
         <Table
           dataSource={filteredProjects}
           rowKey="id"
@@ -85,7 +85,7 @@ export const ProjectComponent = () => {
               key: 'action',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               render: (_: any, record: Project) => (
-                <ExternalLink
+                <ArrowRight
                   size={16}
                   cursor="pointer"
                   onClick={() => enterProject(record.id)}

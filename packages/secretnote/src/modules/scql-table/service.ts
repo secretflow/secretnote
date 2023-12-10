@@ -1,4 +1,5 @@
 import { inject, prop, singleton } from '@difizen/mana-app';
+import { Modal } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { history } from 'umi';
 
@@ -19,11 +20,12 @@ export interface DataTable {
 
 export type DataTableNode = DataNode & {
   children: DataTableNode[];
-  editable: boolean;
+  belongToMe: boolean;
   data?: DataTable;
 };
 
 export enum Constraint {
+  UNDEFINED = '',
   UNKNOWN = 'UNKNOWN',
   PLAINTEXT = 'PLAINTEXT',
   ENCRYPTED_ONLY = 'ENCRYPTED_ONLY',
@@ -61,7 +63,17 @@ export class DataTableService {
 
   async getDataTables() {
     const treeNodes: DataTableNode[] = [];
-    const { party } = await this.getPlatformInfo();
+
+    const project = await this.getProjectInfo();
+    if (!project) {
+      return;
+    }
+
+    const platformInfo = await this.getPlatformInfo();
+    if (!platformInfo) {
+      return;
+    }
+
     const tables = await this.requestService.request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
@@ -69,25 +81,23 @@ export class DataTableService {
         project_id: this.getProjectId(),
       }),
     });
+
+    const { members } = project;
+    const { party } = platformInfo;
+
     if (tables) {
-      if (tables.length === 0) {
-        this.dataTables = [
-          {
-            key: party,
-            title: party,
-            isLeaf: false,
-            editable: true,
-            children: [],
-          },
-        ];
-        return;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      tables.forEach((item: any) => {
-        const node = treeNodes.find((n) => n.key === item.table_owner);
-        const editable = party === item.table_owner;
-        if (node) {
-          if (node.children) {
+      members.forEach((member: string) => {
+        const belongToMe = party === member;
+        const node: DataTableNode = {
+          key: member,
+          title: member,
+          isLeaf: false,
+          belongToMe,
+          children: [],
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        tables.forEach((item: any) => {
+          if (item.table_owner === member) {
             node.children.push({
               key: item.table_name,
               title: item.table_name,
@@ -100,34 +110,12 @@ export class DataTableService {
                 columns: item.columns,
               },
               children: [],
-              editable,
+              belongToMe,
             });
           }
-        } else {
-          const newNode: DataTableNode = {
-            key: item.table_owner,
-            title: item.table_owner,
-            isLeaf: false,
-            editable,
-            children: [
-              {
-                key: item.table_name,
-                title: item.table_name,
-                isLeaf: true,
-                data: {
-                  tableName: item.table_name,
-                  refTable: item.ref_table,
-                  dbType: item.db_type,
-                  tableOwner: item.table_owner,
-                  columns: item.columns,
-                },
-                children: [],
-                editable,
-              },
-            ],
-          };
-          treeNodes.push(newNode);
-        }
+        });
+
+        treeNodes.push(node);
       });
     }
 
@@ -165,6 +153,18 @@ export class DataTableService {
   }
 
   async getTableCCL(tableName: string) {
+    const result: TableCCL[] = [];
+
+    const table = await this.getTableInfo(tableName);
+    if (!table) {
+      return result;
+    }
+
+    const project = await this.getProjectInfo();
+    if (!project) {
+      return result;
+    }
+
     const ccl = await this.requestService.request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
@@ -173,24 +173,26 @@ export class DataTableService {
         table_name: tableName,
       }),
     });
+    if (!ccl) {
+      return result;
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: TableCCL[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ccl.forEach((item: any) => {
-      const column = item.col.column_name;
-      const party = item.party_code;
-      const constraint = item.constraint;
-
-      const c = result.find((r) => r.column === column);
-      if (c) {
-        c[party] = constraint;
-      } else {
-        result.push({
-          column,
-          [party]: constraint,
-        });
-      }
+    const { members } = project;
+    table.columns.forEach((column: DataTableColumn) => {
+      const item: TableCCL = {
+        column: column.name,
+      };
+      members.forEach((member: string) => {
+        item[member] = Constraint.UNDEFINED;
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ccl.forEach((c: any) => {
+        const { column_name, table_name } = c.col;
+        if (column_name === column.name && table_name === tableName) {
+          item[c.party_code] = c.constraint;
+        }
+      });
+      result.push(item);
     });
 
     return result;
@@ -208,7 +210,7 @@ export class DataTableService {
 
     ccl.forEach((item) => {
       Object.keys(item).forEach((column) => {
-        if (column !== 'column') {
+        if (column !== 'column' && item[column] !== Constraint.UNDEFINED) {
           cclList.push({
             col: {
               column_name: item.column,
@@ -239,6 +241,42 @@ export class DataTableService {
       }),
     });
     return platformInfo;
+  }
+
+  async getProjectInfo() {
+    const project = await this.requestService.request('api/broker', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'getProjectInfo',
+        project_id: this.getProjectId(),
+      }),
+    });
+    if (!project) {
+      Modal.info({
+        title: 'Info',
+        content: 'You were not involved in the project.',
+        okText: 'Back to project list',
+        onOk: () => {
+          history.push('/scql/project');
+        },
+      });
+      return;
+    }
+
+    return project;
+  }
+
+  async getTableInfo(tableName: string) {
+    const table = await this.requestService.request('api/broker', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'getTableInfo',
+        project_id: this.getProjectId(),
+        table_name: tableName,
+      }),
+    });
+
+    return table;
   }
 
   getProjectId() {

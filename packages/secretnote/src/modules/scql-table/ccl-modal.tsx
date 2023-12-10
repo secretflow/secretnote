@@ -8,17 +8,27 @@ import { type DataTable, DataTableService, type TableCCL, CONSTRAINT } from './s
 const ConfigPanel = (props: ModalItemProps<DataTable>) => {
   const { visible, close, data } = props;
   const [tableCCL, setTableCCL] = useState<TableCCL[]>([]);
+  const [loading, setLoading] = useState(false);
   const service = useInject<DataTableService>(DataTableService);
 
   const getTableCCL = async () => {
-    const ccl: TableCCL[] = await service.getTableCCL(data.tableName);
-    setTableCCL(ccl);
+    try {
+      setLoading(true);
+      const ccl: TableCCL[] = await service.getTableCCL(data.tableName);
+      setTableCCL(ccl);
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const changeCCL = async () => {
     try {
       await service.grantTableCCL(data.tableName, tableCCL);
-      message.success('CCL config successfully.');
+      message.success('ccl config successfully.');
       close();
     } catch (e) {
       if (e instanceof Error) {
@@ -38,7 +48,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
             };
           }
           return {
-            title: item,
+            title: `Grant to ${item}`,
             dataIndex: item,
             key: item,
             render: (text: string, record: TableCCL) => (
@@ -68,10 +78,10 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
 
   return (
     <Modal
-      width={680}
+      width={720}
       open={visible}
       destroyOnClose={true}
-      title="Config CCL"
+      title="CCL Config"
       onOk={() => changeCCL()}
       onCancel={() => {
         close();
@@ -82,6 +92,14 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
         }
       }}
     >
+      <a
+        className="secretnote-ccl-doc-link"
+        href="https://www.secretflow.org.cn/docs/scql/latest/zh-Hans/topics/ccl/intro"
+        target="_blank"
+        rel="noreferrer"
+      >
+        CCL 配置指南
+      </a>
       <Table
         className="secretnote-ccl-table"
         dataSource={tableCCL}
@@ -89,6 +107,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
         pagination={false}
         columns={columns}
         size="small"
+        loading={loading}
       />
     </Modal>
   );

@@ -60,7 +60,7 @@ class BrokerHandler(APIHandler):
             project_id=project_id, invitee=invitee, address=host
         )
 
-    async def get_data_tables(self, model, host):
+    async def get_table_list(self, model, host):
         project_id = model.get("project_id", None)
 
         if project_id is None:
@@ -92,6 +92,19 @@ class BrokerHandler(APIHandler):
             address=host,
         )
 
+    async def get_table_info(self, model, host):
+        project_id = model.get("project_id", None)
+        table_name = model.get("table_name", None)
+
+        if (project_id is None) or (table_name is None):
+            raise Exception("no project_id or table_name provided.")
+
+        return await broker_manager.get_table_info(
+            project_id=project_id,
+            table_name=table_name,
+            address=host,
+        )
+
     async def get_table_ccl(self, model, host):
         project_id = model.get("project_id", None)
         table_name = model.get("table_name", None)
@@ -101,7 +114,7 @@ class BrokerHandler(APIHandler):
 
         return await broker_manager.get_ccl_list(
             project_id=project_id,
-            table_name=[table_name],
+            table_name=table_name,
             address=host,
         )
 
@@ -166,11 +179,13 @@ class BrokerHandler(APIHandler):
             elif action == "inviteMember":
                 result = await self.invite_member(model, host)
             elif action == "getDataTables":
-                result = await self.get_data_tables(model, host)
+                result = await self.get_table_list(model, host)
             elif action == "createTable":
                 result = await self.create_table(model, host)
             elif action == "deleteTable":
                 result = await self.delete_table(model, host)
+            elif action == "getTableInfo":
+                result = await self.get_table_info(model, host)
             elif action == "getTableCCL":
                 result = await self.get_table_ccl(model, host)
             elif action == "grantCCL":

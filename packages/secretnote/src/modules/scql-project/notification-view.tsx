@@ -141,7 +141,7 @@ export const InvitationNotificationComponent = () => {
           style={{
             backgroundColor: '#87d068',
             marginTop: -2,
-            marginLeft: 8,
+            marginLeft: 12,
             cursor: 'pointer',
           }}
           icon={<User size={12} color="#fff" />}

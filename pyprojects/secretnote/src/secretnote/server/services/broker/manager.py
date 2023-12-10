@@ -212,14 +212,31 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
+    async def get_table_info(self, project_id: str, table_name: str, address: str):
+        url = f"{address}{BROKER_SERVICE_PATH['list_tables']}"
+        body = {"project_id": project_id, "names": [table_name]}
+        response = await self.request(
+            url=url,
+            method="POST",
+            body=body,
+        )
+        code, message = self.get_request_status(response)
+
+        if code != 0:
+            raise Exception(message)
+
+        table = response.get("tables", [])
+
+        return table[0] if len(table) > 0 else None
+
     async def get_ccl_list(
         self,
-        project_id,
-        table_name: List[str],
+        project_id: str,
+        table_name: str,
         address: str,
     ):
         url = f"{address}{BROKER_SERVICE_PATH['show_ccl']}"
-        body = {"project_id": project_id, "tables": table_name, "dest_parties": []}
+        body = {"project_id": project_id, "tables": [table_name], "dest_parties": []}
         response = await self.request(
             url=url,
             method="POST",

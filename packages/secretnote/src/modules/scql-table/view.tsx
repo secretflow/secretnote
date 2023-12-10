@@ -9,8 +9,15 @@ import {
   ModalService,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import { message, Modal, Space, Tree, Popover, Descriptions, Typography } from 'antd';
-import { ChevronDown, Trash, Plus, TableProperties, Settings } from 'lucide-react';
+import { message, Modal, Space, Tree, Popover, Descriptions } from 'antd';
+import {
+  ChevronDown,
+  Trash,
+  TableProperties,
+  Settings,
+  View,
+  PlusSquare,
+} from 'lucide-react';
 
 import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
@@ -33,8 +40,8 @@ const DataTableDetails = (props: { data?: DataTable }) => {
   return (
     <div className="secretnote-node-description">
       <Descriptions title="表信息" column={1}>
-        <Descriptions.Item label="表名称">{data.tableName}</Descriptions.Item>
         <Descriptions.Item label="数据库类型">{data.dbType}</Descriptions.Item>
+        <Descriptions.Item label="表名称">{data.tableName}</Descriptions.Item>
         <Descriptions.Item label="关联表">{data.refTable}</Descriptions.Item>
         <Descriptions.Item label="数据列">
           {data.columns.map((c) => c.name).join(', ')}
@@ -53,7 +60,7 @@ export const DataTableComponent = () => {
       case 'add':
         instance.modalService.openModal(DataTableConfigModal);
         break;
-      case 'ccl':
+      case 'configCCL':
         instance.modalService.openModal(CCLConfigModal, node.data);
         break;
       case 'delete':
@@ -77,15 +84,15 @@ export const DataTableComponent = () => {
   };
 
   const titleRender = (nodeData: DataTableNode) => {
-    const { isLeaf, editable } = nodeData;
+    const { isLeaf, belongToMe } = nodeData;
 
-    const folderMenuItems: Menu[] = editable
-      ? [{ key: 'add', label: '添加数据表', icon: <Plus size={12} /> }]
+    const folderMenuItems: Menu[] = belongToMe
+      ? [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }]
       : [];
 
-    const dataMenuItems: Menu[] = editable
+    const dataMenuItems: Menu[] = belongToMe
       ? [
-          { key: 'ccl', label: '配置 CCL', icon: <Settings size={12} /> },
+          { key: 'configCCL', label: '配置 CCL', icon: <Settings size={12} /> },
           { type: 'divider' },
           {
             key: 'delete',
@@ -94,7 +101,7 @@ export const DataTableComponent = () => {
             danger: true,
           },
         ]
-      : [];
+      : [{ key: 'viewCCL', label: '查看 CCL', icon: <View size={12} /> }];
 
     const title = (
       <div className="ant-tree-title-content">
@@ -124,7 +131,7 @@ export const DataTableComponent = () => {
         overlayStyle={{ maxWidth: 360 }}
         overlayClassName="secret-table-detail-popover"
         content={<DataTableDetails data={nodeData.data} />}
-        trigger="click"
+        trigger="hover"
       >
         {title}
       </Popover>
