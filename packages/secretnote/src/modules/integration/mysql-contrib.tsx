@@ -6,7 +6,6 @@ import { Form, Input, message, Modal, Space } from 'antd';
 import { useEffect } from 'react';
 
 import { ReactComponent as MySQLIcon } from '@/assets/image/mysql.svg';
-import { ERROR_CODE, getErrorMessage } from '@/utils';
 
 import type { Integration } from './protocol';
 import { IntegrationMetaContribution } from './protocol';
@@ -39,12 +38,10 @@ const ConfigPanel = (props: ModalItemProps<Integration['attrs']>) => {
             database: values.database,
           },
         };
-        const code = editMode
-          ? await service.updateIntegration(params)
-          : await service.addIntegration(params);
-        if (code !== ERROR_CODE.NO_ERROR) {
-          message.error(getErrorMessage(code));
-        } else {
+        try {
+          editMode
+            ? await service.updateIntegration(params)
+            : await service.addIntegration(params);
           await service.getIntegrations();
           if (editMode) {
             message.success('更新成功');
@@ -52,8 +49,12 @@ const ConfigPanel = (props: ModalItemProps<Integration['attrs']>) => {
             message.success('添加成功');
           }
           close();
+        } catch (e) {
+          if (e instanceof Error) {
+            message.error(e.message);
+          }
         }
-        return code;
+        return;
       })
       .catch(() => {
         //

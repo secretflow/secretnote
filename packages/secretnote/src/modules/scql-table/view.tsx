@@ -15,7 +15,6 @@ import {
   Trash,
   TableProperties,
   Settings,
-  View,
   PlusSquare,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -74,6 +73,7 @@ const DataTableDetails = (props: { data?: DataTable }) => {
             title: `Grant to ${item}`,
             dataIndex: item,
             key: item,
+            render: (text: string) => text || '-',
           };
         })
       : [];

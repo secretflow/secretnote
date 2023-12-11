@@ -2,6 +2,7 @@ import { inject, singleton } from '@difizen/mana-app';
 import { history } from 'umi';
 
 import { RequestService } from '@/modules/request';
+import { transpose } from '@/utils';
 
 @singleton()
 export class SCQLQueryService {
@@ -20,7 +21,45 @@ export class SCQLQueryService {
         query,
       }),
     });
-    return data;
+
+    const columns: string[] = [];
+    const rows: string[][] = [];
+
+    if (data) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data.forEach((item: any) => {
+        columns.push(item.name);
+        rows.push(this.getRowValue(item));
+      });
+
+      return {
+        columns,
+        rows: transpose(rows),
+      };
+    }
+
+    return {
+      columns,
+      rows,
+    };
+  }
+
+  getRowValue(row: Record<string, string[]>) {
+    const keys = [
+      'int32_data',
+      'int64_data',
+      'float_data',
+      'double_data',
+      'bool_data',
+      'string_data',
+    ];
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (row[key] && row[key].length > 0) {
+        return row[key];
+      }
+    }
+    return [];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

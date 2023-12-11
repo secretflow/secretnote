@@ -1,8 +1,6 @@
 import type { Contribution } from '@difizen/mana-app';
 import { contrib, inject, prop, singleton, StorageService } from '@difizen/mana-app';
 
-import { ERROR_CODE } from '@/utils';
-
 import type { Integration } from './protocol';
 import { IntegrationMetaContribution } from './protocol';
 
@@ -29,12 +27,8 @@ export class IntegrationService {
   }
 
   async addIntegration(integration: Integration) {
-    if (!this.checkName(integration.name)) {
-      return ERROR_CODE.INTEGRATION_ALREADY_EXISTED;
-    }
     this.integrations.push(integration);
     await this.serialize();
-    return ERROR_CODE.NO_ERROR;
   }
 
   async deleteIntegration(name: string) {
@@ -50,7 +44,6 @@ export class IntegrationService {
       return i;
     });
     await this.serialize();
-    return ERROR_CODE.NO_ERROR;
   }
 
   generateExecutableCode(integrationName: string, variableName: string, code: string) {

@@ -3,6 +3,7 @@ import type {
   CellViewOptions,
   IOutputAreaOption,
   IOutput,
+  ExecutionMeta,
 } from '@difizen/libro-jupyter';
 import {
   CellService,
@@ -89,6 +90,17 @@ export class SqlCellView extends JupyterCodeCellView {
 
   async run() {
     this.clearExecution();
+    this.model.executing = true;
+    this.model.kernelExecuting = true;
+    this.model.executeCount = 1;
+
+    const startTime = new Date().toISOString();
+    this.setExecutionTime({
+      start: startTime,
+      toExecute: startTime,
+      end: '',
+    });
+
     try {
       const data = await this.queryService.query(this.model.value);
       const msg = {
@@ -99,10 +111,10 @@ export class SqlCellView extends JupyterCodeCellView {
         metadata: {},
         content: {
           data: {
-            'text/html': this.queryService.queryResult2Html(data),
+            'application/vnd.libro.sql+json': data,
           },
           metadata: {},
-          execution_count: 2,
+          execution_count: 1,
         },
         buffers: [],
         channel: 'iopub',
@@ -127,7 +139,31 @@ export class SqlCellView extends JupyterCodeCellView {
         this.model.msgChangeEmitter.fire(msg);
       }
     }
+    this.model.executing = false;
+    this.model.kernelExecuting = false;
+
+    this.setExecutionTime({
+      start: startTime,
+      toExecute: startTime,
+      end: new Date().toISOString(),
+    });
 
     return true;
+  }
+
+  setExecutionTime(times: { start?: string; end?: string; toExecute?: string }) {
+    const meta = this.model.metadata.execution as ExecutionMeta;
+    if (meta) {
+      const { start, end, toExecute } = times;
+      if (start !== undefined) {
+        meta['shell.execute_reply.started'] = start;
+      }
+      if (end !== undefined) {
+        meta['shell.execute_reply.end'] = end;
+      }
+      if (toExecute !== undefined) {
+        meta.to_execute = toExecute;
+      }
+    }
   }
 }

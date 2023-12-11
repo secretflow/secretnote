@@ -64,7 +64,7 @@ export class NotebookFileService {
             const newPath = path.replace(file.name, name);
             const isExisted = await this.isFileExisted(newPath);
             if (isExisted) {
-              return ERROR_CODE.NOTEBOOK_ALREADY_EXISTED;
+              throw new Error('The notebook is already existed.');
             }
             const newFile = await this.contentsManager.rename(path, newPath);
             await this.getFileList();
@@ -76,7 +76,6 @@ export class NotebookFileService {
       }
     }
     this.renameNotebookFile = null;
-    return ERROR_CODE.NO_ERROR;
   }
 
   async addFile() {

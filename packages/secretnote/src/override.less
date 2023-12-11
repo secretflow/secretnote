@@ -18,8 +18,14 @@
   }
 }
 
-.rc-tooltip-inner {
-  min-height: auto !important;
+.rc-tooltip {
+  .libro-tooltip-text {
+    font-size: 13px;
+  }
+
+  .rc-tooltip-inner {
+    min-height: auto;
+  }
 }
 
 // table
@@ -247,5 +253,20 @@ svg.lucide {
 
   &:hover {
     color: var(--mana-secretnote-icon-hover-color);
+  }
+}
+
+// dropdown
+.ant-dropdown {
+  .ant-dropdown-menu {
+    .ant-dropdown-menu-item {
+      color: var(--mana-secretnote-text-color);
+      font-size: 13px;
+
+      .libro-run-menu-label {
+        color: var(--mana-secretnote-text-color);
+        font-size: 13px;
+      }
+    }
   }
 }

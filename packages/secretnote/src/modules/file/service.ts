@@ -89,21 +89,18 @@ export class FileService {
   async uploadFile(nodeData: DataNode, name: string, content: string) {
     const serverId = nodeData.key as string;
     const server = await this.serverManager.getServerDetail(serverId);
-    if (!server) {
-      return ERROR_CODE.SERVER_NOT_FOUND;
+    if (server) {
+      const baseUrl = this.serverManager.getServerUrl(server).baseUrl;
+      const path = `${BASE_PATH}/${name}`;
+      await this.contentsManager.save(path, {
+        content,
+        baseUrl,
+        name,
+        path,
+        type: 'file',
+        format: 'text',
+      });
     }
-    const baseUrl = this.serverManager.getServerUrl(server).baseUrl;
-    const path = `${BASE_PATH}/${name}`;
-    await this.contentsManager.save(path, {
-      content,
-      baseUrl,
-      name,
-      path,
-      type: 'file',
-      format: 'text',
-    });
-
-    return ERROR_CODE.NO_ERROR;
   }
 
   async downloadFile(nodeData: DataNode) {
