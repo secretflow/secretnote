@@ -7,7 +7,8 @@ export default defineConfig({
   favicons: ['/secretnote/favicon.svg'],
   exportStatic: {},
   routes: [
-    { path: '/', component: 'secretnote' },
+    { path: '/', redirect: '/scql/project' },
+    { path: '/secretflow', component: 'secretflow' },
     { path: '/preview', component: 'preview' },
     { path: '/scql/project', component: 'scql-project' },
     { path: '/scql/project/:id', component: 'scql-workspace' },

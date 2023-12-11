@@ -182,7 +182,7 @@ export const DataTableComponent = () => {
         arrow={false}
         overlayStyle={{ maxWidth: 520 }}
         content={<DataTableDetails data={nodeData.data} />}
-        trigger="click"
+        trigger="hover"
         destroyTooltipOnHide
       >
         {title}
