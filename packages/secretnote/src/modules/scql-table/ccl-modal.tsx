@@ -98,7 +98,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
         target="_blank"
         rel="noreferrer"
       >
-        CCL 配置指南
+        CCL configuration Guide
       </a>
       <Table
         className="secretnote-ccl-table"

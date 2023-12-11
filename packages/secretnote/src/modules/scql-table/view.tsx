@@ -9,7 +9,7 @@ import {
   ModalService,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import { message, Modal, Space, Tree, Popover, Descriptions } from 'antd';
+import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';
 import {
   ChevronDown,
   Trash,
@@ -18,6 +18,7 @@ import {
   View,
   PlusSquare,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
@@ -26,16 +27,56 @@ import { SideBarContribution } from '@/modules/layout';
 import './index.less';
 import { DataTableConfigModal } from './add-modal';
 import { CCLConfigModal } from './ccl-modal';
-import { DataTableService, type DataTableNode, type DataTable } from './service';
+import {
+  DataTableService,
+  type DataTableNode,
+  type DataTable,
+  type TableCCL,
+} from './service';
 
 const { DirectoryTree } = Tree;
 
 const DataTableDetails = (props: { data?: DataTable }) => {
   const { data } = props;
+  const [tableCCL, setTableCCL] = useState<TableCCL[]>([]);
+  const instance = useInject<DataTableView>(ViewInstance);
+
+  const getTableCCL = async (tableName: string) => {
+    const ccl = await instance.service.getTableCCL(tableName);
+    setTableCCL(ccl);
+  };
+
+  useEffect(
+    () => {
+      if (data) {
+        getTableCCL(data.tableName);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data],
+  );
 
   if (!data) {
     return null;
   }
+
+  const columns =
+    tableCCL.length > 0
+      ? Object.keys(tableCCL[0]).map((item) => {
+          if (item === 'column') {
+            return {
+              title: 'Column',
+              dataIndex: 'column',
+              key: 'column',
+            };
+          }
+          return {
+            title: `Grant to ${item}`,
+            dataIndex: item,
+            key: item,
+          };
+        })
+      : [];
 
   return (
     <div className="secretnote-node-description">
@@ -45,6 +86,16 @@ const DataTableDetails = (props: { data?: DataTable }) => {
         <Descriptions.Item label="关联表">{data.refTable}</Descriptions.Item>
         <Descriptions.Item label="数据列">
           {data.columns.map((c) => c.name).join(', ')}
+        </Descriptions.Item>
+        <Descriptions.Item label="CCL">
+          <Table
+            className="secretnote-ccl-view-table"
+            dataSource={tableCCL}
+            rowKey="column"
+            pagination={false}
+            columns={columns}
+            size="small"
+          />
         </Descriptions.Item>
       </Descriptions>
     </div>
@@ -101,7 +152,7 @@ export const DataTableComponent = () => {
             danger: true,
           },
         ]
-      : [{ key: 'viewCCL', label: '查看 CCL', icon: <View size={12} /> }];
+      : [];
 
     const title = (
       <div className="ant-tree-title-content">
@@ -127,11 +178,12 @@ export const DataTableComponent = () => {
     return (
       <Popover
         placement="rightTop"
+        align={{ offset: [10, 0] }}
         arrow={false}
-        overlayStyle={{ maxWidth: 360 }}
-        overlayClassName="secret-table-detail-popover"
+        overlayStyle={{ maxWidth: 520 }}
         content={<DataTableDetails data={nodeData.data} />}
-        trigger="hover"
+        trigger="click"
+        destroyTooltipOnHide
       >
         {title}
       </Popover>
