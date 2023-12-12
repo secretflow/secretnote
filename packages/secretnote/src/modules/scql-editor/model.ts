@@ -6,13 +6,7 @@ import {
   SaveFileErrorModal,
   DocumentCommands,
 } from '@difizen/libro-jupyter';
-import {
-  CommandRegistry,
-  inject,
-  ModalService,
-  prop,
-  transient,
-} from '@difizen/mana-app';
+import { CommandRegistry, inject, ModalService, transient } from '@difizen/mana-app';
 import debounce from 'lodash.debounce';
 
 @transient()
@@ -23,9 +17,8 @@ export class SecretNoteModel extends LibroModel {
   public currentFileContents!: IContentsModel;
   public readonly contentsManager: ContentsManager;
 
-  @prop()
   kernelConnection = true;
-  @prop()
+  kernelConnecting = false;
   lspEnabled = false;
 
   get isKernelIdle() {

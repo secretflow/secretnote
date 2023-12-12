@@ -4,12 +4,15 @@ import type {
   IOutputAreaOption,
   IOutput,
   ExecutionMeta,
+  CodeEditorViewOptions,
 } from '@difizen/libro-jupyter';
 import {
   CellService,
   CellEditorMemo,
-  JupyterCodeCellView,
   isOutput,
+  CodeEditorView,
+  JupyterCodeCellView,
+  NotebookCommands,
 } from '@difizen/libro-jupyter';
 import {
   inject,
@@ -19,10 +22,12 @@ import {
   ViewInstance,
   ViewManager,
   ViewOption,
-  watch,
+  CommandRegistry,
 } from '@difizen/mana-app';
 import { forwardRef } from 'react';
 
+import type { SQLEditor } from '../editor';
+import { SQLEditorFactory } from '../editor';
 import { SqlOutputArea } from '../output';
 import { SCQLQueryService } from '../service';
 
@@ -44,24 +49,28 @@ SqlCellComponent.displayName = 'SqlCellComponent';
 export class SqlCellView extends JupyterCodeCellView {
   override view = SqlCellComponent;
   readonly queryService: SCQLQueryService;
+  readonly viewManager: ViewManager;
+  readonly commandRegistry: CommandRegistry;
 
   constructor(
     @inject(ViewOption) options: CellViewOptions,
     @inject(CellService) cellService: CellService,
     @inject(ViewManager) viewManager: ViewManager,
     @inject(SCQLQueryService) queryService: SCQLQueryService,
+    @inject(CommandRegistry) commandRegistry: CommandRegistry,
   ) {
     super(options, cellService, viewManager);
     this.options = options;
-    this.viewManager = viewManager;
     this.queryService = queryService;
+    this.viewManager = viewManager;
+    this.commandRegistry = commandRegistry;
 
     this.outputs = options.cell?.outputs as IOutput[];
     this.className = this.className + ' sql';
 
-    // 创建outputArea
     this.viewManager
       .getOrCreateView<LibroOutputArea, IOutputAreaOption>(SqlOutputArea, {
+        outputAreaId: this.id,
         cellId: this.id,
         cell: this,
       })
@@ -71,7 +80,6 @@ export class SqlCellView extends JupyterCodeCellView {
         if (isOutput(output)) {
           await this.outputArea.fromJSON(output);
         }
-        this.outputAreaDeferred.resolve(outputArea);
         this.outputWatch();
         return;
       })
@@ -80,12 +88,91 @@ export class SqlCellView extends JupyterCodeCellView {
       });
   }
 
-  override outputWatch() {
-    this.toDispose.push(
-      watch(this.outputArea, 'outputs', () => {
-        this.parent.model.onChange?.();
-      }),
-    );
+  onViewMount = async () => {
+    await this.createEditor();
+  };
+
+  createEditor() {
+    const option: CodeEditorViewOptions = {
+      factory: (editorOption) =>
+        SQLEditorFactory({
+          ...editorOption,
+          config: {
+            ...editorOption.config,
+            readOnly: this.parent.model.readOnly,
+          },
+        }),
+      model: this.model,
+      config: {
+        readOnly: this.parent.model.readOnly,
+        editable: !this.parent.model.readOnly,
+      },
+    };
+    this.viewManager
+      .getOrCreateView<CodeEditorView, CodeEditorViewOptions>(CodeEditorView, option)
+      .then(async (editorView) => {
+        this.editorView = editorView;
+
+        await this.editorView.editorReady;
+        this.handleCommand();
+
+        return;
+      })
+      .catch(() => {
+        //
+      });
+  }
+
+  handleCommand() {
+    const editor = (this.editorView?.editor as SQLEditor)?.monacoEditor;
+    if (editor) {
+      editor.addCommand(
+        9,
+        () => {
+          this.commandRegistry.executeCommand(NotebookCommands.EnterCommandMode.id);
+        },
+        '!editorHasSelection && !editorHasSelection && !editorHasMultipleSelections',
+      );
+      editor.addCommand(
+        2048 | 3,
+        () => {
+          this.commandRegistry.executeCommand(NotebookCommands.RunCell.id);
+        },
+        '!findWidgetVisible && !referenceSearchVisible',
+      );
+      editor.addCommand(
+        1024 | 3,
+        () => {
+          this.commandRegistry.executeCommand(NotebookCommands.RunCellAndSelectNext.id);
+        },
+        '!findInputFocussed',
+      );
+      editor.addCommand(
+        512 | 3,
+        () => {
+          this.commandRegistry.executeCommand(
+            NotebookCommands.RunCellAndInsertBelow.id,
+          );
+        },
+        '!findWidgetVisible',
+      );
+
+      editor.addCommand(
+        2048 | 1024 | 83,
+        () => {
+          this.commandRegistry.executeCommand(NotebookCommands.SplitCellAntCursor.id);
+        },
+        // '!findWidgetVisible',
+      );
+
+      editor.addCommand(
+        2048 | 36,
+        () => {
+          this.commandRegistry.executeCommand('libro-search:toggle');
+        },
+        // '!findWidgetVisible',
+      );
+    }
   }
 
   async run() {
@@ -122,21 +209,25 @@ export class SqlCellView extends JupyterCodeCellView {
       this.model.msgChangeEmitter.fire(msg);
     } catch (e) {
       if (e instanceof Error) {
-        const msg = {
-          header: {
+        const message = e.message;
+        const messageLines = message.split('\n');
+        if (messageLines.length > 0) {
+          const msg = {
+            header: {
+              msg_type: 'error',
+            },
             msg_type: 'error',
-          },
-          msg_type: 'error',
-          metadata: {},
-          content: {
-            traceback: [],
-            ename: 'ExecuteQueryException',
-            evalue: e.message,
-          },
-          buffers: [],
-          channel: 'iopub',
-        };
-        this.model.msgChangeEmitter.fire(msg);
+            metadata: {},
+            content: {
+              traceback: messageLines.slice(1),
+              ename: 'ExecuteQueryException',
+              evalue: messageLines[0],
+            },
+            buffers: [],
+            channel: 'iopub',
+          };
+          this.model.msgChangeEmitter.fire(msg);
+        }
       }
     }
     this.model.executing = false;

@@ -23,6 +23,12 @@ export class SqlCellModel extends JupyterCodeCellModel {
   clearExecution = () => {
     this.executeCount = null;
     this.executing = false;
+    this.kernelExecuting = false;
+    this.metadata.execution = {
+      'shell.execute_reply.started': '',
+      'shell.execute_reply.end': '',
+      to_execute: '',
+    };
   };
 
   dispose() {
