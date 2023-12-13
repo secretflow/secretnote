@@ -1,10 +1,5 @@
 import type { Meta } from '@storybook/react';
-
-import type { VisualizationProps } from '@/.openapi-stubs';
-
-import millionaires from './millionaires.story.json';
-import real from './real.story.json';
-import spu_lr from './spu_lr.story.json';
+import useSWR from 'swr';
 
 import { VisualizationContextProvider } from './index';
 
@@ -14,26 +9,33 @@ const meta: Meta<typeof VisualizationContextProvider> = {
 
 export default meta;
 
-export const MillionairesContext = ({ children }: React.PropsWithChildren) => {
-  return (
-    <VisualizationContextProvider {...(millionaires as VisualizationProps)}>
-      {children}
-    </VisualizationContextProvider>
-  );
-};
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export const LinearRegressionContext = ({ children }: React.PropsWithChildren) => {
-  return (
-    <VisualizationContextProvider {...(spu_lr as VisualizationProps)}>
-      {children}
-    </VisualizationContextProvider>
-  );
-};
+const createProvider = (sampleName: string) =>
+  function ContextProvider({ children }: React.PropsWithChildren) {
+    const { data, isLoading } = useSWR(sampleName, fetcher);
+    if (isLoading) {
+      return null;
+    }
+    return (
+      <VisualizationContextProvider {...data}>{children}</VisualizationContextProvider>
+    );
+  };
 
-export const RealContext = ({ children }: React.PropsWithChildren) => {
-  return (
-    <VisualizationContextProvider {...(real as VisualizationProps)}>
-      {children}
-    </VisualizationContextProvider>
-  );
-};
+export const MillionairesContext = createProvider('/millionaires.story.json');
+
+export const MillionairesAliceContext = createProvider(
+  '/millionaires.real.alice.story.json',
+);
+
+export const MillionairesBobContext = createProvider(
+  '/millionaires.real.bob.story.json',
+);
+
+export const LinearRegressionContext = createProvider('/spu_lr.story.json');
+
+export const RealUserlandContext = createProvider('/real.userland.story.json');
+
+export const RealContext = createProvider('/real.story.json');
+
+export const SimContext = createProvider('/sim.story.json');

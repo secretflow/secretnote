@@ -9,8 +9,8 @@
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx",
-    "./src/.openapi-stubs/**/*.ts",
-    "./src/**/*.story.json"
+    "./src/.openapi-stubs/**/*.ts"
+    // "./src/**/*.story.json"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
