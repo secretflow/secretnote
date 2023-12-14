@@ -1,8 +1,7 @@
-import { inject, singleton, prop } from '@difizen/mana-app';
+import { singleton, prop } from '@difizen/mana-app';
 import { history } from 'umi';
 
-import { RequestService } from '@/modules/request';
-import { randomHex } from '@/utils';
+import { randomHex, request } from '@/utils';
 
 export interface Member {
   name: string;
@@ -12,18 +11,12 @@ export interface Member {
 
 @singleton()
 export class MemberService {
-  protected readonly requestService: RequestService;
-
   @prop()
   members: Member[] = [];
 
-  constructor(@inject(RequestService) requestService: RequestService) {
-    this.requestService = requestService;
-  }
-
   async getMemberList() {
     const { party } = await this.getPlatformInfo();
-    const project = await this.requestService.request('api/broker', {
+    const project = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getProjectInfo',
@@ -41,7 +34,7 @@ export class MemberService {
   }
 
   async inviteMember(name: string) {
-    await this.requestService.request('api/broker', {
+    await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'inviteMember',
@@ -52,7 +45,7 @@ export class MemberService {
   }
 
   async getPlatformInfo() {
-    const platformInfo = await this.requestService.request('api/broker', {
+    const platformInfo = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getPlatformInfo',

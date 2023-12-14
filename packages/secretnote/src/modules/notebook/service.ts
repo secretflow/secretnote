@@ -3,7 +3,7 @@ import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
 import { ContentsManager } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { downloadFileByUrl, ERROR_CODE } from '@/utils';
+import { downloadFileByUrl } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';

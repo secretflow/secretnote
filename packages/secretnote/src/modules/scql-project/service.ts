@@ -1,6 +1,6 @@
-import { singleton, prop, inject } from '@difizen/mana-app';
+import { singleton, prop } from '@difizen/mana-app';
 
-import { RequestService } from '@/modules/request';
+import { request } from '@/utils';
 
 export interface Project {
   id: string;
@@ -30,8 +30,6 @@ export interface PlatformInfo {
 
 @singleton()
 export class ProjectService {
-  protected readonly requestService: RequestService;
-
   @prop()
   projects: Project[] = [];
   @prop()
@@ -39,12 +37,8 @@ export class ProjectService {
   @prop()
   platformInfo: PlatformInfo = { party: '', host: '' };
 
-  constructor(@inject(RequestService) requestService: RequestService) {
-    this.requestService = requestService;
-  }
-
   async getPlatformInfo() {
-    const platformInfo = await this.requestService.request('api/broker', {
+    const platformInfo = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getPlatformInfo',
@@ -55,7 +49,7 @@ export class ProjectService {
   }
 
   async getProjectList() {
-    const projectList = await this.requestService.request('api/broker', {
+    const projectList = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getProjectList',
@@ -76,7 +70,7 @@ export class ProjectService {
   }
 
   async addProject(project: Partial<Project>) {
-    await this.requestService.request('api/broker', {
+    await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'addProject',
@@ -89,7 +83,7 @@ export class ProjectService {
   }
 
   async getInvitationList() {
-    const invitationList = await this.requestService.request('api/broker', {
+    const invitationList = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getInvitationList',
@@ -106,7 +100,7 @@ export class ProjectService {
   }
 
   async processInvitation(invitationId: string, accepted: boolean) {
-    await this.requestService.request('api/broker', {
+    await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'processInvitation',

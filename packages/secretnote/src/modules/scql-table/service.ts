@@ -1,9 +1,9 @@
-import { inject, prop, singleton } from '@difizen/mana-app';
+import { prop, singleton } from '@difizen/mana-app';
 import { Modal } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { history } from 'umi';
 
-import { RequestService } from '@/modules/request';
+import { request } from '@/utils';
 
 export interface DataTableColumn {
   name: string;
@@ -52,14 +52,8 @@ export interface TableCCL {
 
 @singleton()
 export class DataTableService {
-  protected readonly requestService: RequestService;
-
   @prop()
   dataTables: DataTableNode[] = [];
-
-  constructor(@inject(RequestService) requestService: RequestService) {
-    this.requestService = requestService;
-  }
 
   async getDataTables() {
     const treeNodes: DataTableNode[] = [];
@@ -74,7 +68,7 @@ export class DataTableService {
       return;
     }
 
-    const tables = await this.requestService.request('api/broker', {
+    const tables = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getDataTables',
@@ -123,7 +117,7 @@ export class DataTableService {
   }
 
   async addDataTable(table: DataTable) {
-    await this.requestService.request('api/broker', {
+    await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'createTable',
@@ -141,7 +135,7 @@ export class DataTableService {
     if (!nodeData.isLeaf) {
       return;
     }
-    await this.requestService.request('api/broker', {
+    await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'deleteTable',
@@ -165,7 +159,7 @@ export class DataTableService {
       return result;
     }
 
-    const ccl = await this.requestService.request('api/broker', {
+    const ccl = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getTableCCL',
@@ -223,7 +217,7 @@ export class DataTableService {
       });
     });
 
-    await this.requestService.request('api/broker', {
+    await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'grantCCL',
@@ -234,7 +228,7 @@ export class DataTableService {
   }
 
   async getPlatformInfo() {
-    const platformInfo = await this.requestService.request('api/broker', {
+    const platformInfo = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getPlatformInfo',
@@ -244,7 +238,7 @@ export class DataTableService {
   }
 
   async getProjectInfo() {
-    const project = await this.requestService.request('api/broker', {
+    const project = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getProjectInfo',
@@ -267,7 +261,7 @@ export class DataTableService {
   }
 
   async getTableInfo(tableName: string) {
-    const table = await this.requestService.request('api/broker', {
+    const table = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'getTableInfo',

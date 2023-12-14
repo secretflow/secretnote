@@ -1,19 +1,12 @@
-import { inject, singleton } from '@difizen/mana-app';
+import { singleton } from '@difizen/mana-app';
 import { history } from 'umi';
 
-import { RequestService } from '@/modules/request';
-import { transpose } from '@/utils';
+import { transpose, request } from '@/utils';
 
 @singleton()
 export class SCQLQueryService {
-  protected readonly requestService: RequestService;
-
-  constructor(@inject(RequestService) requestService: RequestService) {
-    this.requestService = requestService;
-  }
-
   async query(query: string) {
-    const data = await this.requestService.request('api/broker', {
+    const data = await request('api/broker', {
       method: 'POST',
       body: JSON.stringify({
         action: 'query',

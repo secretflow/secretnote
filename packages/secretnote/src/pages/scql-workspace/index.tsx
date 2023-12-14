@@ -4,7 +4,6 @@ import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 import { LayoutModule } from '@/modules/layout';
 import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { NotebookModule } from '@/modules/notebook';
-import { RequestModule } from '@/modules/request';
 import { SCQLEditorModule } from '@/modules/scql-editor';
 import { SCQLMemberModule } from '@/modules/scql-member';
 import { SCQLDataTableModule } from '@/modules/scql-table';
@@ -24,7 +23,6 @@ const App = (): JSX.Element => {
         LayoutModule,
         ThemeModule,
         StorageModule,
-        RequestModule,
         NotebookModule,
         SCQLMemberModule,
         SCQLDataTableModule,

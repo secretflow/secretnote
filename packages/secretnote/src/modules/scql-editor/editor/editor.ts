@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type {
   IEditor,
   IEditorOptions,
@@ -6,15 +7,21 @@ import type {
   IEditorConfig,
   IPosition,
   ICoordinate,
+  SearchMatch,
 } from '@difizen/libro-jupyter';
 import { Disposable, DisposableCollection, watch, Emitter } from '@difizen/mana-app';
 import * as monaco from 'monaco-editor';
-import { format } from 'sql-formatter';
+import type { IMatching } from 'syntax-parser';
 
 import { uuid } from '@/utils';
+
+import { parser } from './auto-complete';
+import './format';
+
 import './index.less';
 
 export type MonacoEditorType = monaco.editor.IStandaloneCodeEditor;
+export type MonacoMatch = monaco.editor.FindMatch;
 
 export class SQLEditor implements IEditor {
   private editorHost: HTMLElement;
@@ -25,6 +32,7 @@ export class SQLEditor implements IEditor {
 
   protected toDispose = new DisposableCollection();
   protected oldDeltaDecorations: string[] = [];
+  protected modalChangeEmitter = new Emitter<boolean>();
 
   monacoEditor?: MonacoEditorType;
   host: HTMLElement;
@@ -53,7 +61,6 @@ export class SQLEditor implements IEditor {
     return this._isDisposed;
   }
 
-  protected modalChangeEmitter = new Emitter<boolean>();
   get onModalChange() {
     return this.modalChangeEmitter.event;
   }
@@ -64,12 +71,13 @@ export class SQLEditor implements IEditor {
     this._uuid = options.uuid || uuid();
     this._config = { ...options.config };
 
-    this.host.classList.add('sql-editor-container');
     this.editorHost = document.createElement('div');
+    this.editorHost.classList.add('sql-editor-container');
     this.host.append(this.editorHost);
 
-    this.registerFormat();
     this.createEditor(this.editorHost);
+
+    this.checkSyntaxError();
 
     this.toDispose.push(watch(this._model, 'selections', this.onSelectionChange));
   }
@@ -104,34 +112,64 @@ export class SQLEditor implements IEditor {
     this.updateEditorSize();
   }
 
-  protected registerFormat() {
-    // define a document formatting provider
-    // then you contextmenu will add an "Format Document" action
-    monaco.languages.registerDocumentFormattingEditProvider('sql', {
-      provideDocumentFormattingEdits(model) {
-        const formatted = format(model.getValue());
-        return [
-          {
-            range: model.getFullModelRange(),
-            text: formatted,
-          },
-        ];
-      },
-    });
+  protected checkSyntaxError() {
+    this.monacoEditor?.onDidChangeModelContent(() => {
+      const model = this.monacoEditor?.getModel();
+      const position = this.monacoEditor?.getPosition();
 
-    // define a range formatting provider
-    // select some codes and right click those codes
-    // you contextmenu will have an "Format Selection" action
-    monaco.languages.registerDocumentRangeFormattingEditProvider('sql', {
-      provideDocumentRangeFormattingEdits(model, range) {
-        const formatted = format(model.getValueInRange(range));
-        return [
+      if (!model || !position) {
+        return;
+      }
+
+      const parseResult = parser(model, position);
+      if (!parseResult) {
+        return;
+      }
+
+      if (parseResult.error) {
+        const newReason =
+          parseResult.error.reason === 'incomplete'
+            ? `Incomplete, expect next input: \n${parseResult.error.suggestions
+                .map((each: IMatching) => {
+                  return each.value;
+                })
+                .join('\n')}`
+            : `Wrong input, expect: \n${parseResult.error.suggestions
+                .map((each: IMatching) => {
+                  return each.value;
+                })
+                .join('\n')}`;
+
+        const errorPosition = parseResult.error.token
+          ? {
+              startLineNumber: model.getPositionAt(parseResult.error.token.position![0])
+                .lineNumber,
+              startColumn: model.getPositionAt(parseResult.error.token.position![0])
+                .column,
+              endLineNumber: model.getPositionAt(parseResult.error.token.position![1])
+                .lineNumber,
+              endColumn:
+                model.getPositionAt(parseResult.error.token.position![1]).column + 1,
+            }
+          : {
+              startLineNumber: 0,
+              startColumn: 0,
+              endLineNumber: 0,
+              endColumn: 0,
+            };
+
+        // model.getPositionAt(parseResult.error.token);
+
+        monaco.editor.setModelMarkers(model, 'sql', [
           {
-            range: range,
-            text: formatted,
+            ...errorPosition,
+            message: newReason,
+            severity: monaco.MarkerSeverity.Error,
           },
-        ];
-      },
+        ]);
+      } else {
+        monaco.editor.setModelMarkers(model, 'sql', []);
+      }
     });
   }
 
@@ -170,6 +208,49 @@ export class SQLEditor implements IEditor {
       matchBrackets: config.matchBrackets ? 'always' : 'never',
       rulers: config.rulers ?? [],
       wordWrapColumn: config.wordWrapColumn || 80,
+    };
+  }
+
+  protected updateEditorSize() {
+    const contentHeight = this.monacoEditor?.getContentHeight() ?? 20;
+    this.host.style.height = `${contentHeight + 30}px`;
+    try {
+      this.monacoEditor?.layout({
+        width: this.host.offsetWidth,
+        height: contentHeight,
+      });
+    } catch (e) {
+      //pass
+    }
+  }
+
+  protected toMonacoRange(range: IRange) {
+    const selection = range ?? this.getSelection();
+    const monacoSelection = {
+      startLineNumber: selection.start.line || 1,
+      startColumn: selection.start.column || 1,
+      endLineNumber: selection.end.line || 1,
+      endColumn: selection.end.column || 1,
+    };
+    return monacoSelection;
+  }
+
+  protected onSelectionChange() {
+    this.setSelections(this.model.selections);
+  }
+
+  protected toMonacoMatch(match: SearchMatch): MonacoMatch {
+    const start = this.getPositionAt(match.position);
+    const end = this.getPositionAt(match.position + match.text.length);
+    return {
+      range: new monaco.Range(
+        start?.line ?? 1,
+        start?.column ?? 1,
+        end?.line ?? 1,
+        end?.column ?? 1,
+      ),
+      matches: [match.text],
+      _findMatchBrand: undefined,
     };
   }
 
@@ -238,19 +319,6 @@ export class SQLEditor implements IEditor {
     this.monacoEditor?.layout();
   };
 
-  protected updateEditorSize() {
-    const contentHeight = this.monacoEditor?.getContentHeight() ?? 20;
-    this.host.style.height = `${contentHeight + 30}px`;
-    try {
-      this.monacoEditor?.layout({
-        width: this.host.offsetWidth,
-        height: contentHeight,
-      });
-    } catch (e) {
-      //pass
-    }
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getPositionForCoordinate = (coordinate: ICoordinate) => {
     return null;
@@ -271,17 +339,6 @@ export class SQLEditor implements IEditor {
       lineNumber: position.line,
     });
   };
-
-  protected toMonacoRange(range: IRange) {
-    const selection = range ?? this.getSelection();
-    const monacoSelection = {
-      startLineNumber: selection.start.line || 1,
-      startColumn: selection.start.column || 1,
-      endLineNumber: selection.end.line || 1,
-      endColumn: selection.end.column || 1,
-    };
-    return monacoSelection;
-  }
 
   getSelection = () => {
     const selection = {
@@ -332,9 +389,74 @@ export class SQLEditor implements IEditor {
     );
   };
 
-  protected onSelectionChange() {
-    this.setSelections(this.model.selections);
-  }
+  revealSelection = (selection: IRange) => {
+    this.monacoEditor?.revealRange(this.toMonacoRange(selection));
+  };
+
+  getSelectionValue = (range?: IRange | undefined) => {
+    const selection = range ?? this.getSelection();
+    return this.monacoEditor
+      ?.getModel()
+      ?.getValueInRange(this.toMonacoRange(selection));
+  };
+
+  replaceSelection = (text: string, range: IRange) => {
+    this.monacoEditor?.executeEdits(undefined, [
+      {
+        range: this.toMonacoRange(range),
+        text,
+      },
+    ]);
+    this.monacoEditor?.pushUndoStop();
+  };
+
+  replaceSelections = (edits: { text: string; range: IRange }[]) => {
+    this.monacoEditor?.executeEdits(
+      undefined,
+      edits.map((item) => ({ range: this.toMonacoRange(item.range), text: item.text })),
+    );
+    this.monacoEditor?.pushUndoStop();
+  };
+
+  getPositionAt = (offset: number): IPosition | undefined => {
+    const position = this.monacoEditor?.getModel()?.getPositionAt(offset);
+    return position ? { line: position.lineNumber, column: position.column } : position;
+  };
+
+  highlightMatches = (matches: SearchMatch[], currentIndex: number | undefined) => {
+    let currentMatch: SearchMatch | undefined;
+    const _matches = matches
+      .map((item, index) => {
+        if (index === currentIndex) {
+          currentMatch = item;
+          return {
+            range: item,
+            options: {
+              className: `currentFindMatch`, // 当前高亮
+            },
+          };
+        }
+        return {
+          range: item,
+          options: {
+            className: `findMatch`, // 匹配高亮
+          },
+        };
+      })
+      .map((item) => ({
+        ...item,
+        range: this.toMonacoMatch(item.range).range,
+      }));
+    this.oldDeltaDecorations =
+      this.monacoEditor?.deltaDecorations(this.oldDeltaDecorations, _matches) || [];
+    if (currentMatch) {
+      const start = this.getPositionAt(currentMatch.position);
+      const end = this.getPositionAt(currentMatch.position + currentMatch.text.length);
+      if (start && end) {
+        this.revealSelection({ end, start });
+      }
+    }
+  };
 
   dispose() {
     if (this.disposed) {

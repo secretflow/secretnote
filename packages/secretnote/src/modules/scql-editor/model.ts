@@ -7,7 +7,7 @@ import {
   DocumentCommands,
 } from '@difizen/libro-jupyter';
 import { CommandRegistry, inject, ModalService, transient } from '@difizen/mana-app';
-import debounce from 'lodash.debounce';
+import { debounce } from 'lodash';
 
 @transient()
 export class SecretNoteModel extends LibroModel {

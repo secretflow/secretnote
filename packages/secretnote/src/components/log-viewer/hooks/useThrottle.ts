@@ -1,4 +1,4 @@
-import throttle from 'lodash.throttle';
+import { throttle } from 'lodash';
 import { useRef, useCallback, useEffect } from 'react';
 
 type Callback = () => void;

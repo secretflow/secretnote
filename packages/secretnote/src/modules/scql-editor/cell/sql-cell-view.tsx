@@ -26,12 +26,9 @@ import {
 } from '@difizen/mana-app';
 import { forwardRef } from 'react';
 
-import type { SQLEditor } from '../editor';
-import { SQLEditorFactory } from '../editor';
+import { SQLEditor } from '../editor';
 import { SqlOutputArea } from '../output';
 import { SCQLQueryService } from '../service';
-
-import '../index.less';
 
 export const SqlCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SqlCellView>(ViewInstance);
@@ -94,14 +91,7 @@ export class SqlCellView extends JupyterCodeCellView {
 
   createEditor() {
     const option: CodeEditorViewOptions = {
-      factory: (editorOption) =>
-        SQLEditorFactory({
-          ...editorOption,
-          config: {
-            ...editorOption.config,
-            readOnly: this.parent.model.readOnly,
-          },
-        }),
+      factory: (editorOption) => new SQLEditor(editorOption),
       model: this.model,
       config: {
         readOnly: this.parent.model.readOnly,

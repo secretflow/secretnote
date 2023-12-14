@@ -3,7 +3,7 @@ import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
-import { downloadFileByUrl as download, ERROR_CODE } from '@/utils';
+import { downloadFileByUrl as download } from '@/utils';
 
 import { SecretNoteServerManager } from '../server';
 
