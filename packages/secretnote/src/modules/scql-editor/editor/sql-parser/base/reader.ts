@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-case-declarations */
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import type { IToken } from 'syntax-parser';
 
 import type {

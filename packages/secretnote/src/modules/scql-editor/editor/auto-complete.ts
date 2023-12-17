@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import * as monaco from 'monaco-editor';
 import type { IParseResult, IMatching } from 'syntax-parser';
 

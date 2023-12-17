@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import * as monaco from 'monaco-editor';
 
 import { request } from '@/utils';

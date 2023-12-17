@@ -175,7 +175,8 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1';
       const init = { method: 'GET' };
-      const data = await request(url, init, server.address);
+      const address = this.serverManager.getServerUrl(server).baseUrl;
+      const data = await request(url, init, address);
 
       return {
         cpu: data.cpu_percent,
@@ -205,7 +206,8 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1/kernel_usage/get_usage/' + id;
       const init = { method: 'GET' };
-      const data = await request(url, init, server.address);
+      const address = this.serverManager.getServerUrl(server).baseUrl;
+      const data = await request(url, init, address);
       const { cpu, memory, pid, cpuText, memoryText } = this.parseKernelStatus(data);
       const { color, text_zh } = kernelStatus[status];
 

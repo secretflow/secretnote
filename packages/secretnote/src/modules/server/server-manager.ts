@@ -127,7 +127,8 @@ export class SecretNoteServerManager {
   private async getServerSpec(server: IServer) {
     const url = 'api/kernelspecs';
     try {
-      const data = await request(url, {}, server.address);
+      const address = this.getServerUrl(server).baseUrl;
+      const data = await request(url, {}, address);
       return data;
     } catch (e) {
       // eslint-disable-next-line no-console

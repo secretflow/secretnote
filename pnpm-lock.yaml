@@ -282,7 +282,7 @@ importers:
       endent:
         specifier: ^2.1.0
         version: 2.1.0
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       lucide-react:
@@ -312,9 +312,6 @@ importers:
       umi:
         specifier: ^4.0.86
         version: 4.0.86(@babel/core@7.23.2)(@types/node@18.16.19)(@types/react@18.2.29)(eslint@8.54.0)(jest@29.7.0)(postcss-less@6.0.0)(postcss@8.4.31)(prettier@3.0.3)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.0)(stylelint@14.16.1)(typescript@4.9.5)(webpack@5.89.0)
-      worker-plugin:
-        specifier: ^5.0.1
-        version: 5.0.1(webpack@5.89.0)
       xterm:
         specifier: ^5.3.0
         version: 5.3.0
@@ -337,9 +334,9 @@ importers:
       '@types/d3-dsv':
         specifier: ^3.0.4
         version: 3.0.4
-      '@types/lodash':
-        specifier: ^4.14.200
-        version: 4.14.200
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/react':
         specifier: ^18.2.28
         version: 18.2.29
@@ -9512,6 +9509,12 @@ packages:
   /@types/linkify-it@3.0.4:
     resolution: {integrity: sha512-hPpIeeHb/2UuCw06kSNAOVWgehBLXEo0/fUs0mw3W2qhqX89PI2yvok83MnuctYGCPrabGIoi0fFso4DQ+sNUQ==}
     dev: false
+
+  /@types/lodash-es@4.17.12:
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+    dependencies:
+      '@types/lodash': 4.14.200
+    dev: true
 
   /@types/lodash.debounce@4.0.3:
     resolution: {integrity: sha512-/2RpcexzkSH16nENwuL/Gd3Y2xvdkNwX32KPESB/D8K2c6HBs7GdSnoj6ngyFWNT1UhXNrIpJd0lgSC3Rmt/3g==}
@@ -34239,15 +34242,6 @@ packages:
       loader-utils: 1.4.2
       schema-utils: 0.4.7
       webpack: 4.41.5
-    dev: false
-
-  /worker-plugin@5.0.1(webpack@5.89.0):
-    resolution: {integrity: sha512-Pn7+19jIiANcGuTSGdy+vrzyF+SGH03A5wV8iu4jRTMAOfAC9bNeiHo4+l5tPS7F0uvICMBv+h8UCvL7lunxcA==}
-    peerDependencies:
-      webpack: '>= 4'
-    dependencies:
-      loader-utils: 1.4.2
-      webpack: 5.89.0(esbuild@0.17.19)
     dev: false
 
   /world-calendars@1.0.3:
