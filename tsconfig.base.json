@@ -22,7 +22,7 @@
 
     /* modules */
     "module": "ESNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
 
     /* features */
