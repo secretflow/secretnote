@@ -42,6 +42,12 @@ managed = true
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.hatch.build.targets.sdist]
+include = []
+
+[tool.hatch.build.targets.wheel]
+bypass-selection = true
+
 [tool.black]
 force-exclude = """
 _pb2\\.pyi?
@@ -57,10 +63,10 @@ select = ["E", "F", "W", "B", "I"]
 src = ["pyprojects/*/src"]
 
 [tool.ruff.extend-per-file-ignores]
-"*.ipynb" = ["E402", "I001"]
+"*.ipynb" = ["E402", "I001", "B018"]
 
 [tool.pyright]
-exclude = ["**/node_modules", "**/__pycache__"]
+exclude = ["**/node_modules", "**/__pycache__", "**/.ipynb_checkpoints"]
 include = ["pyprojects/*/src"]
 reportGeneralTypeIssues = "information"
 reportOptionalMemberAccess = "information"

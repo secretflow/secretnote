@@ -18,9 +18,28 @@ from typing import (
 )
 from weakref import WeakValueDictionary
 
-from opentelemetry import trace
+from secretnote.utils.warnings import optional_dependencies
 
-from secretnote.formal.symbols import LogicalLocation
+from .formal.symbols import LogicalLocation
+
+with optional_dependencies("instrumentation", "secretflow"):
+    from fed import FedObject
+    from opentelemetry import trace
+    from ray import ObjectRef
+    from secretflow.data import Partition
+    from secretflow.device.device import (
+        HEU,
+        PYU,
+        SPU,
+        TEEU,
+        Device,
+        HEUObject,
+        PYUObject,
+        SPUObject,
+        TEEUObject,
+    )
+
+    from libspu.spu_pb2 import FieldType, ProtocolKind
 
 
 class LifetimeIdentityTracker:
@@ -49,16 +68,12 @@ id_tracker = LifetimeIdentityTracker()
 
 
 def logical_location(device: Any) -> LogicalLocation:
-    from secretflow.device.device import HEU, PYU, SPU, TEEU
-
     if isinstance(device, PYU):
         type_ = "PYU"
         parties = (device.party,)
         params = {}
 
     elif isinstance(device, SPU):
-        from libspu.spu_pb2 import FieldType, ProtocolKind
-
         type_ = "SPU"
         parties = tuple(device.actors)
         params = {
@@ -100,17 +115,6 @@ def find_globals(fn: Union[FunctionType, MethodType, CodeType], ns: Dict):
 
 
 def fingerprint(obj: Any) -> str:
-    from fed import FedObject
-    from ray import ObjectRef
-    from secretflow.data import Partition
-    from secretflow.device.device import (
-        Device,
-        HEUObject,
-        PYUObject,
-        SPUObject,
-        TEEUObject,
-    )
-
     if obj is None:
         return "python/none"
 
@@ -120,11 +124,12 @@ def fingerprint(obj: Any) -> str:
         return f"ray/objectref/{obj}"
     if isinstance(obj, FedObject):
         # FIXME:
-        ref = obj.get_ray_object_ref()
-        if ref:
-            return f"rayfed/known/{fingerprint(ref)}"
-        else:
-            return f"rayfed/exotic/{obj.get_fed_task_id()}"
+        # ref = obj.get_ray_object_ref()
+        # if ref:
+        #     return f"rayfed/known/{fingerprint(ref)}"
+        # else:
+        #     return f"rayfed/exotic/{obj.get_fed_task_id()}"
+        return f"rayfed/exotic/{obj.get_fed_task_id()}"
     if isinstance(obj, Partition):
         # FIXME:
         idx = obj.agent_idx
@@ -206,11 +211,11 @@ def qualname_tuple(obj: Any) -> Tuple[Optional[str], Optional[str]]:
     return module_name, obj_name
 
 
-def qualname(obj: Any) -> str:
+def qualname(obj: Any, sep=".") -> str:
     if isinstance(obj, ModuleType):
         return obj.__name__
     module_name, obj_name = qualname_tuple(obj)
-    return f"{module_name or '<unknown_module>'}.{obj_name or '<unknown>'}"
+    return f"{module_name or '<unknown_module>'}{sep}{obj_name or '<unknown>'}"
 
 
 def type_annotation(obj: Any) -> str:
@@ -244,8 +249,11 @@ def source_path(filename: None) -> None:
 
 
 def source_path(filename: Optional[str]) -> Optional[str]:
-    from IPython.core.getipython import get_ipython
-    from IPython.utils.path import compress_user
+    try:
+        from IPython.core.getipython import get_ipython
+        from IPython.utils.path import compress_user
+    except ImportError:
+        return filename
 
     if filename is None:
         return None

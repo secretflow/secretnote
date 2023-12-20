@@ -1,6 +1,7 @@
 import ast
 import contextvars
 import sys
+from contextlib import ExitStack
 from types import FrameType
 from typing import (
     Any,
@@ -15,16 +16,10 @@ from typing import (
     cast,
 )
 
-import stack_data.core
-from astunparse import unparse
 from more_itertools import first_true
-from opentelemetry import trace
-from opentelemetry.context import Context
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from secretnote.utils.logging import log_dev_exception
-from secretnote.utils.pydantic import Reference, ReferenceMap
+from secretnote.utils.warnings import optional_dependencies
 
 from .checkpoint import CheckpointGroup
 from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME
@@ -37,6 +32,17 @@ from .models import (
     TracedFrame,
 )
 from .snapshot import fingerprint, json_key
+from .utils import Reference, ReferenceMap
+
+with optional_dependencies("instrumentation"):
+    import stack_data.core
+    from astunparse import unparse
+    from opentelemetry import trace
+    from opentelemetry.context import Context
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.trace.span import Span
+
 
 FinalizeSpan = Callable[[Optional[FrameType]], None]
 
@@ -58,7 +64,7 @@ class Profiler:
         self._session_tokens: List[contextvars.Token] = []
 
         # most recent on the right
-        self._recent_stacks: List[Tuple[Context, TracedFrame]] = []
+        self._recent_stacks: List[Tuple[ExitStack, Span, TracedFrame]] = []
         # most recent on the left
         self._recent_returns: List[FinalizeSpan] = []
 
@@ -99,10 +105,10 @@ class Profiler:
         return refs, values
 
     def _stack_push(self, frame: FrameType, checkpoint: FunctionCheckpoint):
-        if self._recent_stacks:
-            ctx = self._recent_stacks[-1][0]
-        else:
-            ctx = self._parent_context
+        stack = ExitStack()
+
+        ctx = self._tracer.start_as_current_span("unknown")
+        span = stack.enter_context(ctx)
 
         refs, values = self._trace_objects(checkpoint.function._origin, frame)
         func_ref, frame_ref = refs
@@ -116,16 +122,15 @@ class Profiler:
             variables=values,
         )
 
-        span = self._tracer.start_span(result.function_name, ctx)
-        ctx = trace.set_span_in_context(span, ctx)
+        span.update_name(result.function_name)
 
-        self._recent_stacks.append((ctx, result))
+        self._recent_stacks.append((stack, span, result))
 
     def _stack_pop(self, f_current: FrameType, retval: Any):
         if not self._recent_stacks:
             return
 
-        ctx, call = self._recent_stacks.pop()
+        ctx, span, call = self._recent_stacks.pop()
 
         (retval_ref,), values = self._trace_objects(retval)
         call.retval = retval_ref
@@ -140,10 +145,12 @@ class Profiler:
                     call.variables.update(values)
             except Exception as e:
                 log_dev_exception(e)
-            span = trace.get_current_span(ctx)
             payload = call.json(by_alias=True, exclude_none=True)
             span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
-            span.end()
+            ctx.close()
+
+        # end_current_span(f_current)
+        # return
 
         self._recent_returns.append(end_current_span)
 

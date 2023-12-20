@@ -1,15 +1,19 @@
 from typing import BinaryIO, Iterable, Protocol
 
 import orjson
-from opentelemetry.sdk.trace import ReadableSpan
-from opentelemetry.sdk.trace.export import SpanExportResult
-from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
-    InMemorySpanExporter as _InMemorySpanExporter,
-)
-from opentelemetry.sdk.util import ns_to_iso_str
-from opentelemetry.trace import format_span_id
+
+from secretnote.utils.warnings import optional_dependencies
 
 from .models import OTelSpanDict
+
+with optional_dependencies("instrumentation"):
+    from opentelemetry.sdk.trace import ReadableSpan
+    from opentelemetry.sdk.trace.export import SpanExportResult
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+        InMemorySpanExporter as _InMemorySpanExporter,
+    )
+    from opentelemetry.sdk.util import ns_to_iso_str
+    from opentelemetry.trace import format_span_id
 
 
 def parse_span(raw_span: ReadableSpan) -> OTelSpanDict:
@@ -36,6 +40,7 @@ def parse_span(raw_span: ReadableSpan) -> OTelSpanDict:
     f_span = {}
 
     f_span["name"] = raw_span._name
+    assert raw_span._context
     f_span["context"] = raw_span._format_context(raw_span._context)
     f_span["kind"] = str(raw_span.kind)
     f_span["parent_id"] = parent_id

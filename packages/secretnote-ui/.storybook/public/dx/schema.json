@@ -1,0 +1,696 @@
+{
+  "definitions": {
+    "CurveType": {
+      "title": "CurveType",
+      "description": "An enumeration.",
+      "enum": ["CURVE_FOURQ", "CURVE_25519", "CURVE_SM2", "CURVE_SECP256K1"]
+    },
+    "ECDHProtocol": {
+      "title": "ECDHProtocol",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "ECDH",
+          "enum": ["ECDH"],
+          "type": "string"
+        },
+        "curve_type": {
+          "default": "CURVE_FOURQ",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CurveType"
+            }
+          ]
+        }
+      }
+    },
+    "KKRTProtocol": {
+      "title": "KKRTProtocol",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "KKRT",
+          "enum": ["KKRT"],
+          "type": "string"
+        }
+      }
+    },
+    "BC22Protocol": {
+      "title": "BC22Protocol",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "BC22",
+          "enum": ["BC22"],
+          "type": "string"
+        }
+      }
+    },
+    "secretnote.dx.recipes.preprocessing.psi.PSI": {
+      "title": "PSI",
+      "type": "object",
+      "properties": {
+        "table_1": {
+          "title": "Table 1",
+          "type": "object",
+          "secretflow:traits": {
+            "IO": {
+              "DataType": "DataFrame",
+              "OwnershipType": {
+                "Exclusive": {
+                  "Owner": ["alice"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        },
+        "table_2": {
+          "title": "Table 2",
+          "type": "object",
+          "secretflow:traits": {
+            "IO": {
+              "DataType": "DataFrame",
+              "OwnershipType": {
+                "Exclusive": {
+                  "Owner": ["bob"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        },
+        "protocol": {
+          "title": "Protocol",
+          "default": {
+            "kind": "ECDH",
+            "curve_type": "CURVE_FOURQ"
+          },
+          "discriminator": {
+            "propertyName": "kind",
+            "mapping": {
+              "ECDH": "#/definitions/ECDHProtocol",
+              "KKRT": "#/definitions/KKRTProtocol",
+              "BC22": "#/definitions/BC22Protocol"
+            }
+          },
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ECDHProtocol"
+            },
+            {
+              "$ref": "#/definitions/KKRTProtocol"
+            },
+            {
+              "$ref": "#/definitions/BC22Protocol"
+            }
+          ]
+        },
+        "bucket_size": {
+          "title": "Bucket Size",
+          "default": 1048576,
+          "type": "integer"
+        },
+        "sort_results": {
+          "title": "Sort Results",
+          "default": true,
+          "type": "boolean"
+        },
+        "compute": {
+          "title": "Compute",
+          "type": "object",
+          "secretflow:traits": {
+            "Runtime": {
+              "OwnershipType": {
+                "SecretShared": {
+                  "Owner": ["alice", "bob"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      },
+      "required": ["table_1", "table_2", "compute"],
+      "secretflow:outputs": {
+        "intersection": {
+          "secretflow:traits": {
+            "OutputRef": {
+              "T": {
+                "IO": {
+                  "DataType": "VDataFrame",
+                  "OwnershipType": {
+                    "Partitioned": {
+                      "Owner": ["alice", "bob"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      }
+    },
+    "GeneralMissingValue": {
+      "title": "GeneralMissingValue",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "general_na",
+          "enum": ["general_na"],
+          "type": "string"
+        }
+      }
+    },
+    "StringMissingValue": {
+      "title": "StringMissingValue",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "string",
+          "enum": ["string"],
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": ["value"]
+    },
+    "IntegerMissingValue": {
+      "title": "IntegerMissingValue",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "integer",
+          "enum": ["integer"],
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": ["value"]
+    },
+    "FloatMissingValue": {
+      "title": "FloatMissingValue",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "float",
+          "enum": ["float"],
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": ["value"]
+    },
+    "FillMean": {
+      "title": "FillMean",
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "title": "Strategy",
+          "default": "mean",
+          "enum": ["mean"],
+          "type": "string"
+        }
+      }
+    },
+    "FillMedian": {
+      "title": "FillMedian",
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "title": "Strategy",
+          "default": "median",
+          "enum": ["median"],
+          "type": "string"
+        }
+      }
+    },
+    "FillMostFrequent": {
+      "title": "FillMostFrequent",
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "title": "Strategy",
+          "default": "most_frequent",
+          "enum": ["most_frequent"],
+          "type": "string"
+        }
+      }
+    },
+    "FillConstant": {
+      "title": "FillConstant",
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "title": "Strategy",
+          "default": "constant",
+          "enum": ["constant"],
+          "type": "string"
+        },
+        "fill_value": {
+          "title": "Fill Value",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "required": ["fill_value"]
+    },
+    "secretnote.dx.recipes.preprocessing.impute.Impute": {
+      "title": "Impute",
+      "type": "object",
+      "properties": {
+        "missing_value": {
+          "title": "Missing Value",
+          "default": {
+            "kind": "general_na"
+          },
+          "discriminator": {
+            "propertyName": "kind",
+            "mapping": {
+              "general_na": "#/definitions/GeneralMissingValue",
+              "string": "#/definitions/StringMissingValue",
+              "integer": "#/definitions/IntegerMissingValue",
+              "float": "#/definitions/FloatMissingValue"
+            }
+          },
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GeneralMissingValue"
+            },
+            {
+              "$ref": "#/definitions/StringMissingValue"
+            },
+            {
+              "$ref": "#/definitions/IntegerMissingValue"
+            },
+            {
+              "$ref": "#/definitions/FloatMissingValue"
+            }
+          ]
+        },
+        "fill_strategy": {
+          "title": "Fill Strategy",
+          "default": {
+            "strategy": "mean"
+          },
+          "discriminator": {
+            "propertyName": "strategy",
+            "mapping": {
+              "mean": "#/definitions/FillMean",
+              "median": "#/definitions/FillMedian",
+              "most_frequent": "#/definitions/FillMostFrequent",
+              "constant": "#/definitions/FillConstant"
+            }
+          },
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FillMean"
+            },
+            {
+              "$ref": "#/definitions/FillMedian"
+            },
+            {
+              "$ref": "#/definitions/FillMostFrequent"
+            },
+            {
+              "$ref": "#/definitions/FillConstant"
+            }
+          ]
+        },
+        "input_table": {
+          "title": "Input Table",
+          "type": "object",
+          "secretflow:traits": {
+            "IO": {
+              "DataType": "VDataFrame",
+              "OwnershipType": {
+                "Partitioned": {
+                  "Owner": ["alice", "bob"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      },
+      "required": ["input_table"],
+      "secretflow:outputs": {
+        "output_table": {
+          "secretflow:traits": {
+            "OutputRef": {
+              "T": {
+                "IO": {
+                  "DataType": "VDataFrame",
+                  "OwnershipType": {
+                    "Partitioned": {
+                      "Owner": ["alice", "bob"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      }
+    },
+    "ColumnRef": {
+      "title": "ColumnRef",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "column_ref",
+          "enum": ["column_ref"],
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": ["name"]
+    },
+    "Constant": {
+      "title": "Constant",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "constant",
+          "enum": ["constant"],
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": ["value"]
+    },
+    "Conjunction": {
+      "title": "Conjunction",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "AND",
+          "enum": ["AND"],
+          "type": "string"
+        },
+        "rhs": {
+          "$ref": "#/definitions/Condition"
+        }
+      },
+      "required": ["rhs"]
+    },
+    "Disjunction": {
+      "title": "Disjunction",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "default": "OR",
+          "enum": ["OR"],
+          "type": "string"
+        },
+        "rhs": {
+          "$ref": "#/definitions/Condition"
+        }
+      },
+      "required": ["rhs"]
+    },
+    "Condition": {
+      "title": "Condition",
+      "type": "object",
+      "properties": {
+        "lhs": {
+          "$ref": "#/definitions/ColumnRef"
+        },
+        "op": {
+          "title": "Op",
+          "enum": ["==", "!=", "<", "<=", ">", ">="],
+          "type": "string"
+        },
+        "rhs": {
+          "title": "Rhs",
+          "discriminator": {
+            "propertyName": "kind",
+            "mapping": {
+              "constant": "#/definitions/Constant",
+              "column_ref": "#/definitions/ColumnRef"
+            }
+          },
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Constant"
+            },
+            {
+              "$ref": "#/definitions/ColumnRef"
+            }
+          ]
+        },
+        "junction": {
+          "title": "Junction",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Conjunction"
+            },
+            {
+              "$ref": "#/definitions/Disjunction"
+            }
+          ]
+        }
+      },
+      "required": ["lhs", "op", "rhs"]
+    },
+    "Case": {
+      "title": "Case",
+      "type": "object",
+      "properties": {
+        "when": {
+          "$ref": "#/definitions/Condition"
+        },
+        "then": {
+          "title": "Then",
+          "discriminator": {
+            "propertyName": "kind",
+            "mapping": {
+              "constant": "#/definitions/Constant",
+              "column_ref": "#/definitions/ColumnRef"
+            }
+          },
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Constant"
+            },
+            {
+              "$ref": "#/definitions/ColumnRef"
+            }
+          ]
+        }
+      },
+      "required": ["when", "then"]
+    },
+    "secretnote.dx.recipes.preprocessing.map_cases.MapCases": {
+      "title": "MapCases",
+      "type": "object",
+      "properties": {
+        "cases": {
+          "title": "Cases",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Case"
+          }
+        },
+        "default_value": {
+          "title": "Default Value",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Constant"
+            },
+            {
+              "$ref": "#/definitions/ColumnRef"
+            }
+          ]
+        },
+        "output_column": {
+          "title": "Output Column",
+          "type": "string"
+        },
+        "input_table": {
+          "title": "Input Table",
+          "type": "object",
+          "secretflow:traits": {
+            "IO": {
+              "DataType": "VDataFrame",
+              "OwnershipType": {
+                "Partitioned": {
+                  "Owner": ["alice", "bob"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      },
+      "required": ["cases", "input_table"],
+      "secretflow:outputs": {
+        "output_table": {
+          "secretflow:traits": {
+            "OutputRef": {
+              "T": "str"
+            }
+          },
+          "anyOf": []
+        }
+      }
+    },
+    "secretnote.dx.recipes.preprocessing.train_test_split.TrainTestSplit": {
+      "title": "TrainTestSplit",
+      "type": "object",
+      "properties": {
+        "table": {
+          "title": "Table",
+          "type": "object",
+          "secretflow:traits": {
+            "IO": {
+              "DataType": "VDataFrame",
+              "OwnershipType": {
+                "Partitioned": {
+                  "Owner": ["alice", "bob"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        },
+        "test_size": {
+          "title": "Test Size",
+          "default": 0.25,
+          "type": "number"
+        },
+        "random_state": {
+          "title": "Random State",
+          "default": 42,
+          "type": "integer"
+        },
+        "shuffle": {
+          "title": "Shuffle",
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": ["table"],
+      "secretflow:outputs": {
+        "train": {
+          "secretflow:traits": {
+            "OutputRef": {
+              "T": {
+                "IO": {
+                  "DataType": "VDataFrame",
+                  "OwnershipType": {
+                    "Partitioned": {
+                      "Owner": ["alice", "bob"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "anyOf": []
+        },
+        "test": {
+          "secretflow:traits": {
+            "OutputRef": {
+              "T": {
+                "IO": {
+                  "DataType": "VDataFrame",
+                  "OwnershipType": {
+                    "Partitioned": {
+                      "Owner": ["alice", "bob"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      }
+    },
+    "secretnote.dx.recipes.stats.pearsonr.PearsonR": {
+      "title": "PearsonR",
+      "type": "object",
+      "properties": {
+        "table": {
+          "title": "Table",
+          "type": "object",
+          "secretflow:traits": {
+            "IO": {
+              "DataType": "VDataFrame",
+              "OwnershipType": {
+                "Partitioned": {
+                  "Owner": ["alice", "bob"]
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      },
+      "required": ["table"],
+      "secretflow:outputs": {
+        "result": {
+          "secretflow:traits": {
+            "OutputRef": {
+              "T": {
+                "IO": {
+                  "DataType": "DataFrame",
+                  "OwnershipType": {}
+                }
+              }
+            }
+          },
+          "anyOf": []
+        }
+      }
+    }
+  }
+}

@@ -12,7 +12,9 @@ from typing import (
 
 from more_itertools import first
 
-from secretnote.formal.symbols import (
+from secretnote.utils.warnings import optional_dependencies
+
+from ...formal.symbols import (
     ExecExpression,
     ExpressionType,
     LocalObject,
@@ -21,7 +23,7 @@ from secretnote.formal.symbols import (
     RemoteObject,
     RevealExpression,
 )
-from secretnote.instrumentation.models import (
+from ...models import (
     DictSnapshot,
     FunctionInfo,
     ListSnapshot,
@@ -30,8 +32,7 @@ from secretnote.instrumentation.models import (
     SnapshotType,
     TracedFrame,
 )
-from secretnote.utils.pydantic import like_pytree
-
+from ...utils import like_pytree
 from .base import Parser
 
 Options = Tuple[Callable, Tuple[int, ...]]
@@ -154,7 +155,8 @@ def _create_exec_expr(
 
 
 def create_parser():
-    import secretflow
+    with optional_dependencies("secretflow"):
+        import secretflow
 
     parser = ExpressionParser()
 

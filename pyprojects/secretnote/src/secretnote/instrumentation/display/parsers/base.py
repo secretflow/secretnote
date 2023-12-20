@@ -6,6 +6,7 @@ from secretnote.utils.logging import log_dev_exception
 T = TypeVar("T", contravariant=True)
 A = TypeVar("A")
 R = TypeVar("R", covariant=True)
+
 ParseFunction = Callable[[T], Generator[R, None, None]]
 
 

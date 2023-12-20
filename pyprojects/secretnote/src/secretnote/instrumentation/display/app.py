@@ -1,17 +1,18 @@
 from typing import Dict, List, Optional, Union, cast
 
-import networkx as nx
+from secretnote.utils.warnings import development_preview_warning, optional_dependencies
 
-from secretnote.formal.symbols import LocalObject, RemoteObject
-from secretnote.instrumentation.models import APILevel, SnapshotType, TracedFrame
-from secretnote.instrumentation.profiler import Profiler
-from secretnote.instrumentation.sdk import get_traced_frame
-from secretnote.utils.warnings import development_preview_warning
-
+from ..formal.symbols import LocalObject, RemoteObject
+from ..models import APILevel, SnapshotType, TracedFrame
+from ..profiler import Profiler
+from ..sdk import get_traced_frame
 from .models import Frame, VisualizationProps
 from .parsers import dependencies, expression
 from .parsers.dependencies import DependencyGraph, DependencyGraphParser, GraphState
 from .parsers.expression import ExpressionParser
+
+with optional_dependencies("instrumentation"):
+    import networkx as nx
 
 
 def visualize(

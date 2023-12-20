@@ -14,12 +14,13 @@ from typing import (
     overload,
 )
 
-import networkx as nx
 from more_itertools import first
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
-from secretnote.formal.symbols import (
+from secretnote.utils.warnings import optional_dependencies
+
+from ...formal.symbols import (
     ExecExpression,
     ExpressionType,
     LocalObject,
@@ -28,10 +29,12 @@ from secretnote.formal.symbols import (
     RemoteObject,
     RevealExpression,
 )
-from secretnote.instrumentation.models import LogicalLocation
-from secretnote.utils.pydantic import Reference
-
+from ...models import LogicalLocation
+from ...utils import Reference
 from .base import Parser
+
+with optional_dependencies("instrumentation"):
+    import networkx as nx
 
 M = TypeVar("M", bound=BaseModel)
 T = TypeVar("T")

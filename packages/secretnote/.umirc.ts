@@ -1,29 +1,43 @@
 import { defineConfig } from 'umi';
 
-export default defineConfig({
-  // This is not portable at all
-  base: '/secretnote/',
-  publicPath: '/secretnote/',
-  favicons: ['/secretnote/favicon.svg'],
+declare global {
+  interface Window {
+    publicPath: string;
+  }
+}
+
+const iife = (fn: () => void) => `(${fn.toString()})()`;
+
+const prodConfig = defineConfig({
+  publicPath: '{{ static_url_prefix }}/',
+  runtimePublicPath: {},
   exportStatic: {},
+  favicons: ['{{ static_url_prefix }}/favicon.svg'],
+  headScripts: [
+    iife(() => {
+      window.publicPath = '{{ static_url_prefix }}/';
+    }),
+    iife(() => {
+      // https://github.com/jupyter-server/jupyter_server/blob/8e5d7668aea4eb4d6ca1767566f4ffcbc4bc49bf/jupyter_server/templates/page.html#L25
+      window.addEventListener('DOMContentLoaded', () => {
+        document.body.dataset['jupyterApiToken'] =
+          '{% if logged_in and token %}{{token | urlencode}}{% endif %}';
+      });
+    }),
+  ],
+});
+
+export default defineConfig({
+  ...prodConfig,
   routes: [
-    { path: '/', component: 'secretnote' },
-    { path: '/preview', component: 'preview' },
+    { path: '/', component: '@/pages/secretnote' },
+    { path: '/preview', component: '@/pages/preview' },
+    { path: '/lipsum', component: '@/pages/lipsum' },
+    { path: '/*', component: '@/pages/404' },
   ],
   // devtool: 'source-map',
+  jsMinifier: 'none',
   writeToDisk: true,
-  headScripts:
-    process.env.NODE_ENV !== 'development'
-      ? [
-          `(${(() => {
-            // https://github.com/jupyter-server/jupyter_server/blob/8e5d7668aea4eb4d6ca1767566f4ffcbc4bc49bf/jupyter_server/templates/page.html#L25
-            window.addEventListener('DOMContentLoaded', () => {
-              document.body.dataset['jupyterApiToken'] =
-                '{% if logged_in and token %}{{token | urlencode}}{% endif %}';
-            });
-          }).toString()})()`,
-        ]
-      : false,
   proxy: {
     '/api': {
       target: 'http://localhost:8888/',

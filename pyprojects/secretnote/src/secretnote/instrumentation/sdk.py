@@ -13,14 +13,7 @@ from typing import (
     cast,
 )
 
-from opentelemetry import trace
-from opentelemetry.sdk.environment_variables import OTEL_SERVICE_NAME
-from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
-
-from secretnote.utils.warnings import development_preview_warning
+from secretnote.utils.warnings import development_preview_warning, optional_dependencies
 
 from .checkpoint import CheckpointGroup
 from .envvars import (
@@ -45,9 +38,27 @@ from .models import (
     TracedFrame,
 )
 from .profiler import Profiler
-from .snapshot import (
-    qualname,
-)
+from .snapshot import qualname
+
+with optional_dependencies("instrumentation", "secretflow"):
+    import fed
+    import fed._private.fed_call_holder
+    import ray
+    import ray.actor
+    import ray.remote_function
+    import secretflow
+    import secretflow.distributed
+    import secretflow.stats
+    from opentelemetry import trace
+    from opentelemetry.sdk.environment_variables import OTEL_SERVICE_NAME
+    from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.trace.propagation.tracecontext import (
+        TraceContextTextMapPropagator,
+    )
+    from ray.runtime_context import get_runtime_context
+    from secretflow.device.proxy import _actor_wrapper
 
 
 def setup_tracing(service_name: Optional[str] = None):
@@ -68,14 +79,15 @@ def setup_tracing(service_name: Optional[str] = None):
 
 
 def setup_tracing_in_ray_worker():
-    from ray.runtime_context import get_runtime_context
-
     runtime_ctx = get_runtime_context()
     setup_tracing(runtime_ctx.get_worker_id())
 
 
 def setup_debug_exporter():
-    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    with optional_dependencies("dev"):
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
+            OTLPSpanExporter,
+        )
 
     provider = cast(TracerProvider, trace.get_tracer_provider())
     processor = SimpleSpanProcessor(
@@ -150,16 +162,6 @@ def get_traced_frame(span: OTelSpanDict) -> Optional[TracedFrame]:
 
 
 def default_checkpoints():
-    import fed
-    import fed._private.fed_call_holder
-    import ray
-    import ray.actor
-    import ray.remote_function
-    import secretflow
-    import secretflow.distributed
-    import secretflow.stats
-    from secretflow.device.proxy import _actor_wrapper
-
     checkpoints = CheckpointGroup()
     add_function = checkpoints.add_function
 

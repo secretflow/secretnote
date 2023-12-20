@@ -2,12 +2,12 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from secretnote.formal.symbols import ExpressionType
-from secretnote.instrumentation.models import FunctionCheckpoint, SnapshotType
-from secretnote.utils.pydantic import Reference
+from secretnote.display.react.component import ComponentProps
 
+from ..formal.symbols import ExpressionType
+from ..models import FunctionCheckpoint, SnapshotType
+from ..utils import Reference
 from .parsers.dependencies import DependencyGraph
-from .react.component import ComponentProps
 
 
 class Frame(BaseModel):

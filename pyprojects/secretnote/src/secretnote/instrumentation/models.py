@@ -21,20 +21,12 @@ from typing import (
     Union,
 )
 
-import stack_data.core
-from opentelemetry.util.types import Attributes
 from pydantic import BaseModel, Field, PrivateAttr
 from typing_extensions import Annotated, override
 
-from secretnote.formal.symbols import LogicalLocation
-from secretnote.utils.pydantic import (
-    ProxiedModel,
-    Reference,
-    ReferenceMap,
-    like_pytree,
-    update_forward_refs,
-)
+from secretnote.utils.warnings import optional_dependencies
 
+from .formal.symbols import LogicalLocation
 from .snapshot import (
     bytecode_hash,
     find_globals,
@@ -47,6 +39,29 @@ from .snapshot import (
     to_string,
     type_annotation,
 )
+from .utils import (
+    ProxiedModel,
+    Reference,
+    ReferenceMap,
+    like_pytree,
+    update_forward_refs,
+)
+
+with optional_dependencies("instrumentation"):
+    import stack_data.core
+    from opentelemetry.util.types import Attributes
+    from secretflow.data.core import Partition
+    from secretflow.data.horizontal import HDataFrame
+    from secretflow.data.ndarray import FedNdarray
+    from secretflow.data.vertical import VDataFrame
+    from secretflow.device.device import (
+        Device,
+        DeviceObject,
+        HEUObject,
+        PYUObject,
+        SPUObject,
+        TEEUObject,
+    )
 
 T = TypeVar("T", bound="SnapshotType")
 
@@ -188,8 +203,6 @@ class RemoteLocationSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     @classmethod
     def typecheck(cls, x):
-        from secretflow.device.device import Device
-
         return isinstance(x, Device)
 
     @classmethod
@@ -214,20 +227,14 @@ class RemoteObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     @classmethod
     def typecheck(cls, x) -> bool:
-        from secretflow.data.core import Partition  # FIXME:
-        from secretflow.device.device import DeviceObject
-
         return isinstance(x, (DeviceObject, Partition))
 
     @classmethod
     def trace(cls, x):
-        from secretflow.data.core import Partition  # FIXME:
-        from secretflow.device.device import HEUObject, PYUObject, SPUObject, TEEUObject
-
         if isinstance(x, PYUObject):
             refs = (fingerprint(x.data),)
         elif isinstance(x, SPUObject):
-            refs = (fingerprint(x.meta), *map(fingerprint, x.shares_name))
+            refs = (fingerprint(x.meta), *sorted(map(fingerprint, x.shares_name)))
         elif isinstance(x, HEUObject):
             refs = (fingerprint(x.data),)
         elif isinstance(x, TEEUObject):
@@ -255,11 +262,13 @@ class ObjectFederationSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     @classmethod
     def typecheck(cls, x) -> bool:
-        from secretflow.data.horizontal import HDataFrame
-        from secretflow.data.ndarray import FedNdarray
-        from secretflow.data.vertical import VDataFrame
-
         if isinstance(x, (VDataFrame, HDataFrame, FedNdarray)):
+            return True
+
+        if isinstance(x, dict) and all(
+            (isinstance(k, Device) and isinstance(v, DeviceObject))
+            for k, v in x.items()
+        ):
             return True
 
         return False
@@ -271,9 +280,6 @@ class ObjectFederationSnapshot(ObjectTracer, Reference, ProxiedModel):
     @classmethod
     def tree(cls, x) -> Dict[str, Union[Dict, List]]:
         # FIXME: clean up
-        from secretflow.data.horizontal import HDataFrame
-        from secretflow.data.ndarray import FedNdarray
-        from secretflow.data.vertical import VDataFrame
 
         if isinstance(x, (VDataFrame, HDataFrame, FedNdarray)):
             return {"federation": [p for p in x.partitions.values()]}
