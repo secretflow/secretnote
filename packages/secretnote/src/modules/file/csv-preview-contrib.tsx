@@ -33,6 +33,49 @@ const TableView = (props: { data: string }) => {
       };
 
       s2.current = new TableSheet(ref.current, s2DataConfig, s2Options);
+      s2.current.setThemeCfg({
+        theme: {
+          rowCell: {
+            text: {
+              textAlign: 'center',
+            },
+          },
+          dataCell: {
+            text: {
+              textAlign: 'center',
+            },
+          },
+        },
+        name: 'colorful',
+        palette: {
+          semanticColors: {
+            red: '#FF4D4F',
+            green: '#29A294',
+            yellow: '#FAAD14',
+          },
+          others: {
+            highlight: '#87B5FF',
+            results: '#F0F7FF',
+          },
+          basicColors: [
+            '#FFFFFF',
+            '#F4F4F5',
+            '#DEDFE0',
+            '#24292E',
+            '#1F2327',
+            '#1F2327',
+            '#1F2327',
+            '#24292E',
+            '#FFFFFF',
+            '#DEDFE0',
+            '#45494D',
+            '#45494D',
+            '#24292E',
+            '#000000',
+            '#000000',
+          ],
+        },
+      });
       s2.current.render();
     }
 

@@ -65,6 +65,14 @@ const defaultHighlightOptions = [
     },
   },
   {
+    keyword: 'ErrorCode',
+    ignoreSensitive: true,
+    decorations: {
+      matchForegroundColor: '#faad14',
+      matchBackground: '#24292e',
+    },
+  },
+  {
     keyword: '[warn]',
     ignoreSensitive: true,
     decorations: {
@@ -76,7 +84,7 @@ const defaultHighlightOptions = [
     keyword: '[debug]',
     ignoreSensitive: true,
     decorations: {
-      matchForegroundColor: 'green',
+      matchForegroundColor: 'cyan',
       matchBackground: '#24292e',
     },
   },
