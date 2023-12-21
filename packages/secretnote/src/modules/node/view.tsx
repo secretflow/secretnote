@@ -18,14 +18,13 @@ import {
   Popover,
   Space,
   Typography,
-  Select,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import { invert } from '@/utils';
 
-import { ServerStatus, ServerTypeMap } from '../server';
+import { ServerStatus } from '../server';
 
 import './index.less';
 import type { Node, ServerStatusTag } from './service';
@@ -76,6 +75,9 @@ const NodeDetails = (props: { node: Node }) => {
   };
 
   const onChangeNodeName = async (n: Node, name: string) => {
+    if (n.name === name) {
+      return;
+    }
     try {
       await instance.service.updateNodeName(n.id, name);
       setEditableStr(name);
@@ -100,9 +102,6 @@ const NodeDetails = (props: { node: Node }) => {
           </Paragraph>
         </Descriptions.Item>
         <Descriptions.Item label={l10n.t('地址')}>{node.address}</Descriptions.Item>
-        <Descriptions.Item label={l10n.t('类型')}>
-          {ServerTypeMap[node.type]}
-        </Descriptions.Item>
         <Descriptions.Item label={l10n.t('状态')}>
           <Badge status={status} text={text} />
         </Descriptions.Item>
@@ -178,18 +177,6 @@ export const NodeComponent = () => {
           ]}
         >
           <Input placeholder="127.0.0.1:8888" />
-        </Form.Item>
-        <Form.Item
-          label={l10n.t('类型')}
-          name="type"
-          rules={[{ required: true, message: l10n.t('请选择节点类型') }]}
-        >
-          <Select
-            options={[
-              { label: l10n.t('通用'), value: 'common' },
-              { label: 'SCQL', value: 'scql' },
-            ]}
-          />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Space>

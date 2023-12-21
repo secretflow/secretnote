@@ -291,7 +291,7 @@ const renderItems = () => {
       });
 
       popup = tippy('body', {
-        getReferenceClientRect: () => props.clientRect,
+        getReferenceClientRect: props.clientRect as any,
         appendTo: () => document.body,
         content: component.element,
         showOnCreate: true,

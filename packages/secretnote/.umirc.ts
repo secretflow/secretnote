@@ -6,6 +6,7 @@ export default defineConfig({
   base: '/secretnote/',
   publicPath: '/secretnote/',
   favicons: ['/secretnote/favicon.svg'],
+  title: 'SecretNote',
   exportStatic: {},
   routes: [
     { path: '/', redirect: '/secretflow' },

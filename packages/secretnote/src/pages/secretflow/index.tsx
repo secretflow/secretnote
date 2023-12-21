@@ -8,7 +8,6 @@ import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { MetricsModule } from '@/modules/metrics';
 import { NodeModule } from '@/modules/node';
 import { NotebookModule } from '@/modules/notebook';
-import { SnippetModule } from '@/modules/snippet';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
@@ -34,7 +33,6 @@ const App = (): JSX.Element => {
         // IntegrationModule,
         MarkdownCellModule,
         WelcomeModule,
-        SnippetModule,
       ]}
     />
   );
