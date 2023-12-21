@@ -42,6 +42,12 @@ managed = true
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.hatch.build.targets.sdist]
+include = []
+
+[tool.hatch.build.targets.wheel]
+bypass-selection = true
+
 [tool.black]
 force-exclude = """
 _pb2\\.pyi?

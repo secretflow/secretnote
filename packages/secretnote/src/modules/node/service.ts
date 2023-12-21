@@ -1,5 +1,4 @@
 import { inject, singleton } from '@difizen/mana-app';
-import { message } from 'antd';
 
 import type { ServerStatus, ServerType } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';

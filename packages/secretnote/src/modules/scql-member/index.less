@@ -1,0 +1,33 @@
+.secretnote-scql-member {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  padding-right: 24px;
+  float: right;
+
+  .ant-avatar-group .ant-badge:not(:first-child) {
+    margin-left: -8px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    color: var(--mana-secretnote-icon-color);
+
+    svg {
+      transition: color 0.3s;
+    }
+
+    &:hover svg {
+      color: #40a9ff;
+    }
+  }
+}
+
+.secretnote-add-member {
+  .ant-form-item {
+    margin-bottom: 4px;
+  }
+}

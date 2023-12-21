@@ -1,7 +1,7 @@
 import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { RequestService } from '@/utils';
+import { request } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus, ServerType } from './protocol';
@@ -12,25 +12,20 @@ export class SecretNoteServerManager {
   servers: IServer[] = [];
 
   protected serverConnection: ServerConnection;
-  protected requestService: RequestService;
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
   readonly onServerAdded = this.onServerAddedEmitter.event;
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
 
-  constructor(
-    @inject(ServerConnection) serverConnection: ServerConnection,
-    @inject(RequestService) requestService: RequestService,
-  ) {
+  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
-    this.requestService = requestService;
     this.getServerList();
   }
 
   async getServerList() {
     const url = 'api/nodes';
     const init = { method: 'GET' };
-    const data = (await this.requestService.request(url, init)) as IServer[];
+    const data = (await request(url, init)) as IServer[];
     for (const item of data) {
       /**
        * For historical reasons, the server id front-end uses a string
@@ -68,7 +63,7 @@ export class SecretNoteServerManager {
           type: newServer.type,
         }),
       };
-      const data = await this.requestService.request(url, init);
+      const data = await request(url, init);
       newServer.status = ServerStatus.running;
       newServer.kernelspec = spec;
       const added = {
@@ -92,7 +87,7 @@ export class SecretNoteServerManager {
     const init = {
       method: 'DELETE',
     };
-    await this.requestService.request(url, init);
+    await request(url, init);
     const server = this.servers[index];
     this.servers.splice(index, 1);
     this.onServerAddedEmitter.fire(server);
@@ -108,7 +103,7 @@ export class SecretNoteServerManager {
         type: server.type,
       }),
     };
-    await this.requestService.request(url, init);
+    await request(url, init);
     this.servers = this.servers.map((item) => {
       if (item.id === id) {
         return {
@@ -125,18 +120,26 @@ export class SecretNoteServerManager {
     const init = {
       method: 'GET',
     };
-    const data = (await this.requestService.request(url, init)) as IServer;
+    const data = (await request(url, init)) as IServer;
     return data;
   }
 
   private async getServerSpec(server: IServer) {
     const url = 'api/kernelspecs';
     try {
-      const data = await this.requestService.request(url, {}, server);
+      const address = this.getServerUrl(server).baseUrl;
+      const data = await request(url, {}, address);
       return data;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
+  }
+
+  getServerUrl(server: IServer) {
+    return {
+      baseUrl: `http://${server.address}/`,
+      wsUrl: `ws://${server.address}/`,
+    };
   }
 }

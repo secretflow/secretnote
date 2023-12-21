@@ -13,7 +13,7 @@ import {
   prop,
   transient,
 } from '@difizen/mana-app';
-import debounce from 'lodash.debounce';
+import { debounce } from 'lodash-es';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager } from '@/modules/server';

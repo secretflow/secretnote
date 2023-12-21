@@ -24,8 +24,6 @@ export enum SideBarArea {
   integrationExtra = 'integrationExtra',
 }
 
-const { Panel } = Collapse;
-
 export const SideBar: React.FC = () => {
   const instance = useInject<SideBarView>(ViewInstance);
   const providers = instance.providers.getContributions();
@@ -47,13 +45,7 @@ export const SideBar: React.FC = () => {
 
   return (
     <div className="secretnote-sidebar">
-      <Collapse defaultActiveKey={defaultActiveKey} ghost>
-        {items.map((item) => (
-          <Panel key={item.key} header={item.label} extra={item.extra}>
-            {item.children}
-          </Panel>
-        ))}
-      </Collapse>
+      <Collapse defaultActiveKey={defaultActiveKey} ghost items={items} />
     </div>
   );
 };

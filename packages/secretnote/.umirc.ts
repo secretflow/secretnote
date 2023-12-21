@@ -1,4 +1,5 @@
 import { defineConfig } from 'umi';
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 export default defineConfig({
   // This is not portable at all
@@ -7,8 +8,12 @@ export default defineConfig({
   favicons: ['/secretnote/favicon.svg'],
   exportStatic: {},
   routes: [
-    { path: '/', component: 'secretnote' },
+    { path: '/', redirect: '/secretflow' },
+    { path: '/secretflow', component: 'secretflow' },
     { path: '/preview', component: 'preview' },
+    { path: '/scql', redirect: '/scql/project' },
+    { path: '/scql/project', component: 'scql-project' },
+    { path: '/scql/project/:id', component: 'scql-workspace' },
   ],
   // devtool: 'source-map',
   writeToDisk: true,
@@ -44,4 +49,8 @@ export default defineConfig({
   ],
   mfsu: false,
   npmClient: 'pnpm',
+  chainWebpack(memo) {
+    memo.plugin('monaco').use(MonacoWebpackPlugin);
+  },
+  esbuildMinifyIIFE: true,
 });

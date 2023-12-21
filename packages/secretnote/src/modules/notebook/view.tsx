@@ -16,7 +16,6 @@ import React from 'react';
 
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-import { ERROR_CODE, getErrorMessage } from '@/utils';
 
 import './index.less';
 import { NotebookFileService } from './service';
@@ -61,10 +60,13 @@ export const NotebookFileComponent = () => {
   };
 
   const renameFile = async () => {
-    const code = await notebookFileService.renameFile();
-    if (code !== ERROR_CODE.NO_ERROR) {
-      message.error(getErrorMessage(code));
-      notebookFileService.renameNotebookFile = null;
+    try {
+      await notebookFileService.renameFile();
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+        notebookFileService.renameNotebookFile = null;
+      }
     }
   };
 

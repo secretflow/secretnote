@@ -2,6 +2,7 @@
   "extends": "./src/.umi/tsconfig.json",
   "compilerOptions": {
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "importHelpers": false
   }
 }

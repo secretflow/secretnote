@@ -40,11 +40,6 @@ single_page_static_path = static_paths()
 
 pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
     (
-        r"/secretnote/preview(.*)",
-        SinglePageApplicationHandler,
-        {"path": single_page_static_path},
-    ),
-    (
         r"/secretnote(.*)",
         SinglePageApplicationHandler,
         {"path": single_page_static_path},

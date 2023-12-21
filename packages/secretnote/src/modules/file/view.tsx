@@ -26,7 +26,7 @@ import {
 import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-import { ERROR_CODE, getErrorMessage, readFile } from '@/utils';
+import { readFile } from '@/utils';
 
 import './index.less';
 import { FileService, FILE_EXTS } from './service';
@@ -78,12 +78,14 @@ export const FileComponent = () => {
 
   const uploadFile = async (nodeData: DataNode, file: File) => {
     const content = await readFile(file);
-    const code = await fileService.uploadFile(nodeData, file.name, content);
-    if (code !== ERROR_CODE.NO_ERROR) {
-      message.error(getErrorMessage(code));
-    } else {
+    try {
+      await fileService.uploadFile(nodeData, file.name, content);
       await fileService.getFileTree();
       message.success(l10n.t('文件上传成功'));
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+      }
     }
   };
 
@@ -147,7 +149,7 @@ export const FileComponent = () => {
     ];
 
     return (
-      <div className="secretnote-tree-title">
+      <div className="ant-tree-title-content">
         <span>
           <Space>
             {getFileIcon(nodeData)}

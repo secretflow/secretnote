@@ -6,6 +6,7 @@
   "language": "en",
   // words - list of words to be always considered correct
   "words": [
+    "ahooks",
     "aiofiles",
     "antd",
     "antv",
@@ -18,6 +19,7 @@
     "dagre",
     "dbaeumer",
     "difizen",
+    "dtype",
     "elkjs",
     "elts",
     "ename",

@@ -3,7 +3,7 @@ import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
 import { ContentsManager } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { downloadFileByUrl, ERROR_CODE } from '@/utils';
+import { downloadFileByUrl } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
@@ -64,7 +64,7 @@ export class NotebookFileService {
             const newPath = path.replace(file.name, name);
             const isExisted = await this.isFileExisted(newPath);
             if (isExisted) {
-              return ERROR_CODE.NOTEBOOK_ALREADY_EXISTED;
+              throw new Error('The notebook is already existed.');
             }
             const newFile = await this.contentsManager.rename(path, newPath);
             await this.getFileList();
@@ -76,7 +76,6 @@ export class NotebookFileService {
       }
     }
     this.renameNotebookFile = null;
-    return ERROR_CODE.NO_ERROR;
   }
 
   async addFile() {

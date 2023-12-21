@@ -1,0 +1,62 @@
+.sql-editor-container {
+  padding: 12px 0 18px;
+  border-radius: 4px;
+  background: var(--mana-libro-input-background) !important;
+}
+
+.sql-editor {
+  background: var(--mana-libro-input-background) !important;
+
+  .monaco-editor-background,
+  .margin {
+    background: var(--mana-libro-input-background) !important;
+  }
+
+  .current-line-margin,
+  .current-line-both {
+    border: unset !important;
+    background: var(--mana-libro-editor-activeline-color) !important;
+  }
+
+  .line-numbers {
+    margin-left: 8px;
+    color: var(--mana-libro-editor-gutter-number-color) !important;
+    font-size: 13px;
+    font-weight: 400;
+    // font-family: Menlo-Regular, consolas, 'DejaVu Sans Mono', monospace !important;
+  }
+
+  .cursors-layer .cursor {
+    background-color: var(--mana-libro-editor-cursor-color);
+  }
+
+  .monaco-hover-content {
+    background-color: #fff;
+
+    .rendered-markdown {
+      table {
+        th {
+          border-bottom: 1px solid #f0f0f0;
+          background-color: #fbfbfb;
+          color: #283849;
+          text-align: center;
+        }
+
+        td {
+          padding: 2px 8px;
+          border-bottom: 1px solid #f0f0f0;
+          color: #40566c;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .monaco-list-rows {
+    background-color: #fff;
+  }
+
+  .codicon-symbol-folder::before {
+    content: '\ebb7';
+  }
+}

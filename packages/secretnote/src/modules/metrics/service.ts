@@ -1,12 +1,12 @@
 import type { IKernelConnection, KernelMessage } from '@difizen/libro-jupyter';
-import { kernelStatus, ServerConnection, URL } from '@difizen/libro-jupyter';
+import { kernelStatus, ServerConnection } from '@difizen/libro-jupyter';
 import { getOrigin, inject, prop, singleton } from '@difizen/mana-app';
 import { Poll } from '@lumino/polling';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager } from '@/modules/server';
 import type { IServer } from '@/modules/server';
-import { RequestService } from '@/utils';
+import { request } from '@/utils';
 
 import { NotebookFileService } from '../notebook';
 
@@ -45,7 +45,6 @@ export class MetricsService {
   protected readonly kernelManager: SecretNoteKernelManager;
   protected readonly serverConnection: ServerConnection;
   protected readonly notebookFileService: NotebookFileService;
-  protected readonly requestService: RequestService;
 
   @prop()
   metrics: MetricsItem[] = [];
@@ -58,13 +57,11 @@ export class MetricsService {
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
     @inject(ServerConnection) serverConnection: ServerConnection,
     @inject(NotebookFileService) notebookFileService: NotebookFileService,
-    @inject(RequestService) requestService: RequestService,
   ) {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.serverConnection = serverConnection;
     this.notebookFileService = notebookFileService;
-    this.requestService = requestService;
     this.notebookFileService.onNotebookFileChanged(() => {
       this.refresh();
     });
@@ -178,7 +175,8 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1';
       const init = { method: 'GET' };
-      const data = await this.requestService.request(url, init, server);
+      const address = this.serverManager.getServerUrl(server).baseUrl;
+      const data = await request(url, init, address);
 
       return {
         cpu: data.cpu_percent,
@@ -208,7 +206,8 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1/kernel_usage/get_usage/' + id;
       const init = { method: 'GET' };
-      const data = await this.requestService.request(url, init, server);
+      const address = this.serverManager.getServerUrl(server).baseUrl;
+      const data = await request(url, init, address);
       const { cpu, memory, pid, cpuText, memoryText } = this.parseKernelStatus(data);
       const { color, text_zh } = kernelStatus[status];
 

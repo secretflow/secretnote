@@ -1,7 +1,4 @@
-import { ServerConnection, URL } from '@difizen/libro-jupyter';
-import { inject, singleton } from '@difizen/mana-app';
-
-import type { IServer } from '@/modules/server';
+import { PageConfig } from '@difizen/libro-jupyter';
 
 export class ResponseError extends Error {
   response: Response;
@@ -31,52 +28,61 @@ export const createResponseError = async (response: Response) => {
   }
 };
 
-@singleton()
-export class RequestService {
-  protected readonly serverConnection: ServerConnection;
+const normalizeUrl = (url: string, base?: string) => {
+  const urlObj = new URL(url, base ?? location.origin);
+  return urlObj.href;
+};
 
-  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
-    this.serverConnection = serverConnection;
+const getCookie = (name: string): string | undefined => {
+  // From http://www.tornadoweb.org/en/stable/guide/security.html
+  const matches = document.cookie.match('\\b' + name + '=([^;]*)\\b');
+  return matches?.[1];
+};
+
+export const request = async (url: string, init: RequestInit, address?: string) => {
+  let requestUrl = normalizeUrl(url, address);
+
+  const cache = init.cache ?? 'no-store';
+  if (cache === 'no-store') {
+    requestUrl += (/\?/.test(url) ? '&' : '?') + new Date().getTime();
   }
 
-  async request(url: string, init: RequestInit, server?: IServer) {
-    const settings = this.getSettings(server);
-    const response = await this.serverConnection.makeRequest(
-      this.getUrl(settings.baseUrl, url),
-      init,
-      settings,
-    );
+  const req = new window.Request(requestUrl, {
+    cache: 'no-store',
+    credentials: 'same-origin',
+    ...init,
+  });
 
-    if (response.status === 204) {
-      return;
+  let authenticated = false;
+  const token = PageConfig.getToken();
+  if (token) {
+    authenticated = true;
+    req.headers.append('Authorization', `token ${token}`);
+  }
+  if (typeof document !== 'undefined' && document?.cookie) {
+    const xsrfToken = getCookie('_xsrf');
+    if (xsrfToken !== undefined) {
+      authenticated = true;
+      req.headers.append('X-XSRFToken', xsrfToken);
     }
-
-    if (response.status === 200) {
-      const data = await response.json();
-      return data;
-    }
-
-    const err = await createResponseError(response);
-    throw err;
   }
 
-  private getSettings(server?: IServer) {
-    const settings = {
-      ...this.serverConnection.settings,
-      ...(server && getServerUrl(server)),
-    };
-    return settings;
+  if (!req.headers.has('Content-Type') && authenticated) {
+    req.headers.set('Content-Type', 'application/json');
   }
 
-  private getUrl(baseUrl: string, url: string, ...args: string[]) {
-    const parts = args.map((path) => URL.encodeParts(path));
-    return URL.join(baseUrl, url, ...parts);
-  }
-}
+  const response = await window.fetch(req);
 
-export const getServerUrl = (server: IServer) => {
-  return {
-    baseUrl: `http://${server.address}/`,
-    wsUrl: `ws://${server.address}/`,
-  };
+  if (response.status === 204) {
+    return;
+  }
+
+  if (response.status === 200) {
+    const data = await response.json();
+    return data;
+  }
+
+  const err = await createResponseError(response);
+
+  throw err;
 };
