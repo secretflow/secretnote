@@ -4,7 +4,7 @@
   "files": [
     "static"
   ],
-  "version": "0.0.0",
+  "version": "0.1.0-dev.0",
   "type": "module",
   "scripts": {
     "format:black": "python -m black --check src tests",

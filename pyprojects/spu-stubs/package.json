@@ -2,7 +2,7 @@
   "name": "spu-stubs",
   "private": true,
   "files": [],
-  "version": "0.0.0",
+  "version": "0.1.0-dev.0",
   "scripts": {
     "format:black": "python -m black --check src tests",
     "lint:ruff": "python -m ruff check src tests",

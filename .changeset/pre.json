@@ -4,7 +4,12 @@
   "initialVersions": {
     "@secretflow/repo-utils": "0.1.0",
     "secretnote": "0.0.0",
-    "spu-stubs": "0.0.0"
+    "spu-stubs": "0.0.0",
+    "@secretflow/secretnote": "0.0.0",
+    "@secretflow/secretnote-ui": "0.0.0"
   },
-  "changesets": ["blue-crabs-argue"]
+  "changesets": [
+    "blue-crabs-argue",
+    "loud-kids-dream"
+  ]
 }

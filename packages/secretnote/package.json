@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/secretnote",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0-dev.0",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
