@@ -8,6 +8,9 @@ import {
   CellService,
   JupyterCodeCellView,
   KernelError,
+  ILSPDocumentConnectionManager,
+  CodeEditorManager,
+  CodeEditorSettings,
 } from '@difizen/libro-jupyter';
 import {
   getOrigin,
@@ -75,8 +78,18 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     @inject(ViewManager) viewManager: ViewManager,
     @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
+    @inject(ILSPDocumentConnectionManager) lsp: ILSPDocumentConnectionManager,
+    @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
+    @inject(CodeEditorSettings) codeEditorSettings: CodeEditorSettings,
   ) {
-    super(options, cellService, viewManager);
+    super(
+      options,
+      cellService,
+      viewManager,
+      lsp,
+      codeEditorManager,
+      codeEditorSettings,
+    );
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.executionParty =

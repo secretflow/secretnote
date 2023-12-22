@@ -13,6 +13,9 @@ import {
   CodeEditorView,
   JupyterCodeCellView,
   NotebookCommands,
+  ILSPDocumentConnectionManager,
+  CodeEditorManager,
+  CodeEditorSettings,
 } from '@difizen/libro-jupyter';
 import {
   inject,
@@ -55,8 +58,18 @@ export class SqlCellView extends JupyterCodeCellView {
     @inject(ViewManager) viewManager: ViewManager,
     @inject(SCQLQueryService) queryService: SCQLQueryService,
     @inject(CommandRegistry) commandRegistry: CommandRegistry,
+    @inject(ILSPDocumentConnectionManager) lsp: ILSPDocumentConnectionManager,
+    @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
+    @inject(CodeEditorSettings) codeEditorSettings: CodeEditorSettings,
   ) {
-    super(options, cellService, viewManager);
+    super(
+      options,
+      cellService,
+      viewManager,
+      lsp,
+      codeEditorManager,
+      codeEditorSettings,
+    );
     this.options = options;
     this.queryService = queryService;
     this.viewManager = viewManager;
@@ -98,7 +111,7 @@ export class SqlCellView extends JupyterCodeCellView {
         editable: !this.parent.model.readOnly,
       },
     };
-    this.viewManager
+    return this.viewManager
       .getOrCreateView<CodeEditorView, CodeEditorViewOptions>(CodeEditorView, option)
       .then(async (editorView) => {
         this.editorView = editorView;

@@ -36,7 +36,7 @@ export class SecretNoteModel extends LibroModel {
   kernelConnections: IKernelConnection[] = [];
 
   @prop()
-  lspEnabled = true;
+  lspEnabled = false;
 
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {

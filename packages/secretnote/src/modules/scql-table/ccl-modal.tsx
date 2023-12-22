@@ -28,7 +28,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
   const changeCCL = async () => {
     try {
       await service.grantTableCCL(data.tableName, tableCCL);
-      message.success('ccl config successfully.');
+      message.success('Ccl config successfully.');
       close();
     } catch (e) {
       if (e instanceof Error) {

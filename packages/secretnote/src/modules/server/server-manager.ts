@@ -74,7 +74,7 @@ export class SecretNoteServerManager {
       this.onServerAddedEmitter.fire(added);
       return added;
     } else {
-      throw new Error('cannot connect to the node.');
+      throw new Error('Cannot connect to the node.');
     }
   }
 

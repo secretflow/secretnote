@@ -32,7 +32,7 @@ const MetricsIcon = () => {
     <AreaChart
       onClick={handleClick}
       size={16}
-      style={{ color: '#7b7b7b', marginTop: 5 }}
+      style={{ color: '#7b7b7b', marginTop: 10 }}
     />
   );
 };

@@ -8,6 +8,7 @@ import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { MetricsModule } from '@/modules/metrics';
 import { NodeModule } from '@/modules/node';
 import { NotebookModule } from '@/modules/notebook';
+import { SFComponentCellModule } from '@/modules/sf-component-cell';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
@@ -29,10 +30,9 @@ const App = (): JSX.Element => {
         ToolbarModule,
         FileModule,
         MetricsModule,
-        // SQLEditorModule,
-        // IntegrationModule,
         MarkdownCellModule,
         WelcomeModule,
+        SFComponentCellModule,
       ]}
     />
   );
