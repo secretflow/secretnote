@@ -11,9 +11,9 @@ from secretnote.docpack.hazmat.primitives import (
     Public,
     Task,
 )
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
-with optional_dependencies("secretflow"):
+with peer_dependencies("secretflow"):
     import pandas as pd
     from secretflow.data.vertical import VDataFrame
 

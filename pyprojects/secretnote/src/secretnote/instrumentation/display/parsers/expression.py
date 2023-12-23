@@ -12,7 +12,7 @@ from typing import (
 
 from more_itertools import first
 
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
 from ...formal.symbols import (
     ExecExpression,
@@ -155,7 +155,7 @@ def _create_exec_expr(
 
 
 def create_parser():
-    with optional_dependencies("secretflow"):
+    with peer_dependencies("secretflow"):
         import secretflow
 
     parser = ExpressionParser()

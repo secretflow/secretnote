@@ -4,15 +4,18 @@ from typing import List, Type
 
 from fastapi import FastAPI
 
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
 from .hazmat.compat import component_to_recipe
-from .hazmat.markers import with_implementation_schema
+from .hazmat.io import DataFrameFileIO, VerticalDataFrameFileIO
+from .hazmat.markers import register_implementations, with_implementation_schema
 from .hazmat.primitives import Task
+
+register_implementations(DataFrameFileIO, VerticalDataFrameFileIO)
 
 
 def all_recipes() -> List[Type[Task]]:
-    with optional_dependencies("secretflow"):
+    with peer_dependencies("secretflow"):
         from secretflow.component.entry import ALL_COMPONENTS
 
     return [component_to_recipe(component) for component in ALL_COMPONENTS]
@@ -29,7 +32,7 @@ def create_app() -> FastAPI:
         async def endpoint(info: recipe) -> None:  # type: ignore
             ...
 
-        app.post(path, name=name)(endpoint)
+        app.post(path, summary=name)(endpoint)
 
     return app
 

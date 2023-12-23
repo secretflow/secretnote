@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field, create_model
 from pydantic.fields import ModelField
 from typing_extensions import override
 
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
 from .markers import MarkerTrait, traits_of
 from .primitives import (
@@ -41,7 +41,7 @@ from .primitives import (
     TaskMetadata,
 )
 
-with optional_dependencies("secretflow"):
+with peer_dependencies("secretflow"):
     import pandas as pd
     from google.protobuf.json_format import MessageToDict
     from google.protobuf.message import Message

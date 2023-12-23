@@ -1,6 +1,7 @@
 import pytest
 
 try:
+    from google.protobuf.json_format import MessageToDict
     from secretflow.component.component import Component
     from secretflow.component.entry import COMP_MAP
 except ImportError:
@@ -11,8 +12,6 @@ from secretnote.docpack.hazmat.compat import component_to_recipe, recipe_to_comp
 
 @pytest.mark.parametrize("comp", COMP_MAP.values(), ids=COMP_MAP.keys())
 def test_roundtripping(comp: Component):
-    from google.protobuf.json_format import MessageToDict
-
     recipe = component_to_recipe(comp)
     comp2 = recipe_to_component(recipe)
 

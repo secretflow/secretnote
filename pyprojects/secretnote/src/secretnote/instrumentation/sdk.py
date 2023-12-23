@@ -84,10 +84,9 @@ def setup_tracing_in_ray_worker():
 
 
 def setup_debug_exporter():
-    with optional_dependencies("dev"):
-        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
-            OTLPSpanExporter,
-        )
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
+        OTLPSpanExporter,
+    )
 
     provider = cast(TracerProvider, trace.get_tracer_provider())
     processor = SimpleSpanProcessor(

@@ -14,9 +14,9 @@ from secretnote.docpack.hazmat.primitives import (
     Task,
 )
 from secretnote.utils.pydantic import update_forward_refs
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
-with optional_dependencies("secretflow"):
+with peer_dependencies("secretflow"):
     from secretflow.data.vertical import VDataFrame
 
 

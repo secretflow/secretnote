@@ -1,7 +1,6 @@
 import warnings
 from contextlib import contextmanager
-
-from loguru import logger
+from typing import Optional
 
 
 def development_preview_warning():
@@ -14,22 +13,45 @@ def development_preview_warning():
     )
 
 
+class OptionalDependencyException(RuntimeError):
+    def __init__(self, module: Optional[str], *features: str):
+        self.module = module
+        self.features = features
+
+    def __str__(self) -> str:
+        features = ",".join(self.features)
+        return (
+            f"Cannot import {self.module}."
+            f"\nHint: Install SecretNote with the [{features}] extras:"
+            f"\n  python -m pip install secretnote[{features}]"
+        )
+
+
+class PeerDependencyException(RuntimeError):
+    def __init__(self, module: Optional[str], *packages: str):
+        self.module = module
+        self.packages = packages
+
+    def __str__(self) -> str:
+        packages = " ".join(self.packages)
+        return (
+            f"Cannot import {self.module}."
+            f"\nError: You must install the following dependencies separately:"
+            f"\n  python -m pip install {packages}"
+        )
+
+
 @contextmanager
 def optional_dependencies(*features: str):
     try:
         yield
     except ImportError as e:
-        module_name = e.name
-        extras = ",".join(features)
-        logger.exception(
-            "Cannot import {module_name}.\nHint: Install SecretNote with"
-            " the [{extras}] extras: python -m pip install secretflow[{extras}]",
-            module_name=module_name,
-            extras=extras,
-        )
-        if "secretflow" in features:
-            logger.exception(
-                "You must install SecretFlow separately:"
-                " python -m pip install secretflow"
-            )
-        raise SystemExit(1) from e
+        raise OptionalDependencyException(e.name, *features) from e
+
+
+@contextmanager
+def peer_dependencies(*packages: str):
+    try:
+        yield
+    except ImportError as e:
+        raise PeerDependencyException(e.name, *packages) from e

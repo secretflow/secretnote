@@ -16,9 +16,9 @@ from pydantic import BaseModel, PrivateAttr
 from typing_extensions import TypeGuard
 
 from secretnote.utils.pydantic import iter_union, update_forward_refs
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
-with optional_dependencies("secretflow"):
+with peer_dependencies("secretflow"):
     import jax
 
 T = TypeVar("T")

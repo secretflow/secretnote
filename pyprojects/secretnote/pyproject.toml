@@ -47,11 +47,6 @@ instrumentation = [
   "ray>=2.2.0",
   "stack_data>=0.6.3",
 ]
-secretflow = [
-  "interconnection>=0.1.0.dev20231204",
-  "spu>=0.6.0b0",
-  "sf-heu>=0.4.4b0",
-]
 
 [project.scripts]
 secretnote = "secretnote.server.app:SecretNoteApp.launch"

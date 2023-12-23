@@ -3,9 +3,9 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import peer_dependencies
 
-with optional_dependencies("secretflow"):
+with peer_dependencies("secretflow"):
     import pandas as pd
     from secretflow.data.vertical import VDataFrame
 
@@ -23,7 +23,7 @@ class VerticalDataFrameFileIO(
     IO[VDataFrame, Partitioned[Any, AXIS_COLUMNS], Any],
     BaseModel,
 ):
-    """Load a vertically-partitioed DataFrame from two parties."""
+    """Load a vertically-partitioned DataFrame from two parties."""
 
     path_0: Path
     path_1: Path

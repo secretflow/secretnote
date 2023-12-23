@@ -3,6 +3,7 @@ import dis
 import inspect
 from collections import defaultdict
 from contextlib import suppress
+from operator import attrgetter
 from pprint import pformat
 from textwrap import dedent
 from types import CodeType, FrameType, FunctionType, MethodType, ModuleType
@@ -18,13 +19,15 @@ from typing import (
 )
 from weakref import WeakValueDictionary
 
-from secretnote.utils.warnings import optional_dependencies
+from secretnote.utils.warnings import optional_dependencies, peer_dependencies
 
 from .formal.symbols import LogicalLocation
 
-with optional_dependencies("instrumentation", "secretflow"):
-    from fed import FedObject
+with optional_dependencies("instrumentation"):
     from opentelemetry import trace
+
+with peer_dependencies("secretflow"):
+    from fed import FedObject
     from ray import ObjectRef
     from secretflow.data import Partition
     from secretflow.device.device import (
@@ -267,8 +270,11 @@ def source_path(filename: Optional[str]) -> Optional[str]:
     return compress_user(filename)
 
 
+_name_getter = attrgetter("__name__")
+
+
 def to_string(obj: Any) -> str:
-    for getter in (pformat, str, repr, fingerprint):
+    for getter in (_name_getter, pformat, str, repr, fingerprint):
         with suppress(Exception):
             text = getter(obj)
             assert isinstance(text, str)
