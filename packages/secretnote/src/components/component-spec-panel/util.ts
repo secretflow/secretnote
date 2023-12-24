@@ -27,11 +27,11 @@ export const getRenderType = (attr: Attr): LevaInputs => {
 export const getDefaultValue = (attr: Attr) => {
   switch (attr.type) {
     case 'AT_BOOL':
-      return attr.atomic.defaultValue.b;
+      return attr.atomic?.defaultValue?.b;
     case 'AT_INT':
-      return attr.atomic.defaultValue.i64;
+      return attr.atomic?.defaultValue?.i64;
     case 'AT_STRING':
-      return attr.atomic.defaultValue.s;
+      return attr.atomic?.defaultValue?.s;
   }
 };
 
@@ -53,7 +53,7 @@ export const toLevaSchema = (
     outputs: {},
   };
 
-  specs.attrs.forEach((attr) => {
+  (specs.attrs || []).forEach((attr) => {
     const key = attr.name;
     const after = visitItem?.(specs, key) || {};
     const schema: SchemaItem = {
@@ -80,12 +80,15 @@ export const toLevaSchema = (
 
     const attrs = input.attrs || [];
     attrs.forEach((attr) => {
+      const k = `input/${key}/${attr.name}`;
+      const afterSchema = visitItem?.(specs, k) || {};
       const attrSchema: SchemaItem = {
         type: LevaInputs.STRING,
         label: `${key}.${attr.name}`,
         value: '',
+        ...(afterSchema as object),
       };
-      res.inputs[`input/${key}/${attr.name}`] = attrSchema;
+      res.inputs[k] = attrSchema;
     });
   });
 

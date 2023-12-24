@@ -47,12 +47,6 @@ const defaultTerminalOptions = {
   fontFamily: 'Roboto Mono,Andale Mono,Consolas,Courier New,monospace',
   lineHeight: 20 / 17,
   fastScrollSensitivity: 35,
-  theme: {
-    selectionBackground: '#fff',
-    selectionForeground: '#fff',
-    background: '#24292e',
-    foreground: '#b5bbc6',
-  },
 };
 
 const defaultHighlightOptions = [
@@ -92,6 +86,7 @@ const defaultHighlightOptions = [
 
 interface IProps {
   code: string;
+  theme?: 'dark' | 'light';
 }
 
 const LogView = (props: IProps) => {
@@ -100,14 +95,32 @@ const LogView = (props: IProps) => {
   const [searchResult, setSearchResult] = useState({ resultIndex: -1, resultCount: 0 });
   const domRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(false);
+  const theme = props.theme || 'dark';
 
   // init terminal
   useEffect(() => {
-    const instance = new Terminal(defaultTerminalOptions);
+    const instance = new Terminal({
+      ...defaultTerminalOptions,
+      theme:
+        theme === 'dark'
+          ? {
+              selectionBackground: '#fff',
+              selectionForeground: '#fff',
+              background: '#24292e',
+              foreground: '#b5bbc6',
+            }
+          : {
+              selectionBackground: '#000',
+              selectionForeground: '#000',
+              background: '#fff',
+              foreground: '#666',
+            },
+    });
     setTerminalInstance(instance);
     return () => {
       instance.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -236,7 +249,7 @@ const LogView = (props: IProps) => {
   }, [terminalInstance]);
 
   const render = (
-    <div className="terminal-viewer">
+    <div className={`terminal-viewer ${theme}`}>
       <div className="terminal-viewer-header">
         <div className="terminal-viewer-input-wrapper">
           <input

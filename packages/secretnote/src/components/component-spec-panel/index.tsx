@@ -54,7 +54,7 @@ const Schema = (props: SchemaProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [specs]);
 
-  useControls(levaSchema, { store });
+  useControls(levaSchema, { store }, [specs]);
 
   return null;
 };
@@ -99,3 +99,4 @@ const ComponentSpecPanel = (props: ComponentSpecPanelProps) => {
 };
 
 export { ComponentSpecPanel };
+export * from './type';
