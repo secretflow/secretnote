@@ -24,6 +24,7 @@ from ...formal.symbols import (
 from ...models import (
     DictSnapshot,
     FunctionInfo,
+    FunctionSnapshot,
     ListSnapshot,
     RemoteLocationSnapshot,
     RemoteObjectSnapshot,
@@ -73,7 +74,7 @@ def _get_parameters(
         elif param.kind == param.VAR_KEYWORD:
             params.update(
                 {
-                    f"{name}{key}{subkey}": subitem
+                    f"{name}.{key}{subkey}": subitem
                     for key, item in item.items()
                     for subkey, subitem in like_pytree(item, SnapshotType)
                 }
@@ -142,6 +143,7 @@ def _create_exec_expr(
 def create_parser():
     with peer_dependencies("secretflow"):
         import secretflow
+        from secretflow.device.proxy import _actor_wrapper
 
     parser = ExpressionParser()
 
@@ -177,6 +179,19 @@ def create_parser():
         yield _create_exec_expr(
             func=data.local_vars[SnapshotType, "func"],
             location=data.local_vars[RemoteLocationSnapshot, "self"].location,
+            args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
+            kwargs=data.local_vars[DictSnapshot, "kwargs"]
+            .to_container(SnapshotType)
+            .items(),
+            retvals=frame.iter_retvals(),
+        )
+
+    @parser.parse(_actor_wrapper, 1)
+    def parse_proxy_call(frame: TracedFrame):
+        data = frame.get_frame()
+        yield _create_exec_expr(
+            func=data.local_vars[SnapshotType, "__actor_method__"],
+            location=data.local_vars[RemoteObjectSnapshot, "self"].location,
             args=data.local_vars[ListSnapshot, "args"].to_container(SnapshotType),
             kwargs=data.local_vars[DictSnapshot, "kwargs"]
             .to_container(SnapshotType)
@@ -220,5 +235,20 @@ def create_parser():
             expr.results.append(_create_object(item, key))
 
         yield expr
+
+    @parser.parse(secretflow.SPU.psi_csv)
+    @parser.parse(secretflow.SPU.psi_df)
+    def parse_routine(frame: TracedFrame):
+        data = frame.get_frame()
+        yield _create_exec_expr(
+            func=frame.function.bind(FunctionSnapshot, frame.variables),
+            location=data.local_vars[RemoteLocationSnapshot, "self"].location,
+            args=[],
+            kwargs=filter(
+                lambda v: v[0] != "self",
+                data.local_vars.of_type(SnapshotType),
+            ),
+            retvals=frame.iter_retvals(),
+        )
 
     return parser

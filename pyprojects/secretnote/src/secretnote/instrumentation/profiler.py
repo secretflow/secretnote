@@ -110,6 +110,17 @@ class Profiler:
         ctx = self._tracer.start_as_current_span("unknown")
         span = stack.enter_context(ctx)
 
+        # FIXME:
+
+        if (
+            checkpoint.function_name
+            == "secretflow.device.proxy._actor_wrapper.<locals>.wrapper"
+        ):
+            frame.f_locals["__actor_method__"] = getattr(
+                frame.f_locals["self"].actor_class,
+                frame.f_locals["name"],
+            )
+
         refs, values = self._trace_objects(checkpoint.function._origin, frame)
         func_ref, frame_ref = refs
 

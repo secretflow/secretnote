@@ -555,14 +555,17 @@ class TracedFrame(BaseModel):
         return self.frame.bind(FrameSnapshot, self.variables)
 
     def iter_retvals(self) -> Iterable[Tuple[str, SnapshotType]]:
+        # FIXME:
         try:
             assignments = self.assignments.bind(DictSnapshot, self.variables)
             for key, value in assignments.values.of_type(SnapshotType):
-                for subkey, subvalue in like_pytree(value, SnapshotType):
+                yield key, value
+                for subkey, subvalue in like_pytree(value, RemoteObjectSnapshot):
                     yield f"{key}{subkey}", subvalue
         except TypeError:
             retval = self.retval.bind(SnapshotType, self.variables)
-            for key, value in like_pytree(retval, SnapshotType):
+            yield "(retval)", retval
+            for key, value in like_pytree(retval, RemoteObjectSnapshot):
                 yield key, value
 
 

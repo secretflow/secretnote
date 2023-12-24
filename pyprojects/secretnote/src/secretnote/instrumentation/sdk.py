@@ -189,6 +189,8 @@ def default_checkpoints():
         secretflow.device.kernels.heu.heu_to_spu,
         secretflow.device.kernels.heu.heu_to_heu,
         secretflow.reveal,
+        secretflow.SPU.psi_csv,
+        secretflow.SPU.psi_df,
     ):
         add_function(fn, semantics=Semantics(api_level=APILevel.INVARIANT))
 
