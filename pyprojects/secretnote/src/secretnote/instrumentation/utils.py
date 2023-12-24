@@ -85,7 +85,7 @@ class Reference(BaseModel):
         item = lookup[self.ref]
 
         if not is_of_type(item, types):
-            raise TypeError(f"Expected {types}, got {type(item)}: {item}")
+            raise TypeError(f"Expected {types}, got {item}")
 
         if isinstance(item, ProxiedModel):
             item._lookup = lookup

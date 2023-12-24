@@ -69,5 +69,7 @@ src = ["pyprojects/*/src"]
 exclude = ["**/node_modules", "**/__pycache__", "**/.ipynb_checkpoints"]
 include = ["pyprojects/*/src"]
 reportGeneralTypeIssues = "information"
+reportIncompatibleMethodOverride = "warning"
+reportIncompatibleVariableOverride = "warning"
 reportOptionalMemberAccess = "information"
 reportPrivateImportUsage = "information"

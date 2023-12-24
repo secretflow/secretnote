@@ -4,10 +4,8 @@ from typing import (
     Callable,
     Dict,
     Iterable,
-    Optional,
     Tuple,
     cast,
-    overload,
 )
 
 from more_itertools import first
@@ -88,19 +86,6 @@ def _get_parameters(
                 }
             )
     return params
-
-
-@overload
-def _create_object(obj: SnapshotType, name: Optional[str] = None) -> LocalObject:
-    ...
-
-
-@overload
-def _create_object(
-    obj: RemoteObjectSnapshot,
-    name: Optional[str] = None,
-) -> RemoteObject:
-    ...
 
 
 def _create_object(obj, name=None):

@@ -149,39 +149,7 @@ class Profiler:
             span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
             ctx.close()
 
-        # end_current_span(f_current)
-        # return
-
-        self._recent_returns.append(end_current_span)
-
-        def end_remaining_spans(f_back: Optional[FrameType]):
-            for fn in self._recent_returns:
-                fn(f_back)
-            self._recent_returns.clear()
-
-        def trace_line_in_outer_frame(f_outer: FrameType):
-            f_outer.f_trace_lines = False
-            f_outer.f_trace = None
-            if f_outer.f_back:
-                f_outer.f_back.f_trace_lines = True
-                f_outer.f_back.f_trace = trace_next_assignments
-            else:
-                # no more outer frame, finalize spans
-                end_remaining_spans(None)
-
-        def trace_next_assignments(f_back: FrameType, event: str, arg: None):
-            if event == "return":
-                # bubble up to outer frame
-                trace_line_in_outer_frame(f_back)
-                return None
-
-            if event != "line":
-                # wait for next line trace
-                return trace_next_assignments
-
-            end_remaining_spans(f_back)
-
-        trace_line_in_outer_frame(f_current)
+        end_current_span(f_current)
 
     def _trace_noop(self, frame: FrameType, event: str, arg: Any):
         frame.f_trace_lines = False

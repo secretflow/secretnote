@@ -51,9 +51,6 @@ with optional_dependencies("instrumentation"):
     import stack_data.core
     from opentelemetry.util.types import Attributes
     from secretflow.data.core import Partition
-    from secretflow.data.horizontal import HDataFrame
-    from secretflow.data.ndarray import FedNdarray
-    from secretflow.data.vertical import VDataFrame
     from secretflow.device.device import (
         Device,
         DeviceObject,
@@ -122,7 +119,7 @@ class ObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
         return cls.trace(None)
 
     def __str__(self) -> str:
-        return f"{type(self)}[{self.snapshot}]"
+        return f"{type(self).__name__}[{self.snapshot}]"
 
 
 class ListSnapshot(ObjectTracer, Reference, ProxiedModel):
@@ -253,45 +250,6 @@ class RemoteObjectSnapshot(ObjectTracer, Reference, ProxiedModel):
 
     def __str__(self) -> str:
         return f"{self.ref} @ {self.location}"
-
-
-class ObjectFederationSnapshot(ObjectTracer, Reference, ProxiedModel):
-    kind: Literal["federated_object"] = "federated_object"
-    type: str
-    federation: ReferenceMap = ReferenceMap.empty_list()
-
-    @classmethod
-    def typecheck(cls, x) -> bool:
-        if isinstance(x, (VDataFrame, HDataFrame, FedNdarray)):
-            return True
-
-        if isinstance(x, dict) and all(
-            (isinstance(k, Device) and isinstance(v, DeviceObject))
-            for k, v in x.items()
-        ):
-            return True
-
-        return False
-
-    @classmethod
-    def trace(cls, x):
-        return ObjectFederationSnapshot(ref=fingerprint(x), type=qualname(type(x)))
-
-    @classmethod
-    def tree(cls, x) -> Dict[str, Union[Dict, List]]:
-        # FIXME: clean up
-
-        if isinstance(x, (VDataFrame, HDataFrame, FedNdarray)):
-            return {"federation": [p for p in x.partitions.values()]}
-        if isinstance(x, dict):
-            return {"federation": list(x.values())}
-        return {"federation": []}
-
-    @override
-    def to_container(self) -> List[Tuple[LogicalLocation, RemoteObjectSnapshot]]:
-        return [
-            (v.location, v) for k, v in self.federation.of_type(RemoteObjectSnapshot)
-        ]
 
 
 class FunctionParameter(BaseModel):
@@ -495,7 +453,6 @@ SnapshotType = Annotated[
         DictSnapshot,
         RemoteObjectSnapshot,
         RemoteLocationSnapshot,
-        ObjectFederationSnapshot,
         FunctionSnapshot,
         FrameInfoSnapshot,
         FrameSnapshot,
@@ -601,7 +558,8 @@ class TracedFrame(BaseModel):
         try:
             assignments = self.assignments.bind(DictSnapshot, self.variables)
             for key, value in assignments.values.of_type(SnapshotType):
-                yield key, value
+                for subkey, subvalue in like_pytree(value, SnapshotType):
+                    yield f"{key}{subkey}", subvalue
         except TypeError:
             retval = self.retval.bind(SnapshotType, self.variables)
             for key, value in like_pytree(retval, SnapshotType):

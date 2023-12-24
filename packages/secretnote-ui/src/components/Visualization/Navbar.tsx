@@ -22,7 +22,6 @@ export function Navbar() {
         { key: '/graph', label: <NavbarLabel>Dependencies</NavbarLabel> },
         { key: '/timeline', label: <NavbarLabel>Timeline</NavbarLabel> },
         { key: '/transactions', label: <NavbarLabel>Transactions</NavbarLabel> },
-        { key: '/symbols', label: <NavbarLabel>Symbols</NavbarLabel> },
       ]}
       selectedKeys={[location.pathname]}
       onSelect={({ key }) => navigate(key)}
