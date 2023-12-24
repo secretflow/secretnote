@@ -132,7 +132,7 @@ export const InvitationNotificationComponent = () => {
         arrow={false}
         overlayClassName="secretnote-notification-popover"
       >
-        <Badge count={pending.length} size="small">
+        <Badge dot count={pending.length} color="#1677ff" size="small">
           <Bell color="#40566c" size={18} cursor="pointer" />
         </Badge>
       </Popover>

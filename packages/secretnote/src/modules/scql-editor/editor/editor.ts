@@ -72,7 +72,7 @@ export class SQLEditor implements IEditor {
     this._config = { ...options.config };
 
     this.editorHost = document.createElement('div');
-    this.editorHost.classList.add('sql-editor-container');
+    //this.editorHost.classList.add('sql-editor-container');
     this.host.append(this.editorHost);
 
     this.createEditor(this.editorHost);

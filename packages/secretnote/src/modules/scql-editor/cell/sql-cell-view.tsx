@@ -76,7 +76,7 @@ export class SqlCellView extends JupyterCodeCellView {
     this.commandRegistry = commandRegistry;
 
     this.outputs = options.cell?.outputs as IOutput[];
-    this.className = this.className + ' sql';
+    this.className = this.className + ' sql-editor-container';
 
     this.viewManager
       .getOrCreateView<LibroOutputArea, IOutputAreaOption>(SqlOutputArea, {
