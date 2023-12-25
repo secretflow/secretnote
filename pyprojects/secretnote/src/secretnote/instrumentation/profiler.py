@@ -1,4 +1,3 @@
-import ast
 import contextvars
 import sys
 from contextlib import ExitStack
@@ -16,9 +15,6 @@ from typing import (
     cast,
 )
 
-from more_itertools import first_true
-
-from secretnote.utils.logging import log_dev_exception
 from secretnote.utils.warnings import optional_dependencies
 
 from .checkpoint import CheckpointGroup
@@ -35,8 +31,6 @@ from .snapshot import fingerprint, json_key
 from .utils import Reference, ReferenceMap
 
 with optional_dependencies("instrumentation"):
-    import stack_data.core
-    from astunparse import unparse
     from opentelemetry import trace
     from opentelemetry.context import Context
     from opentelemetry.sdk.trace import TracerProvider
@@ -65,8 +59,6 @@ class Profiler:
 
         # most recent on the right
         self._recent_stacks: List[Tuple[ExitStack, Span, TracedFrame]] = []
-        # most recent on the left
-        self._recent_returns: List[FinalizeSpan] = []
 
     @property
     def checkpoints(self):
@@ -148,20 +140,9 @@ class Profiler:
         call.retval = retval_ref
         call.variables.update(values)
 
-        def end_current_span(f_back: Optional[FrameType]):
-            try:
-                if f_back and (named_values := _trace_named_return(f_back, retval)):
-                    named_values = {k.strip(): v for k, v in named_values.items()}
-                    (refs,), values = self._trace_objects(named_values)
-                    call.assignments = refs
-                    call.variables.update(values)
-            except Exception as e:
-                log_dev_exception(e)
-            payload = call.json(by_alias=True, exclude_none=True)
-            span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
-            ctx.close()
-
-        end_current_span(f_current)
+        payload = call.json(by_alias=True, exclude_none=True)
+        span.set_attribute(OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME, payload)
+        ctx.close()
 
     def _trace_noop(self, frame: FrameType, event: str, arg: Any):
         frame.f_trace_lines = False
@@ -231,65 +212,6 @@ def _trace_object(obj: Any, tracers: List[Type[ObjectTracer]]):
         raise TypeError(f"Cannot snapshot {type(obj)}")
 
     return result, snapshots
-
-
-def _trace_named_return(frame: FrameType, retval: Any):
-    retval_type = type(retval)
-
-    info = stack_data.core.FrameInfo(frame)
-
-    if retval_type is tuple or retval_type is list:
-        # could be unpacking assignment, in which case there will be a different
-        # tuple in the parent frame, then we will have to compare by elements
-        #
-        # we limit the supporting types to vanilla tuple/list
-        # because we will need to iterate over it to determine item identity
-        # and we want to avoid side effects in custom iterables
-
-        def resolve_variables() -> Optional[Dict]:
-            retval_len = len(retval)
-
-            for expr, ast_nodes, value in cast(
-                List[stack_data.core.Variable],
-                info.variables,
-            ):
-                if value is retval:
-                    # if it wasn't actually unpacked, return the entire iterable
-                    return {expr: value}
-
-                if (
-                    isinstance(value, tuple)
-                    and len(value) == retval_len
-                    and all(a is b for a, b in zip(value, retval))
-                ):
-                    tuple_ast = cast(
-                        Optional[ast.Tuple],
-                        first_true(
-                            ast_nodes,
-                            pred=lambda x: isinstance(x, ast.Tuple),
-                        ),
-                    )
-
-                    if tuple_ast and len(tuple_ast.elts) == retval_len:
-                        # map expressions to values
-                        names = [unparse(x) for x in tuple_ast.elts]
-                        return {name: value for name, value in zip(names, retval)}
-
-            # can't find any corresponding value
-            # this can happen with unpacking assignment with stars
-            # (stack_data will refuse to parse the expression)
-            return None
-
-    else:
-        # resolve by identity
-
-        def resolve_variables() -> Optional[Dict]:
-            for expr, _, value in cast(List[stack_data.core.Variable], info.variables):
-                if value is retval:
-                    return {expr: value}
-            return None
-
-    return resolve_variables()
 
 
 current_profiler = contextvars.ContextVar[Profiler]("current_profiler")

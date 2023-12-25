@@ -1,6 +1,5 @@
 import type * as G6 from '@antv/g6';
 import * as d3 from 'd3';
-import YAML from 'yaml';
 
 import type { RemoteObjectNode, LocalObjectNode, FunctionNode } from '@/.openapi-stubs';
 import type { SnapshotReifier } from '@/utils/reify';
@@ -66,7 +65,7 @@ function codeBlock<T>(
     .append('div')
     .style('background', '#f5f5f5')
     .style('margin', '6px 0 0')
-    .style('max-height', '10vh')
+    .style('max-height', '20vh')
     .style('overflow', 'auto')
     .style('padding', '6px')
     .append('pre')
@@ -79,18 +78,18 @@ function codeBlock<T>(
 }
 
 export function remoteObjectTooltip({ root }: TooltipProps<RemoteObjectNode>) {
-  tooltipHeader(root, (d) => `Remote object #${d.data.numbering || 'numbering ?'}`);
+  tooltipHeader(
+    root,
+    (d) => d.data.name || `Remote object #${d.data.numbering || 'numbering ?'}`,
+  );
   attributes(root, [
+    ['Object #', (d) => d.data.numbering || '?'],
     ['Device', (d) => d.data.location.type],
     [
       (d) => (d.data.location.parties.length > 1 ? 'Parties' : 'Party'),
       (d) => d.data.location.parties.join(', '),
     ],
   ]);
-  const params = root.datum().data.location.parameters || {};
-  if (Object.keys(params).length > 0) {
-    codeBlock(root, () => YAML.stringify({ properties: params }, { indent: 2 }));
-  }
 }
 
 export function localObjectTooltip({ root, reify }: TooltipProps<LocalObjectNode>) {

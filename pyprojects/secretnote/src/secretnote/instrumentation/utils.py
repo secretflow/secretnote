@@ -1,6 +1,7 @@
 from typing import (
     Any,
     Dict,
+    Generator,
     Iterable,
     List,
     Mapping,
@@ -57,12 +58,16 @@ def like_pytree(
     of_type: Type[T],
     *,
     container_t=(list, dict, tuple),
-) -> Iterable[Tuple[str, T]]:
+) -> Generator[Tuple[str, T], None, bool]:
     container = to_container(ref, container_t=container_t)
     flattened, tree = jax.tree_util.tree_flatten_with_path(container)
+    all_yielded = True
     for path, value in flattened:
         if is_of_type(value, of_type):
             yield (jax.tree_util.keystr(path), value)
+        else:
+            all_yielded = False
+    return all_yielded
 
 
 class ProxiedModel(BaseModel):

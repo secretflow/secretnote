@@ -559,14 +559,28 @@ class TracedFrame(BaseModel):
         try:
             assignments = self.assignments.bind(DictSnapshot, self.variables)
             for key, value in assignments.values.of_type(SnapshotType):
-                yield key, value
-                for subkey, subvalue in like_pytree(value, RemoteObjectSnapshot):
-                    yield f"{key}{subkey}", subvalue
+                g = like_pytree(value, RemoteObjectSnapshot)
+                while True:
+                    try:
+                        subkey, subvalue = next(g)
+                        yield f"{key}{subkey}", subvalue
+                    except StopIteration as e:
+                        all_yielded = e.value
+                        if not all_yielded:
+                            yield key, value
+                        break
         except TypeError:
             retval = self.retval.bind(SnapshotType, self.variables)
-            yield "(retval)", retval
-            for key, value in like_pytree(retval, RemoteObjectSnapshot):
-                yield key, value
+            g = like_pytree(retval, RemoteObjectSnapshot)
+            while True:
+                try:
+                    key, value = next(g)
+                    yield key, value
+                except StopIteration as e:
+                    all_yielded = e.value
+                    if not all_yielded:
+                        yield "(retval)", retval
+                    break
 
 
 class OTelSpanContextDict(BaseModel):
