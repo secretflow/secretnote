@@ -1,3 +1,4 @@
+import { CodeEditorManager } from '@difizen/libro-code-editor';
 import type {
   ExecutionMeta,
   KernelMessage,
@@ -9,6 +10,7 @@ import {
   JupyterCodeCellView,
   KernelError,
 } from '@difizen/libro-jupyter';
+import { DocumentConnectionManager } from '@difizen/libro-lsp';
 import {
   getOrigin,
   inject,
@@ -75,8 +77,17 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     @inject(ViewManager) viewManager: ViewManager,
     @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
+    @inject(DocumentConnectionManager)
+    documentConnectionManager: DocumentConnectionManager,
+    @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
   ) {
-    super(options, cellService, viewManager);
+    super(
+      options,
+      cellService,
+      viewManager,
+      documentConnectionManager,
+      codeEditorManager,
+    );
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.executionParty =

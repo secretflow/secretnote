@@ -35,7 +35,7 @@ export default defineConfig({
     { path: '/lipsum', component: '@/pages/lipsum' },
     { path: '/*', component: '@/pages/404' },
   ],
-  // devtool: 'source-map',
+  devtool: 'source-map',
   jsMinifier: 'none',
   writeToDisk: true,
   proxy: {
@@ -58,4 +58,5 @@ export default defineConfig({
   ],
   mfsu: false,
   npmClient: 'pnpm',
+  hash: true,
 });
