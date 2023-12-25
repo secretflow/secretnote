@@ -85,6 +85,7 @@ class Profiler:
 
     def __call__(self, frame: FrameType, event: str, arg: Any):
         if not (checkpoint := self._checkpoints.match_frame(frame)):
+            # TODO: generic frames for timelines
             return
 
         if event == "call":

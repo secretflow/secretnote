@@ -262,7 +262,7 @@ export function ExecutionGraph() {
   return (
     <div style={{ position: 'relative' }}>
       <div
-        style={{ width: '100%', height: '80vh', minHeight: '600px' }}
+        style={{ width: '100%', height: '60vh', minHeight: '600px' }}
         ref={container}
       />
       <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>

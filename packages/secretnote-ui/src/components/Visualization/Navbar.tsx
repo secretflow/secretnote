@@ -19,9 +19,9 @@ export function Navbar() {
     <NavbarMenu
       mode="horizontal"
       items={[
-        { key: '/graph', label: <NavbarLabel>Dependencies</NavbarLabel> },
-        { key: '/timeline', label: <NavbarLabel>Timeline</NavbarLabel> },
-        { key: '/transactions', label: <NavbarLabel>Transactions</NavbarLabel> },
+        { key: '/graph', label: <NavbarLabel>Dependency Graph</NavbarLabel> },
+        // { key: '/timeline', label: <NavbarLabel>Timeline</NavbarLabel> },
+        // { key: '/transactions', label: <NavbarLabel>Transactions</NavbarLabel> },
       ]}
       selectedKeys={[location.pathname]}
       onSelect={({ key }) => navigate(key)}
