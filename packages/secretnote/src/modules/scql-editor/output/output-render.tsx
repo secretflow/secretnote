@@ -5,7 +5,10 @@ export const SQLOutputRender: React.FC<{ model: BaseOutputView }> = (props: {
   model: BaseOutputView;
 }) => {
   const { model } = props;
-  const data = model.data['application/vnd.libro.sql+json'];
+  const data = model.data['application/vnd.libro.sql+json'] as {
+    columns: string[];
+    rows: string[][];
+  };
 
   if (!data) {
     return null;

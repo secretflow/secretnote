@@ -2,28 +2,28 @@ import { CellOptions, LibroModel, LibroJupyterModule } from '@difizen/libro-jupy
 import { ManaModule } from '@difizen/mana-app';
 
 import {
-  SqlCellContribution,
-  SqlCellModel,
-  SqlCellModelFactory,
-  SqlCellView,
+  SQLCellContribution,
+  SQLCellModel,
+  SQLCellModelFactory,
+  SQLCellView,
 } from './cell';
-import { SecretNoteContentContribution } from './contents';
+import { SQLContentContribution } from './contents';
 import { SecretNoteModel } from './model';
 import { SqlOutputArea, SQLOutputMimeTypeContribution } from './output';
 import { SCQLQueryService } from './service';
 
 export const SCQLEditorModule = ManaModule.create()
   .register(
-    SecretNoteContentContribution,
-    SqlCellContribution,
-    SqlCellView,
-    SqlCellModel,
+    SQLContentContribution,
+    SQLCellContribution,
+    SQLCellView,
+    SQLCellModel,
     SqlOutputArea,
     SCQLQueryService,
     SQLOutputMimeTypeContribution,
     { token: LibroModel, useClass: SecretNoteModel },
     {
-      token: SqlCellModelFactory,
+      token: SQLCellModelFactory,
       useFactory: (ctx) => {
         return (options: CellOptions) => {
           const child = ctx.container.createChild();
@@ -31,7 +31,7 @@ export const SCQLEditorModule = ManaModule.create()
             token: CellOptions,
             useValue: options,
           });
-          const model = child.get(SqlCellModel);
+          const model = child.get(SQLCellModel);
           return model;
         };
       },

@@ -2,8 +2,8 @@ import type { CellMeta, CellModel, CellOptions } from '@difizen/libro-jupyter';
 import { CellModelContribution, CellViewContribution } from '@difizen/libro-jupyter';
 import { inject, singleton } from '@difizen/mana-app';
 
-import { MarkdownCellModelFactory } from './markdown-cell-protocol';
-import { MarkdownCellView } from './markdown-cell-view';
+import { MarkdownCellModelFactory } from './protocol';
+import { MarkdownCellView } from './view';
 
 @singleton({ contrib: [CellModelContribution, CellViewContribution] })
 export class MarkdownCellContribution

@@ -1,2 +1,2 @@
-export * from './code-cell-model';
-export * from './code-cell-view';
+export * from './model';
+export * from './view';

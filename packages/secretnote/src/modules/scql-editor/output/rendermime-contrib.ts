@@ -9,7 +9,7 @@ export class SQLOutputMimeTypeContribution implements RenderMimeContribution {
     return 100;
   };
 
-  renderType = 'sqlOutputRender';
+  renderType = 'SQLOutputRender';
   safe = true;
   mimeTypes = ['application/vnd.libro.sql+json'];
   render = SQLOutputRender;

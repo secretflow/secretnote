@@ -5,7 +5,7 @@ import { URI, singleton } from '@difizen/mana-app';
 import type { SecretNoteModel } from '../model';
 
 @singleton({ contrib: ContentContribution })
-export class SecretNoteContentContribution implements ContentContribution {
+export class SQLContentContribution implements ContentContribution {
   canHandle = () => {
     return 3;
   };

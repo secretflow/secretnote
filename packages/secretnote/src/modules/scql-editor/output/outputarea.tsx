@@ -8,7 +8,7 @@ import {
 } from '@difizen/libro-jupyter';
 import { inject, transient, view, ViewOption } from '@difizen/mana-app';
 
-import type { SqlCellModel } from '../cell';
+import type { SQLCellModel } from '../cell';
 
 @transient()
 @view('libro-sql-output-area')
@@ -19,7 +19,7 @@ export class SqlOutputArea extends LibroOutputArea {
   }
 
   handleMsg() {
-    const cellModel = this.cell.model as SqlCellModel;
+    const cellModel = this.cell.model as SQLCellModel;
     cellModel.msgChange((msg) => {
       if (msg.header.msg_type !== 'status') {
         if (

@@ -231,5 +231,5 @@ export class SecretNoteModel extends LibroModel {
 
   autoSave = debounce(() => {
     this.commandRegistry.executeCommand(DocumentCommands.Save.id);
-  }, 500);
+  }, 1000);
 }
