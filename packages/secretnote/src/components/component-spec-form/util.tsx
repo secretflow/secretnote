@@ -1,13 +1,14 @@
+import { Tooltip } from 'antd';
 import { LevaInputs } from 'leva';
 import { SpecialInputs, type Schema } from 'leva/src/types';
 
-import type { ComponentSpec, SchemaItem, Attr, Value } from './type';
+import type { ComponentSpec, SchemaItem, Attr } from './type';
 
 export const getOptions = (attr: Attr) => {
   if (attr.atomic.allowedValues) {
     return attr.atomic.allowedValues.ss;
   }
-  return undefined;
+  return [];
 };
 
 export const getRenderType = (attr: Attr): LevaInputs => {
@@ -35,19 +36,27 @@ export const getDefaultValue = (attr: Attr) => {
   }
 };
 
-export const getDefaultValues = (specs: ComponentSpec) => {
-  const res: Value = {};
-  specs.attrs.forEach((attr) => {
-    res[attr.name] = getDefaultValue(attr);
-  });
-  return res;
+export const getLabel = (attr: Attr) => {
+  const label = attr.name;
+  const required = !attr.atomic.isOptional;
+  const description = attr.desc;
+
+  return (
+    <Tooltip title={description} placement="left">
+      <span>
+        {required && <span style={{ color: 'red' }}>*</span>}
+        &nbsp;
+        {label}
+      </span>
+    </Tooltip>
+  );
 };
 
 export const toLevaSchema = (
   specs: ComponentSpec,
   visitItem?: (item: ComponentSpec, key: string) => Partial<SchemaItem>,
 ): Schema => {
-  const res: Record<string, Schema> = {
+  const res: Record<'attrs' | 'inputs' | 'outputs', Schema> = {
     attrs: {},
     inputs: {},
     outputs: {},
@@ -58,7 +67,7 @@ export const toLevaSchema = (
     const after = visitItem?.(specs, key) || {};
     const schema: SchemaItem = {
       type: getRenderType(attr),
-      label: attr.name,
+      label: getLabel(attr),
       value: getDefaultValue(attr),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       options: getOptions(attr) as any,

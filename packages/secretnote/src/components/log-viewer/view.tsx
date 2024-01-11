@@ -59,14 +59,6 @@ const defaultHighlightOptions = [
     },
   },
   {
-    keyword: 'ErrorCode',
-    ignoreSensitive: true,
-    decorations: {
-      matchForegroundColor: '#faad14',
-      matchBackground: '#24292e',
-    },
-  },
-  {
     keyword: '[warn]',
     ignoreSensitive: true,
     decorations: {
@@ -179,6 +171,10 @@ const LogView = (props: IProps) => {
   // init data
   useEffect(() => {
     if (terminalInstance) {
+      if (props.code === '') {
+        terminalInstance.clear();
+        return;
+      }
       const code = props.code.replaceAll('\n', '\r\n');
       terminalInstance.write(code);
     }
@@ -253,6 +249,7 @@ const LogView = (props: IProps) => {
       <div className="terminal-viewer-header">
         <div className="terminal-viewer-input-wrapper">
           <input
+            placeholder="Search..."
             className="terminal-viewer-input"
             value={searchValue}
             type="text"

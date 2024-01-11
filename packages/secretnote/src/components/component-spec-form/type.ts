@@ -53,7 +53,7 @@ export interface ComponentSpec {
   name: string;
   desc: string;
   version: string;
-  attrs: Attr[];
+  attrs?: Attr[];
   inputs: IO[];
   outputs: IO[];
 }

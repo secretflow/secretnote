@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemoizedFn } from 'ahooks';
 import {
   LevaPanel,
@@ -15,14 +14,14 @@ import type { ComponentSpec, Value, SchemaItem } from './type';
 import { toLevaSchema } from './util';
 import './index.less';
 
-export interface SchemaProps {
-  specs: ComponentSpec;
+interface SchemaProps {
+  schema: ComponentSpec;
   defaultValue?: Value;
   onChange?: (changedValue: Value, fullValue: Value) => void;
 }
 
-const Schema = (props: SchemaProps) => {
-  const { specs, defaultValue, onChange } = props;
+const SchemaForm = (props: SchemaProps) => {
+  const { schema, defaultValue, onChange } = props;
   const store = useStoreContext();
 
   const getValue = useMemoizedFn(() => {
@@ -33,7 +32,7 @@ const Schema = (props: SchemaProps) => {
   });
 
   const levaSchema = useMemo(() => {
-    return toLevaSchema(specs, (item, key) => {
+    return toLevaSchema(schema, (item, key) => {
       const config = {
         onChange: (value, path, context) => {
           if (context.initial || !context.fromPanel) {
@@ -41,25 +40,26 @@ const Schema = (props: SchemaProps) => {
           }
 
           const full = getValue();
-          onChange?.({ [context.key]: value } as any, full as any);
+          onChange?.({ [context.key]: value }, full);
         },
       } as SchemaItem;
 
       if (defaultValue && defaultValue[key]) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (config as any)['value'] = defaultValue[key];
       }
 
       return config;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [specs]);
+  }, [schema]);
 
-  useControls(levaSchema, { store }, [specs]);
+  useControls(levaSchema, { store }, [schema]);
 
   return null;
 };
 
-interface ComponentSpecPanelProps {
+interface ComponentSpecFormProps {
   specs: ComponentSpec;
   defaultValue?: Value;
   onChange?: (changedValue: Value, fullValue: Value) => void;
@@ -68,12 +68,12 @@ interface ComponentSpecPanelProps {
   style?: CSSProperties;
 }
 
-const ComponentSpecPanel = (props: ComponentSpecPanelProps) => {
+const ComponentSpecForm = (props: ComponentSpecFormProps) => {
   const { defaultValue, title, onChange, specs, className, style } = props;
   const store = useCreateStore();
 
   return (
-    <div className={`component-spec-panel ${className}`} style={style}>
+    <div className={`component-spec-form ${className}`} style={style}>
       <LevaPanel
         hideCopyButton
         neverHide
@@ -92,11 +92,11 @@ const ComponentSpecPanel = (props: ComponentSpecPanelProps) => {
         }}
       />
       <LevaStoreProvider store={store}>
-        <Schema specs={specs} defaultValue={defaultValue} onChange={onChange} />
+        <SchemaForm schema={specs} defaultValue={defaultValue} onChange={onChange} />
       </LevaStoreProvider>
     </div>
   );
 };
 
-export { ComponentSpecPanel };
+export { ComponentSpecForm };
 export * from './type';

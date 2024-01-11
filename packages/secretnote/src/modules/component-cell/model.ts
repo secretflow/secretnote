@@ -9,7 +9,7 @@ import { inject, transient } from '@difizen/mana-app';
 import type { Event } from '@difizen/mana-common';
 
 @transient()
-export class SFComponentCellModel
+export class ComponentCellModel
   extends LibroCellModel
   implements ExecutedWithKernelCellModel
 {
@@ -40,7 +40,7 @@ export class SFComponentCellModel
     this.executing = false;
     this.kernelExecuting = false;
     this.msgChangeEmitter = new Emitter<any>();
-    this.metadata = options?.cell?.metadata || {};
+    this.metadata = options.cell.metadata || {};
   }
 
   clearExecution(): void {

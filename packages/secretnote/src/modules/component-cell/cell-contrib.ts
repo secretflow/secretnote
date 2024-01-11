@@ -2,17 +2,17 @@ import type { CellMeta, CellModel, CellOptions } from '@difizen/libro-jupyter';
 import { CellModelContribution, CellViewContribution } from '@difizen/libro-jupyter';
 import { inject, singleton } from '@difizen/mana-app';
 
-import { SFComponentCellModelFactory } from './protocol';
-import { SFComponentCellView } from './view';
+import { ComponentCellModelFactory } from './protocol';
+import { ComponentCellView } from './view';
 
 @singleton({ contrib: [CellModelContribution, CellViewContribution] })
-export class SFComponentCellContribution
+export class ComponentCellContribution
   implements CellModelContribution, CellViewContribution
 {
-  protected readonly modelFactory: SFComponentCellModelFactory;
+  protected readonly modelFactory: ComponentCellModelFactory;
 
   constructor(
-    @inject(SFComponentCellModelFactory) modelFactory: SFComponentCellModelFactory,
+    @inject(ComponentCellModelFactory) modelFactory: ComponentCellModelFactory,
   ) {
     this.modelFactory = modelFactory;
   }
@@ -35,5 +35,5 @@ export class SFComponentCellContribution
     return model;
   }
 
-  view = SFComponentCellView;
+  view = ComponentCellView;
 }
