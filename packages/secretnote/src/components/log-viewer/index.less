@@ -157,12 +157,14 @@ input.terminal-viewer-input {
   }
 
   > * {
-    margin-left: 8px;
+    margin-left: 2px;
   }
 }
 
 .input-suffix-search-result {
+  margin-right: 8px;
   font-size: 12px;
+  line-height: 12px;
 }
 
 .input-suffix-search--disabled {
@@ -228,6 +230,10 @@ input.terminal-viewer-input {
     border: 1px solid #e5ebf1;
     background-color: #fff;
 
+    &:hover {
+      box-shadow: 0 0 0 1px #40566c;
+    }
+
     .terminal-viewer-input {
       background-color: #fff;
       color: #666;
@@ -236,10 +242,14 @@ input.terminal-viewer-input {
         color: #666;
       }
     }
-  }
 
-  .input-suffix-search-tool {
-    background-color: #fff;
+    .input-suffix-search-tool {
+      background-color: #fff;
+    }
+
+    .input-suffix-search-result {
+      color: #666;
+    }
   }
 
   .terminal-viewer-toolbar-button {

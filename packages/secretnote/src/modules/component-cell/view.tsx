@@ -14,47 +14,18 @@ import {
   prop,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import { Tabs, type TabsProps, Empty } from 'antd';
 import { message } from 'antd';
 import { forwardRef } from 'react';
 
-import { ComponentSpecForm } from '@/components/component-spec-form';
 import type { ComponentSpec, Value } from '@/components/component-spec-form';
-import LogView from '@/components/log-viewer';
 import type { SecretNoteModel } from '@/modules/editor';
 
+import { CellComponent } from './cell-component';
 import { codeTemplate } from './code-template';
-import { ComponentOptions, getComponentTitle } from './componet-option';
 import type { ComponentCellModel } from './model';
-import './index.less';
 
 export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<ComponentCellView>(ViewInstance);
-
-  const items: TabsProps['items'] = [
-    {
-      key: '1',
-      label: 'Log',
-      children: (
-        <div className="sf-component-log">
-          {instance.log ? (
-            <LogView code={instance.log} theme="light" />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No log." />
-          )}
-        </div>
-      ),
-    },
-    {
-      key: '2',
-      label: 'Report',
-      children: (
-        <div className="sf-component-report">
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No report." />
-        </div>
-      ),
-    },
-  ];
 
   return (
     <div
@@ -70,36 +41,11 @@ export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) 
         }
       }}
     >
-      <div className="header">
-        <span>component:</span>
-        <ComponentOptions
-          onComponentSpecChange={(spec) => (instance.componentSpec = spec)}
-        />
-      </div>
-      <div className="body">
-        <div className="config">
-          {instance.componentSpec ? (
-            <ComponentSpecForm
-              title={
-                instance.componentSpec ? getComponentTitle(instance.componentSpec) : ''
-              }
-              specs={instance.componentSpec}
-              onChange={(changedValue, fullValue) => {
-                instance.componentConfigValue = fullValue;
-              }}
-            />
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="Select a component first."
-              style={{ marginTop: 120 }}
-            />
-          )}
-        </div>
-        <div className="result">
-          <Tabs defaultActiveKey="1" items={items} size="small" />
-        </div>
-      </div>
+      <CellComponent
+        log={instance.log}
+        onComponentChange={(c) => (instance.component = c)}
+        onComponentConfigChange={(v) => (instance.componentConfigValue = v)}
+      />
     </div>
   );
 });
@@ -113,17 +59,13 @@ export class ComponentCellView extends LibroExecutableCellView {
   outputArea = { outputs: [] } as unknown as BaseOutputArea;
 
   @prop()
-  componentSpec: ComponentSpec | undefined;
+  component: ComponentSpec | undefined;
 
   @prop()
   componentConfigValue: Value = {};
 
   @prop()
   log = '';
-
-  get running() {
-    return this.cellModel.executing;
-  }
 
   get cellModel() {
     return this.model as ComponentCellModel;
@@ -136,7 +78,7 @@ export class ComponentCellView extends LibroExecutableCellView {
       return false;
     }
 
-    if (!this.componentSpec) {
+    if (!this.component) {
       message.error(l10n.t('Please select a component first.'));
       return false;
     }

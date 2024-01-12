@@ -27,10 +27,10 @@ const defaultSearchOptions = {
   incremental: false,
   decorations: {
     matchForegroundColor: '#000000',
-    matchBackground: '#ffff54',
+    matchBackground: '#f6c8ac',
     matchBorder: 'none',
     matchOverviewRuler: 'none',
-    activeMatchBackground: '#ff9540',
+    activeMatchBackground: '#babfb1',
     activeMatchBorder: 'none',
     activeMatchColorOverviewRuler: 'none',
   },
@@ -88,6 +88,7 @@ const LogView = (props: IProps) => {
   const domRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(false);
   const theme = props.theme || 'dark';
+  const renderedCodeRef = useRef<string[]>([]);
 
   // init terminal
   useEffect(() => {
@@ -102,10 +103,10 @@ const LogView = (props: IProps) => {
               foreground: '#b5bbc6',
             }
           : {
-              selectionBackground: '#000',
+              selectionBackground: '#b7d7fb',
               selectionForeground: '#000',
               background: '#fff',
-              foreground: '#666',
+              foreground: '#000',
             },
     });
     setTerminalInstance(instance);
@@ -173,10 +174,13 @@ const LogView = (props: IProps) => {
     if (terminalInstance) {
       if (props.code === '') {
         terminalInstance.clear();
+        renderedCodeRef.current = [];
         return;
+      } else {
+        const code = props.code.replaceAll('\n', '\r\n');
+        terminalInstance.write(code);
+        renderedCodeRef.current.push(code);
       }
-      const code = props.code.replaceAll('\n', '\r\n');
-      terminalInstance.write(code);
     }
   }, [terminalInstance, props.code]);
 
