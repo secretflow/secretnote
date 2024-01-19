@@ -28,13 +28,7 @@ const MetricsIcon = () => {
     modalService.openModal(MetricsModal);
   };
 
-  return (
-    <AreaChart
-      onClick={handleClick}
-      size={16}
-      style={{ color: '#7b7b7b', marginTop: 10 }}
-    />
-  );
+  return <AreaChart className="chat-icon" onClick={handleClick} size={16} />;
 };
 
 @singleton({ contrib: [CommandContribution, ToolbarContribution, ModalContribution] })

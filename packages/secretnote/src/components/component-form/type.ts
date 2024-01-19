@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import type { Schema } from 'leva/src/types';
-
 export type AttrType = 'AT_STRING' | 'AT_BOOL' | 'AT_INT';
 
 export type ValueKey = 's' | 'ss' | 'i64' | 'f' | 'b';
 
 export type IOType =
+  // table
   | 'sf.table.individual'
   | 'sf.table.vertical_table'
-  | 'sf.model.ss_sgd';
+  // model
+  | 'sf.model.ss_sgd'
+  | 'sf.model.ss_glm'
+  | 'sf.model.sgb'
+  | 'sf.model.ss_xgb'
+  | 'sf.report';
 
 export type AtomicValue = Record<ValueKey, any>;
 
@@ -58,4 +61,22 @@ export interface ComponentSpec {
   outputs: IO[];
 }
 
-export type SchemaItem = Schema[keyof Schema];
+export interface SchemaItem {
+  id: string;
+  type: string;
+  title: string;
+  description?: string;
+  properties?: object;
+  required?: Array<string>;
+  oneOf?: Array<any>;
+  $oneOfIndex?: number;
+  $oneOfDisabled?: boolean;
+  $hidden?: boolean;
+  $tableColumnHidden?: boolean;
+  $tableRender?: string;
+  $componentType?: string;
+  $oneOfComponentType?: string;
+  $order?: number;
+  $formItemProps?: Record<string, any>;
+  $disabled?: boolean;
+}

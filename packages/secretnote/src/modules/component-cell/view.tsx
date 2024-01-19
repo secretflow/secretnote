@@ -42,7 +42,7 @@ export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) 
       }}
     >
       <CellComponent
-        log={instance.log}
+        logs={instance.logs}
         onComponentChange={(c) => (instance.component = c)}
         onComponentConfigChange={(v) => (instance.componentConfigValue = v)}
       />
@@ -65,7 +65,7 @@ export class ComponentCellView extends LibroExecutableCellView {
   componentConfigValue: Value = {};
 
   @prop()
-  log = '';
+  logs: string[] = [];
 
   get cellModel() {
     return this.model as ComponentCellModel;
@@ -84,7 +84,7 @@ export class ComponentCellView extends LibroExecutableCellView {
     }
 
     this.clearExecution();
-    this.log = 'Start executing...\n';
+    this.logs = [];
 
     try {
       this.cellModel.executing = true;
@@ -146,10 +146,9 @@ export class ComponentCellView extends LibroExecutableCellView {
 
   handleMessages(msg: KernelMessage.IIOPubMessage | KernelMessage.IExecuteReplyMsg) {
     if (isStreamMsg(msg)) {
-      const text = msg.content.text || '';
-      this.log = text;
+      this.logs = [...this.logs, msg.content.text];
     } else if (isErrorMsg(msg)) {
-      this.log = msg.content.traceback.join('');
+      this.logs = [...this.logs, msg.content.traceback.join('')];
     }
   }
 

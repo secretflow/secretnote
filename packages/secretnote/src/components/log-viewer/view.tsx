@@ -77,7 +77,7 @@ const defaultHighlightOptions = [
 ];
 
 interface IProps {
-  code: string;
+  code: string[];
   theme?: 'dark' | 'light';
 }
 
@@ -88,7 +88,7 @@ const LogView = (props: IProps) => {
   const domRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(false);
   const theme = props.theme || 'dark';
-  const renderedCodeRef = useRef<string[]>([]);
+  const renderedIndexRef = useRef<number>(0);
 
   // init terminal
   useEffect(() => {
@@ -172,14 +172,17 @@ const LogView = (props: IProps) => {
   // init data
   useEffect(() => {
     if (terminalInstance) {
-      if (props.code === '') {
+      if (props.code.length === 0) {
         terminalInstance.clear();
-        renderedCodeRef.current = [];
+        renderedIndexRef.current = 0;
         return;
       } else {
-        const code = props.code.replaceAll('\n', '\r\n');
-        terminalInstance.write(code);
-        renderedCodeRef.current.push(code);
+        const codes = props.code.slice(renderedIndexRef.current);
+        if (codes.length > 0) {
+          const codeWithLn = codes.join('').replaceAll('\n', '\r\n');
+          terminalInstance.write(codeWithLn);
+          renderedIndexRef.current = props.code.length;
+        }
       }
     }
   }, [terminalInstance, props.code]);
