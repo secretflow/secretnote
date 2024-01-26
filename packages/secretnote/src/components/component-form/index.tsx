@@ -9,7 +9,7 @@ import { transformSpecToJsonSchema } from './util';
 
 interface ComponentFormProps {
   config: ComponentSpec;
-  value?: Value;
+  defaultValue?: Value;
   onValuesChange?: (changedValues: Value, values: Value) => void;
 }
 
@@ -21,7 +21,7 @@ const ComponentForm = forwardRef(
         <SchemaForm
           ref={ref}
           json={transformSpecToJsonSchema(props.config)}
-          value={props.value}
+          value={props.defaultValue}
           customComponent={TableConfig}
           formOptions={{
             size: 'small',
@@ -29,7 +29,7 @@ const ComponentForm = forwardRef(
             labelAlign: 'left',
             labelCol: { span: 8 },
             wrapperCol: { span: 12, offset: 4 },
-            initialValues: props.value,
+            initialValues: props.defaultValue,
             onValuesChange(changedValues, values) {
               // eslint-disable-next-line no-console
               console.log(values);
@@ -44,3 +44,4 @@ const ComponentForm = forwardRef(
 ComponentForm.displayName = 'ComponentForm';
 
 export { ComponentForm };
+export * from './type';

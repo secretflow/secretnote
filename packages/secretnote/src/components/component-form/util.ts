@@ -101,6 +101,13 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
         description: '',
         properties: {},
       },
+      outputs: {
+        id: 'outputs',
+        type: 'object',
+        title: 'outputs',
+        description: '',
+        properties: {},
+      },
     },
   };
 
@@ -109,7 +116,7 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
     const type = getRenderType(attr);
     const options = getOptions(attr);
 
-    const item: any = {
+    const attrItem: any = {
       id: name,
       type,
       title: name,
@@ -123,13 +130,13 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
       $required: isFieldRequired(attr),
     };
 
-    setByPath(json, `properties/attrs/properties/${name}`, item);
+    setByPath(json, `properties/attrs/properties/${name}`, attrItem);
   });
 
   (spec.inputs || []).forEach((input) => {
     const inputName = input.name;
 
-    const item = {
+    const inputItem = {
       id: inputName,
       type: 'object',
       title: inputName,
@@ -140,22 +147,19 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
         attrs: (input.attrs || []).map((attr) => attr.name),
       },
     };
-    setByPath(json, `properties/inputs/properties/${inputName}`, item);
+    setByPath(json, `properties/inputs/properties/${inputName}`, inputItem);
+  });
 
-    // const attrs = input.attrs || [];
-    // attrs.forEach((attr) => {
-    //   const attrName = attr.name;
-    //   const title = `${inputName}.${attrName}`;
-    //   const attrItem: any = {
-    //     id: `input/${inputName}/${attrName}`,
-    //     type: 'string',
-    //     description: attr.desc,
-    //     title,
-    //     $required: true,
-    //   };
-
-    //   setByPath(json, `properties/inputs/properties/${title}`, attrItem);
-    // });
+  (spec.outputs || []).forEach((output) => {
+    const outputName = output.name;
+    const outputItem: any = {
+      id: ['output', outputName],
+      type: 'string',
+      description: output.desc,
+      title: outputName,
+      $required: true,
+    };
+    setByPath(json, `properties/outputs/properties/${outputName}`, outputItem);
   });
 
   return json;

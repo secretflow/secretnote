@@ -56,11 +56,10 @@ const TableSelector = (props: TableSelectorProps) => {
     requestData();
   }, []);
 
-  const getDefaultTable = (party: string) => {
-    const dataRef = props.value?.data_ref || [];
-    const partyDataRef = dataRef.find((item) => item.party === party);
-    if (partyDataRef) {
-      return [partyDataRef.party, partyDataRef.uri];
+  const getDefaultTable = (index: number) => {
+    const dataRef = (props.value?.data_ref || [])[index];
+    if (dataRef) {
+      return [dataRef.party, dataRef.uri];
     }
     return [];
   };
@@ -70,20 +69,24 @@ const TableSelector = (props: TableSelectorProps) => {
     return schema;
   };
 
-  const onTableChange = (value: string[]) => {
-    if (props.onChange && value && value.length > 1) {
-      const [party, uri] = value;
-      const dataRef = props.value?.data_ref || [];
-      const partyDataRef = dataRef.find((item) => item.party === party);
-      if (partyDataRef) {
-        partyDataRef.uri = uri;
+  const onTableChange = (index: number, value: string[]) => {
+    if (props.onChange) {
+      if (value && value.length === 2) {
+        const [party, uri] = value;
+        const dataRef = props.value?.data_ref || [];
+        dataRef[index] = { uri, party };
+        props.onChange({
+          data_ref: dataRef,
+          schema: props.value?.schema,
+        });
       } else {
-        dataRef.push({ uri, party });
+        const dataRef = props.value?.data_ref || [];
+        dataRef.splice(index, 1);
+        props.onChange({
+          data_ref: dataRef,
+          schema: props.value?.schema,
+        });
       }
-      props.onChange({
-        data_ref: dataRef,
-        schema: props.value?.schema,
-      });
     }
   };
 
@@ -104,9 +107,9 @@ const TableSelector = (props: TableSelectorProps) => {
             {item.children.length > 0 ? (
               <>
                 <Cascader
-                  defaultValue={getDefaultTable(item.value)}
+                  defaultValue={getDefaultTable(index)}
                   options={table}
-                  onChange={(val) => onTableChange(val as string[])}
+                  onChange={(val) => onTableChange(index, val as string[])}
                 />
                 {index === 0 && (
                   <Popover

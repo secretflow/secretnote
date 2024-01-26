@@ -1,7 +1,7 @@
 import { Cascader } from 'antd';
 import { groupBy } from 'lodash-es';
 
-import type { ComponentSpec } from '@/components/component-spec-form';
+import type { ComponentSpec } from '@/components/component-form';
 
 import components from './component.json';
 
@@ -50,20 +50,39 @@ const transformComponentsToOptions = (componentSpecs: ComponentSpec[]) => {
   return options;
 };
 
+const componentsOptions = transformComponentsToOptions(
+  components.comps as ComponentSpec[],
+);
+
+const getComponentByIds = (id: string[]) => {
+  const [domain, name, version] = id;
+  const component = components.comps.find(
+    (c) => c.domain === domain && c.name === name && c.version === version,
+  );
+  return component as ComponentSpec;
+};
+
+const getComponentIds = (component: ComponentSpec) => {
+  return [component.domain, component.name, component.version];
+};
+
 const ComponentOptions = ({
+  component,
   onComponentChange,
 }: {
-  onComponentChange: (component: ComponentSpec) => void;
+  component?: ComponentSpec;
+  onComponentChange?: (component: ComponentSpec) => void;
 }) => {
   return (
     <Cascader
       popupClassName="component-cascader"
       size="small"
-      options={transformComponentsToOptions(components.comps as ComponentSpec[])}
+      options={componentsOptions}
+      value={component ? [component.domain, component.name, component.version] : []}
       onChange={(value, selectedOptions) => {
-        const component = selectedOptions?.[selectedOptions.length - 1]?.component;
-        if (component) {
-          onComponentChange(component);
+        const c = selectedOptions?.[selectedOptions.length - 1]?.component;
+        if (c && onComponentChange) {
+          onComponentChange(c);
         }
       }}
       placeholder="Please select a component first."
@@ -71,4 +90,4 @@ const ComponentOptions = ({
   );
 };
 
-export { ComponentOptions };
+export { ComponentOptions, getComponentByIds, getComponentIds };

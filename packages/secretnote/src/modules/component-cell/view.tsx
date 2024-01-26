@@ -1,9 +1,16 @@
-import type { BaseOutputArea, KernelMessage } from '@difizen/libro-jupyter';
+import type {
+  BaseOutputArea,
+  KernelMessage,
+  IOutput,
+  CellViewOptions,
+} from '@difizen/libro-jupyter';
 import {
   LibroExecutableCellView,
   KernelError,
-  isErrorMsg,
+  CellService,
+  DocumentCommands,
   isStreamMsg,
+  isErrorMsg,
 } from '@difizen/libro-jupyter';
 import {
   transient,
@@ -12,17 +19,20 @@ import {
   ViewInstance,
   getOrigin,
   prop,
+  inject,
+  CommandRegistry,
+  ViewOption,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message } from 'antd';
 import { forwardRef } from 'react';
 
-import type { ComponentSpec, Value } from '@/components/component-spec-form';
+import type { ComponentSpec, Value } from '@/components/component-form';
 import type { SecretNoteModel } from '@/modules/editor';
 
-import { CellComponent } from './cell-component';
-import { codeTemplate } from './code-template';
-import type { ComponentCellModel } from './model';
+import { CellComponent, getComponentByIds, getComponentIds } from './cell-component';
+import { generateComponentCode } from './generate-code';
+import type { ComponentCellModel, ComponentMetadata } from './model';
 
 export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<ComponentCellView>(ViewInstance);
@@ -42,9 +52,15 @@ export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) 
       }}
     >
       <CellComponent
-        logs={instance.logs}
-        onComponentChange={(c) => (instance.component = c)}
-        onComponentConfigChange={(v) => (instance.componentConfigValue = v)}
+        outputs={instance.cellModel.outputs}
+        component={instance.component}
+        onComponentChange={(c) => {
+          instance.onComponentChange(c);
+        }}
+        defaultComponentConfig={instance.defaultComponentConfig}
+        onComponentConfigChange={(changeValues, values) => {
+          instance.onComponentConfigChange(values);
+        }}
       />
     </div>
   );
@@ -55,6 +71,8 @@ SFComponentCellComponent.displayName = 'SFComponentCellComponent';
 @view('sf-component-cell-view')
 export class ComponentCellView extends LibroExecutableCellView {
   view = SFComponentCellComponent;
+  private commandRegistry: CommandRegistry;
+
   // Only with outputArea can the Execute button on the right appear. This could be libro's bug
   outputArea = { outputs: [] } as unknown as BaseOutputArea;
 
@@ -62,13 +80,57 @@ export class ComponentCellView extends LibroExecutableCellView {
   component: ComponentSpec | undefined;
 
   @prop()
-  componentConfigValue: Value = {};
+  componentConfigValue: Value | undefined;
 
   @prop()
-  logs: string[] = [];
+  defaultComponentConfig: Value | undefined;
 
   get cellModel() {
     return this.model as ComponentCellModel;
+  }
+
+  constructor(
+    @inject(ViewOption) options: CellViewOptions,
+    @inject(CellService) cellService: CellService,
+    @inject(CommandRegistry) commandRegistry: CommandRegistry,
+  ) {
+    super(options, cellService);
+    this.commandRegistry = commandRegistry;
+  }
+
+  onViewMount() {
+    const meta = this.cellModel.metadata as ComponentMetadata;
+    if (meta.component) {
+      const { id, params } = meta.component;
+      this.component = getComponentByIds(id);
+      this.defaultComponentConfig = params;
+      this.componentConfigValue = params;
+    }
+  }
+
+  onComponentChange = (c: ComponentSpec) => {
+    this.component = c;
+    this.componentConfigValue = {};
+    this.cellModel.outputs = [];
+
+    this.cellModel.metadata.component = {
+      id: getComponentIds(c),
+      params: {},
+    };
+    this.cellModel.outputs = [];
+  };
+
+  onComponentConfigChange = (v: Value) => {
+    this.componentConfigValue = v;
+    const metadata = this.cellModel.metadata as ComponentMetadata;
+    if (metadata && metadata.component) {
+      metadata.component.params = v;
+    }
+    this.save();
+  };
+
+  save() {
+    this.commandRegistry.executeCommand(DocumentCommands.Save.id);
   }
 
   async run() {
@@ -84,7 +146,7 @@ export class ComponentCellView extends LibroExecutableCellView {
     }
 
     this.clearExecution();
-    this.logs = [];
+    this.cellModel.outputs = [];
 
     try {
       this.cellModel.executing = true;
@@ -94,7 +156,7 @@ export class ComponentCellView extends LibroExecutableCellView {
         const connection = kernelConnections[i];
 
         const future = connection.requestExecute({
-          code: codeTemplate,
+          code: generateComponentCode(this.component, this.componentConfigValue),
         });
 
         future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
@@ -118,6 +180,7 @@ export class ComponentCellView extends LibroExecutableCellView {
 
       const ok = futureDoneList.every((msg) => msg.content.status === 'ok');
       if (ok) {
+        this.save();
         return true;
       } else {
         const error = futureDoneList.find((msg) => msg.content.status !== 'ok');
@@ -145,11 +208,23 @@ export class ComponentCellView extends LibroExecutableCellView {
   }
 
   handleMessages(msg: KernelMessage.IIOPubMessage | KernelMessage.IExecuteReplyMsg) {
-    if (isStreamMsg(msg)) {
-      this.logs = [...this.logs, msg.content.text];
-    } else if (isErrorMsg(msg)) {
-      this.logs = [...this.logs, msg.content.traceback.join('')];
+    if (isStreamMsg(msg) || isErrorMsg(msg)) {
+      const output: IOutput = {
+        ...msg.content,
+        output_type: msg.header.msg_type,
+      };
+      this.cellModel.outputs = [...this.cellModel.outputs, output];
     }
+  }
+
+  toJSON() {
+    return {
+      id: this.cellModel.id,
+      cell_type: 'component',
+      source: generateComponentCode(this.component, this.componentConfigValue),
+      metadata: this.cellModel.metadata,
+      outputs: this.cellModel.outputs,
+    };
   }
 
   focus(toEdit: boolean) {

@@ -1,106 +1,105 @@
+import type { IOutput } from '@difizen/libro-jupyter';
 import { Tabs, type TabsProps, Empty } from 'antd';
-import { type FormInstance } from 'antd/es/form';
-import { useRef, useState } from 'react';
+import { forwardRef, type ForwardedRef, useMemo, useEffect } from 'react';
 
 import { ComponentForm } from '@/components/component-form';
-import type { ComponentSpec, Value } from '@/components/component-spec-form';
+import type { ComponentSpec, Value } from '@/components/component-form';
 import LogView from '@/components/log-viewer';
 
-import { ComponentOptions } from './options';
+import { ComponentOptions, getComponentByIds, getComponentIds } from './options';
 import './index.less';
 
 interface CellComponentProps {
-  logs: string[];
-  onComponentChange: (component: ComponentSpec) => void;
-  onComponentConfigChange: (config: Value) => void;
+  component?: ComponentSpec;
+  onComponentChange?: (component: ComponentSpec) => void;
+  defaultComponentConfig?: Value;
+  onComponentConfigChange?: (changedValues: Value, values: Value) => void;
+  outputs: IOutput[];
 }
 
-const CellComponent = (props: CellComponentProps) => {
-  const [component, setComponent] = useState<ComponentSpec>();
-  const formRef = useRef<FormInstance>(null);
+const CellComponent = forwardRef(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (props: CellComponentProps, ref: ForwardedRef<any>) => {
+    const {
+      component,
+      onComponentChange,
+      defaultComponentConfig,
+      onComponentConfigChange,
+      outputs,
+    } = props;
 
-  const items: TabsProps['items'] = [
-    {
-      key: '1',
-      label: 'Log',
-      children: (
-        <div className="sf-component-log">
-          {props.logs.length > 0 ? (
-            <LogView code={props.logs} theme="light" />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No log." />
-          )}
-        </div>
-      ),
-    },
-    {
-      key: '2',
-      label: 'Report',
-      children: (
-        <div className="sf-component-report">
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No report." />
-        </div>
-      ),
-    },
-  ];
+    const outputLogs = useMemo(() => {
+      const logs: string[] = [];
+      outputs.forEach((output) => {
+        if (output.output_type === 'stream') {
+          if (output.text) {
+            logs.push(output.text as string);
+          }
+        } else if (output.output_type === 'error') {
+          if (output.traceback) {
+            logs.push((output.traceback as string[]).join(''));
+          }
+        }
+      });
 
-  return (
-    <div className="component-cell-container">
-      <div className="header">
-        <span>component:</span>
-        <ComponentOptions
-          onComponentChange={(c) => {
-            setComponent(c);
-            props.onComponentChange(c);
-          }}
-        />
-      </div>
-      <div className="body">
-        <div className="config">
-          {component ? (
-            <ComponentForm
-              config={component}
-              ref={formRef}
-              value={{
-                protocol: 'ECDH_PSI_2PC',
-                sort: true,
-                bucket_size: '1048576',
-                ecdh_curve_type: 'CURVE_SM2',
-                input: {
-                  receiver_input: {
-                    type: 'sf.table.individual',
-                    tables: {
-                      data_ref: [
-                        {
-                          uri: 'iris_alice.csv',
-                          party: 'alice',
-                        },
-                      ],
-                      schema: {
-                        ids: ['id1,id2'],
-                        id_types: ['str,str'],
-                      },
-                    },
-                  },
-                  sender_input: {},
-                },
-                'input/receiver_input/key': 'uid',
-              }}
-            />
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="Select a component first."
-              style={{ marginTop: 120 }}
-            />
-          )}
+      return <LogView code={logs} theme="light" />;
+    }, [outputs]);
+
+    const items: TabsProps['items'] = [
+      {
+        key: '1',
+        label: 'Log',
+        children: <div className="sf-component-log">{outputLogs}</div>,
+      },
+      {
+        key: '2',
+        label: 'Report',
+        children: (
+          <div className="sf-component-report">
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No report." />
+          </div>
+        ),
+      },
+    ];
+
+    return (
+      <div className="component-cell-container">
+        <div className="header">
+          <span>component:</span>
+          <ComponentOptions
+            component={component}
+            onComponentChange={(c) => {
+              if (onComponentChange) {
+                onComponentChange(c);
+              }
+            }}
+          />
         </div>
-        <div className="result">
-          <Tabs defaultActiveKey="1" items={items} size="small" />
+        <div className="body">
+          <div className="config">
+            {component ? (
+              <ComponentForm
+                config={component}
+                ref={ref}
+                defaultValue={defaultComponentConfig}
+                onValuesChange={onComponentConfigChange}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="Select a component first."
+                style={{ marginTop: 120 }}
+              />
+            )}
+          </div>
+          <div className="result">
+            <Tabs defaultActiveKey="1" items={items} size="small" />
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+CellComponent.displayName = 'CellComponent';
 
-export { CellComponent };
+export { CellComponent, getComponentByIds, getComponentIds };

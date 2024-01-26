@@ -20,6 +20,7 @@ const TableConfig = {
         labelCol={{ span: 24 }}
         wrapperCol={{ offset: 1 }}
         key={root.id}
+        className="table-config-item"
       >
         <Form.Item
           label="type"
