@@ -1,11 +1,12 @@
 import type { IOutput } from '@difizen/libro-jupyter';
-import { Tabs, type TabsProps, Empty } from 'antd';
-import { forwardRef, type ForwardedRef, useMemo, useEffect } from 'react';
+import { Tabs, type TabsProps, Empty, Spin } from 'antd';
+import { forwardRef, type ForwardedRef, useMemo } from 'react';
 
 import { ComponentForm } from '@/components/component-form';
 import type { ComponentSpec, Value } from '@/components/component-form';
 import LogView from '@/components/log-viewer';
 
+import { generateComponentCellCode } from './cell-code';
 import { ComponentOptions, getComponentByIds, getComponentIds } from './options';
 import './index.less';
 
@@ -15,6 +16,7 @@ interface CellComponentProps {
   defaultComponentConfig?: Value;
   onComponentConfigChange?: (changedValues: Value, values: Value) => void;
   outputs: IOutput[];
+  loading?: boolean;
 }
 
 const CellComponent = forwardRef(
@@ -26,6 +28,7 @@ const CellComponent = forwardRef(
       defaultComponentConfig,
       onComponentConfigChange,
       outputs,
+      loading,
     } = props;
 
     const outputLogs = useMemo(() => {
@@ -49,7 +52,17 @@ const CellComponent = forwardRef(
       {
         key: '1',
         label: 'Log',
-        children: <div className="sf-component-log">{outputLogs}</div>,
+        children: (
+          <div className="sf-component-log">
+            {loading ? (
+              <div className="loading">
+                <Spin />
+              </div>
+            ) : (
+              outputLogs
+            )}
+          </div>
+        ),
       },
       {
         key: '2',
@@ -102,4 +115,4 @@ const CellComponent = forwardRef(
 );
 CellComponent.displayName = 'CellComponent';
 
-export { CellComponent, getComponentByIds, getComponentIds };
+export { CellComponent, getComponentByIds, getComponentIds, generateComponentCellCode };

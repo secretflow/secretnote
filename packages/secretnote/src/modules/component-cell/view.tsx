@@ -30,8 +30,12 @@ import { forwardRef } from 'react';
 import type { ComponentSpec, Value } from '@/components/component-form';
 import type { SecretNoteModel } from '@/modules/editor';
 
-import { CellComponent, getComponentByIds, getComponentIds } from './cell-component';
-import { generateComponentCode } from './generate-code';
+import {
+  CellComponent,
+  getComponentByIds,
+  getComponentIds,
+  generateComponentCellCode,
+} from './cell-component';
 import type { ComponentCellModel, ComponentMetadata } from './model';
 
 export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
@@ -52,6 +56,7 @@ export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) 
       }}
     >
       <CellComponent
+        loading={instance.launching}
         outputs={instance.cellModel.outputs}
         component={instance.component}
         onComponentChange={(c) => {
@@ -84,6 +89,9 @@ export class ComponentCellView extends LibroExecutableCellView {
 
   @prop()
   defaultComponentConfig: Value | undefined;
+
+  @prop()
+  launching = false;
 
   get cellModel() {
     return this.model as ComponentCellModel;
@@ -140,7 +148,7 @@ export class ComponentCellView extends LibroExecutableCellView {
       return false;
     }
 
-    if (!this.component) {
+    if (!this.component || !this.componentConfigValue) {
       message.error(l10n.t('Please select a component first.'));
       return false;
     }
@@ -150,13 +158,14 @@ export class ComponentCellView extends LibroExecutableCellView {
 
     try {
       this.cellModel.executing = true;
+      this.launching = true;
       const list: Promise<KernelMessage.IExecuteReplyMsg>[] = [];
 
       for (let i = 0, len = kernelConnections.length; i < len; i += 1) {
         const connection = kernelConnections[i];
 
         const future = connection.requestExecute({
-          code: generateComponentCode(this.component, this.componentConfigValue),
+          code: generateComponentCellCode(this.component, this.componentConfigValue),
         });
 
         future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
@@ -194,6 +203,8 @@ export class ComponentCellView extends LibroExecutableCellView {
         return false;
       }
       throw reason;
+    } finally {
+      this.launching = false;
     }
   }
 
@@ -208,6 +219,7 @@ export class ComponentCellView extends LibroExecutableCellView {
   }
 
   handleMessages(msg: KernelMessage.IIOPubMessage | KernelMessage.IExecuteReplyMsg) {
+    this.launching = false;
     if (isStreamMsg(msg) || isErrorMsg(msg)) {
       const output: IOutput = {
         ...msg.content,
@@ -218,10 +230,14 @@ export class ComponentCellView extends LibroExecutableCellView {
   }
 
   toJSON() {
+    const source =
+      this.component && this.componentConfigValue
+        ? generateComponentCellCode(this.component, this.componentConfigValue)
+        : '';
     return {
       id: this.cellModel.id,
       cell_type: 'component',
-      source: generateComponentCode(this.component, this.componentConfigValue),
+      source,
       metadata: this.cellModel.metadata,
       outputs: this.cellModel.outputs,
     };

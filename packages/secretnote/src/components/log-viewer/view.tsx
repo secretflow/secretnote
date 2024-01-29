@@ -111,7 +111,12 @@ const LogView = (props: IProps) => {
     });
     setTerminalInstance(instance);
     return () => {
-      instance.dispose();
+      // https://github.com/xtermjs/xterm.js/issues/4757#issuecomment-1712841561
+      try {
+        instance.dispose();
+      } catch (e) {
+        // pass
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
