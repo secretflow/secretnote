@@ -6,7 +6,7 @@ import { forwardRef } from 'react';
 import { Editor } from '@/components/markdown-editor';
 
 import './index.less';
-import type { MarkdownCellModel } from './markdown-cell-model';
+import type { MarkdownCellModel } from './model';
 
 export const MarkdownCell = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<MarkdownCellView>(ViewInstance);

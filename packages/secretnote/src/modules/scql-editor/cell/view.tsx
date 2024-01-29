@@ -5,14 +5,15 @@ import type {
   IOutput,
   ExecutionMeta,
   CodeEditorViewOptions,
+  KernelMessage,
 } from '@difizen/libro-jupyter';
 import {
   CellService,
   CellEditorMemo,
   isOutput,
   CodeEditorView,
-  JupyterCodeCellView,
   NotebookCommands,
+  LibroExecutableCellView,
 } from '@difizen/libro-jupyter';
 import {
   inject,
@@ -23,6 +24,7 @@ import {
   ViewManager,
   ViewOption,
   CommandRegistry,
+  prop,
 } from '@difizen/mana-app';
 import { forwardRef } from 'react';
 
@@ -30,8 +32,10 @@ import { SQLEditor } from '../editor';
 import { SqlOutputArea } from '../output';
 import { SCQLQueryService } from '../service';
 
+import type { SQLCellModel } from './model';
+
 export const SqlCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
-  const instance = useInject<SqlCellView>(ViewInstance);
+  const instance = useInject<SQLCellView>(ViewInstance);
 
   return (
     <div tabIndex={10} ref={ref} className={instance.className} onBlur={instance.blur}>
@@ -43,11 +47,21 @@ SqlCellComponent.displayName = 'SqlCellComponent';
 
 @transient()
 @view('sql-cell-view')
-export class SqlCellView extends JupyterCodeCellView {
+export class SQLCellView extends LibroExecutableCellView {
   override view = SqlCellComponent;
   readonly queryService: SCQLQueryService;
   readonly viewManager: ViewManager;
   readonly commandRegistry: CommandRegistry;
+
+  @prop()
+  outputs: IOutput[] = [];
+
+  @prop()
+  editorView?: CodeEditorView;
+
+  get cellModel() {
+    return this.model as SQLCellModel;
+  }
 
   constructor(
     @inject(ViewOption) options: CellViewOptions,
@@ -56,14 +70,14 @@ export class SqlCellView extends JupyterCodeCellView {
     @inject(SCQLQueryService) queryService: SCQLQueryService,
     @inject(CommandRegistry) commandRegistry: CommandRegistry,
   ) {
-    super(options, cellService, viewManager);
+    super(options, cellService);
     this.options = options;
     this.queryService = queryService;
     this.viewManager = viewManager;
     this.commandRegistry = commandRegistry;
 
     this.outputs = options.cell?.outputs as IOutput[];
-    this.className = this.className + ' sql';
+    this.className = this.className + ' sql-editor-container';
 
     this.viewManager
       .getOrCreateView<LibroOutputArea, IOutputAreaOption>(SqlOutputArea, {
@@ -92,18 +106,18 @@ export class SqlCellView extends JupyterCodeCellView {
   createEditor() {
     const option: CodeEditorViewOptions = {
       factory: (editorOption) => new SQLEditor(editorOption),
-      model: this.model,
+      model: this.cellModel,
       config: {
         readOnly: this.parent.model.readOnly,
         editable: !this.parent.model.readOnly,
       },
     };
-    this.viewManager
+    return this.viewManager
       .getOrCreateView<CodeEditorView, CodeEditorViewOptions>(CodeEditorView, option)
       .then(async (editorView) => {
         this.editorView = editorView;
 
-        await this.editorView.editorReady;
+        await editorView.editorReady;
         this.handleCommand();
 
         return;
@@ -166,25 +180,24 @@ export class SqlCellView extends JupyterCodeCellView {
   }
 
   async run() {
-    this.clearExecution();
-    this.model.executing = true;
-    this.model.kernelExecuting = true;
-    this.model.executeCount = 1;
-
     const startTime = new Date().toISOString();
-    this.setExecutionTime({
-      start: startTime,
-      toExecute: startTime,
-      end: '',
-    });
+
+    this.clearExecution();
+    this.setExecutionStatus(true, true);
+    this.setExecutionTime(startTime, '');
+    this.cellModel.executeCount = 1;
 
     try {
-      const data = await this.queryService.query(this.model.value);
-      const msg = {
+      const data = await this.queryService.query(this.cellModel.value);
+      const msg: KernelMessage.IExecuteResultMsg = {
         header: {
           msg_type: 'execute_result',
+          date: '',
+          msg_id: '',
+          session: '',
+          username: '',
+          version: '',
         },
-        msg_type: 'execute_result',
         metadata: {},
         content: {
           data: {
@@ -195,18 +208,23 @@ export class SqlCellView extends JupyterCodeCellView {
         },
         buffers: [],
         channel: 'iopub',
+        parent_header: {},
       };
-      this.model.msgChangeEmitter.fire(msg);
+      this.cellModel.msgChangeEmitter.fire(msg);
     } catch (e) {
       if (e instanceof Error) {
         const message = e.message;
         const messageLines = message.split('\n');
         if (messageLines.length > 0) {
-          const msg = {
+          const msg: KernelMessage.IErrorMsg = {
             header: {
               msg_type: 'error',
+              date: '',
+              msg_id: '',
+              session: '',
+              username: '',
+              version: '',
             },
-            msg_type: 'error',
             metadata: {},
             content: {
               traceback: messageLines.slice(1),
@@ -215,36 +233,45 @@ export class SqlCellView extends JupyterCodeCellView {
             },
             buffers: [],
             channel: 'iopub',
+            parent_header: {},
           };
-          this.model.msgChangeEmitter.fire(msg);
+          this.cellModel.msgChangeEmitter.fire(msg);
         }
       }
     }
-    this.model.executing = false;
-    this.model.kernelExecuting = false;
 
-    this.setExecutionTime({
-      start: startTime,
-      toExecute: startTime,
-      end: new Date().toISOString(),
-    });
+    this.setExecutionStatus(false, false);
+    this.setExecutionTime(startTime, new Date().toISOString());
 
     return true;
   }
 
-  setExecutionTime(times: { start?: string; end?: string; toExecute?: string }) {
-    const meta = this.model.metadata.execution as ExecutionMeta;
+  setExecutionStatus(executing: boolean, kernelExecuting: boolean) {
+    this.cellModel.executing = executing;
+    this.cellModel.kernelExecuting = kernelExecuting;
+  }
+
+  setExecutionTime(start: string, end: string) {
+    const meta = this.cellModel.metadata.execution as ExecutionMeta;
     if (meta) {
-      const { start, end, toExecute } = times;
-      if (start !== undefined) {
-        meta['shell.execute_reply.started'] = start;
-      }
-      if (end !== undefined) {
-        meta['shell.execute_reply.end'] = end;
-      }
-      if (toExecute !== undefined) {
-        meta.to_execute = toExecute;
-      }
+      meta['shell.execute_reply.started'] = start;
+      meta.to_execute = start;
+      meta['shell.execute_reply.end'] = end;
     }
   }
+
+  // why need this?
+  calcEditorAreaHeight() {
+    return 0;
+  }
+
+  override clearExecution = () => {
+    this.cellModel.clearExecution();
+    Promise.resolve()
+      .then(() => {
+        this.outputArea.clear();
+        return;
+      })
+      .catch(console.error);
+  };
 }

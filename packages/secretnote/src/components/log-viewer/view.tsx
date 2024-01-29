@@ -27,10 +27,10 @@ const defaultSearchOptions = {
   incremental: false,
   decorations: {
     matchForegroundColor: '#000000',
-    matchBackground: '#ffff54',
+    matchBackground: '#f6c8ac',
     matchBorder: 'none',
     matchOverviewRuler: 'none',
-    activeMatchBackground: '#ff9540',
+    activeMatchBackground: '#babfb1',
     activeMatchBorder: 'none',
     activeMatchColorOverviewRuler: 'none',
   },
@@ -47,12 +47,6 @@ const defaultTerminalOptions = {
   fontFamily: 'Roboto Mono,Andale Mono,Consolas,Courier New,monospace',
   lineHeight: 20 / 17,
   fastScrollSensitivity: 35,
-  theme: {
-    selectionBackground: '#fff',
-    selectionForeground: '#fff',
-    background: '#24292e',
-    foreground: '#b5bbc6',
-  },
 };
 
 const defaultHighlightOptions = [
@@ -61,14 +55,6 @@ const defaultHighlightOptions = [
     ignoreSensitive: true,
     decorations: {
       matchForegroundColor: 'red',
-      matchBackground: '#24292e',
-    },
-  },
-  {
-    keyword: 'ErrorCode',
-    ignoreSensitive: true,
-    decorations: {
-      matchForegroundColor: '#faad14',
       matchBackground: '#24292e',
     },
   },
@@ -91,7 +77,8 @@ const defaultHighlightOptions = [
 ];
 
 interface IProps {
-  code: string;
+  code: string[];
+  theme?: 'dark' | 'light';
 }
 
 const LogView = (props: IProps) => {
@@ -100,14 +87,33 @@ const LogView = (props: IProps) => {
   const [searchResult, setSearchResult] = useState({ resultIndex: -1, resultCount: 0 });
   const domRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(false);
+  const theme = props.theme || 'dark';
+  const renderedIndexRef = useRef<number>(0);
 
   // init terminal
   useEffect(() => {
-    const instance = new Terminal(defaultTerminalOptions);
+    const instance = new Terminal({
+      ...defaultTerminalOptions,
+      theme:
+        theme === 'dark'
+          ? {
+              selectionBackground: '#fff',
+              selectionForeground: '#fff',
+              background: '#24292e',
+              foreground: '#b5bbc6',
+            }
+          : {
+              selectionBackground: '#b7d7fb',
+              selectionForeground: '#000',
+              background: '#fff',
+              foreground: '#000',
+            },
+    });
     setTerminalInstance(instance);
     return () => {
       instance.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -166,8 +172,18 @@ const LogView = (props: IProps) => {
   // init data
   useEffect(() => {
     if (terminalInstance) {
-      const code = props.code.replaceAll('\n', '\r\n');
-      terminalInstance.write(code);
+      if (props.code.length === 0) {
+        terminalInstance.clear();
+        renderedIndexRef.current = 0;
+        return;
+      } else {
+        const codes = props.code.slice(renderedIndexRef.current);
+        if (codes.length > 0) {
+          const codeWithLn = codes.join('').replaceAll('\n', '\r\n');
+          terminalInstance.write(codeWithLn);
+          renderedIndexRef.current = props.code.length;
+        }
+      }
     }
   }, [terminalInstance, props.code]);
 
@@ -236,10 +252,11 @@ const LogView = (props: IProps) => {
   }, [terminalInstance]);
 
   const render = (
-    <div className="terminal-viewer">
+    <div className={`terminal-viewer ${theme}`}>
       <div className="terminal-viewer-header">
         <div className="terminal-viewer-input-wrapper">
           <input
+            placeholder="Search..."
             className="terminal-viewer-input"
             value={searchValue}
             type="text"

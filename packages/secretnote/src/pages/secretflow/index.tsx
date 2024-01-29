@@ -1,6 +1,7 @@
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 
+import { ComponentCellModule } from '@/modules/component-cell';
 import { EditorModule } from '@/modules/editor';
 import { FileModule } from '@/modules/file';
 import { LayoutModule } from '@/modules/layout';
@@ -29,10 +30,9 @@ const App = (): JSX.Element => {
         ToolbarModule,
         FileModule,
         MetricsModule,
-        // SQLEditorModule,
-        // IntegrationModule,
         MarkdownCellModule,
         WelcomeModule,
+        ComponentCellModule,
       ]}
     />
   );

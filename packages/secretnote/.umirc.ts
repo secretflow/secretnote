@@ -1,5 +1,4 @@
 import { defineConfig } from 'umi';
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 export default defineConfig({
   // This is not portable at all
@@ -50,8 +49,8 @@ export default defineConfig({
   ],
   mfsu: false,
   npmClient: 'pnpm',
-  chainWebpack(memo) {
-    memo.plugin('monaco').use(MonacoWebpackPlugin);
-  },
+  // chainWebpack(memo) {
+  //   memo.plugin('monaco').use(MonacoWebpackPlugin);
+  // },
   esbuildMinifyIIFE: true,
 });

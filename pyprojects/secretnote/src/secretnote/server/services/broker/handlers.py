@@ -155,7 +155,6 @@ class BrokerHandler(APIHandler):
             raise web.HTTPError(400, "no action provided.")
 
         host = self.get_config("host")
-
         if host is None:
             raise web.HTTPError(400, "no host provided.")
 

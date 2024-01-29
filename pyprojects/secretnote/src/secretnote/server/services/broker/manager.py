@@ -20,8 +20,6 @@ BROKER_SERVICE_PATH = {
     "show_ccl": "/intra/ccl/show",
 }
 
-global_project_id = "secretnote"
-
 
 class BrokerManager:
     def __init__(self):
@@ -59,7 +57,7 @@ class BrokerManager:
 
         return code, message
 
-    async def create_project(self, project: Dict, address: str):
+    async def create_project(self, project: Dict[str, Any], address: str) -> str:
         url = f"{address}{BROKER_SERVICE_PATH['create_project']}"
         body = {
             **project,
@@ -77,7 +75,7 @@ class BrokerManager:
 
         return response.get("project_id", "")
 
-    async def get_project_list(self, address: str):
+    async def get_project_list(self, address: str) -> List[Dict[str, Any]]:
         url = f"{address}{BROKER_SERVICE_PATH['list_projects']}"
         body = {"ids": []}
         response = await self.request(
@@ -92,7 +90,7 @@ class BrokerManager:
 
         return response.get("projects", [])
 
-    async def get_project_info(self, project_id: str, address: str):
+    async def get_project_info(self, project_id: str, address: str) -> Dict[str, Any]:
         url = f"{address}{BROKER_SERVICE_PATH['list_projects']}"
         body = {"ids": [project_id]}
         response = await self.request(
@@ -109,7 +107,9 @@ class BrokerManager:
 
         return project[0] if len(project) > 0 else None
 
-    async def get_invitation_list(self, party: str, address: str):
+    async def get_invitation_list(
+        self, party: str, address: str
+    ) -> List[Dict[str, Any]]:
         url = f"{address}{BROKER_SERVICE_PATH['list_invitations']}"
         body = {}
         response = await self.request(
@@ -125,7 +125,9 @@ class BrokerManager:
         invite_list = response.get("invitations", [])
         return [invite for invite in invite_list if invite["inviter"] != party]
 
-    async def process_invitation(self, invitation_id: str, respond: str, address: str):
+    async def process_invitation(
+        self, invitation_id: str, respond: str, address: str
+    ) -> None:
         url = f"{address}{BROKER_SERVICE_PATH['process_invitation']}"
         body = {
             "invitation_id": invitation_id,
@@ -142,7 +144,7 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    async def invite_member(self, project_id: str, invitee: str, address: str):
+    async def invite_member(self, project_id: str, invitee: str, address: str) -> None:
         url = f"{address}{BROKER_SERVICE_PATH['invite_member']}"
         body = {
             "project_id": project_id,
@@ -163,7 +165,9 @@ class BrokerManager:
 
         return response
 
-    async def get_table_list(self, project_id: str, address: str):
+    async def get_table_list(
+        self, project_id: str, address: str
+    ) -> List[Dict[str, Any]]:
         url = f"{address}{BROKER_SERVICE_PATH['list_tables']}"
         body = {"project_id": project_id, "names": []}
         response = await self.request(
@@ -180,10 +184,10 @@ class BrokerManager:
 
     async def create_table(
         self,
-        project_id,
-        table: Dict,
+        project_id: str,
+        table: Dict[str, Any],
         address: str,
-    ):
+    ) -> None:
         url = f"{address}{BROKER_SERVICE_PATH['create_table']}"
         body = {
             "project_id": project_id,
@@ -199,7 +203,9 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    async def delete_table(self, project_id: str, table_name: str, address: str):
+    async def delete_table(
+        self, project_id: str, table_name: str, address: str
+    ) -> None:
         url = f"{address}{BROKER_SERVICE_PATH['drop_table']}"
         body = {"project_id": project_id, "table_name": table_name}
         response = await self.request(
@@ -212,7 +218,9 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    async def get_table_info(self, project_id: str, table_name: str, address: str):
+    async def get_table_info(
+        self, project_id: str, table_name: str, address: str
+    ) -> Any:
         url = f"{address}{BROKER_SERVICE_PATH['list_tables']}"
         body = {"project_id": project_id, "names": [table_name]}
         response = await self.request(
@@ -234,7 +242,7 @@ class BrokerManager:
         project_id: str,
         table_name: str,
         address: str,
-    ):
+    ) -> List[Dict[str, Any]]:
         url = f"{address}{BROKER_SERVICE_PATH['show_ccl']}"
         body = {"project_id": project_id, "tables": [table_name], "dest_parties": []}
         response = await self.request(
@@ -249,7 +257,9 @@ class BrokerManager:
 
         return response.get("column_control_list", [])
 
-    async def grant_ccl(self, project_id: str, ccl_list: List[Any], address: str):
+    async def grant_ccl(
+        self, project_id: str, ccl_list: List[Any], address: str
+    ) -> None:
         url = f"{address}{BROKER_SERVICE_PATH['grant_ccl']}"
         body = {
             "project_id": project_id,
@@ -265,7 +275,9 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    async def revoke_ccl(self, project_id: str, ccl_list: List[Any], address: str):
+    async def revoke_ccl(
+        self, project_id: str, ccl_list: List[Any], address: str
+    ) -> None:
         url = f"{address}{BROKER_SERVICE_PATH['revoke_ccl']}"
         body = {
             "project_id": project_id,
@@ -281,7 +293,7 @@ class BrokerManager:
         if code != 0:
             raise Exception(message)
 
-    async def query(self, project_id: str, query: str, address: str):
+    async def query(self, project_id: str, query: str, address: str) -> List[Any]:
         url = f"{address}{BROKER_SERVICE_PATH['query']}"
         body = {
             "project_id": project_id,
@@ -299,13 +311,13 @@ class BrokerManager:
 
         return response.get("out_columns", [])
 
-    def create_query_job(self, query: str, address: str, project_id=global_project_id):
+    async def create_query_job(self, project_id: str, address: str, query: str) -> str:
         url = f"{address}{BROKER_SERVICE_PATH['submit_query']}"
         body = {
             "project_id": project_id,
             "query": query,
         }
-        response = self.request(
+        response = await self.request(
             url=url,
             method="POST",
             body=body,
@@ -317,10 +329,10 @@ class BrokerManager:
 
         return response.get("job_id", "")
 
-    def get_job_result(self, job_id: str, address: str):
+    async def get_job_result(self, job_id: str, address: str) -> List[Any]:
         url = f"{address}{BROKER_SERVICE_PATH['fetch_result']}"
         body = {"job_id": job_id}
-        response = self.request(
+        response = await self.request(
             url=url,
             method="POST",
             body=body,

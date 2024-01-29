@@ -2,16 +2,16 @@ import type { CellMeta, CellModel, CellOptions } from '@difizen/libro-jupyter';
 import { CellModelContribution, CellViewContribution } from '@difizen/libro-jupyter';
 import { inject, singleton } from '@difizen/mana-app';
 
-import { SqlCellModelFactory } from './sql-cell-protocol';
-import { SqlCellView } from './sql-cell-view';
+import { SQLCellModelFactory } from './protocol';
+import { SQLCellView } from './view';
 
 @singleton({ contrib: [CellModelContribution, CellViewContribution] })
-export class SqlCellContribution
+export class SQLCellContribution
   implements CellModelContribution, CellViewContribution
 {
-  protected readonly modelFactory: SqlCellModelFactory;
+  protected readonly modelFactory: SQLCellModelFactory;
 
-  constructor(@inject(SqlCellModelFactory) modelFactory: SqlCellModelFactory) {
+  constructor(@inject(SQLCellModelFactory) modelFactory: SQLCellModelFactory) {
     this.modelFactory = modelFactory;
   }
   cellMeta: CellMeta = {
@@ -33,5 +33,5 @@ export class SqlCellContribution
     return model;
   }
 
-  view = SqlCellView;
+  view = SQLCellView;
 }

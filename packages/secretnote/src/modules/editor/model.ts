@@ -36,7 +36,7 @@ export class SecretNoteModel extends LibroModel {
   kernelConnections: IKernelConnection[] = [];
 
   @prop()
-  lspEnabled = true;
+  lspEnabled = false;
 
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {
@@ -231,5 +231,5 @@ export class SecretNoteModel extends LibroModel {
 
   autoSave = debounce(() => {
     this.commandRegistry.executeCommand(DocumentCommands.Save.id);
-  }, 500);
+  }, 1000);
 }

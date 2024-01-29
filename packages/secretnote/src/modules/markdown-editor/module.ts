@@ -1,10 +1,10 @@
 import { CellOptions } from '@difizen/libro-jupyter';
 import { ManaModule } from '@difizen/mana-app';
 
-import { MarkdownCellContribution } from './markdown-cell-contrib';
-import { MarkdownCellModel } from './markdown-cell-model';
-import { MarkdownCellModelFactory } from './markdown-cell-protocol';
-import { MarkdownCellView } from './markdown-cell-view';
+import { MarkdownCellContribution } from './cell-contrib';
+import { MarkdownCellModel } from './model';
+import { MarkdownCellModelFactory } from './protocol';
+import { MarkdownCellView } from './view';
 
 export const MarkdownCellModule = ManaModule.create()
   .register(MarkdownCellContribution, MarkdownCellView, MarkdownCellModel)
