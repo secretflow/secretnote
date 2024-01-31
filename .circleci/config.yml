@@ -1,0 +1,49 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/configuration-reference/#jobs
+jobs:
+  devcontainer-publish:
+    docker:
+      - image: cimg/base:stable
+    resource_class: xlarge
+
+    parameters:
+      platform:
+        type: string
+        default: linux/amd64
+      tag:
+        type: string
+        default: latest
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and publish
+          command: |
+            docker buildx build \
+              --platform=<< parameters.platform >> \
+              -f docker/app/Dockerfile \
+              --progress=plain \
+              .
+
+            docker login -u secretflow -p ${DOCKER_DEPLOY_TOKEN}
+            docker push secretflow/secretnote:<< parameters.tag >>
+
+# Orchestrate jobs using workflows
+# See: https://circleci.com/docs/configuration-reference/#workflows
+workflows:
+  devcontainer-publish-amd64:
+    jobs:
+      - devcontainer-publish:
+          platform: linux/amd64
+          tag: unstable-amd64
+
+  devcontainer-publish-arm64:
+    jobs:
+      - devcontainer-publish:
+          platform: linux/arm64
+          tag: unstable-arm64
