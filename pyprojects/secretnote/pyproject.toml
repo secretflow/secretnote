@@ -22,7 +22,8 @@ dependencies = [
   "orjson>=3.9.9",
   "packaging>=23.1",
   "pydantic>=1.10, <2",
-  "ray[default]~=2.9.0", # FIXME: ideally from upstream
+  "ray[default]~=2.6.3", # FIXME: ????????????
+  "secretflow-ray==2.2.0",
   "rich>=13.7.0",
   "stack_data>=0.6.3",
   "tqdm>=4.66.1",
