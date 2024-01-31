@@ -24,14 +24,17 @@ jobs:
       - run:
           name: Build and publish
           command: |
+            export IMAGE_NAME=secretflow/secretnote:<< parameters.tag >>
+
             docker buildx build \
               --platform=<< parameters.platform >> \
               -f docker/app/Dockerfile \
+              -t ${IMAGE_NAME} \
               --progress=plain \
               .
 
             docker login -u secretflow -p ${DOCKER_DEPLOY_TOKEN}
-            docker push secretflow/secretnote:<< parameters.tag >>
+            docker push ${IMAGE_NAME}
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
