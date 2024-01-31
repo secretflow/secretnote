@@ -3,7 +3,6 @@ from os import makedirs, path
 from pathlib import Path
 from typing import Deque, Iterable, Tuple
 
-from jupyter_core import paths
 from rich.tree import Tree
 
 
@@ -29,6 +28,8 @@ def path_to_tree(root: Path) -> Tree:
 
 
 def get_db_path():
+    from jupyter_core import paths
+
     jupyter_config_dir = paths.jupyter_config_dir()
     if not path.exists(jupyter_config_dir):
         makedirs(jupyter_config_dir)

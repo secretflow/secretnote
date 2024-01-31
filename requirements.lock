@@ -4,11 +4,11 @@
 # last locked with the following flags:
 #   pre: false
 #   features: []
-#   all-features: false
+#   all-features: true
+#   with-sources: false
 
 -e file:.
 -e file:pyprojects/secretnote
--e file:pyprojects/spu-stubs
 aiohttp==3.9.1
 aiohttp-cors==0.7.0
 aiosignal==1.3.1
@@ -50,7 +50,6 @@ google-api-core==2.15.0
 google-auth==2.25.2
 googleapis-common-protos==1.62.0
 gpustat==1.1.1
-greenlet==3.0.2
 grpcio==1.60.0
 idna==3.6
 importlib-metadata==6.11.0
@@ -87,7 +86,6 @@ nbconvert==7.13.0
 nbformat==5.9.2
 nest-asyncio==1.5.8
 networkx==3.1
-numpy==1.24.4
 nvidia-ml-py==12.535.133
 opencensus==0.11.3
 opencensus-context==0.1.3
@@ -119,7 +117,7 @@ python-dateutil==2.8.2
 python-json-logger==2.0.7
 pyyaml==6.0.1
 pyzmq==25.1.2
-ray==2.6.3
+ray==2.9.1
 referencing==0.32.0
 requests==2.31.0
 rfc3339-validator==0.1.4

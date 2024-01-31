@@ -27,8 +27,10 @@
   "scripts": {
     "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck:tsc": "tsc --noEmit",
-    "build": "vite build --mode=esm && vite build --mode=browser && vite build --mode=esm-bundled",
-    "dev": "NODE_ENV=development vite build --mode=development --watch"
+    "build:js": "vite build --mode=esm && vite build --mode=browser && vite build --mode=esm-bundled",
+    "prepare": "nx build:js",
+    "dev": "NODE_ENV=development vite build --mode=development --watch",
+    "build": "nx build:js"
   },
   "dependencies": {
     "@antv/algorithm": "^0.1.26",
@@ -72,10 +74,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "nx": {
-    "tags": [
-      "postinstall"
-    ]
   }
 }

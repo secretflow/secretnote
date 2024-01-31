@@ -19,8 +19,10 @@
     "setup:umi": "umi setup",
     "lint:eslint": "eslint src",
     "lint:stylelint": "stylelint 'src/**/*.{css,less}'",
-    "build": "umi build",
-    "dev": "umi dev"
+    "build:js": "umi build",
+    "prepare": "nx setup:umi && nx build:js",
+    "dev": "umi dev",
+    "build": "nx build:js"
   },
   "dependencies": {
     "@antv/s2": "^1.52.0",
@@ -86,10 +88,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "nx": {
-    "tags": [
-      "postinstall"
-    ]
   }
 }

@@ -1,0 +1,22 @@
+services:
+  alice:
+    image: 'secretflow/secretnote:unstable-amd64'
+    platform: linux/amd64
+    environment:
+      - SELF_PARTY=alice
+      - ALL_PARTIES=alice,bob
+    ports:
+      # Jupyter
+      - 8090:8888
+    entrypoint: /root/scripts/start.sh
+
+  bob:
+    image: 'secretflow/secretnote:unstable-amd64'
+    platform: linux/amd64
+    environment:
+      - SELF_PARTY=bob
+      - ALL_PARTIES=alice,bob
+    ports:
+      # Jupyter
+      - 8092:8888
+    entrypoint: /root/scripts/start.sh
