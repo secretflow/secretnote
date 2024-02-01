@@ -61,6 +61,7 @@
     "classnames": "^2.3.2",
     "d3-dsv": "^3.0.1",
     "endent": "^2.1.0",
+    "highlight.js": "^11.9.0",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.284.0",
     "monaco-editor": "^0.45.0",

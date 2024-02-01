@@ -29,6 +29,8 @@
     "fdspawn",
     "getipython",
     "grpcio",
+    "highlightjs",
+    "hljs",
     "ifaddresses",
     "iloc",
     "INET",

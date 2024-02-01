@@ -1,8 +1,6 @@
 [project]
-authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
-classifiers = [
-  "Private :: Do Not Upload",
-]
+authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
+classifiers = ["Private :: Do Not Upload"]
 dependencies = []
 name = "monorepo"
 readme = "README.md"
@@ -68,6 +66,13 @@ src = ["pyprojects/*/src"]
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]
 include = ["pyprojects/*/src"]
+
+reportArgumentType = "information"
+reportAttributeAccessIssue = "information"
 reportGeneralTypeIssues = "information"
+reportIncompatibleMethodOverride = "information"
+reportIncompatibleVariableOverride = "information"
 reportOptionalMemberAccess = "information"
+reportOverlappingOverload = "information"
 reportPrivateImportUsage = "information"
+reportReturnType = "information"

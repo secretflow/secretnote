@@ -8,7 +8,7 @@ import { downloadFileByUrl as download } from '@/utils';
 import { SecretNoteServerManager } from '../server';
 
 export const BASE_PATH = '/';
-export const FILE_EXTS = ['.csv', '.log', '.txt'];
+export const FILE_EXTS = ['.csv', '.log', '.txt', '.jsonl'];
 @singleton()
 export class FileService {
   protected readonly contentsManager: ContentsManager;
