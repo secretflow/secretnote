@@ -17,22 +17,39 @@ const getRenderType = (attr: Attr): string => {
       return 'number';
     case 'AT_STRING':
       return 'string';
+    case 'AT_FLOAT':
+      return 'number';
   }
+  return 'string';
 };
 
-const getDefaultValue = (attr: Attr) => {
+const getValue = (attr: Attr, key: 'defaultValue' | 'lowerBound' | 'upperBound') => {
   switch (attr.type) {
     case 'AT_BOOL':
-      return attr.atomic?.defaultValue?.b;
+      return attr.atomic?.[key]?.b;
     case 'AT_INT':
-      return attr.atomic?.defaultValue?.i64;
+      return attr.atomic?.[key]?.i64;
     case 'AT_STRING':
-      return attr.atomic?.defaultValue?.s;
+      return attr.atomic?.[key]?.s;
+    case 'AT_FLOAT':
+      return attr.atomic?.[key]?.f;
   }
 };
 
 const isFieldRequired = (attr: Attr) => {
   return !attr.atomic.isOptional;
+};
+
+const getMinimum = (attr: Attr) => {
+  if (attr.atomic.lowerBoundEnabled) {
+    return Number(getValue(attr, 'lowerBound'));
+  }
+};
+
+const getMaximum = (attr: Attr) => {
+  if (attr.atomic.upperBoundEnabled) {
+    return Number(getValue(attr, 'upperBound'));
+  }
 };
 
 export const setByPath = (
@@ -126,8 +143,10 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
         label: v,
         value: v,
       })),
-      $defaultValue: getDefaultValue(attr),
+      $defaultValue: getValue(attr, 'defaultValue'),
       $required: isFieldRequired(attr),
+      minimum: getMinimum(attr),
+      maximum: getMaximum(attr),
     };
 
     setByPath(json, `properties/attrs/properties/${name}`, attrItem);

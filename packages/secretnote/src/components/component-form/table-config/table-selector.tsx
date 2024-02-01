@@ -16,7 +16,8 @@ type Table = {
 
 type TableValue = {
   data_ref: Table[];
-  schema: SchemaValue;
+  schema?: SchemaValue;
+  schemas?: SchemaValue[];
 };
 
 type TableOption = {
@@ -64,9 +65,13 @@ const TableSelector = (props: TableSelectorProps) => {
     return [];
   };
 
-  const getDefaultSchema = () => {
-    const schema = props.value?.schema || {};
-    return schema;
+  const getDefaultSchema = (index: number) => {
+    const dataRef = props.value?.data_ref || [];
+    if (dataRef.length > 1) {
+      return props.value?.schemas?.[index];
+    } else if (dataRef.length === 1) {
+      return props.value?.schema;
+    }
   };
 
   const onTableChange = (index: number, value: string[]) => {
@@ -76,26 +81,38 @@ const TableSelector = (props: TableSelectorProps) => {
         const dataRef = props.value?.data_ref || [];
         dataRef[index] = { uri, party };
         props.onChange({
+          ...props.value,
           data_ref: dataRef,
-          schema: props.value?.schema,
         });
       } else {
         const dataRef = props.value?.data_ref || [];
         dataRef.splice(index, 1);
         props.onChange({
+          ...props.value,
           data_ref: dataRef,
-          schema: props.value?.schema,
         });
       }
     }
   };
 
-  const onTableSchemaChange = (value: SchemaValue) => {
+  const onTableSchemaChange = (index: number, value: SchemaValue) => {
     if (props.onChange) {
-      props.onChange({
-        data_ref: props.value?.data_ref,
-        schema: { ...props.value?.schema, ...value },
-      });
+      const dataRef = props.value?.data_ref || [];
+      if (dataRef.length > 1) {
+        const schemas = props.value?.schemas || [];
+        schemas[index] = { ...schemas[index], ...value };
+        props.onChange({
+          ...props.value,
+          schemas: schemas,
+          schema: undefined,
+        });
+      } else if (dataRef.length === 1) {
+        props.onChange({
+          ...props.value,
+          schema: { ...props.value?.schema, ...value },
+          schemas: undefined,
+        });
+      }
     }
   };
 
@@ -111,23 +128,21 @@ const TableSelector = (props: TableSelectorProps) => {
                   options={table}
                   onChange={(val) => onTableChange(index, val as string[])}
                 />
-                {index === 0 && (
-                  <Popover
-                    content={
-                      <SchemaSelector
-                        value={getDefaultSchema()}
-                        onChange={onTableSchemaChange}
-                      />
-                    }
-                    placement="right"
-                    title=""
-                    overlayClassName="secretnote-table-selector-popover"
-                    trigger="click"
-                    arrow={false}
-                  >
-                    <Settings size={14} cursor="pointer" />
-                  </Popover>
-                )}
+                <Popover
+                  content={
+                    <SchemaSelector
+                      value={getDefaultSchema(index)}
+                      onChange={(val) => onTableSchemaChange(index, val)}
+                    />
+                  }
+                  placement="right"
+                  title=""
+                  overlayClassName="secretnote-table-selector-popover"
+                  trigger="click"
+                  arrow={false}
+                >
+                  <Settings size={14} cursor="pointer" />
+                </Popover>
               </>
             ) : (
               <span key={item.value} className="no-table">

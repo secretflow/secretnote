@@ -1,3 +1,4 @@
+import type { FormInstance } from 'antd';
 import { Input, Form, Select } from 'antd';
 
 import type { SchemaItem } from '../type';
@@ -9,10 +10,17 @@ const labelCol = { span: 8 };
 const wrapperCol = { offset: 4, span: 12 };
 
 const TableConfig = {
-  tableConfig: (props: { root: SchemaItem }) => {
+  tableConfig: (props: { root: SchemaItem; form: FormInstance }) => {
     const { root } = props;
     const types = getByPath(root, '$inputTableConfig/types');
     const attrs = getByPath(root, '$inputTableConfig/attrs');
+
+    const getInputType = () => {
+      const type = props.form.getFieldValue(['input', root.id, 'type']);
+      if (type) {
+        return type.split('.')[1];
+      }
+    };
 
     return (
       <Form.Item
@@ -43,14 +51,17 @@ const TableConfig = {
             <Input />
           </Form.Item>
         ))}
-        <Form.Item
-          label="tables"
-          name={['input', root.id, 'tables']}
-          labelCol={labelCol}
-          wrapperCol={wrapperCol}
-        >
-          <TableSelector />
-        </Form.Item>
+        {getInputType() === 'table' && (
+          <Form.Item
+            label="tables"
+            name={['input', root.id, 'tables']}
+            labelCol={labelCol}
+            wrapperCol={wrapperCol}
+            dependencies={['input', root.id, 'type']}
+          >
+            <TableSelector />
+          </Form.Item>
+        )}
       </Form.Item>
     );
   },
