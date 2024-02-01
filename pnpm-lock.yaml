@@ -91,10 +91,10 @@ importers:
       '@antv/s2': ^1.52.0
       '@codemirror/lang-python': ^6.1.2
       '@difizen/libro-jupyter': ^0.1.14
-      '@difizen/mana-app': ^0.1.8
-      '@difizen/mana-common': ^0.1.8
-      '@difizen/mana-l10n': ^0.1.8
-      '@difizen/mana-react': ^0.1.8
+      '@difizen/mana-app': ^0.1.9
+      '@difizen/mana-common': ^0.1.9
+      '@difizen/mana-l10n': ^0.1.9
+      '@difizen/mana-react': ^0.1.9
       '@kanaries/web-data-loader': ^0.1.7
       '@lumino/polling': ^1.11.4
       '@rjsf/antd': ^5.7.3
@@ -132,7 +132,6 @@ importers:
       d3-dsv: ^3.0.1
       endent: ^2.1.0
       highlight.js: ^11.9.0
-      highlightjs-line-numbers.js: ^2.8.0
       lodash-es: ^4.17.21
       lucide-react: ^0.284.0
       monaco-editor: ^0.45.0
@@ -186,7 +185,6 @@ importers:
       d3-dsv: 3.0.1
       endent: 2.1.0
       highlight.js: 11.9.0
-      highlightjs-line-numbers.js: 2.8.0
       lodash-es: 4.17.21
       lucide-react: 0.284.0
       monaco-editor: 0.45.0
@@ -6066,7 +6064,7 @@ packages:
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0_react@16.14.0
-      react-is: 16.13.1
+      react-is: 17.0.2
     dev: false
 
   /@mdx-js/loader/1.5.1_react@16.14.0:
@@ -17660,19 +17658,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
-
-  /follow-redirects/1.15.5_debug@4.3.4:
-    resolution: {integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dependencies:
-      debug: 4.3.4_supports-color@6.1.0
-    dev: false
 
   /font-atlas/2.1.0:
     resolution: {integrity: sha512-kP3AmvX+HJpW4w3d+PiPR2X6E1yvsBXt2yhuCw+yReO9F1WYhvZwx3c95DGZGwg9xYzDGrgJYa885xmVA+28Cg==}
@@ -19067,10 +19052,6 @@ packages:
     deprecated: Version no longer supported. Upgrade to @latest
     dev: false
 
-  /highlightjs-line-numbers.js/2.8.0:
-    resolution: {integrity: sha512-TEf1gw0c8mb8nan0QwliqS7obT4cpUd9hzsGzsZLweteNnWea/VIqy5/aQqsa5wnz9lnvmtAkS1ZtDTjB/goYQ==}
-    dev: false
-
   /history/4.10.1:
     resolution: {integrity: sha512-36nwAD620w12kuzPAsyINPWJqlNbij+hpK1k9XRloDtym8mxzGYl2c17LnV6IAGB2Dmg4tEa7G7DlawS0+qjew==}
     dependencies:
@@ -19345,7 +19326,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.5_debug@4.3.4
+      follow-redirects: 1.15.5
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -19356,7 +19337,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.5_debug@4.3.4
+      follow-redirects: 1.15.5
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -28081,7 +28062,6 @@ packages:
 
   /react-is/17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
-    dev: true
 
   /react-is/18.1.0:
     resolution: {integrity: sha512-Fl7FuabXsJnV5Q1qIOQwx/sagGF18kogb4gpfcG4gjLBWO0WDiiz1ko/ExayuxE7InyQkBLkxRFG5oxY6Uu3Kg==}

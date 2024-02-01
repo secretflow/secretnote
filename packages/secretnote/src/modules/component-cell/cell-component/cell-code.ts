@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ComponentSpec, Value, IOType } from '@/components/component-form';
 
+const deviceConfig = {
+  runtime_config: { protocol: 'REF2K', field: 'FM64' },
+  link_desc: {
+    connect_retry_times: 60,
+    connect_retry_interval_ms: 1000,
+    brpc_channel_protocol: 'http',
+    brpc_channel_connection_type: 'pooled',
+    recv_timeout_ms: 1200000,
+    http_timeout_ms: 1200000,
+  },
+};
+
 const clusterConfig = {
   public_config: {
     ray_fed_config: {
@@ -23,8 +35,17 @@ const clusterConfig = {
         name: 'spu',
         type: 'spu',
         parties: ['alice', 'bob'],
-        config:
-          '{"runtime_config":{"protocol":"REF2K","field":"FM64"},"link_desc":{"connect_retry_times":60,"connect_retry_interval_ms":1000,"brpc_channel_protocol":"http","brpc_channel_connection_type":"pooled","recv_timeout_ms":1200000,"http_timeout_ms":1200000}}',
+        config: JSON.stringify(deviceConfig),
+      },
+      {
+        name: 'heu',
+        type: 'heu',
+        parties: [],
+        config: JSON.stringify({
+          mode: 'PHEU',
+          schema: 'paillier',
+          key_size: 2048,
+        }),
       },
     ],
   },
@@ -41,12 +62,14 @@ const getAttrValue = (component: ComponentSpec, key: string, value: any) => {
         return { b: value };
       case 'AT_STRING':
         return { s: value };
+      case 'AT_FLOAT':
+        return { f: value };
       default:
         return { s: value };
     }
   } else {
     // input has no marked data type in the attr, so it can only be fixed
-    return { ss: [value] };
+    return { ss: (value || '').split(',') };
   }
 };
 
@@ -77,39 +100,45 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
   const { input, output, ...others } = config;
 
   // attr
-  Object.entries(others).forEach(([key, value]) => {
-    componentConfig.attr_paths.push(key);
-    const attrValue = getAttrValue(component, key, value);
-    componentConfig.attrs.push(attrValue);
-  });
+  if (others) {
+    Object.entries(others).forEach(([key, value]) => {
+      componentConfig.attr_paths.push(key);
+      const attrValue = getAttrValue(component, key, value);
+      componentConfig.attrs.push(attrValue);
+    });
+  }
 
   // input
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Object.entries(input).forEach(([key, value]: [string, any]) => {
-    const { type, tables } = value;
-
-    if (type && tables) {
-      componentConfig.inputs.push({
-        name: key,
-        type: type,
-        data_refs: tables.data_ref.map((ref: any) => ({
-          uri: ref.uri,
-          party: ref.party,
-          format: 'csv',
-        })),
-        meta: {
-          '@type': getIOMetaType(type),
-          schema: tables.schema,
-          line_count: -1,
-        },
-      });
-    }
-  });
+  if (input) {
+    Object.entries(input).forEach(([key, value]: [string, any]) => {
+      const { type, tables } = value;
+      const schemaKey = type === 'sf.table.individual' ? 'schema' : 'schemas';
+      if (type && tables) {
+        componentConfig.inputs.push({
+          name: key,
+          type: type,
+          data_refs: tables.data_ref.map((ref: any) => ({
+            uri: ref.uri,
+            party: ref.party,
+            format: 'csv',
+          })),
+          meta: {
+            '@type': getIOMetaType(type),
+            [schemaKey]: tables[schemaKey],
+            line_count: -1,
+          },
+        });
+      }
+    });
+  }
 
   // output
-  Object.entries(output).forEach(([, value]) => {
-    componentConfig.output_uris.push(value);
-  });
+  if (output) {
+    Object.entries(output).forEach(([, value]) => {
+      componentConfig.output_uris.push(value);
+    });
+  }
 
   return `
     from secretflow.spec.v1.evaluation_pb2 import NodeEvalParam

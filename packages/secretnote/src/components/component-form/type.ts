@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type AttrType = 'AT_STRING' | 'AT_BOOL' | 'AT_INT';
+export type AttrType = 'AT_STRING' | 'AT_BOOL' | 'AT_INT' | 'AT_FLOAT';
 
 export type ValueKey = 's' | 'ss' | 'i64' | 'f' | 'b';
 
@@ -27,6 +27,9 @@ export type Atomic = {
   lowerBoundEnabled?: boolean;
   lowerBound?: AtomicValue;
   lowerBoundInclusive?: boolean;
+  upperBoundEnabled?: boolean;
+  upperBound?: AtomicValue;
+  upperBoundInclusive?: boolean;
 };
 
 export interface Attr {
