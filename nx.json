@@ -1,100 +1,82 @@
 {
-  // We are using Nx for monorepo task orchestration
-  // See https://nx.dev/concepts/mental-model
   "$schema": "https://cdn.jsdelivr.net/npm/nx@latest/schemas/nx-schema.json",
-  // Inputs affect when Nx will re-run a task
-  // If inputs are not changed then Nx will skip re-run and replay cached results
-  // For example, we would want to re-run ESLint whenever eslintrc is updated
-  // This guarantees that tasks are always correct and up-to-date
-  //
-  // Named inputs defined here are to be referenced in targetDefaults
-  // See https://nx.dev/concepts/mental-model#computation-hashing-and-caching
-  // and https://nx.dev/reference/nx-json#inputs-&-namedinputs
-  //
-  // ${workspaceRoot} = root of repo
-  // ${projectRoot} = root of package in which the task is defined
   "namedInputs": {
     ":default": ["{projectRoot}/**/*"],
-    ":eslint": ["{workspaceRoot}/.eslintrc.*", "{workspaceRoot}/.eslintignore"],
-    ":stylelint": [
-      "{workspaceRoot}/.stylelintrc.*",
-      "{workspaceRoot}/.stylelintignore"
-    ],
-    ":prettier": ["{workspaceRoot}/.prettierrc.*", "{workspaceRoot}/.prettierignore"],
-    ":tsc": ["{workspaceRoot}/tsconfig.*"],
-    ":vitest": ["{workspaceRoot}/vitest.config.*", "{workspaceRoot}/vitest.config.mjs"],
-    ":python": ["{workspaceRoot}/pyproject.toml"]
+    ":javascript": ["{workspaceRoot}/tsconfig.*", "{workspaceRoot}/pnpm-lock.yaml"],
+    ":python": [
+      "{workspaceRoot}/pyproject.toml",
+      "{workspaceRoot}/requirements.lock",
+      "{workspaceRoot}/requirements-dev.lock"
+    ]
   },
-  // targetDefaults configure default options for each task
-  // such as inputs, outputs and dependencies
-  // See https://nx.dev/reference/nx-json#target-defaults
-  // The actual commands are defined in the `scripts` section in each package's package.json
   "targetDefaults": {
     "lint:eslint": {
-      "inputs": [":default", ":eslint"]
+      "inputs": [
+        ":default",
+        ":javascript",
+        "{workspaceRoot}/.eslintrc.*",
+        "{workspaceRoot}/.eslintignore"
+      ],
+      "cache": true
     },
     "lint:stylelint": {
-      "inputs": [":default", ":stylelint"]
-    },
-    "format:black": {
-      "inputs": [":default", ":python"]
-    },
-    "format:prettier": {
-      "inputs": [":default", ":prettier"]
+      "inputs": [
+        ":default",
+        ":javascript",
+        "{workspaceRoot}/.stylelintrc.*",
+        "{workspaceRoot}/.stylelintignore"
+      ],
+      "cache": true
     },
     "lint:ruff": {
-      "inputs": [":default", ":python"]
+      "inputs": [":default", ":python"],
+      "cache": true
+    },
+    "format:prettier": {
+      "inputs": ["{workspaceRoot}/**/*"],
+      "cache": false
+    },
+    "format:black": {
+      "inputs": [":default", ":python"],
+      "cache": true
     },
     "typecheck:tsc": {
-      "inputs": ["^:default", ":default", ":tsc"]
+      "inputs": ["^:default", ":default", ":javascript"],
+      "cache": true
     },
     "typecheck:pyright": {
-      "inputs": ["^:default", ":default", ":python"]
+      "inputs": ["^:default", ":default", ":python"],
+      "cache": true
     },
     "test:vitest": {
-      "inputs": ["^:default", ":default", ":vitest"],
-      "outputs": ["{projectRoot}/coverage"]
+      "inputs": ["^:default", ":default", "{workspaceRoot}/vitest.config.*"],
+      "cache": false
     },
     "test:pytest": {
-      "inputs": ["^:default", ":default", ":python"]
+      "inputs": ["^:default", ":default", ":python"],
+      "cache": false
     },
     "setup:umi": {
-      "inputs": [":default", ":tsc"],
-      "outputs": ["{projectRoot}/src/.umi"]
+      "inputs": [":default", ":javascript"],
+      "outputs": ["{projectRoot}/src/.umi"],
+      "cache": true
     },
-    "build": {
-      "inputs": ["^:default", ":default", ":tsc", ":python"],
-      "outputs": ["{projectRoot}/build", "{projectRoot}/dist"],
-      "dependsOn": ["^build"]
+    "build:js": {
+      "inputs": [":default", ":javascript"],
+      "outputs": [
+        "{projectRoot}/build",
+        "{projectRoot}/dist",
+        "{projectRoot}/src/.umi",
+        "{projectRoot}/src/.umi-production"
+      ],
+      "dependsOn": ["^build:js", "^build:py"],
+      "cache": true
     },
-    "publish": {
-      "dependsOn": ["^build", "build", "^publish"]
-    },
-    "ci:setup": {},
-    "ci:javascript": {},
-    "ci:python": {},
-    "ci:publish": {},
-    "dev": {}
-  },
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "parallel": 8,
-        "cacheableOperations": [
-          "build",
-          "format:black",
-          "format:prettier",
-          "lint:eslint",
-          "lint:ruff",
-          "lint:stylelint",
-          "setup:umi",
-          "test:pytest",
-          "test:vitest",
-          "typecheck:pyright",
-          "typecheck:tsc"
-        ]
-      }
+    "build:py": {
+      "inputs": [":default", ":python"],
+      "dependsOn": ["^build:js", "^build:py"],
+      "cache": false
     }
-  }
+  },
+  "parallel": 8
 }
