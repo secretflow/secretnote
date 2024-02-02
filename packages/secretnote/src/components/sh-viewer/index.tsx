@@ -15,7 +15,7 @@ const ShViewer = ({ code }: IProps) => {
   }, []);
 
   return (
-    <pre style={{ background: '#2b2b2b', padding: ' 12px 0', borderRadius: 8 }}>
+    <pre style={{ background: '#2b2b2b', padding: '12px 0', borderRadius: 8 }}>
       <code className="language-bash" style={{ padding: '0 1em' }}>
         {code}
       </code>
