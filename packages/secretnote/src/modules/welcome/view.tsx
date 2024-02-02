@@ -30,23 +30,22 @@ interface DescriptionProps {
 const PrepareNodeDes = (props: DescriptionProps) => {
   return (
     <div className="step">
-      <div className="text">最简单的方式就是使用 docker image 启动两个计算节点。</div>
-      <ShViewer code={['docker run -it secretflow/secretnote']} />
       <div className="text">
-        启动成功后，我们可以打开地址
-        <a
-          className="link"
-          href="http://127.0.0.1:8090"
-          target="_blank"
-          rel="noreferrer"
-        >
-          127.0.0.1:8090
-        </a>
-        访问 secretnote
-        页面并在右上角节点管理区域将两个节点添加进来。(两个节点地址默认为 127.0.0.1:8090
-        和 127.0.0.1:8092)。
+        最简单的方式就是使用 docker image 启动两个计算节点。分别在两台机器上启动容器：
       </div>
-      <img src={addNodeImgUrl} alt="add node" style={{ margin: 0 }} />
+      <ShViewer
+        code={`# alice 机器\ndocker run -it -p 8888:8888 -e "SELF_PARTY=alice" secretflow/secretnote:unstable-amd64`}
+      />
+      <ShViewer
+        code={`# bob 机器\ndocker run -it -p 8888:8888 -e "SELF_PARTY=bob" secretflow/secretnote:unstable-amd64`}
+      />
+      <div className="text">
+        启动成功后，可以通过访问任意一台机器的 Web
+        页面（例如：http://ip-alice:8888）访问
+        SecretNote，并在右上角节点管理区域将两个节点添加进来（两个节点地址为
+        http://ip-alice:8888 和 http://ip-bob:8888）。
+      </div>
+      <img src={addNodeImgUrl} alt="add node" style={{ width: 450, margin: 0 }} />
       {!props.finished && (
         <Button type="link" onClick={() => props.done(0)}>
           完成
