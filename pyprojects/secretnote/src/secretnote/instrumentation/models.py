@@ -60,13 +60,11 @@ class APILevel(IntEnum):
 class ObjectTracer(abc.ABC):
     @classmethod
     @abc.abstractmethod
-    def typecheck(cls, x) -> bool:
-        ...
+    def typecheck(cls, x) -> bool: ...
 
     @classmethod
     @abc.abstractmethod
-    def trace(cls, x) -> "SnapshotType":
-        ...
+    def trace(cls, x) -> "SnapshotType": ...
 
     @classmethod
     def tree(cls, x) -> Dict[str, Union[List, Dict]]:

@@ -55,8 +55,7 @@ def parse_span(raw_span: ReadableSpan) -> OTelSpanDict:
 
 
 class SpanReader(Protocol):
-    def iter_spans(self) -> Iterable[OTelSpanDict]:
-        ...
+    def iter_spans(self) -> Iterable[OTelSpanDict]: ...
 
 
 class InMemorySpanExporter(_InMemorySpanExporter, SpanReader):

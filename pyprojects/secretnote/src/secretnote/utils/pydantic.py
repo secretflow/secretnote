@@ -136,12 +136,10 @@ class ReferenceMap(ProxiedModel, Mapping):
     __root__: Union[List[Reference], Dict[Any, Reference], Tuple[Reference, ...]]
 
     @overload
-    def __getitem__(self, item: TypedKey[T]) -> T:
-        ...
+    def __getitem__(self, item: TypedKey[T]) -> T: ...
 
     @overload
-    def __getitem__(self, item: Any):
-        ...
+    def __getitem__(self, item: Any): ...
 
     def __getitem__(self, item):
         if not isinstance(item, tuple):
