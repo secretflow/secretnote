@@ -11,16 +11,13 @@ class OnDemandDevice:
         self.world = world
 
     @overload
-    def __call__(self, kind: Type[PYU], party: str, *parties: str) -> PYU:
-        ...
+    def __call__(self, kind: Type[PYU], party: str, *parties: str) -> PYU: ...
 
     @overload
-    def __call__(self, kind: Type[SPU], party: str, *parties: str) -> SPU:
-        ...
+    def __call__(self, kind: Type[SPU], party: str, *parties: str) -> SPU: ...
 
     @overload
-    def __call__(self, kind: Type[HEU], party: str, *parties: str) -> HEU:
-        ...
+    def __call__(self, kind: Type[HEU], party: str, *parties: str) -> HEU: ...
 
     def __call__(self, kind: SupportedDevices, party: str, *parties: str):
         if kind is PYU:

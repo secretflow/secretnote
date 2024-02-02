@@ -6,5 +6,4 @@ app = FastAPI()
 
 
 @app.post("/visualize")
-async def visualize(data: Visualization) -> None:
-    ...
+async def visualize(data: Visualization) -> None: ...

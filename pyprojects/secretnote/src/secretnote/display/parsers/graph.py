@@ -149,12 +149,10 @@ class GraphState(Generic[TExpression]):
         return edge
 
     @overload
-    def create_object_node(self, obj: LocalObject) -> LocalObjectNode:
-        ...
+    def create_object_node(self, obj: LocalObject) -> LocalObjectNode: ...
 
     @overload
-    def create_object_node(self, obj: RemoteObject) -> RemoteObjectNode:
-        ...
+    def create_object_node(self, obj: RemoteObject) -> RemoteObjectNode: ...
 
     def create_object_node(self, obj: ObjectSymbolType):
         if isinstance(obj, LocalObject):

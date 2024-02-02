@@ -144,18 +144,15 @@ def fingerprint(obj: Any) -> str:
 
 
 @overload
-def hash_digest(obj: CodeType) -> str:
-    ...
+def hash_digest(obj: CodeType) -> str: ...
 
 
 @overload
-def hash_digest(obj: Hashable) -> str:
-    ...
+def hash_digest(obj: Hashable) -> str: ...
 
 
 @overload
-def hash_digest(obj: Any) -> Optional[str]:
-    ...
+def hash_digest(obj: Any) -> Optional[str]: ...
 
 
 def hash_digest(obj):
@@ -218,13 +215,11 @@ def source_code(obj):
 
 
 @overload
-def source_path(filename: str) -> str:
-    ...
+def source_path(filename: str) -> str: ...
 
 
 @overload
-def source_path(filename: None) -> None:
-    ...
+def source_path(filename: None) -> None: ...
 
 
 def source_path(filename: Optional[str]) -> Optional[str]:
