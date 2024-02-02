@@ -46,7 +46,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         return JUPYTER_SERVER_EXTENSION_MODULE
 
     @classmethod
-    def launch(self, argv=None):
+    def launch(cls, argv=None):
         """Launch the app with command line arguments."""
 
         if argv is None:
@@ -54,9 +54,9 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         else:
             args = argv
 
-        self.ensure_extension_url(args)
+        cls.ensure_extension_url(args)
 
-        self.launch_instance(
+        cls.launch_instance(
             [
                 "--ServerApp.token=''",
                 "--ServerApp.allow_origin=*",
@@ -68,9 +68,9 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         )
 
     @classmethod
-    def ensure_extension_url(self, args):
+    def ensure_extension_url(cls, args):
         for arg in args:
             if arg.startswith("--mode="):
                 pathname = arg.split("=")[1]
-                self.extension_url += pathname
+                cls.extension_url += pathname
                 break

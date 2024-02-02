@@ -8,14 +8,14 @@
   },
   "[javascript]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
   },
   "[javascriptreact]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
@@ -48,14 +48,14 @@
   },
   "[typescript]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
   },
   "[typescriptreact]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
@@ -83,6 +83,14 @@
     "mdx"
   ],
   "black-formatter.args": ["--config", "pyproject.toml"],
+  "black-formatter.importStrategy": "fromEnvironment",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportArgumentType": "warning",
+    "reportOptionalMemberAccess": "warning",
+    "reportAttributeAccessIssue": "warning",
+    "reportReturnType": "warning"
+  },
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.include": ["pyprojects/**", "examples/**"],
   "python.testing.pytestArgs": [
@@ -92,10 +100,5 @@
     "--cov-report=html"
   ],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true,
-  "[javascript][javascriptreact][typescript][typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  }
+  "python.testing.pytestEnabled": true
 }

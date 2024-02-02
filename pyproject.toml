@@ -1,5 +1,5 @@
 [project]
-authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
+authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
 classifiers = ["Private :: Do Not Upload"]
 dependencies = []
 name = "monorepo"
@@ -18,7 +18,7 @@ members = ["pyprojects/*"]
 
 [tool.rye]
 dev-dependencies = [
-  "black[jupyter]>=23.7.0",
+  "black[jupyter]>=24.1.0",
   "datamodel-code-generator>=0.22.1",
   "fastapi<0.100",
   "hatch>=1.7.0",
@@ -53,7 +53,7 @@ _pb2\\.pyi?
 | secretnote/proto
 """
 line-length = 88
-target-versions = ["py38", "py39", "py310"]
+target-version = ["py38", "py39", "py310"]
 
 [tool.ruff]
 line-length = 88
@@ -65,14 +65,13 @@ src = ["pyprojects/*/src"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]
-include = ["pyprojects/*/src"]
+include = ["pyprojects/**"]
+typeCheckingMode = "basic"
 
-reportArgumentType = "information"
-reportAttributeAccessIssue = "information"
-reportGeneralTypeIssues = "information"
-reportIncompatibleMethodOverride = "information"
-reportIncompatibleVariableOverride = "information"
-reportOptionalMemberAccess = "information"
-reportOverlappingOverload = "information"
-reportPrivateImportUsage = "information"
-reportReturnType = "information"
+# https://github.com/microsoft/pylance-release/issues/5207 pyright is out of sync with pylance
+# we manually specify certain rules
+# this should keep in sync with `python.analysis.diagnosticSeverityOverrides` in .vscode/settings.json
+reportArgumentType = "warning"
+reportAttributeAccessIssue = "warning"
+reportOptionalMemberAccess = "warning"
+reportReturnType = "warning"
