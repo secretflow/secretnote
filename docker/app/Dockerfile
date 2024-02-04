@@ -16,8 +16,7 @@ ENV CI=true
 USER root
 WORKDIR /repo
 
-COPY --from=source-tree /repo/pnpm-lock.yaml /repo/pnpm-lock.yaml
-COPY --from=source-tree /repo/.npmrc /repo/.npmrc
+COPY --from=source-tree /repo/pnpm-lock.yaml /repo/.npmrc /repo/
 
 RUN pnpm fetch
 

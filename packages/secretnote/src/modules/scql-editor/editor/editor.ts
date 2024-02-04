@@ -9,7 +9,13 @@ import type {
   ICoordinate,
   SearchMatch,
 } from '@difizen/libro-jupyter';
-import { Disposable, DisposableCollection, watch, Emitter } from '@difizen/mana-app';
+import {
+  Disposable,
+  DisposableCollection,
+  watch,
+  Emitter,
+  Deferred,
+} from '@difizen/mana-app';
 import * as monaco from 'monaco-editor';
 import type { IMatching } from 'syntax-parser';
 
@@ -24,6 +30,8 @@ export type MonacoEditorType = monaco.editor.IStandaloneCodeEditor;
 export type MonacoMatch = monaco.editor.FindMatch;
 
 export class SQLEditor implements IEditor {
+  protected editorReadyDeferred = new Deferred<void>();
+  editorReady = this.editorReadyDeferred.promise;
   private editorHost: HTMLElement;
   private _model: IModel;
   private _uuid = '';
@@ -110,6 +118,7 @@ export class SQLEditor implements IEditor {
     );
 
     this.updateEditorSize();
+    this.editorReadyDeferred.resolve();
   }
 
   protected checkSyntaxError() {
