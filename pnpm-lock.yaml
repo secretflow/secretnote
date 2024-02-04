@@ -260,6 +260,9 @@ importers:
       sql-formatter:
         specifier: ^15.0.2
         version: 15.2.0
+      styled-components:
+        specifier: ^6.1.0
+        version: 6.1.8(react-dom@18.2.0)(react@18.2.0)
       syntax-parser:
         specifier: ^1.0.18
         version: 1.0.18(@types/react@18.2.48)(quill-delta@5.1.0)(rxjs@7.8.1)(tslib@2.6.2)

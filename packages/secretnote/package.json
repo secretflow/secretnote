@@ -68,6 +68,7 @@
     "monaco-editor-webpack-plugin": "^7.1.0",
     "smoothie": "^1.36.1",
     "sql-formatter": "^15.0.2",
+    "styled-components": "^6.1.0",
     "syntax-parser": "^1.0.18",
     "tippy.js": "^6.3.7",
     "tiptap-markdown": "^0.8.2",
