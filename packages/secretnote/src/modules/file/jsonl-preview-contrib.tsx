@@ -1,9 +1,29 @@
 import { singleton } from '@difizen/mana-app';
 import hljs from 'highlight.js';
 import { useEffect } from 'react';
+import styled from 'styled-components';
 
 import { FilePreviewContribution } from './protocol';
 import 'highlight.js/styles/xcode.css'; // 选择主题 https://highlightjs.org/demo
+
+const CodeWrapper = styled.pre`
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  margin: 0;
+
+  .line-number {
+    float: left;
+    text-align: right;
+    margin-right: 12px;
+    color: #bfbfbf;
+    user-select: none;
+  }
+
+  code {
+    padding: 0 1em !important;
+  }
+`;
 
 const JsonlView = (props: { data: string }) => {
   useEffect(() => {
@@ -18,22 +38,10 @@ const JsonlView = (props: { data: string }) => {
     .join('');
 
   return (
-    <pre style={{ width: '100%', height: '100%', overflow: 'scroll', margin: 0 }}>
-      <span
-        style={{
-          float: 'left',
-          textAlign: 'right',
-          marginRight: 12,
-          color: '#bfbfbf',
-          userSelect: 'none',
-        }}
-      >
-        {lineNumber}
-      </span>
-      <code className="language-json" style={{ padding: '0 1em' }}>
-        {props.data}
-      </code>
-    </pre>
+    <CodeWrapper>
+      <span className="line-number">{lineNumber}</span>
+      <code className="language-json">{props.data}</code>
+    </CodeWrapper>
   );
 };
 
