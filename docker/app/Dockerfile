@@ -16,7 +16,7 @@ ENV CI=true
 USER root
 WORKDIR /repo
 
-COPY --from=source-tree /repo/pnpm-lock.yaml /repo/pnpm-lock.yaml
+COPY --from=source-tree /repo/pnpm-lock.yaml /repo/.npmrc /repo/
 
 RUN pnpm fetch
 
@@ -39,6 +39,8 @@ RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 WORKDIR /root
 
 COPY ./docker/app/root/scripts /root/scripts
+
+RUN mkdir workspace
 
 ENV SELF_PARTY=alice
 ENV ALL_PARTIES=alice

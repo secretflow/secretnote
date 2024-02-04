@@ -9,6 +9,6 @@ const LogViewer = React.lazy(() => import('@/components/log-viewer'));
 export class LogPreview implements FilePreviewContribution {
   type = 'log';
   render = (data: string) => {
-    return <LogViewer code={data} />;
+    return <LogViewer code={[data]} />;
   };
 }

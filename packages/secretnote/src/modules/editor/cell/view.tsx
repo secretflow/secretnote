@@ -10,7 +10,6 @@ import {
   KernelError,
   ILSPDocumentConnectionManager,
   CodeEditorManager,
-  CodeEditorSettings,
 } from '@difizen/libro-jupyter';
 import {
   getOrigin,
@@ -25,6 +24,7 @@ import {
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message } from 'antd';
+import { isUndefined } from 'lodash-es';
 import { forwardRef } from 'react';
 
 import { Ribbon } from '@/components/ribbon';
@@ -36,15 +36,15 @@ import type { SecretNoteModel } from '../model';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SecretNoteCodeCellView>(ViewInstance);
-  const { allExecutionParty, executionParty } = instance;
+  const { partyList, parties } = instance;
 
   return (
     <div className={instance.className} ref={ref} tabIndex={10} onBlur={instance.blur}>
       <Ribbon
-        items={allExecutionParty}
-        value={executionParty}
+        items={partyList.map((name) => ({ label: name, key: name }))}
+        value={parties}
         onChange={(val) => {
-          instance.changeExecutionParty(val);
+          instance.onPartiesChange(val);
         }}
       >
         <CellEditorMemo />
@@ -53,6 +53,8 @@ const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   );
 });
 SecretNoteCodeCellComponent.displayName = 'SecretNoteCodeCellComponent';
+
+let lastParties: string[] = []; // store last parties for new cell
 
 @transient()
 @view('secretnote-code-cell-view')
@@ -63,13 +65,10 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   view = SecretNoteCodeCellComponent;
 
   @prop()
-  executionParty: string[] = [];
+  parties: string[] = [];
 
-  get allExecutionParty() {
-    return this.serverManager.servers.map((server) => ({
-      key: server.id,
-      label: server.name,
-    }));
+  get partyList() {
+    return this.serverManager.servers.map((server) => server.name);
   }
 
   constructor(
@@ -80,89 +79,72 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
     @inject(ILSPDocumentConnectionManager) lsp: ILSPDocumentConnectionManager,
     @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
-    @inject(CodeEditorSettings) codeEditorSettings: CodeEditorSettings,
   ) {
-    super(
-      options,
-      cellService,
-      viewManager,
-      lsp,
-      codeEditorManager,
-      codeEditorSettings,
-    );
+    super(options, cellService, viewManager, lsp, codeEditorManager);
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
-    this.executionParty =
-      this.getExecutionParty() || this.allExecutionParty.map((item) => item.key);
+    this.parties = this.getInitializedParties();
+  }
+
+  getUsableConnections() {
+    const libroModel = this.parent.model as SecretNoteModel;
+
+    if (!libroModel) {
+      return [];
+    }
+
+    const kernelConnections = getOrigin(libroModel.kernelConnections);
+
+    return kernelConnections.filter((connection) => {
+      if (connection.isDisposed) {
+        return false;
+      }
+      const server = this.kernelManager.getServerByKernelConnection(connection);
+      return (
+        server && server.status === 'running' && this.parties.includes(server.name)
+      );
+    });
   }
 
   async run() {
-    const libroModel = this.parent.model as SecretNoteModel;
     const cellModel = this.model;
+    const kernelConnections = this.getUsableConnections();
 
-    if (!libroModel) {
-      return false;
-    }
-
-    let kernelConnections = getOrigin(libroModel.kernelConnections);
-
-    // 没有可用的 Kernel 连接
     if (kernelConnections.length === 0) {
-      message.info(l10n.t('没有可用的 Kernel 连接'));
-      return false;
-    }
-
-    kernelConnections = kernelConnections.filter((connection) => {
-      const server = this.kernelManager.getServerByKernelConnection(connection);
-      return (
-        server && server.status === 'running' && this.executionParty.includes(server.id)
-      );
-    });
-    if (kernelConnections.length === 0) {
-      message.info(l10n.t('请选择一个执行节点'));
-      return false;
-    }
-    if (kernelConnections.length !== this.executionParty.length) {
-      message.info(l10n.t('有的 Kernel 连接不可用'));
-      return false;
-    }
-
-    const hasDisposedConnection = kernelConnections.some((item) => {
-      return item.isDisposed;
-    });
-    if (hasDisposedConnection) {
-      message.error(l10n.t('有的 Kernel 连接已经被销毁'));
+      message.info(l10n.t('No available node to execute'));
       return false;
     }
 
     this.clearExecution();
-    this.setExecutionStatus({ executing: true });
-    this.setExecutionTime({ start: '', end: '', toExecute: new Date().toISOString() });
-    this.setExecutionParty();
+    this.updateExecutionStatus({ executing: true });
+    this.updateExecutionTime({
+      toExecute: new Date().toISOString(),
+    });
+    this.savePartiesToMeta();
 
     try {
       const list: Promise<KernelMessage.IExecuteReplyMsg>[] = [];
       for (let i = 0, len = kernelConnections.length; i < len; i += 1) {
         const connection = kernelConnections[i];
-
-        const future = connection.requestExecute({
-          code: cellModel.value,
-        });
+        const future = connection.requestExecute(
+          {
+            code: cellModel.value,
+          },
+          // Even after receiving a reply message, you can still receive other messages.
+          false,
+        );
 
         future.onIOPub = (
           msg: KernelMessage.IIOPubMessage<KernelMessage.IOPubMessageType>,
         ) => {
+          if (msg.header.msg_type === 'execute_input') {
+            this.updateExecutionStatus({ kernelExecuting: true });
+            this.updateExecutionTime({ start: msg.header.date });
+          }
           cellModel.msgChangeEmitter.fire({
             connection,
             msg,
           });
-          if (
-            cellModel.kernelExecuting === false &&
-            msg.header.msg_type === 'execute_input'
-          ) {
-            this.setExecutionStatus({ kernelExecuting: true });
-            this.setExecutionTime({ start: msg.header.date });
-          }
         };
 
         future.onReply = (msg: KernelMessage.IExecuteReplyMsg) => {
@@ -176,8 +158,8 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
       }
 
       const futureDoneList = await Promise.all(list);
-      this.setExecutionStatus({ executing: false, kernelExecuting: false });
-      this.setExecutionTime(this.parseMessageTime(futureDoneList));
+      this.updateExecutionStatus({ executing: false, kernelExecuting: false });
+      this.updateExecutionTime(this.parseMessageTime(futureDoneList));
 
       const ok = futureDoneList.every((msg) => msg.content.status === 'ok');
       if (ok) {
@@ -197,27 +179,27 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     }
   }
 
-  setExecutionStatus(status: { executing?: boolean; kernelExecuting?: boolean }) {
+  updateExecutionStatus(status: { executing?: boolean; kernelExecuting?: boolean }) {
     const { executing, kernelExecuting } = status;
-    if (executing !== undefined) {
+    if (!isUndefined(executing)) {
       this.model.executing = executing;
     }
-    if (kernelExecuting !== undefined) {
+    if (!isUndefined(kernelExecuting)) {
       this.model.kernelExecuting = kernelExecuting;
     }
   }
 
-  setExecutionTime(times: { start?: string; end?: string; toExecute?: string }) {
+  updateExecutionTime(times: { start?: string; end?: string; toExecute?: string }) {
     const meta = this.model.metadata.execution as ExecutionMeta;
     if (meta) {
       const { start, end, toExecute } = times;
-      if (start !== undefined) {
+      if (!isUndefined(start)) {
         meta['shell.execute_reply.started'] = start;
       }
-      if (end !== undefined) {
+      if (!isUndefined(end)) {
         meta['shell.execute_reply.end'] = end;
       }
-      if (toExecute !== undefined) {
+      if (!isUndefined(toExecute)) {
         meta.to_execute = toExecute;
       }
     }
@@ -240,29 +222,32 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     return { start, end };
   }
 
-  changeExecutionParty(party: string[]) {
-    this.executionParty = party;
-    this.setExecutionParty(party);
+  onPartiesChange(parties: string[]) {
+    this.parties = parties;
+    this.savePartiesToMeta(parties);
+    lastParties = parties;
   }
 
-  getExecutionParty() {
+  getInitializedParties() {
     const execution = this.model.metadata.execution as ExecutionMeta;
-    if (execution && execution.executionParty) {
+    if (execution && execution.parties) {
       try {
-        const party: string[] = JSON.parse(execution.executionParty as string);
-        return party.filter((p) =>
-          this.allExecutionParty.some((item) => item.key === p),
-        );
+        const parties: string[] = JSON.parse(execution.parties as string);
+        return parties.filter((p) => this.partyList.includes(p));
       } catch (e) {
         return [];
       }
+    } else if (lastParties.length > 0) {
+      // load parties from previous cell settings
+      return lastParties;
     }
+    return this.partyList;
   }
 
-  setExecutionParty(party: string[] = this.executionParty) {
+  savePartiesToMeta(parties: string[] = this.parties) {
     const execution = this.model.metadata.execution as ExecutionMeta;
     if (execution) {
-      execution.executionParty = JSON.stringify(party);
+      execution.parties = JSON.stringify(parties);
     }
   }
 }

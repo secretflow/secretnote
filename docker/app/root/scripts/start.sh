@@ -7,4 +7,4 @@ ray start \
   --disable-usage-stats \
   --resources="{\"$SELF_PARTY\": 4}"
 
-secretnote --allow-root --no-browser
+secretnote --allow-root --no-browser --notebook-dir=/root/workspace
