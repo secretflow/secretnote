@@ -1,26 +1,25 @@
-import './index.less';
+import hljs from 'highlight.js';
+import { useEffect } from 'react';
+
+import 'highlight.js/styles/a11y-dark.css';
 
 interface IProps {
-  code: string[];
+  code: string;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const ShViewer = (props: IProps) => {
-  const { code, className, style } = props;
+const ShViewer = ({ code }: IProps) => {
+  useEffect(() => {
+    hljs.highlightAll();
+  }, []);
 
   return (
-    <div className={`${className || ''} language-sh`} style={style}>
-      <pre>
-        <code>
-          {code.map((line, index) => (
-            <span className="line" key={index}>
-              <span className="caret">&gt;</span> <span className="code">{line}</span>
-            </span>
-          ))}
-        </code>
-      </pre>
-    </div>
+    <pre style={{ background: '#2b2b2b', padding: '12px 0', borderRadius: 8 }}>
+      <code className="language-bash" style={{ padding: '0 1em' }}>
+        {code}
+      </code>
+    </pre>
   );
 };
 
