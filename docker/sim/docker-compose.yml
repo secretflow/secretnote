@@ -9,6 +9,8 @@ services:
       # Jupyter
       - 8090:8888
     entrypoint: /root/scripts/start.sh
+    volumes:
+      - /root/scripts
 
   bob:
     image: 'secretflow/secretnote:unstable-amd64'
@@ -20,3 +22,5 @@ services:
       # Jupyter
       - 8092:8888
     entrypoint: /root/scripts/start.sh
+    volumes:
+      - /root/scripts
