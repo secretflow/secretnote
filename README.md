@@ -25,7 +25,7 @@ pip install -U secretnote
 secretnote
 ```
 
-3. 在浏览器中打开步骤 2 启动服务的 web client，默认地址为 http://ip:8888，并按照新手引导页面熟悉 secretnote 的基本操作。
+3. 在浏览器中打开步骤 2 启动服务的 web client，默认地址为 `http://ip:8888`，并按照新手引导页面熟悉 secretnote 的基本操作。
 
 #### docker 安装方式
 
@@ -87,4 +87,4 @@ pip install -U secretnote
 secretnote -mode=scql --party=alice --host=http://127.0.0.1:8991
 ```
 
-3. 在浏览器中打开步骤 2 启动服务的 web client，默认地址为 http://ip:8888，并按照新手引导页面熟悉 secretnote 的基本操作。
+3. 在浏览器中打开步骤 2 启动服务的 web client，默认地址为 `http://ip:8888`，并按照新手引导页面熟悉 secretnote 的基本操作。
