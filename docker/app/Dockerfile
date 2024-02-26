@@ -40,8 +40,6 @@ WORKDIR /root
 
 COPY ./docker/app/root/scripts /root/scripts
 
-RUN mkdir workspace
-
 ENV SELF_PARTY=alice
 ENV ALL_PARTIES=alice
 
