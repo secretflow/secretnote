@@ -34,7 +34,7 @@ export class SecretNoteModel extends LibroModel {
     this.contentsManager = contentsManager;
     this.modalService = modalService;
     this.commandRegistry = commandRegistry;
-    this.onContentChanged(this.autoSave.bind(this));
+    this.onSourceChanged(this.autoSave.bind(this));
   }
 
   async saveNotebookContent(): Promise<void> {

@@ -17,6 +17,7 @@
     "build": "nx build:py"
   },
   "devDependencies": {
+    "@difizen/libro-analyzer": "^0.1.0",
     "@secretflow/secretnote": "workspace:^",
     "@secretflow/secretnote-ui": "workspace:^"
   }

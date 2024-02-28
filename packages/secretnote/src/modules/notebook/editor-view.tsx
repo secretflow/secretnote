@@ -40,8 +40,8 @@ export const EditorComponent = () => {
           setLibroView(v);
           return;
         })
-        .catch(() => {
-          //
+        .catch((e) => {
+          console.error('getOrCreateView fail', e);
         });
     }
   }, [currentNotebookFile, instance]);
