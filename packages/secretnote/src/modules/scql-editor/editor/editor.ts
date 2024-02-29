@@ -8,6 +8,7 @@ import type {
   IPosition,
   ICoordinate,
   SearchMatch,
+  EditorState,
 } from '@difizen/libro-jupyter';
 import {
   Disposable,
@@ -44,6 +45,7 @@ export class SQLEditor implements IEditor {
 
   monacoEditor?: MonacoEditorType;
   host: HTMLElement;
+  editorState?: EditorState<EditorState>;
 
   get uuid(): string {
     return this._uuid;
@@ -217,6 +219,16 @@ export class SQLEditor implements IEditor {
       matchBrackets: config.matchBrackets ? 'always' : 'never',
       rulers: config.rulers ?? [],
       wordWrapColumn: config.wordWrapColumn || 80,
+    };
+  }
+
+  getState(): EditorState<EditorState> {
+    const cursorPosition = this.getCursorPosition();
+    const selections = this.getSelections();
+    return {
+      ...this.editorState!,
+      cursorPosition,
+      selections,
     };
   }
 

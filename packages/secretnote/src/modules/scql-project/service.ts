@@ -11,16 +11,18 @@ export interface Project {
 }
 
 export interface Invitation {
-  accepted: number;
   id: string;
   inviter: string;
+  invitee: string;
   project: string;
+  status: Respond;
 }
 
 export enum Respond {
-  Pending = 0,
-  Accepted = 1,
-  Declined = -1,
+  UNDECIDED = 'UNDECIDED',
+  ACCEPTED = 'ACCEPTED',
+  DECLINED = 'DECLINED',
+  INVALID = 'INVALID',
 }
 
 export interface PlatformInfo {
@@ -91,9 +93,10 @@ export class ProjectService {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.invitationList = invitationList.map((item: any) => ({
-      accepted: item.accepted,
+      status: item.status,
       id: item.invitation_id,
       inviter: item.inviter,
+      invitee: item.invitee,
       project: item.project.name || item.project.project_id,
     }));
     return invitationList;

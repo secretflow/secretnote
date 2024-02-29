@@ -26,10 +26,10 @@ import { ProjectService, Respond } from './service';
 export const InvitationNotificationComponent = () => {
   const instance = useInject<InvitationNotificationView>(ViewInstance);
   const pending = instance.service.invitationList.filter(
-    (item) => item.accepted === Respond.Pending,
+    (item) => item.status === Respond.UNDECIDED,
   );
   const archived = instance.service.invitationList.filter(
-    (item) => item.accepted !== Respond.Pending,
+    (item) => item.status !== Respond.UNDECIDED,
   );
 
   const handleInvitation = async (id: string, accepted: boolean) => {
@@ -102,10 +102,10 @@ export const InvitationNotificationComponent = () => {
                   <span
                     className="action"
                     style={{
-                      color: item.accepted === Respond.Accepted ? 'green' : 'orange',
+                      color: item.status === Respond.ACCEPTED ? 'green' : 'orange',
                     }}
                   >
-                    {Respond[item.accepted]}
+                    {Respond[item.status]}
                   </span>
                 </li>
               ))}
