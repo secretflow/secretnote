@@ -36,7 +36,10 @@ export class SecretNoteModel extends LibroModel {
   kernelConnections: IKernelConnection[] = [];
 
   @prop()
-  lspEnabled = false;
+  filePath = '';
+
+  @prop()
+  lspEnabled = true;
 
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {
@@ -63,7 +66,7 @@ export class SecretNoteModel extends LibroModel {
     this.commandRegistry = commandRegistry;
     this.serverManager.onServerAdded(this.onServerAdded.bind(this));
     this.serverManager.onServerDeleted(this.onServerDeleted.bind(this));
-    this.onContentChanged(this.autoSave.bind(this));
+    this.onSourceChanged(this.autoSave.bind(this));
   }
 
   async startKernelConnection() {

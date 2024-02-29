@@ -75,12 +75,11 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     @inject(ViewOption) options: CellViewOptions,
     @inject(CellService) cellService: CellService,
     @inject(ViewManager) viewManager: ViewManager,
+    @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
     @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
-    @inject(ILSPDocumentConnectionManager) lsp: ILSPDocumentConnectionManager,
-    @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
   ) {
-    super(options, cellService, viewManager, lsp, codeEditorManager);
+    super(options, cellService, viewManager, codeEditorManager);
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.parties = this.getInitializedParties();

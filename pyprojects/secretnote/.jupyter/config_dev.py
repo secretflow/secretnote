@@ -19,17 +19,29 @@ c.ServerApp.token = ""
 
 c.ServerApp.root_dir = "../../.secretnote"
 
+c.LanguageServerManager.autodetect = False
+
 c.LanguageServerManager.language_servers = {
-    "pyright-extended": {
+    "ruff-lsp": {
+        # if installed as a binary
+        "argv": [
+            "ruff-lsp",
+        ],
+        "languages": ["python"],
+        "version": 2,
+        "mime_types": ["text/x-python"],
+        "display_name": "ruff-lsp",
+    },
+    "libro-analyzer": {
         # if installed as a binary
         "argv": [
             "node",
-            "node_modules/@replit/pyright-extended/langserver.index.js",
+            "node_modules/@difizen/libro-analyzer/index.js",
             "--stdio",
         ],
         "languages": ["python"],
         "version": 2,
         "mime_types": ["text/x-python"],
-        "display_name": "pyright-extended",
+        "display_name": "libro-analyzer",
     },
 }

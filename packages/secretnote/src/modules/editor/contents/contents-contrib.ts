@@ -18,6 +18,7 @@ export class SecretNoteContentContribution implements ContentContribution {
     if (currentFileContents) {
       currentFileContents.content.nbformat_minor = 5;
       secretNoteModel.currentFileContents = currentFileContents;
+      secretNoteModel.filePath = currentFileContents.path;
 
       if (!secretNoteModel.quickEditMode && !secretNoteModel.readOnly) {
         secretNoteModel.startKernelConnection();

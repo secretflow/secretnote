@@ -138,20 +138,20 @@ importers:
         specifier: ^6.1.2
         version: 6.1.3(@codemirror/state@6.4.0)(@codemirror/view@6.23.1)(@lezer/common@1.2.1)
       '@difizen/libro-jupyter':
-        specifier: ^0.1.14
-        version: 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(mapbox-gl@1.13.3)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.1.22
+        version: 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(mapbox-gl@1.13.3)(react-dom@18.2.0)(react@18.2.0)
       '@difizen/mana-app':
-        specifier: ^0.1.9
-        version: 0.1.9(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.1.10
+        version: 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@difizen/mana-common':
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       '@difizen/mana-l10n':
-        specifier: ^0.1.9
-        version: 0.1.9(react@18.2.0)
+        specifier: ^0.1.10
+        version: 0.1.10(react@18.2.0)
       '@difizen/mana-react':
-        specifier: ^0.1.9
-        version: 0.1.9(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.1.10
+        version: 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@kanaries/web-data-loader':
         specifier: ^0.1.7
         version: 0.1.7
@@ -415,6 +415,9 @@ importers:
 
   pyprojects/secretnote:
     devDependencies:
+      '@difizen/libro-analyzer':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@secretflow/secretnote':
         specifier: workspace:^
         version: link:../../packages/secretnote
@@ -3618,7 +3621,7 @@ packages:
       '@codemirror/language': 6.10.0
       '@codemirror/state': 6.4.0
       '@lezer/common': 1.2.1
-      '@lezer/css': 1.1.7
+      '@lezer/css': 1.1.8
     transitivePeerDependencies:
       - '@codemirror/view'
     dev: false
@@ -3628,17 +3631,17 @@ packages:
     dependencies:
       '@codemirror/autocomplete': 6.12.0(@codemirror/language@6.10.0)(@codemirror/state@6.4.0)(@codemirror/view@6.23.1)(@lezer/common@1.2.1)
       '@codemirror/lang-css': 6.2.1(@codemirror/view@6.23.1)
-      '@codemirror/lang-javascript': 6.2.1
+      '@codemirror/lang-javascript': 6.2.2
       '@codemirror/language': 6.10.0
       '@codemirror/state': 6.4.0
       '@codemirror/view': 6.23.1
       '@lezer/common': 1.2.1
-      '@lezer/css': 1.1.7
-      '@lezer/html': 1.3.8
+      '@lezer/css': 1.1.8
+      '@lezer/html': 1.3.9
     dev: false
 
-  /@codemirror/lang-javascript@6.2.1:
-    resolution: {integrity: sha512-jlFOXTejVyiQCW3EQwvKH0m99bUYIw40oPmFjSX2VS78yzfe0HELZ+NEo9Yfo1MkGRpGlj3Gnu4rdxV1EnAs5A==}
+  /@codemirror/lang-javascript@6.2.2:
+    resolution: {integrity: sha512-VGQfY+FCc285AhWuwjYxQyUQcYurWlxdKYT4bqwr3Twnd5wP5WSeu52t4tvvuWmljT4EmgEgZCqSieokhtY8hg==}
     dependencies:
       '@codemirror/autocomplete': 6.12.0(@codemirror/language@6.10.0)(@codemirror/state@6.4.0)(@codemirror/view@6.23.1)(@lezer/common@1.2.1)
       '@codemirror/language': 6.10.0
@@ -4177,15 +4180,39 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@difizen/libro-code-cell@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-HUlLcxTOD22CgegGRjREJGGMW3lFCPnJB63CETT9T9e1nHnrLPCNN9ekvgZU4c8Aq9YTCmhtfDI7lCLdxxW+Hw==}
+  /@difizen/libro-analyzer@0.1.0:
+    resolution: {integrity: sha512-ARm/ZIxIU0pNTzUPnOiiTus9o2Y5TT+WboWPP0eBifLqoxZMJ6SETU2PkFxBLOpREBpbdNk/hvtWcNkBQCmbuw==}
+    engines: {node: '>=12.0.0'}
+    hasBin: true
+    dependencies:
+      '@iarna/toml': 2.2.5
+      '@yarnpkg/fslib': 2.10.3
+      '@yarnpkg/libzip': 2.3.0
+      chalk: 4.1.2
+      chokidar: 3.5.3
+      command-line-args: 5.2.1
+      jsonc-parser: 3.2.1
+      leven: 3.1.0
+      source-map-support: 0.5.21
+      tmp: 0.2.1
+      vscode-jsonrpc: 8.1.0
+      vscode-languageserver: 8.1.0
+      vscode-languageserver-textdocument: 1.0.10
+      vscode-languageserver-types: 3.17.3
+      vscode-uri: 3.0.8
+    optionalDependencies:
+      fsevents: 2.3.3
+    dev: true
+
+  /@difizen/libro-code-cell@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-d+sN5vNALFDEeibEY6koCKUFxWAi/YT5B2bF9TbGgLcSA7CYRtXrKoVKbGkTtXzmaAVlZAXz2GafSAgd2jHktg==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
@@ -4196,14 +4223,14 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-code-editor@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-CPd/1OZpFpJpMouHUmXFIiQPW6Yk1E2GeUArf/BHbRrHRTedjyaltPEo8qu3EI7hEDwSTxUllWoxq3NS3q03UQ==}
+  /@difizen/libro-code-editor@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-AAyNcp8gH52QHRw17j1SFIGfd2wxujNWnNnXVYCHGUcHLqnW9VS7I2Kz+Ldz7t5Hidgz8X2JinHIOfVXy0NBYA==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-l10n': 0.1.9(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-l10n': 0.1.10(react@18.2.0)
       react: 18.2.0
       uuid: 9.0.1
     transitivePeerDependencies:
@@ -4211,8 +4238,8 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-codemirror@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-CyAxKyfxeUSGy7UgEfPOlGeMwcAkxCVngO+fCFR2Z/OI/wUYhDwP+jNMtwdURLKaRgtv7woZr3IvXi21UPwyTA==}
+  /@difizen/libro-codemirror@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-be4BItusYasC1E2LTfc/cA5086DD7TbdeBo6H3VAQC+60GGm7sZXDGNwmOBqY6hmOtc+/yj5uz/SMqK8No4sww==}
     dependencies:
       '@codemirror/autocomplete': 6.12.0(@codemirror/language@6.10.0)(@codemirror/state@6.4.0)(@codemirror/view@6.23.1)(@lezer/common@1.2.1)
       '@codemirror/commands': 6.3.3
@@ -4223,17 +4250,17 @@ packages:
       '@codemirror/search': 6.5.5
       '@codemirror/state': 6.4.0
       '@codemirror/view': 6.23.1
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-lsp': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-rendermime': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-lsp': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-rendermime': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
       highlight.js: 11.9.0
       markdown-it: 13.0.2
       uuid: 9.0.1
-      vscode-languageserver-protocol: 3.17.5
+      vscode-languageserver-protocol: 3.17.3
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
       - '@types/node'
@@ -4244,21 +4271,21 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-cofine-editor-contribution@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-FOvnTp8S4qHlQlxDcXVVmLbs5+8kLCy1SLd2aQrsm7wkgz2hmCUUOa+lvvMQmrcOv6nS7o9X9Ca0LxTLph9nuQ==}
+  /@difizen/libro-cofine-editor-contribution@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-6ExjRtHecduzthKb9idhKxPDlF5PfBgeYAcZAVHRCZOoN3bvLZiwvkgWpBLtSwMGxVRHx2q+ev1m5PDwmEla9g==}
     dependencies:
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
     transitivePeerDependencies:
       - react
       - react-dom
       - supports-color
     dev: false
 
-  /@difizen/libro-cofine-editor-core@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-gX36kFUF7/GSaKBzJuDhFQSG+t8DAtkeewfBE86FK9BhumVv+RtuUDbTk3QRyPuQWofqzVj4V/cEnLoH3wLV0w==}
+  /@difizen/libro-cofine-editor-core@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-xecu0geaSD17rDRcvvOpc/lODhDCYcVOWyW7TVAlRChoCcwkYo6nbzTHKTJwFEGAyCGxOV4xKpcTlHfJJogn/Q==}
     dependencies:
-      '@difizen/libro-cofine-editor-contribution': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-cofine-editor-contribution': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@difizen/monaco-editor-core': 0.39.4
       debug: 4.3.4
       reflect-metadata: 0.1.14
@@ -4268,18 +4295,18 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-cofine-editor@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-bYyPA727u6FK8fRrylR3eCOLK9/rixDZZy9ijfGVoSDiQhHdg3CkGCunNRvH/ozAy8ScYxKrLA/7HAl6jvNR8A==}
+  /@difizen/libro-cofine-editor@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-BxEc/kEBObZfOsigfELTBf5QaP1hp1ZAfKKchH02A1bA1U8phgEV+AHOatx+87lXHrlybFVZVavglylgowBCgg==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-cofine-editor-core': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-cofine-textmate': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-lsp': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-cofine-editor-core': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-cofine-textmate': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-lsp': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@difizen/monaco-editor-core': 0.39.4
       react: 18.2.0
       resize-observer-polyfill: 1.5.1
@@ -4294,11 +4321,11 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-cofine-textmate@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-23yIs0Tf+ZHkzxndPNOCBZ+vywDQB+8/IR1OSOrkwx1M+aoifDGjlW2p8n9NZMBIdONzKdmAW+vzW0LL8iB2bw==}
+  /@difizen/libro-cofine-textmate@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Yu61+EX74T/gDKLBtyvBt25cHkktpWZuJVcpW1K/RmlqtvlfMcKmrTgZWb/k8kTBkh3cGPq4V2BJPu5UwjalGA==}
     dependencies:
-      '@difizen/libro-cofine-editor-core': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-cofine-editor-core': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       fast-plist: 0.1.3
       vscode-oniguruma: 1.7.0
       vscode-textmate: 9.0.0
@@ -4308,35 +4335,35 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-common@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-TQk1YnrDFJ4+vLJqWSnK99+Q+iwVer488sa4GmnZe6h7sKpJfmFCQcIzdDC2tUa0YK3jAyu2ZypiHzysyqD2PQ==}
+  /@difizen/libro-common@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-4ef1xyd69ZUAdxFKfUDI4Tu0nz4WjDoIkl+wR+Wrm308lGjgx1q17aX5Vm00fjaePD0b46sGXZOQTJavUgWFMg==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       path-browserify: 1.0.1
       react: 18.2.0
-      sanitize-html: 2.11.0
+      sanitize-html: 2.12.1
       url-parse: 1.5.10
     transitivePeerDependencies:
       - react-dom
       - supports-color
     dev: false
 
-  /@difizen/libro-core@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Fd3a90ecPSNmkGs7EkYiVkaE4imWVWT+MXmPmUtQPPpMUrxJCOaEQ50G15Z7UpPQ6WJTwgPXWVPJUA7maPl1NA==}
+  /@difizen/libro-core@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-oH325bgxlwl7UsdGGn8PDc0cAENI1TK6sUIsUCY4WChb8pR06i0NCG9IeTIYD+0OaQO8CSCLeFXqQG2GiWpczA==}
     peerDependencies:
       antd: ^5.8.6
       react: ^18.2.0
     dependencies:
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-shared-model': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-virtualized': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-l10n': 0.1.9(react@18.2.0)
-      '@difizen/mana-react': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-shared-model': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-virtualized': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-l10n': 0.1.10(react@18.2.0)
+      '@difizen/mana-react': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       antd: 5.13.3(react-dom@18.2.0)(react@18.2.0)
       classnames: 2.5.1
       dayjs: 1.11.10
@@ -4354,35 +4381,36 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-jupyter@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(mapbox-gl@1.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-/8zIpuHCMh1Y9+d0B7FMwG9KqdB4CloSw06f+SQUA9D10bv7oU/fItyn04A/1A1WJ1evGIlcvbk/pCDEzzkLag==}
+  /@difizen/libro-jupyter@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(mapbox-gl@1.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-aJE9gjMaYPjOnpne1khcdvQ4gu+DGVw00yy6sis2Rj15012sYDy+IhkrVe+7VuVzt0Y3gz46g3t1ZCkcshHKSw==}
     peerDependencies:
       antd: ^5.8.6
       react: ^18.2.0
     dependencies:
       '@ant-design/colors': 7.0.2
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-code-cell': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-codemirror': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-cofine-editor': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-kernel': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-l10n': 0.1.17(react@18.2.0)
-      '@difizen/libro-lsp': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-markdown-cell': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-output': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-raw-cell': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-rendermime': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-search': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-search-code-cell': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-l10n': 0.1.9(react@18.2.0)
+      '@difizen/libro-code-cell': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-codemirror': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-cofine-editor': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-kernel': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-l10n': 0.1.22(react@18.2.0)
+      '@difizen/libro-language-client': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-lsp': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-markdown-cell': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-output': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-raw-cell': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-rendermime': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-search': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-search-code-cell': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-l10n': 0.1.10(react@18.2.0)
       antd: 5.13.3(react-dom@18.2.0)(react@18.2.0)
       classnames: 2.5.1
       moment: 2.30.1
-      plotly.js: 2.28.0(mapbox-gl@1.13.3)
+      plotly.js: 2.29.1(mapbox-gl@1.13.3)
       react: 18.2.0
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
@@ -4393,16 +4421,16 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-kernel@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ZoLRUvEl/uIexsvLHntaPJ5tpo+6K4fzhJH/L5ZlW4zDv5ehm1T9QeIeZ2I1JL2X/rk/JyPXD179Tmxo7RzDwA==}
+  /@difizen/libro-kernel@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-xBAE+Dbvpv3Xwgca79ze10LIbtMGhcNworj9BVgAGDxI+OF+RfH9xV7PgONfwJ2pk0KZXFnQCZEGgSgp4LILXA==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       minimist: 1.2.8
-      query-string: 8.1.0
+      query-string: 8.2.0
       react: 18.2.0
       uuid: 9.0.1
     transitivePeerDependencies:
@@ -4414,29 +4442,56 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-l10n@0.1.17(react@18.2.0):
-    resolution: {integrity: sha512-I13rW/io99or7YfplTxVNlm5/PIzYg1h67EN7iJffOpuFI4ZiiRe9AlZEtnuMCiA4qCYCzL571MZgNHxkXtx+A==}
+  /@difizen/libro-l10n@0.1.22(react@18.2.0):
+    resolution: {integrity: sha512-jEdiTRyDPRukbLMJqbCLePID0RVBk74lEk4PyzDUsgBjVh760onk/Am5QY0A4V3AA4uw+OpAhXsPhBnfta3LWg==}
     dependencies:
-      '@difizen/mana-l10n': 0.1.9(react@18.2.0)
+      '@difizen/mana-l10n': 0.1.10(react@18.2.0)
     transitivePeerDependencies:
       - react
     dev: false
 
-  /@difizen/libro-lsp@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Kd8bey4sAAsRFRVWZ6VKnOyAm1ZajbBiyoNc7Q6ahJawPXtDiTaPQ94wxEggBhwcWdN9Bw7XUaGPohy0q9vFSg==}
+  /@difizen/libro-language-client@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-QL8CXqz8BhwkUAy3o50vPztD1KNaj0CCiLRDE3F521gclFeVzo+8t+httyFJkzW7N9jIAIDRR6wPxXA9Tkl/mA==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-kernel': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-kernel': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-lsp': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-common': 0.1.10
+      '@difizen/monaco-editor-core': 0.39.4
+      '@difizen/vscode-languageserver-protocol': 3.17.6-next.2
+      minimatch: 9.0.3
+      react: 18.2.0
+      uuid: 9.0.1
+      vscode-uri: 3.0.8
+      vscode-ws-jsonrpc: 3.2.0
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+    dev: false
+
+  /@difizen/libro-lsp@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-jxO+fcRXxX+7+KIu3wl68k7BOvstv9Pk3RZl8EVNiKMRrwi5d2qYz0dgFmAamWKogvm5tHvy2ojvMUUFLu5FzA==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-kernel': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       lodash.mergewith: 4.6.2
       react: 18.2.0
       uuid: 9.0.1
       vscode-jsonrpc: 6.0.0
-      vscode-languageserver-protocol: 3.17.5
+      vscode-languageserver-protocol: 3.17.3
       vscode-ws-jsonrpc: 1.0.2
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
@@ -4447,16 +4502,16 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-markdown-cell@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-rIiGwITGbhbbOTu0fzOk1j/H2lBbemZ8VnLYjhK/yt+zn/vYP5XMWFSRhXvKMNllArZ8M53n5raPxbCTHB0UeA==}
+  /@difizen/libro-markdown-cell@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-DlLlIv6nzHvTSyInVZeOy9IjicvfIBjiwaTV7MSV9mzsoDZr+SqqwqLoXYeh3NIhdSlpWyqEOXrJ+AVHuDyfYw==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-markdown': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-markdown': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@types/markdown-it': 12.2.3
       markdown-it: 13.0.2
       markdown-it-anchor: 8.6.7(@types/markdown-it@12.2.3)(markdown-it@13.0.2)
@@ -4470,10 +4525,10 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-markdown@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-bRUnZKbUv/Gf678I5j1f5KVM63IdhzuCj+ioDRsHOr+Fp13S2Ot4dLPuXTmDJrL5mmTTiFrUkZhjyQ7nz3aFKA==}
+  /@difizen/libro-markdown@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-f2KC3hNOsjpZW0smkzvtQCA3GzGcd/8pcUCueo2hluMqQQwLLepKs9EEVCPr8lEnzugwZC0+nPsxGLH3aIoPlw==}
     dependencies:
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       '@types/markdown-it': 12.2.3
       markdown-it: 13.0.2
       markdown-it-anchor: 8.6.7(@types/markdown-it@12.2.3)(markdown-it@13.0.2)
@@ -4483,16 +4538,16 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-output@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-3Ah0Fmp7ywodQYXrFYOB9b8aMxtS4c7ZiChdDrjgQg1Xta8OlxsKC+72CoBZD+IwL+9ebW6deefIuj/0SM5SLA==}
+  /@difizen/libro-output@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-sBitH8Z3Uwn1riGqmRxIwhYm/k1ltHVWev5talFMIU3sE25eSARhp5njIqClMOUQu1dsW/sFO2oiQfkhoIqc2w==}
     peerDependencies:
       antd: ^5.8.6
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-rendermime': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-rendermime': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       antd: 5.13.3(react-dom@18.2.0)(react@18.2.0)
       markdown-it: 13.0.2
       react: 18.2.0
@@ -4504,15 +4559,15 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-raw-cell@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-rwCZq42giHj5QXoLWhQWJ5ZB4pauBGSZK5b40rGxzAar5zGrwlSqYhfYAZok++5rfXII90n+druaRm1hAsI2+w==}
+  /@difizen/libro-raw-cell@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ZqRNBTIpGr7Huhjm9t8lcOB/fzuy0Va9ZvX1U17t99o0p0tOYFSLo2S6WjAQ2FKGhhGbjhA9VOb78XRFPuisiw==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
@@ -4523,15 +4578,15 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-rendermime@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-hBBEmxQHuxKkcwOryEJBzsVd7/dCLQE5rY0S2BO44gz0H2r2bgHhTl820qy2nj5qMgsY2VkxTyVwgJ5kFcIKLg==}
+  /@difizen/libro-rendermime@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-3G1+UIsjZUu74qITnPL/561JM8q7P8iPKTQJb+jpLWlrLEW1vTCOrGsS1wNxi1QfUhGssdqUpc0umVTLuV9juA==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-markdown': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-markdown': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       lodash.escape: 4.0.1
       react: 18.2.0
     transitivePeerDependencies:
@@ -4543,15 +4598,15 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-search-code-cell@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-UAK+vXpA+GRyAzGDVtuI9mNcSTxBDlRZC3HbDoU9dxQ5+ZocGRkLQ8qGCi2xjdqA7NCBhgWjMuixmVLRsEi89A==}
+  /@difizen/libro-search-code-cell@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-mrxgtGcVMdRi1JxCYpmx/tHjrscJCZGRt2M/awpDxBv4E1ED+ANDFpj0DUniqfBIfMQFSUpbIZxIKQuRqJyhxA==}
     dependencies:
-      '@difizen/libro-code-cell': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-search': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-cell': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-search': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
       - '@types/node'
@@ -4562,18 +4617,18 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-search@0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-7tnYIrTD7zYkC9F7xTVnogqOP+Wwsl+/Nxjz9inj8fFgQu8TTouAJLlH5qUZg9UNK4fQ2dsqSPFJeAfmDdB4NQ==}
+  /@difizen/libro-search@0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-cMihkRIdVv6PBwKDZ3CLyHOlNUoOe6aO1+Yu11Yc805WktX/cl+y8YWFQP1qVT9lqEhCSFx3ddz0cB4XOWmY0w==}
     peerDependencies:
       antd: ^5.8.6
       react: ^18.2.0
     dependencies:
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-code-editor': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/libro-core': 0.1.17(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-l10n': 0.1.9(react@18.2.0)
+      '@difizen/libro-code-editor': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-core': 0.1.22(@types/node@18.19.11)(@types/react@18.2.48)(antd@5.13.3)(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-l10n': 0.1.10(react@18.2.0)
       '@types/lodash.debounce': 4.0.9
       antd: 5.13.3(react-dom@18.2.0)(react@18.2.0)
       classnames: 2.5.1
@@ -4588,22 +4643,22 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/libro-shared-model@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Q3qPmK7uH20Sk9rBvR38+cz9ECnAaEDaSuVyxoFlOch3yVYCDHUr+SaKblBI2BHMUslolD/grE6Z6w6bEGZl8A==}
+  /@difizen/libro-shared-model@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-5Z3jy/x0LlilIZNAUyw39szmNb5mnGjr5yDIZfxjrQNYI6uXaYv8UPF2Qie4N7FK3Z6wB58I/RlQ+XYgJ6cZSg==}
     dependencies:
-      '@difizen/libro-common': 0.1.17(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-app': 0.1.9(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/libro-common': 0.1.22(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-app': 0.1.10(react-dom@18.2.0)(react@18.2.0)
       uuid: 9.0.1
-      y-protocols: 1.0.6(yjs@13.6.11)
-      yjs: 13.6.11
+      y-protocols: 1.0.6(yjs@13.6.12)
+      yjs: 13.6.12
     transitivePeerDependencies:
       - react
       - react-dom
       - supports-color
     dev: false
 
-  /@difizen/libro-virtualized@0.1.17(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-nUm5YuCtyNmbKKPGezhR316g334v7huRpptlYo/O/x88p/hhvY0XpTVdpMI5C1XxHd5AU8i//Co2U8/FOid8aA==}
+  /@difizen/libro-virtualized@0.1.22(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-7TPoPBFmOYkgUYVjRhN5YYKVIrg9DjYnJHpVgNYhKyHuABCErpdwy9+Jqqcm90qrWS/ZdGsmjtl2NYhkWOTQjQ==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -4614,19 +4669,19 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@difizen/mana-app@0.1.9(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-7QpI7KlL8AlaandkBFjXfZB2iIWqvKRbdXkXDDO+V58GX6AVm9rbVQiKi9wv+4OMJhBsliMIctE6zyJEcQTkcQ==}
+  /@difizen/mana-app@0.1.10(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ABcOF8p/SX8pPrdcbeWLOwpRVhNxY0ivQZINgmlxrFRR9ZGvoQdSOr8siw3IgffvxkOi76Y9EQODThYAyzCkLw==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
     dependencies:
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-common': 0.1.9
-      '@difizen/mana-core': 0.1.9(react@18.2.0)
-      '@difizen/mana-l10n': 0.1.9(react@18.2.0)
-      '@difizen/mana-observable': 0.1.9(react@18.2.0)
-      '@difizen/mana-react': 0.1.9(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-syringe': 0.1.9
+      '@difizen/mana-common': 0.1.10
+      '@difizen/mana-core': 0.1.10(react@18.2.0)
+      '@difizen/mana-l10n': 0.1.10(react@18.2.0)
+      '@difizen/mana-observable': 0.1.10(react@18.2.0)
+      '@difizen/mana-react': 0.1.10(react-dom@18.2.0)(react@18.2.0)
+      '@difizen/mana-syringe': 0.1.10
       '@types/lodash.debounce': 4.0.3
       '@types/react-virtualized': 9.21.29
       classnames: 2.5.1
@@ -4645,18 +4700,18 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/mana-common@0.1.9:
-    resolution: {integrity: sha512-yTvq5mlQ3Sq3J2ugoxiDbQEW7wbQ3P1f75rF6DiA7GOE28pwzukvPcNdAID5ug8shDEkY23NOpfCXa0RpQ7Qtg==}
+  /@difizen/mana-common@0.1.10:
+    resolution: {integrity: sha512-MnYK0KrTo20RrdWrKedxjaR7JhiYCCuFLo2iaPKFn2plJXtMhQx319SESnTZ67IJhN9oDBzh7TOeoc1AiJP7iA==}
     dependencies:
       path-browserify: 1.0.1
     dev: false
 
-  /@difizen/mana-core@0.1.9(react@18.2.0):
-    resolution: {integrity: sha512-88JZW36++6/kNUYSgRIey9wrL7ZZgL6xYL7+T9J2p1jTAZaBBHS772mQRpHA8VIp+o+5tq5mr3eWRyxT75qhZA==}
+  /@difizen/mana-core@0.1.10(react@18.2.0):
+    resolution: {integrity: sha512-G9nXg60mshAy28pieP/j3l3aYkOp4CAcs+MGLcVNDb2T8dzxxQYWz4OYRGMfq0ADNyHBSQ0NpiNHTUV1PYvAPw==}
     dependencies:
-      '@difizen/mana-common': 0.1.9
-      '@difizen/mana-observable': 0.1.9(react@18.2.0)
-      '@difizen/mana-syringe': 0.1.9
+      '@difizen/mana-common': 0.1.10
+      '@difizen/mana-observable': 0.1.10(react@18.2.0)
+      '@difizen/mana-syringe': 0.1.10
       ajv: 8.12.0
       debug: 4.3.4
       resize-observer-polyfill: 1.5.1
@@ -4666,32 +4721,32 @@ packages:
       - supports-color
     dev: false
 
-  /@difizen/mana-l10n@0.1.9(react@18.2.0):
-    resolution: {integrity: sha512-QL9Q4k/cx9S6ApYUoV7fA1X+7bGciYCP4v6jV34bmrYaJbjS5ewJ0MG3hkmPaCxtyYr6En9JwOs1dSvkd22tQA==}
+  /@difizen/mana-l10n@0.1.10(react@18.2.0):
+    resolution: {integrity: sha512-H5EGh5XQqvofB30tAjPrI+nqgNTGKqV/xf6YipazCG8hG1RD7kL5Dp0kVxEcI/mZPK0InkSLCuz2V/mHbmbgHw==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
       react: 18.2.0
     dev: false
 
-  /@difizen/mana-observable@0.1.9(react@18.2.0):
-    resolution: {integrity: sha512-0ct1YieMXqtfFZfQRiL/0q71EE15XNU2JD1b3lVUY+xUbhVw/Cv/RPb5DLtxWtZIFVOf5SW74EX0DKrdEgV0Yg==}
+  /@difizen/mana-observable@0.1.10(react@18.2.0):
+    resolution: {integrity: sha512-EcW0e9GEqdEAJnfShNLmE8LCwJpplaqdcuSmhovIG6GUw5igJh3ExLhxz6JJr0q3Q9v6Hq3owNkmog3WDObAZA==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
-      '@difizen/mana-common': 0.1.9
-      '@difizen/mana-syringe': 0.1.9
+      '@difizen/mana-common': 0.1.10
+      '@difizen/mana-syringe': 0.1.10
       react: 18.2.0
       reflect-metadata: 0.1.14
     dev: false
 
-  /@difizen/mana-react@0.1.9(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-NxPAgwhS1JdUaUtiS7iXZuaf6JjVGz5n305I80IaYvGA3WBZIdfxR65il0ZVXXnPtXC3RgvoSBe2qIaa4awv2w==}
+  /@difizen/mana-react@0.1.10(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ph5VOq4cVD1KReg+sa4l1kUZBOd1G0eITp2Ygb+5/xiVt0xTrNRWWl9Q0xKbw+7QVGj4vY+HmvW68h0UCiPQuA==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
-      '@difizen/mana-common': 0.1.9
+      '@difizen/mana-common': 0.1.10
       classnames: 2.5.1
       rc-dropdown: 3.6.2(react-dom@18.2.0)(react@18.2.0)
       rc-tabs: 11.16.1(react-dom@18.2.0)(react@18.2.0)
@@ -4701,16 +4756,27 @@ packages:
       - react-dom
     dev: false
 
-  /@difizen/mana-syringe@0.1.9:
-    resolution: {integrity: sha512-/EE2lcu/cBuAPhdwJHGd2jecqoF/HVx/NO99GlF86Z5Fw0dlrX3iNs5OC0WdESbZotwYRqFAVkO+nCEttWPilA==}
+  /@difizen/mana-syringe@0.1.10:
+    resolution: {integrity: sha512-2/2cda4HRBheqfY3uC9avaSohbyN5qPrEQ5eJobLLaDybkT27PA12FKV0v70kGdMV2JcowCtTKG+WkO4kmhKow==}
     dependencies:
-      '@difizen/mana-common': 0.1.9
+      '@difizen/mana-common': 0.1.10
       inversify: 5.1.1
       reflect-metadata: 0.1.14
     dev: false
 
   /@difizen/monaco-editor-core@0.39.4:
     resolution: {integrity: sha512-4aHhsaEJUOWOqxxHvV7r+UP/3f/wHHJvQdkwnMt28HIkP1KKjG/gEXoVDxsv7MWT31pSp9OhXl2K3BPy32P7yQ==}
+    dev: false
+
+  /@difizen/vscode-languageserver-protocol@3.17.6-next.2:
+    resolution: {integrity: sha512-8Cv49S16VOGPzJpffLxsuDjbccYaCrZZKRHV4FpfXHryIMK5yAQhd36hDA+shsZbdtK48nzgO1t1w+LDtWH97w==}
+    dependencies:
+      '@difizen/vscode-languageserver-types': 3.17.6-next.1
+      vscode-jsonrpc: 8.2.1-next.1
+    dev: false
+
+  /@difizen/vscode-languageserver-types@3.17.6-next.1:
+    resolution: {integrity: sha512-sXsdZX1PbkE5LeBLCawFL0+kHhoJqR7bNA3/mqNMAUJEcno1P8OEl7qaH7Ofv8zuZtI8AuNXhVv8sd/pZSVH6Q==}
     dev: false
 
   /@discoveryjs/json-ext@0.5.7:
@@ -5274,6 +5340,10 @@ packages:
     engines: {node: '>=6.9.0'}
     dev: false
 
+  /@iarna/toml@2.2.5:
+    resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
+    dev: true
+
   /@iconify/types@2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
     dev: false
@@ -5799,8 +5869,8 @@ packages:
     resolution: {integrity: sha512-yemX0ZD2xS/73llMZIK6KplkjIjf2EvAHcinDi/TfJ9hS25G0388+ClHt6/3but0oOxinTcQHJLDXh6w1crzFQ==}
     dev: false
 
-  /@lezer/css@1.1.7:
-    resolution: {integrity: sha512-7BlFFAKNn/b39jJLrhdLSX5A2k56GIJvyLqdmm7UU+7XvequY084iuKDMAEhAmAzHnwDE8FK4OQtsIUssW91tg==}
+  /@lezer/css@1.1.8:
+    resolution: {integrity: sha512-7JhxupKuMBaWQKjQoLtzhGj83DdnZY9MckEOG5+/iLKNK2ZJqKc6hf6uc0HjwCX7Qlok44jBNqZhHKDhEhZYLA==}
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
@@ -5813,8 +5883,8 @@ packages:
       '@lezer/common': 1.2.1
     dev: false
 
-  /@lezer/html@1.3.8:
-    resolution: {integrity: sha512-EXseJ3pUzWxE6XQBQdqWHZqqlGQRSuNMBcLb6mZWS2J2v+QZhOObD+3ZIKIcm59ntTzyor4LqFTb72iJc3k23Q==}
+  /@lezer/html@1.3.9:
+    resolution: {integrity: sha512-MXxeCMPyrcemSLGaTQEZx0dBUH0i+RPl8RN5GwMAzo53nTsd/Unc/t5ZxACeQoyPUM5/GkPLRUs2WliOImzkRA==}
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
@@ -11448,6 +11518,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
+  /array-back@3.1.0:
+    resolution: {integrity: sha512-TkuxA4UCOvxuDK6NZYXCalszEzj+TLszyASooky+i742l9TqsOdYCMJJupxRic61hwquNtppB3hgcuq9SVSH1Q==}
+    engines: {node: '>=6'}
+    dev: true
+
   /array-bounds@1.0.1:
     resolution: {integrity: sha512-8wdW3ZGk6UjMPJx/glyEt0sLzzwAE1bhToPsO1W2pbpR2gULyxe3BjSiuJFheP50T/GgODVPz2fuMUmIywt8cQ==}
     dev: false
@@ -12414,7 +12489,6 @@ packages:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
     dependencies:
       balanced-match: 1.0.2
-    dev: true
 
   /braces@1.8.5:
     resolution: {integrity: sha512-xU7bpz2ytJl1bH9cgIurjpg/n8Gohy9GTw81heDYLJQ4RU60dlyJsa+atVF2pI0yMMvKxI9HkKwjePCj5XI1hw==}
@@ -13478,6 +13552,16 @@ packages:
   /comma-separated-tokens@1.0.8:
     resolution: {integrity: sha512-GHuDRO12Sypu2cV70d1dkA2EUmXHgntrzbpvOB+Qy+49ypNfGgFQIC2fhhXbnyrJRynDCAARsT7Ou0M6hirpfw==}
     dev: false
+
+  /command-line-args@5.2.1:
+    resolution: {integrity: sha512-H4UfQhZyakIjC74I9d34fGYDwk3XpSr17QhEd0Q3I9Xq1CETHo4Hcuo87WyWHpAF1aSLjLRf5lD9ZGX2qStUvg==}
+    engines: {node: '>=4.0.0'}
+    dependencies:
+      array-back: 3.1.0
+      find-replace: 3.0.0
+      lodash.camelcase: 4.3.0
+      typical: 4.0.0
+    dev: true
 
   /commander@11.0.0:
     resolution: {integrity: sha512-9HMlXtt/BNoYr8ooyjjNRdIilOTkVJXB+GhxMTtOKwk0R4j4lS4NpjuqmRxroBfnfTSHQIHQB7wryHhXarNjmQ==}
@@ -17527,6 +17611,13 @@ packages:
       commondir: 1.0.1
       make-dir: 3.1.0
       pkg-dir: 4.2.0
+    dev: true
+
+  /find-replace@3.0.0:
+    resolution: {integrity: sha512-6Tb2myMioCAgv5kfvP5/PkZZ/ntTpVK39fHY7WkWBgvbeE+VHd/tZuZ4mrC+bxh4cfOZeYKVPaJIZtZXV7GNCQ==}
+    engines: {node: '>=4.0.0'}
+    dependencies:
+      array-back: 3.1.0
     dev: true
 
   /find-root@1.1.0:
@@ -22072,8 +22163,8 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  /lib0@0.2.88:
-    resolution: {integrity: sha512-KyroiEvCeZcZEMx5Ys+b4u4eEBbA1ch7XUaBhYpwa/nPMrzTjUhI4RfcytmQfYoTBPcdyx+FX6WFNIoNuJzJfQ==}
+  /lib0@0.2.90:
+    resolution: {integrity: sha512-iQmk+fThPq1ZTD2cFUu8xN6JLp9gFWnjs8auR6hmI6QQXoy6sSEh85uKcdkqpuEnkhhwQm4GSlKHOYfSCVp0Mw==}
     engines: {node: '>=16'}
     hasBin: true
     dependencies:
@@ -23891,7 +23982,6 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     dependencies:
       brace-expansion: 2.0.1
-    dev: true
 
   /minimist-options@3.0.2:
     resolution: {integrity: sha512-FyBrT/d0d4+uiZRbqznPXqw3IpZZG3gl3wKWiX784FycUKVwBt0uLBFkQrtE4tZOrgo78nZp2jnKz3L65T5LdQ==}
@@ -25589,8 +25679,8 @@ packages:
       semver-compare: 1.0.0
     dev: false
 
-  /plotly.js@2.28.0(mapbox-gl@1.13.3):
-    resolution: {integrity: sha512-fEvAapXhFTFO/PM5LnUvoG+tgOxRjjW7C7nHwVaDLKfq0F+SF/p3zRgo7vKwk9588WfgEHvuk6yRnp1mxZ+YSw==}
+  /plotly.js@2.29.1(mapbox-gl@1.13.3):
+    resolution: {integrity: sha512-+XirhgCh42JF/iVu/RtBRbhcs328ipinajy7hd3mnZdnQv2Th6F441DSXer5S+P0nNluNs10vAFTELo4k/icjg==}
     dependencies:
       '@plotly/d3': 3.8.1
       '@plotly/d3-sankey': 0.7.2
@@ -25631,7 +25721,7 @@ packages:
       probe-image-size: 7.2.3
       regl: /@plotly/regl@2.1.2
       regl-error2d: 2.0.12
-      regl-line2d: 3.1.2
+      regl-line2d: 3.1.3
       regl-scatter2d: 3.3.1
       regl-splom: 1.0.14
       strongly-connected-components: 1.0.1
@@ -27269,8 +27359,8 @@ packages:
       strict-uri-encode: 2.0.0
     dev: false
 
-  /query-string@8.1.0:
-    resolution: {integrity: sha512-BFQeWxJOZxZGix7y+SByG3F36dA0AbTy9o6pSmKFcFz7DAj0re9Frkty3saBn3nHo3D0oZJ/+rx3r8H8r8Jbpw==}
+  /query-string@8.2.0:
+    resolution: {integrity: sha512-tUZIw8J0CawM5wyGBiDOAp7ObdRQh4uBor/fUR9ZjmbZVvw95OD9If4w3MQxr99rg0DJZ/9CIORcpEqU5hQG7g==}
     engines: {node: '>=14.16'}
     dependencies:
       decode-uri-component: 0.4.1
@@ -28783,8 +28873,8 @@ packages:
       update-diff: 1.1.0
     dev: false
 
-  /regl-line2d@3.1.2:
-    resolution: {integrity: sha512-nmT7WWS/WxmXAQMkgaMKWXaVmwJ65KCrjbqHGOUjjqQi6shfT96YbBOvelXwO9hG7/hjvbzjtQ2UO0L3e7YaXQ==}
+  /regl-line2d@3.1.3:
+    resolution: {integrity: sha512-fkgzW+tTn4QUQLpFKsUIE0sgWdCmXAM3ctXcCgoGBZTSX5FE2A0M7aynz7nrZT5baaftLrk9te54B+MEq4QcSA==}
     dependencies:
       array-bounds: 1.0.1
       array-find-index: 1.0.2
@@ -28793,7 +28883,6 @@ packages:
       earcut: 2.2.4
       es6-weak-map: 2.0.3
       flatten-vertex-data: 1.0.2
-      glslify: 7.1.1
       object-assign: 4.1.1
       parse-rect: 1.2.0
       pick-by-alias: 1.2.0
@@ -29497,8 +29586,8 @@ packages:
       - supports-color
     dev: false
 
-  /sanitize-html@2.11.0:
-    resolution: {integrity: sha512-BG68EDHRaGKqlsNjJ2xUB7gpInPA8gVx/mvjO743hZaeMCZ2DwzW7xvsqZ+KNU4QKwj86HJ3uu2liISf2qBBUA==}
+  /sanitize-html@2.12.1:
+    resolution: {integrity: sha512-Plh+JAn0UVDpBRP/xEjsk+xDCoOvMBwQUf/K+/cBAVuTbtX8bj2VB7S1sL1dssVpykqp0/KPSesHrqXtokVBpA==}
     dependencies:
       deepmerge: 4.3.1
       escape-string-regexp: 4.0.0
@@ -29546,6 +29635,7 @@ packages:
 
   /sax@1.3.0:
     resolution: {integrity: sha512-0s+oAmw9zLl1V1cS9BtZN7JAd0cW5e0QH4W3LWEK6a4LaLEA2OTpGYWDY+6XasBLtz6wkm3u1xRw95mRuJ59WA==}
+    requiresBuild: true
     dev: false
 
   /saxes@3.1.11:
@@ -32139,6 +32229,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  /typical@4.0.0:
+    resolution: {integrity: sha512-VAH4IvQ7BDFYglMd7BPRDfLgxZZX4O4TFcRDA6EN5X7erNJJq+McIEp8np9aVtxrCJ6qx4GTYVfOWNjcqwZgRw==}
+    engines: {node: '>=8'}
+    dev: true
+
   /uc.micro@1.0.6:
     resolution: {integrity: sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==}
     dev: false
@@ -33158,10 +33253,25 @@ packages:
     engines: {node: '>=8.0.0 || >=10.0.0'}
     dev: false
 
+  /vscode-jsonrpc@8.1.0:
+    resolution: {integrity: sha512-6TDy/abTQk+zDGYazgbIPc+4JoXdwC8NHU9Pbn4UJP1fehUyZmM4RHp5IthX7A6L5KS30PRui+j+tbbMMMafdw==}
+    engines: {node: '>=14.0.0'}
+
   /vscode-jsonrpc@8.2.0:
     resolution: {integrity: sha512-C+r0eKJUIfiDIfwJhria30+TYWPtuHJXHtI7J0YlOmKAo7ogxP20T0zxB7HZQIFhIyvoBPwWskjxrvAtfjyZfA==}
     engines: {node: '>=14.0.0'}
     dev: false
+
+  /vscode-jsonrpc@8.2.1-next.1:
+    resolution: {integrity: sha512-L+DYtdUtqUXGpyMgHqer6IBKvFFhl/1ToiMmCmG85LYHuuX0jllHMz77MYt0RicakoYY+Lq1yLK6Qj3YBqgzDQ==}
+    engines: {node: '>=14.0.0'}
+    dev: false
+
+  /vscode-languageserver-protocol@3.17.3:
+    resolution: {integrity: sha512-924/h0AqsMtA5yK22GgMtCYiMdCOtWTSGgUOkgEDX+wk2b0x4sAfLiO4NxBxqbiVtz7K7/1/RgVrVI0NClZwqA==}
+    dependencies:
+      vscode-jsonrpc: 8.1.0
+      vscode-languageserver-types: 3.17.3
 
   /vscode-languageserver-protocol@3.17.5:
     resolution: {integrity: sha512-mb1bvRJN8SVznADSGWM9u/b07H7Ecg0I3OgXDuLdn307rl/J3A9YD6/eYOssqhecL27hK1IPZAsaqh00i/Jljg==}
@@ -33170,9 +33280,23 @@ packages:
       vscode-languageserver-types: 3.17.5
     dev: false
 
+  /vscode-languageserver-textdocument@1.0.10:
+    resolution: {integrity: sha512-dPA6WqtAQJ/Iopm0Hrj11VvaKxsEcm62jpqyaYbY0xuvUffeWAn77f3VKr2SCsJphSyEw4Fjkjqm2gQ24KQfrA==}
+    dev: true
+
+  /vscode-languageserver-types@3.17.3:
+    resolution: {integrity: sha512-SYU4z1dL0PyIMd4Vj8YOqFvHu7Hz/enbWtpfnVbJHU4Nd1YNYx8u0ennumc6h48GQNeOLxmwySmnADouT/AuZA==}
+
   /vscode-languageserver-types@3.17.5:
     resolution: {integrity: sha512-Ld1VelNuX9pdF39h2Hgaeb5hEZM2Z3jUrrMgWQAu82jMtZp7p3vJT3BzToKtZI7NgQssZje5o0zryOrhQvzQAg==}
     dev: false
+
+  /vscode-languageserver@8.1.0:
+    resolution: {integrity: sha512-eUt8f1z2N2IEUDBsKaNapkz7jl5QpskN2Y0G01T/ItMxBxw1fJwvtySGB9QMecatne8jFIWJGWI61dWjyTLQsw==}
+    hasBin: true
+    dependencies:
+      vscode-languageserver-protocol: 3.17.3
+    dev: true
 
   /vscode-oniguruma@1.7.0:
     resolution: {integrity: sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==}
@@ -33186,8 +33310,18 @@ packages:
     resolution: {integrity: sha512-8TEXQxlldWAuIODdukIb+TR5s+9Ds40eSJrw+1iDDA9IFORPjMELarNQE3myz5XIkWWpdprmJjm1/SxMlWOC8A==}
     dev: false
 
+  /vscode-uri@3.0.8:
+    resolution: {integrity: sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==}
+
   /vscode-ws-jsonrpc@1.0.2:
     resolution: {integrity: sha512-09OpRC0RcqZs4DleJRgs+R+7gQkwb4tgvsL43lzVZwW4N5NO3H/9sLNeKPBt83k7WyA8qBZjrzM6X7tKFpFrjQ==}
+    dependencies:
+      vscode-jsonrpc: 8.1.0
+    dev: false
+
+  /vscode-ws-jsonrpc@3.2.0:
+    resolution: {integrity: sha512-5gWWTWMwIPKI1AqjVzE/sANPz2yoXTTJmKkrOW4NFMFPkPNUp1VIgCYXRwqO4ONJhrSbFaAm3b4+ZDnA27fePg==}
+    engines: {node: '>=16.11.0', npm: '>=8.0.0'}
     dependencies:
       vscode-jsonrpc: 8.2.0
     dev: false
@@ -33894,14 +34028,14 @@ packages:
     resolution: {integrity: sha512-8QqjlekLUFTrU6x7xck1MsPzPA571K5zNqWm0M0oroYEWVOptZ0+ubQSkQ3uxIEhcIHRujJy6emDWX4A7qyFzg==}
     dev: false
 
-  /y-protocols@1.0.6(yjs@13.6.11):
+  /y-protocols@1.0.6(yjs@13.6.12):
     resolution: {integrity: sha512-vHRF2L6iT3rwj1jub/K5tYcTT/mEYDUppgNPXwp8fmLpui9f7Yeq3OEtTLVF012j39QnV+KEQpNqoN7CWU7Y9Q==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     peerDependencies:
       yjs: ^13.0.0
     dependencies:
-      lib0: 0.2.88
-      yjs: 13.6.11
+      lib0: 0.2.90
+      yjs: 13.6.12
     dev: false
 
   /y18n@3.2.2:
@@ -34091,11 +34225,11 @@ packages:
     resolution: {integrity: sha512-8HFIh676uyGYP6wP13R/j6OJ/1HwJ46snpvzE7aHAN3Ryqh2yX6Xox2B4CUmTwwOIzlG3Bs7ocsP5dZH/R1Qbg==}
     dev: false
 
-  /yjs@13.6.11:
-    resolution: {integrity: sha512-FvRRJKX9u270dOLkllGF/UDCWwmIv2Z+ucM4v1QO1TuxdmoiMnSUXH1HAcOKOrkBEhQtPTkxep7tD2DrQB+l0g==}
+  /yjs@13.6.12:
+    resolution: {integrity: sha512-KOT8ILoyVH2f/PxPadeu5kVVS055D1r3x1iFfJVJzFdnN98pVGM8H07NcKsO+fG3F7/0tf30Vnokf5YIqhU/iw==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     dependencies:
-      lib0: 0.2.88
+      lib0: 0.2.90
     dev: false
 
   /ylru@1.3.2:
