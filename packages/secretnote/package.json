@@ -27,7 +27,7 @@
   "dependencies": {
     "@antv/s2": "^1.52.0",
     "@codemirror/lang-python": "^6.1.2",
-    "@difizen/libro-jupyter": "^0.2.0",
+    "@difizen/libro-jupyter": "^0.1.22",
     "@difizen/mana-app": "^0.1.10",
     "@difizen/mana-common": "^0.1.10",
     "@difizen/mana-l10n": "^0.1.10",
