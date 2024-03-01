@@ -76,7 +76,7 @@ export class SQLCellView extends LibroExecutableCellView {
     this.viewManager = viewManager;
     this.commandRegistry = commandRegistry;
 
-    this.outputs = options.cell?.outputs as IOutput[];
+    this.outputs = (options.cell?.outputs || []) as IOutput[];
     this.className = this.className + ' sql-editor-container';
 
     this.viewManager
@@ -103,8 +103,17 @@ export class SQLCellView extends LibroExecutableCellView {
     await this.createEditor();
   };
 
+  override toJSON() {
+    const meta = super.toJSON();
+    return {
+      ...meta,
+      outputs: this.outputArea?.toJSON() ?? this.outputs,
+    };
+  }
+
   createEditor() {
     const option: CodeEditorViewOptions = {
+      uuid: this.options.uuid,
       factory: (editorOption) => new SQLEditor(editorOption),
       model: this.cellModel,
       config: {
@@ -116,10 +125,8 @@ export class SQLCellView extends LibroExecutableCellView {
       .getOrCreateView<CodeEditorView, CodeEditorViewOptions>(CodeEditorView, option)
       .then(async (editorView) => {
         this.editorView = editorView;
-
-        await editorView.editorReady;
+        await editorView.editor.editorReady;
         this.handleCommand();
-
         return;
       })
       .catch(() => {
