@@ -6,7 +6,7 @@ services:
       - SELF_PARTY=alice
       - ALL_PARTIES=alice,bob
     ports:
-      # Jupyter
+      # SecretNote
       - 8090:8888
     entrypoint: /root/scripts/start.sh
     volumes:
@@ -19,7 +19,7 @@ services:
       - SELF_PARTY=bob
       - ALL_PARTIES=alice,bob
     ports:
-      # Jupyter
+      # SecretNote
       - 8092:8888
     entrypoint: /root/scripts/start.sh
     volumes:
