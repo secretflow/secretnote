@@ -23,7 +23,6 @@ dev-dependencies = [
   "fastapi<0.100",
   "hatch>=1.7.0",
   "ipython>=8.12.2",
-  "jupyter-lsp>=2.2.0",
   "jupyterlab>=4.0.5",
   "logging_tree>=1.9",
   "mypy>=1.5.1",
