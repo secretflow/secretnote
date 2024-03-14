@@ -132,7 +132,6 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
     const { name, desc } = attr;
     const type = getRenderType(attr);
     const options = getOptions(attr);
-
     const attrItem: any = {
       id: name,
       type,
@@ -148,13 +147,11 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
       minimum: getMinimum(attr),
       maximum: getMaximum(attr),
     };
-
     setByPath(json, `properties/attrs/properties/${name}`, attrItem);
   });
 
   (spec.inputs || []).forEach((input) => {
     const inputName = input.name;
-
     const inputItem = {
       id: inputName,
       type: 'object',

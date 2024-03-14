@@ -13,17 +13,19 @@ const deviceConfig = {
   },
 };
 
+const RayFedPort = 8000;
+const SPUPort = 8001;
 const clusterConfig = {
   public_config: {
     ray_fed_config: {
       parties: ['alice', 'bob'],
-      addresses: ['alice:8000', 'bob:8000'],
+      addresses: [`alice:${RayFedPort}`, `bob:${RayFedPort}`],
     },
     spu_configs: [
       {
         name: 'spu',
         parties: ['alice', 'bob'],
-        addresses: ['alice:8001', 'bob:8001'],
+        addresses: [`alice:${SPUPort}`, `bob:${SPUPort}`],
       },
     ],
   },
@@ -82,6 +84,9 @@ const getIOMetaType = (type: IOType) => {
   return '';
 };
 
+/**
+ * Generate Python code for a component cell.
+ */
 const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
   if (!(component && config)) {
     return '';
@@ -141,38 +146,41 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
   }
 
   return `
-    from secretflow.spec.v1.evaluation_pb2 import NodeEvalParam
-    from secretflow.spec.extend.cluster_pb2 import SFClusterConfig
-    from secretflow.component.entry import comp_eval
-    from google.protobuf.json_format import Parse
-    from secretflow.spec.v1.data_pb2 import StorageConfig
-    import os
+if True: # limit the scope of the execution to avoid polluting the global namespace
+  from secretflow.spec.v1.evaluation_pb2 import NodeEvalParam
+  from secretflow.spec.v1.data_pb2 import StorageConfig
+  from secretflow.spec.extend.cluster_pb2 import SFClusterConfig
+  from secretflow.component.entry import comp_eval
+  from google.protobuf.json_format import Parse, MessageToJson
+  from ipykernel.comm import Comm
+  import os
 
-    cluster_config_str = r"""
-    ${JSON.stringify(clusterConfig)}
-    """
+  cluster_config_str = r"""
+  ${JSON.stringify(clusterConfig)}
+  """
 
+  component_config_str = r"""
+  ${JSON.stringify(componentConfig)}
+  """
 
-    component_config_str = r"""
-    ${JSON.stringify(componentConfig)}
-    """
+  self_party = os.getenv("SELF_PARTY", "alice")
+  cluster_config = SFClusterConfig()
+  Parse(cluster_config_str.replace('{self_party}', self_party), cluster_config)
 
-    self_party = os.getenv("SELF_PARTY", "alice")
-    cluster_config = SFClusterConfig()
-    Parse(cluster_config_str.replace('{self_party}', self_party), cluster_config)
+  node_eval_config = NodeEvalParam()
+  Parse(component_config_str, node_eval_config)
 
-    node_eval_config = NodeEvalParam()
-    Parse(component_config_str, node_eval_config)
+  storage_config = StorageConfig(
+      type="local_fs",
+      local_fs=StorageConfig.LocalFSConfig(wd=os.getcwd()),
+  )
 
-    storage_config = StorageConfig(
-        type="local_fs",
-        local_fs=StorageConfig.LocalFSConfig(wd="/home/vscode/examples"),
-    )
+  res = comp_eval(node_eval_config, storage_config, cluster_config)
 
-    res = comp_eval(node_eval_config, storage_config, cluster_config)
-
-    print(f"The execution is complete and the result is: \\n{res}")
-    `;
+  print(f"The execution is complete and the result is: \\n{res}")
+  
+  Comm().send(data={"$type": "secretnote.component-cell.result", "payload": MessageToJson(res, indent=0)})
+    `.trim();
 };
 
 export { generateComponentCellCode };

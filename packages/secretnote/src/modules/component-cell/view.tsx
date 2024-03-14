@@ -3,6 +3,7 @@ import type {
   KernelMessage,
   IOutput,
   CellViewOptions,
+  JSONObject,
 } from '@difizen/libro-jupyter';
 import {
   LibroExecutableCellView,
@@ -11,6 +12,7 @@ import {
   DocumentCommands,
   isStreamMsg,
   isErrorMsg,
+  isCommMsgMsg,
 } from '@difizen/libro-jupyter';
 import {
   transient,
@@ -36,7 +38,14 @@ import {
   getComponentIds,
   generateComponentCellCode,
 } from './cell-component';
-import type { ComponentCellModel, ComponentMetadata } from './model';
+import type { ComponentCellModel, ComponentMetadata, SFReport } from './model';
+
+// secretnote customized some comm messages to pass wanted data from kernel to frontend
+type CustomizedCommMsgDataType = 'secretnote.component-cell.result';
+type CustomizedCommMsgData = {
+  $type: CustomizedCommMsgDataType;
+  payload?: string;
+} & JSONObject;
 
 export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<ComponentCellView>(ViewInstance);
@@ -58,6 +67,7 @@ export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) 
       <CellComponent
         loading={instance.launching}
         outputs={instance.cellModel.outputs}
+        report={instance.cellModel.report}
         component={instance.component}
         onComponentChange={(c) => {
           instance.onComponentChange(c);
@@ -220,12 +230,42 @@ export class ComponentCellView extends LibroExecutableCellView {
 
   handleMessages(msg: KernelMessage.IIOPubMessage | KernelMessage.IExecuteReplyMsg) {
     this.launching = false;
+
     if (isStreamMsg(msg) || isErrorMsg(msg)) {
+      // concat the terminal output to the log tab
       const output: IOutput = {
         ...msg.content,
         output_type: msg.header.msg_type,
       };
       this.cellModel.outputs = [...this.cellModel.outputs, output];
+    }
+
+    if (isCommMsgMsg(msg)) {
+      // handle secretnote customized comm messages
+      if (
+        (msg.content.data as CustomizedCommMsgData)?.$type ===
+        'secretnote.component-cell.result'
+      ) {
+        const payload = JSON.parse((msg.content.data?.payload || '{}') as string);
+
+        // organize data for the report tab
+        const reports = payload.outputs.filter((v: any) => v.type === 'sf.report');
+        if (reports.length) {
+          // this component comes with a report
+          const report = reports[0] as SFReport; // currently no operator has multiple reports
+          const activeTable = report.meta.tabs[0].divs[0].children[0].table;
+          // refactor the report data to the format of the Report tab
+          this.cellModel.report = {
+            name: report.name,
+            metaName: report.meta.name,
+            metaDesc: report.meta.desc,
+            // currently no report has multiple tabs, divs, and children
+            metaColumnNames: activeTable.headers.map((v) => v.name),
+            metaRowNames: activeTable.rows.map((v) => v.name),
+            metaRowItems: activeTable.rows.map((v) => v.items),
+          };
+        }
+      }
     }
   }
 
@@ -240,6 +280,7 @@ export class ComponentCellView extends LibroExecutableCellView {
       source,
       metadata: this.cellModel.metadata,
       outputs: this.cellModel.outputs,
+      report: this.cellModel.report,
     };
   }
 

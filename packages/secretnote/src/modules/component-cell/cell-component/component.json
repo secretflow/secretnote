@@ -663,7 +663,14 @@
         {
           "name": "feature_dataset",
           "desc": "Input vertical table.",
-          "types": ["sf.table.vertical_table"]
+          "types": ["sf.table.vertical_table"],
+          "attrs": [
+            {
+              "name": "saved_features",
+              "desc": "Features to save into output pred file.",
+              "colMinCntInclusive": "1"
+            }
+          ]
         }
       ],
       "outputs": [
@@ -1599,6 +1606,11 @@
           "types": ["sf.table.vertical_table"],
           "attrs": [
             {
+              "name": "feature_selects",
+              "desc": "Features to be trained with.",
+              "colMinCntInclusive": "1"
+            },
+            {
               "name": "label",
               "desc": "Label of train dataset.",
               "colMinCntInclusive": "1",
@@ -1616,7 +1628,7 @@
       ]
     },
     {
-      "domain": "preprocessing",
+      "domain": "data_filter",
       "name": "feature_filter",
       "desc": "Drop features from the dataset.",
       "version": "0.0.1",
@@ -1642,7 +1654,7 @@
       ]
     },
     {
-      "domain": "preprocessing",
+      "domain": "data_prep",
       "name": "psi",
       "desc": "PSI between two parties.",
       "version": "0.0.1",
@@ -1733,7 +1745,7 @@
       ]
     },
     {
-      "domain": "preprocessing",
+      "domain": "data_prep",
       "name": "train_test_split",
       "desc": "Split datasets into random train and test subsets.\n- Please check: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html",
       "version": "0.0.1",

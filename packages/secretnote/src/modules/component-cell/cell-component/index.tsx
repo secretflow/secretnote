@@ -1,6 +1,7 @@
 import type { IOutput } from '@difizen/libro-jupyter';
-import { Tabs, type TabsProps, Empty, Spin } from 'antd';
-import { forwardRef, type ForwardedRef, useMemo } from 'react';
+import { Tabs, Empty, Spin, Table, Descriptions } from 'antd';
+import type { TabsProps, TableProps, DescriptionsProps } from 'antd';
+import { forwardRef, type ForwardedRef, useMemo, useEffect } from 'react';
 
 import { ComponentForm } from '@/components/component-form';
 import type { ComponentSpec, Value } from '@/components/component-form';
@@ -9,6 +10,7 @@ import LogView from '@/components/log-viewer';
 import { generateComponentCellCode } from './cell-code';
 import { ComponentOptions, getComponentByIds, getComponentIds } from './options';
 import './index.less';
+import { ComponentReport } from '../model';
 
 interface CellComponentProps {
   component?: ComponentSpec;
@@ -16,6 +18,7 @@ interface CellComponentProps {
   defaultComponentConfig?: Value;
   onComponentConfigChange?: (changedValues: Value, values: Value) => void;
   outputs: IOutput[];
+  report: ComponentReport | null; // data for the Report tab
   loading?: boolean;
 }
 
@@ -28,9 +31,11 @@ const CellComponent = forwardRef(
       defaultComponentConfig,
       onComponentConfigChange,
       outputs,
+      report,
       loading,
     } = props;
 
+    // content of Log tab
     const outputLogs = useMemo(() => {
       const logs: string[] = [];
       outputs.forEach((output) => {
@@ -47,6 +52,41 @@ const CellComponent = forwardRef(
 
       return <LogView code={logs} theme="light" />;
     }, [outputs]);
+
+    // content of Report tab
+    const reportDescriptionItems: DescriptionsProps['items'] = report
+      ? [
+          { key: '1', label: 'report.name', children: report.name },
+          { key: '2', label: 'report.meta.name', children: report.metaName },
+          { key: '3', label: 'report.meta.desc', children: report.metaDesc },
+        ]
+      : [];
+    const reportTableColumns: TableProps['columns'] = report
+      ? [
+          // 2D array, first column holds row names
+          { title: '', dataIndex: '$key', key: -1, rowScope: 'row' },
+          ...report.metaColumnNames.map((name, idx) => ({
+            title: name,
+            dataIndex: name,
+            key: name,
+          })),
+        ]
+      : [];
+    const reportTableDataSource = report
+      ? (() => {
+          const dataSource = [];
+          for (let i = 0; i < report.metaRowItems.length!; i++) {
+            const obj: Value = {
+              $key: report.metaRowNames[i],
+            };
+            report.metaColumnNames.forEach((name, j) => {
+              obj[name] = Object.values(report.metaRowItems[i][j])[0];
+            });
+            dataSource.push({ ...obj });
+          }
+          return dataSource;
+        })()
+      : [];
 
     const items: TabsProps['items'] = [
       {
@@ -69,7 +109,19 @@ const CellComponent = forwardRef(
         label: 'Report',
         children: (
           <div className="sf-component-report">
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No report." />
+            {report ? (
+              <div>
+                <Descriptions items={reportDescriptionItems} />
+                <Table
+                  columns={reportTableColumns}
+                  dataSource={reportTableDataSource}
+                  pagination={false}
+                  virtual={true}
+                />
+              </div>
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No report." />
+            )}
           </div>
         ),
       },

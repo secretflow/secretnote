@@ -13,6 +13,47 @@ import {
 import { Emitter, prop } from '@difizen/mana-app';
 import { inject, transient } from '@difizen/mana-app';
 import type { Event } from '@difizen/mana-common';
+import type { Value } from '@/components/component-form';
+
+// type of sf.report from secretflow component
+export type SFReport = {
+  name: string;
+  type: 'sf.report';
+  systemInfo: Value;
+  meta: {
+    '@type': 'type.googleapis.com/secretflow.spec.v1.Report';
+    name: string;
+    desc: string;
+    // @see https://github.com/secretflow/spec/blob/main/secretflow/spec/v1/report.proto
+    tabs: {
+      divs: {
+        children: {
+          type: 'table';
+          table: {
+            headers: {
+              name: string;
+              type: string;
+            }[];
+            rows: {
+              name: string;
+              items: Value[]; // value of this row, {protobuf type -> value}[]
+            }[];
+          };
+        }[];
+      }[];
+    }[];
+  };
+};
+
+// type of necessary data for the Report tab
+export type ComponentReport = {
+  name: string; // name
+  metaName: string; // .meta.name
+  metaDesc: string; // .meta.desc
+  metaColumnNames: string[]; // column names of the table
+  metaRowNames: string[]; // row names of the table
+  metaRowItems: Value[]; // table cells
+};
 
 export interface ComponentMetadata {
   component: {
@@ -54,6 +95,9 @@ export class ComponentCellModel
   @prop()
   outputs: IOutput[] = [];
 
+  @prop()
+  report: ComponentReport | null;
+
   constructor(@inject(CellOptions) options: CellOptions) {
     super(options);
     this.executing = false;
@@ -61,6 +105,7 @@ export class ComponentCellModel
     this.msgChangeEmitter = new Emitter<any>();
     this.metadata = options.cell.metadata || {};
     this.outputs = (options.cell.outputs as IOutput[]) || [];
+    this.report = (options.cell.report as ComponentReport) || null;
     this.value = concatMultilineString(options.cell.source);
   }
 
