@@ -1,5 +1,6 @@
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel } from '@difizen/mana-react';
+import { history } from 'umi';
 
 import { ReactComponent as Logo } from '@/assets/image/logo.svg';
 
@@ -12,6 +13,11 @@ export enum HeaderArea {
 
 export const Header: React.FC = () => {
   const reload = () => {
+    const pathname = history.location.pathname;
+    if (pathname.startsWith('/secretnote/scql')) {
+      location.href = '/secretnote/scql/project';
+      return;
+    }
     window.location.reload();
   };
 

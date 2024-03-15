@@ -147,12 +147,16 @@ export class DataTableService {
   }
 
   async getTableCCL(tableName: string) {
-    const result: TableCCL[] = [];
+    const result: {
+      owner: string;
+      ccl: TableCCL[];
+    } = { owner: '', ccl: [] };
 
     const table = await this.getTableInfo(tableName);
     if (!table) {
       return result;
     }
+    result.owner = table.table_owner;
 
     const project = await this.getProjectInfo();
     if (!project) {
@@ -186,7 +190,7 @@ export class DataTableService {
           item[c.party_code] = c.constraint;
         }
       });
-      result.push(item);
+      result.ccl.push(item);
     });
 
     return result;

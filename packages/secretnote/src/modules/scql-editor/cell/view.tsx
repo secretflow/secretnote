@@ -38,7 +38,19 @@ export const SqlCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SQLCellView>(ViewInstance);
 
   return (
-    <div tabIndex={10} ref={ref} className={instance.className} onBlur={instance.blur}>
+    <div
+      tabIndex={10}
+      ref={ref}
+      className={instance.className}
+      onFocus={() => {
+        instance.focus(true);
+      }}
+      onBlur={(e) => {
+        if (typeof ref !== 'function' && !ref?.current?.contains(e.relatedTarget)) {
+          instance.blur();
+        }
+      }}
+    >
       <CellEditorMemo />
     </div>
   );
@@ -281,4 +293,18 @@ export class SQLCellView extends LibroExecutableCellView {
       })
       .catch(console.error);
   };
+
+  focus(toEdit: boolean) {
+    if (toEdit) {
+      this.cellModel.isEdit = true;
+    }
+  }
+
+  blur() {
+    this.cellModel.isEdit = false;
+  }
+
+  shouldEnterEditorMode() {
+    return this.cellModel.isEdit;
+  }
 }
