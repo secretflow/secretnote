@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ComponentSpec, Value, IOType } from '@/components/component-form';
+import type {
+  ComponentSpec,
+  Value,
+  IOType,
+  IOTypeKind,
+} from '@/components/component-form';
 
 const deviceConfig = {
   runtime_config: { protocol: 'REF2K', field: 'FM64' },
@@ -81,6 +86,8 @@ const getIOMetaType = (type: IOType) => {
   } else if (type === 'sf.table.vertical_table') {
     return 'type.googleapis.com/secretflow.spec.v1.VerticalTable';
   }
+  // TODO add more to cover all IOType
+
   return '';
 };
 
@@ -92,7 +99,9 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
     return '';
   }
 
+  const __extra = Symbol('__extra');
   const componentConfig: any = {
+    [__extra]: {}, // extra information to carry and won't be stringified into JSON
     domain: component.domain,
     name: component.name,
     version: component.version,
@@ -117,23 +126,44 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (input) {
     Object.entries(input).forEach(([key, value]: [string, any]) => {
-      const { type, tables } = value;
-      const schemaKey = type === 'sf.table.individual' ? 'schema' : 'schemas';
-      if (type && tables) {
-        componentConfig.inputs.push({
-          name: key,
-          type: type,
-          data_refs: tables.data_ref.map((ref: any) => ({
-            uri: ref.uri,
-            party: ref.party,
-            format: 'csv',
-          })),
-          meta: {
-            '@type': getIOMetaType(type),
-            [schemaKey]: tables[schemaKey],
-            line_count: -1,
-          },
-        });
+      const { type } = value as { type?: IOType } & Record<any, any>;
+
+      if (type) {
+        const typeKind = type.split('.')[1] as IOTypeKind;
+        switch (typeKind) {
+          case 'table': {
+            const { tables } = value;
+            const schemaKey = type === 'sf.table.individual' ? 'schema' : 'schemas';
+            if (tables) {
+              componentConfig.inputs.push({
+                name: key,
+                type: type,
+                data_refs: tables.data_ref.map((ref: any) => ({
+                  uri: ref.uri,
+                  party: ref.party,
+                  format: 'csv',
+                })),
+                meta: {
+                  '@type': getIOMetaType(type),
+                  [schemaKey]: tables[schemaKey],
+                  line_count: -1,
+                },
+              });
+            }
+            break;
+          }
+          case 'model': {
+            const { model } = value; // variable name in the context storing the model
+            if (model) {
+              // model is variable name and cannot be stringified into a pb-parseable JSON
+              componentConfig[__extra].model = model;
+            }
+            break;
+          }
+          case 'report':
+            // currently no report will be used as input
+            break;
+        }
       }
     });
   }
@@ -145,8 +175,20 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
     });
   }
 
+  // the output of TrainOps (i.e., trained model) will be stored in a context variable
+  const TrainOps = [
+    'ml.train.ss_xgb_train',
+    'ml.train.ss_glm_train',
+    'ml.train.ss_sgd_train',
+    'ml.train.sgb_train',
+  ]; // TODO guard its type
+  let ctxVar: string | undefined;
+  TrainOps.some((op) => op === `${componentConfig.domain}.${componentConfig.name}`) &&
+    (ctxVar = componentConfig.output_uris[0]); // variable name is the same as output
+
   return `
-if True: # limit the scope of the execution to avoid polluting the global namespace
+${ctxVar ? `${ctxVar} = None` : ''}
+def __run_component(): # limit the scope of the execution to avoid polluting the global namespace
   from secretflow.spec.v1.evaluation_pb2 import NodeEvalParam
   from secretflow.spec.v1.data_pb2 import StorageConfig
   from secretflow.spec.extend.cluster_pb2 import SFClusterConfig
@@ -169,7 +211,8 @@ if True: # limit the scope of the execution to avoid polluting the global namesp
 
   node_eval_config = NodeEvalParam()
   Parse(component_config_str, node_eval_config)
-
+  ${componentConfig[__extra].model ? `node_eval_config.inputs.insert(0, ${componentConfig[__extra].model})` : ''}
+  
   storage_config = StorageConfig(
       type="local_fs",
       local_fs=StorageConfig.LocalFSConfig(wd=os.getcwd()),
@@ -178,8 +221,12 @@ if True: # limit the scope of the execution to avoid polluting the global namesp
   res = comp_eval(node_eval_config, storage_config, cluster_config)
 
   print(f"The execution is complete and the result is: \\n{res}")
+
+  ${ctxVar ? `global ${ctxVar}; ${ctxVar} = res.outputs[0];` : ''}
   
   Comm().send(data={"$type": "secretnote.component-cell.result", "payload": MessageToJson(res, indent=0)})
+
+__run_component()
     `.trim();
 };
 
