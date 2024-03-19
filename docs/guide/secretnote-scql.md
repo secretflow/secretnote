@@ -12,6 +12,8 @@
 pip install -U secretnote
 ```
 
+**注意：当前 pip 包只支持 python>=3.8,<=3.10 版本**
+
 打开两个终端，分别执行下面的启动命令：
 
 ```shell
