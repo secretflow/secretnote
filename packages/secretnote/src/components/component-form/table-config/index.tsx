@@ -21,7 +21,6 @@ const TableConfig = {
         return type.split('.')[1] as IOTypeKind;
       }
     };
-
     const inputKind = getInputKind();
 
     return (

@@ -15,6 +15,31 @@ import { inject, transient } from '@difizen/mana-app';
 import type { Event } from '@difizen/mana-common';
 import type { Value } from '@/components/component-form';
 
+type TableChild = {
+  type: 'table';
+  table: {
+    headers: {
+      name: string;
+      type: string;
+    }[];
+    rows: {
+      name: string;
+      items: Value[]; // value of this row, {protobuf type -> value}[]
+    }[];
+  };
+};
+
+type DescriptionsChild = {
+  type: 'descriptions';
+  descriptions: {
+    items: {
+      name: string;
+      type: string;
+      value: Value; // {protobuf type -> value}[]
+    }[];
+  };
+};
+
 // type of sf.report from secretflow component
 export type SFReport = {
   name: string;
@@ -27,19 +52,7 @@ export type SFReport = {
     // @see https://github.com/secretflow/spec/blob/main/secretflow/spec/v1/report.proto
     tabs: {
       divs: {
-        children: {
-          type: 'table';
-          table: {
-            headers: {
-              name: string;
-              type: string;
-            }[];
-            rows: {
-              name: string;
-              items: Value[]; // value of this row, {protobuf type -> value}[]
-            }[];
-          };
-        }[];
+        children: (TableChild | DescriptionsChild)[];
       }[];
     }[];
   };
@@ -96,7 +109,7 @@ export class ComponentCellModel
   outputs: IOutput[] = [];
 
   @prop()
-  report: ComponentReport | null;
+  report: ComponentReport | null; // data for the Report tab
 
   constructor(@inject(CellOptions) options: CellOptions) {
     super(options);

@@ -80,16 +80,30 @@ const getAttrValue = (component: ComponentSpec, key: string, value: any) => {
   }
 };
 
+/**
+ * Get the type spec of the input/output.
+ */
 const getIOMetaType = (type: IOType) => {
-  if (type === 'sf.table.individual') {
-    return 'type.googleapis.com/secretflow.spec.v1.IndividualTable';
-  } else if (type === 'sf.table.vertical_table') {
-    return 'type.googleapis.com/secretflow.spec.v1.VerticalTable';
-  }
-  // TODO add more to cover all IOType
+  const mapping: Record<IOType, string> = {
+    'sf.table.individual': 'secretflow.spec.v1.IndividualTable',
+    'sf.table.vertical_table': 'secretflow.spec.v1.VerticalTable',
+    'sf.model.sgb': 'secretflow.spec.extend.DeviceObjectCollection',
+    'sf.model.ss_glm': 'secretflow.spec.extend.DeviceObjectCollection',
+    'sf.model.ss_sgd': 'secretflow.spec.extend.DeviceObjectCollection',
+    'sf.model.ss_xgb': 'secretflow.spec.extend.DeviceObjectCollection',
+    'sf.report': 'secretflow.spec.v1.Report',
+  };
 
-  return '';
+  return mapping[type] ? `type.googleapis.com/${mapping[type]}` : '';
 };
+
+// Operators for training models
+const TrainOps = [
+  'ml.train.ss_xgb_train',
+  'ml.train.ss_glm_train',
+  'ml.train.ss_sgd_train',
+  'ml.train.sgb_train',
+] as const;
 
 /**
  * Generate Python code for a component cell.
@@ -175,20 +189,22 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
     });
   }
 
-  // the output of TrainOps (i.e., trained model) will be stored in a context variable
-  const TrainOps = [
-    'ml.train.ss_xgb_train',
-    'ml.train.ss_glm_train',
-    'ml.train.ss_sgd_train',
-    'ml.train.sgb_train',
-  ]; // TODO guard its type
-  let ctxVar: string | undefined;
-  TrainOps.some((op) => op === `${componentConfig.domain}.${componentConfig.name}`) &&
-    (ctxVar = componentConfig.output_uris[0]); // variable name is the same as output
+  // the output of TrainOps (e.g. trained model) will be stored in a context variable
+  // variable name is the same as output_uri
+  const modelCtxVars: string[] | undefined = TrainOps.includes(
+    `${componentConfig.domain}.${componentConfig.name}` as any,
+  )
+    ? [...componentConfig.output_uris]
+    : undefined;
+  const modelCtxVarsDecl = modelCtxVars ? `${modelCtxVars.join(' = ')} = None` : '';
+  const modelCtxVarsAssign = modelCtxVars
+    ? `global ${modelCtxVars.join(', ')}\n` +
+      modelCtxVars.map((v, i) => `  ${v} = res.outputs[${i}]`).join('\n')
+    : '';
 
   return `
-${ctxVar ? `${ctxVar} = None` : ''}
-def __run_component(): # limit the scope of the execution to avoid polluting the global namespace
+${modelCtxVarsDecl}
+def __run_component(): # limit the scope to avoid polluting global
   from secretflow.spec.v1.evaluation_pb2 import NodeEvalParam
   from secretflow.spec.v1.data_pb2 import StorageConfig
   from secretflow.spec.extend.cluster_pb2 import SFClusterConfig
@@ -222,9 +238,9 @@ def __run_component(): # limit the scope of the execution to avoid polluting the
 
   print(f"The execution is complete and the result is: \\n{res}")
 
-  ${ctxVar ? `global ${ctxVar}; ${ctxVar} = res.outputs[0];` : ''}
-  
-  Comm().send(data={"$type": "secretnote.component-cell.result", "payload": MessageToJson(res, indent=0)})
+  ${modelCtxVarsAssign}
+
+  Comm().send(data={"$type": "component-cell.result", "payload": MessageToJson(res, indent=0)})
 
 __run_component()
     `.trim();

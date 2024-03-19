@@ -40,8 +40,8 @@ import {
 } from './cell-component';
 import type { ComponentCellModel, ComponentMetadata, SFReport } from './model';
 
-// secretnote customized some comm messages to pass wanted data from kernel to frontend
-type CustomizedCommMsgDataType = 'secretnote.component-cell.result';
+// customized comm messages to pass wanted data from kernel to frontend
+type CustomizedCommMsgDataType = 'component-cell.result'; // | ...
 type CustomizedCommMsgData = {
   $type: CustomizedCommMsgDataType;
   payload?: string;
@@ -228,6 +228,9 @@ export class ComponentCellView extends LibroExecutableCellView {
     return getOrigin(libroModel.kernelConnections);
   }
 
+  /**
+   * Handle messages from kernel.
+   */
   handleMessages(msg: KernelMessage.IIOPubMessage | KernelMessage.IExecuteReplyMsg) {
     this.launching = false;
 
@@ -243,27 +246,45 @@ export class ComponentCellView extends LibroExecutableCellView {
     if (isCommMsgMsg(msg)) {
       // handle secretnote customized comm messages
       if (
-        (msg.content.data as CustomizedCommMsgData)?.$type ===
-        'secretnote.component-cell.result'
+        (msg.content.data as CustomizedCommMsgData)?.$type === 'component-cell.result'
       ) {
         const payload = JSON.parse((msg.content.data?.payload || '{}') as string);
-
         // organize data for the report tab
         const reports = payload.outputs.filter((v: any) => v.type === 'sf.report');
         if (reports.length) {
-          // this component comes with a report
-          const report = reports[0] as SFReport; // currently no operator has multiple reports
-          const activeTable = report.meta.tabs[0].divs[0].children[0].table;
-          // refactor the report data to the format of the Report tab
-          this.cellModel.report = {
+          // currently no operator has multiple reports, no report has multiple tabs, divs and children
+          const report = reports[0] as SFReport;
+          const activeChild = report.meta?.tabs?.[0]?.divs?.[0]?.children?.[0] || {};
+
+          const commonInfo = {
             name: report.name,
             metaName: report.meta.name,
             metaDesc: report.meta.desc,
-            // currently no report has multiple tabs, divs, and children
-            metaColumnNames: activeTable.headers.map((v) => v.name),
-            metaRowNames: activeTable.rows.map((v) => v.name),
-            metaRowItems: activeTable.rows.map((v) => v.items),
           };
+          // refactor report data to the format of Report tab according to sub-type of children
+          if (activeChild.type === 'table') {
+            this.cellModel.report = {
+              ...commonInfo,
+              metaColumnNames: activeChild.table.headers.map((v) => v.name),
+              metaRowNames: activeChild.table.rows.map((v) => v.name),
+              metaRowItems: activeChild.table.rows.map((v) => v.items),
+            };
+          } else if (activeChild.type === 'descriptions') {
+            this.cellModel.report = {
+              ...commonInfo,
+              metaColumnNames: ['value'],
+              metaRowNames: activeChild.descriptions.items.map((v) => v.name),
+              metaRowItems: activeChild.descriptions.items.map((v) => [v.value]),
+            };
+          } else {
+            // unknown type
+            this.cellModel.report = {
+              ...commonInfo,
+              metaColumnNames: [],
+              metaRowNames: [],
+              metaRowItems: [],
+            };
+          }
         }
       }
     }
