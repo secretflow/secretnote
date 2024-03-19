@@ -10,7 +10,9 @@ SecretNote 是专为隐语开发者打造的高级工具套件。以 notebook �
 
 SecretNote 有单独的 [pip](https://pypi.org/project/secretnote/) 安装包，可以单独使用。为了避免安装、部署、启动等环境问题，推荐使用 docker 方式启动 SecretFlow 运行环境。
 
-1. 启动两个容器，推荐使用 docker compose，这样方便管理容器之间的通信。
+**注意：当前 docker 镜像暂时不支持 Mac M1、M2 机器以及 ARM 架构机器**
+
+1. 启动两个容器，推荐使用 docker compose，这样方便管理容器之间的通信。新建文件夹，并新建文件 `docker-compose.yml`，内容如下：
 
 ```yml
 services:
@@ -39,6 +41,8 @@ services:
       - /root/scripts
 ```
 
+然后在新建的文件夹中执行以下命令：
+
 ```bash
 docker compose up
 ```
@@ -49,6 +53,8 @@ docker compose up
 
 SecretNote 通过对 P2P SCQL 进行产品化封装，可以通过 Web Client 降低开发者编写 SCQL Query 以及配置 CCL 的难度。
 
+**注意：当前 pip 包只支持 python>=3.8,<=3.10 版本**
+
 1. 分别在两台机器上部署 SCQL 环境，参考 [P2P 模式部署](https://www.secretflow.org.cn/docs/scql/0.5.0b2/zh-Hans/topics/deployment/how-to-deploy-p2p-cluster)。
 
 2. 分别在两台机器上安装 SecretNote，并启动服务。
@@ -58,7 +64,7 @@ pip install -U secretnote
 
 # party 为 scql broker 服务的 party_code
 # host 为 scql broker 服务的地址
-secretnote -mode=scql --party=alice --host=http://127.0.0.1:8991
+secretnote --mode=scql --party=alice --host=http://127.0.0.1:8991
 ```
 
 3. 分别打开两台机器的启动的 Web Client，然后在 Web Client 上完成整个 SCQL 研发流程。详细步骤可以参考[文档](./docs/guide/secretnote-scql.md)。
