@@ -2,6 +2,8 @@ import type { NotebookModel, NotebookOption } from '@difizen/libro-jupyter';
 import { ContentContribution } from '@difizen/libro-jupyter';
 import { URI, singleton } from '@difizen/mana-app';
 
+import { getLocalBaseUrl } from '@/utils';
+
 import type { SecretNoteModel } from '../model';
 
 @singleton({ contrib: ContentContribution })
@@ -14,7 +16,10 @@ export class SecretNoteContentContribution implements ContentContribution {
     const fireUri = new URI(options.resource);
     const filePath = fireUri.path.toString();
 
-    const currentFileContents = await secretNoteModel.contentsManager.get(filePath);
+    const currentFileContents = await secretNoteModel.contentsManager.get(filePath, {
+      baseUrl: getLocalBaseUrl(),
+      content: true,
+    });
     if (currentFileContents) {
       currentFileContents.content.nbformat_minor = 5;
       secretNoteModel.currentFileContents = currentFileContents;

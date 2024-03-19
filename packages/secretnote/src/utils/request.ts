@@ -1,4 +1,20 @@
-import { PageConfig } from '@difizen/libro-jupyter';
+import { PageConfig, URL as LibroURL } from '@difizen/libro-jupyter';
+
+export const getRemoteBaseUrl = (serverId: string, origin = location.origin) => {
+  return origin + '/secretnoteagent/' + serverId;
+};
+
+export const getRemoteWsUrl = (serverId: string, origin = location.origin) => {
+  return getRemoteBaseUrl(serverId, origin).replace(/^http/, 'ws');
+};
+
+export const getLocalBaseUrl = () => {
+  return getRemoteBaseUrl('0'); // 0 代表请求本地服务
+};
+
+export const getLocalWsUrl = () => {
+  return getRemoteWsUrl('0'); // 0 代表请求本地服务
+};
 
 export class ResponseError extends Error {
   response: Response;
@@ -28,8 +44,8 @@ export const createResponseError = async (response: Response) => {
   }
 };
 
-const normalizeUrl = (url: string, base?: string) => {
-  const urlObj = new URL(url, base ?? location.origin);
+const normalizeUrl = (url: string, serverId: string, origin: string) => {
+  const urlObj = new URL(LibroURL.join(getRemoteBaseUrl(serverId, origin), url));
   return urlObj.href;
 };
 
@@ -39,8 +55,15 @@ const getCookie = (name: string): string | undefined => {
   return matches?.[1];
 };
 
-export const request = async (url: string, init: RequestInit, address?: string) => {
-  let requestUrl = normalizeUrl(url, address);
+// serverId: 请求会被代理到的目标服务，serverId 为 0 时代表请求本地服务
+// origin: 请求的源地址，用于跨域请求
+export const request = async (
+  url: string,
+  init: RequestInit,
+  serverId = '0',
+  origin = location.origin,
+) => {
+  let requestUrl = normalizeUrl(url, serverId, origin);
 
   const cache = init.cache ?? 'no-store';
   if (cache === 'no-store') {

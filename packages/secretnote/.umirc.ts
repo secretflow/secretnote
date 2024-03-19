@@ -30,7 +30,13 @@ export default defineConfig({
         ]
       : false,
   proxy: {
-    '/api': {
+    '/secretnoteagent/': {
+      target: 'http://localhost:8888/',
+      changeOrigin: true,
+      secure: false,
+      ws: true,
+    },
+    '/api/': {
       target: 'http://localhost:8888/',
       changeOrigin: true,
       secure: false,

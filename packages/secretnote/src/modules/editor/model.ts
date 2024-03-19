@@ -18,6 +18,7 @@ import { debounce } from 'lodash-es';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager } from '@/modules/server';
 import type { IServer } from '@/modules/server';
+import { getLocalBaseUrl } from '@/utils';
 
 @transient()
 export class SecretNoteModel extends LibroModel {
@@ -66,7 +67,7 @@ export class SecretNoteModel extends LibroModel {
     this.commandRegistry = commandRegistry;
     this.serverManager.onServerAdded(this.onServerAdded.bind(this));
     this.serverManager.onServerDeleted(this.onServerDeleted.bind(this));
-    this.onSourceChanged(this.autoSave.bind(this));
+    this.onChanged(this.autoSave.bind(this));
   }
 
   async startKernelConnection() {
@@ -100,6 +101,7 @@ export class SecretNoteModel extends LibroModel {
         type: this.currentFileContents.type,
         content: notebookContent,
         format: this.currentFileContents.format,
+        baseUrl: getLocalBaseUrl(),
       });
 
       if (!res) {
@@ -204,13 +206,17 @@ export class SecretNoteModel extends LibroModel {
 
   async createCheckpoint() {
     if (this.currentFileContents) {
-      await this.contentsManager.createCheckpoint(this.currentFileContents.path);
+      await this.contentsManager.createCheckpoint(this.currentFileContents.path, {
+        baseUrl: getLocalBaseUrl(),
+      });
     }
   }
 
   async listCheckpoints() {
     if (this.currentFileContents) {
-      await this.contentsManager.listCheckpoints(this.currentFileContents.path);
+      await this.contentsManager.listCheckpoints(this.currentFileContents.path, {
+        baseUrl: getLocalBaseUrl(),
+      });
     }
   }
 
@@ -219,6 +225,7 @@ export class SecretNoteModel extends LibroModel {
       await this.contentsManager.restoreCheckpoint(
         this.currentFileContents.path,
         checkpointID,
+        { baseUrl: getLocalBaseUrl() },
       );
     }
   }
@@ -228,6 +235,7 @@ export class SecretNoteModel extends LibroModel {
       await this.contentsManager.deleteCheckpoint(
         this.currentFileContents.path,
         checkpointID,
+        { baseUrl: getLocalBaseUrl() },
       );
     }
   }

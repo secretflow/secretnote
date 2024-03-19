@@ -8,7 +8,6 @@ import {
   CellService,
   JupyterCodeCellView,
   KernelError,
-  ILSPDocumentConnectionManager,
   CodeEditorManager,
 } from '@difizen/libro-jupyter';
 import {
@@ -86,7 +85,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   }
 
   getUsableConnections() {
-    const libroModel = this.parent.model as SecretNoteModel;
+    const libroModel = this.parent.model as unknown as SecretNoteModel;
 
     if (!libroModel) {
       return [];

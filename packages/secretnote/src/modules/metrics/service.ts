@@ -1,5 +1,5 @@
 import type { IKernelConnection, KernelMessage } from '@difizen/libro-jupyter';
-import { kernelStatus, ServerConnection } from '@difizen/libro-jupyter';
+import { kernelStatus } from '@difizen/libro-jupyter';
 import { getOrigin, inject, prop, singleton } from '@difizen/mana-app';
 import { Poll } from '@lumino/polling';
 
@@ -43,7 +43,6 @@ export class MetricsService {
 
   protected readonly serverManager: SecretNoteServerManager;
   protected readonly kernelManager: SecretNoteKernelManager;
-  protected readonly serverConnection: ServerConnection;
   protected readonly notebookFileService: NotebookFileService;
 
   @prop()
@@ -55,12 +54,10 @@ export class MetricsService {
   constructor(
     @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
-    @inject(ServerConnection) serverConnection: ServerConnection,
     @inject(NotebookFileService) notebookFileService: NotebookFileService,
   ) {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
-    this.serverConnection = serverConnection;
     this.notebookFileService = notebookFileService;
     this.notebookFileService.onNotebookFileChanged(() => {
       this.refresh();
@@ -175,8 +172,7 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1';
       const init = { method: 'GET' };
-      const address = this.serverManager.getServerUrl(server).baseUrl;
-      const data = await request(url, init, address);
+      const data = await request(url, init, server.id);
 
       return {
         cpu: data.cpu_percent,
@@ -206,8 +202,7 @@ export class MetricsService {
     try {
       const url = '/api/metrics/v1/kernel_usage/get_usage/' + id;
       const init = { method: 'GET' };
-      const address = this.serverManager.getServerUrl(server).baseUrl;
-      const data = await request(url, init, address);
+      const data = await request(url, init, server.id);
       const { cpu, memory, pid, cpuText, memoryText } = this.parseKernelStatus(data);
       const { color, text_zh } = kernelStatus[status];
 

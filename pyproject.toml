@@ -1,5 +1,5 @@
 [project]
-authors = [{name = "Tony Wu", email = "tonywu6@protonmail.com"}]
+authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
 classifiers = ["Private :: Do Not Upload"]
 dependencies = []
 name = "monorepo"

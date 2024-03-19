@@ -1,7 +1,7 @@
 import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { request } from '@/utils';
+import { request, getLocalBaseUrl, getLocalWsUrl } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus, ServerType } from './protocol';
@@ -11,7 +11,7 @@ export class SecretNoteServerManager {
   @prop()
   servers: IServer[] = [];
 
-  protected serverConnection: ServerConnection;
+  protected readonly serverConnection: ServerConnection;
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
   readonly onServerAdded = this.onServerAddedEmitter.event;
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
@@ -19,6 +19,10 @@ export class SecretNoteServerManager {
 
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
+    this.serverConnection.updateSettings({
+      baseUrl: getLocalBaseUrl(),
+      wsUrl: getLocalWsUrl(),
+    });
     this.getServerList();
   }
 
@@ -127,19 +131,12 @@ export class SecretNoteServerManager {
   private async getServerSpec(server: IServer) {
     const url = 'api/kernelspecs';
     try {
-      const address = this.getServerUrl(server).baseUrl;
-      const data = await request(url, {}, address);
+      const origin = `http://${server.address}`;
+      const data = await request(url, {}, '0', origin);
       return data;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
-  }
-
-  getServerUrl(server: IServer) {
-    return {
-      baseUrl: `http://${server.address}/`,
-      wsUrl: `ws://${server.address}/`,
-    };
   }
 }
