@@ -7,6 +7,8 @@ export type IOType =
   // table
   | 'sf.table.individual'
   | 'sf.table.vertical_table'
+  // binning rule
+  | 'sf.rule.binning'
   // model
   | 'sf.model.ss_sgd'
   | 'sf.model.ss_glm'

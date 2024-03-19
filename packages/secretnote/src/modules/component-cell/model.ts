@@ -35,7 +35,7 @@ type DescriptionsChild = {
     items: {
       name: string;
       type: string;
-      value: Value; // {protobuf type -> value}[]
+      value: Value; // {protobuf type -> value}
     }[];
   };
 };

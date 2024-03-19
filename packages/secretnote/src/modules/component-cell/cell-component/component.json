@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "comps": [
     {
-      "domain": "feature",
+      "domain": "preprocessing",
       "name": "vert_bin_substitution",
       "desc": "Substitute datasets' value by bin substitution rules.",
       "version": "0.0.1",

@@ -77,6 +77,19 @@ const TableConfig = {
             <Input />
           </Form.Item>
         )}
+        {/* Prepare rule context varibale input for rule input */}
+        {/* TODO this is not a table exactly. Extract from table-config? */}
+        {inputKind === 'rule' && (
+          <Form.Item
+            label="rule"
+            name={['input', root.id, 'rule']}
+            labelCol={labelCol}
+            wrapperCol={wrapperCol}
+            dependencies={['input', root.id, 'type']}
+          >
+            <Input />
+          </Form.Item>
+        )}
       </Form.Item>
     );
   },

@@ -1,7 +1,7 @@
 import type { IOutput } from '@difizen/libro-jupyter';
 import { Tabs, Empty, Spin, Table, Descriptions } from 'antd';
 import type { TabsProps, TableProps, DescriptionsProps } from 'antd';
-import { forwardRef, type ForwardedRef, useMemo, useEffect } from 'react';
+import { forwardRef, type ForwardedRef, useMemo } from 'react';
 
 import { ComponentForm } from '@/components/component-form';
 import type { ComponentSpec, Value } from '@/components/component-form';

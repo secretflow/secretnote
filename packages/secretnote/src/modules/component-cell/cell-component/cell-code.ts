@@ -87,6 +87,7 @@ const getIOMetaType = (type: IOType) => {
   const mapping: Record<IOType, string> = {
     'sf.table.individual': 'secretflow.spec.v1.IndividualTable',
     'sf.table.vertical_table': 'secretflow.spec.v1.VerticalTable',
+    'sf.rule.binning': 'secretflow.spec.extend.DeviceObjectCollection',
     'sf.model.sgb': 'secretflow.spec.extend.DeviceObjectCollection',
     'sf.model.ss_glm': 'secretflow.spec.extend.DeviceObjectCollection',
     'sf.model.ss_sgd': 'secretflow.spec.extend.DeviceObjectCollection',
@@ -97,8 +98,10 @@ const getIOMetaType = (type: IOType) => {
   return mapping[type] ? `type.googleapis.com/${mapping[type]}` : '';
 };
 
-// Operators for training models
-const TrainOps = [
+// Operators that outputs are required to be exposed to a context variable
+const ExposeOutputOps = [
+  'feature.vert_binning',
+  'feature.vert_woe_binning',
   'ml.train.ss_xgb_train',
   'ml.train.ss_glm_train',
   'ml.train.ss_sgd_train',
@@ -174,9 +177,17 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
             }
             break;
           }
+          case 'rule': {
+            // the same processing procedure as model
+            const { rule } = value;
+            if (rule) {
+              componentConfig[__extra].rule = rule;
+            }
+            break;
+          }
           case 'report':
             // currently no report will be used as input
-            break;
+            throw new Error('Report is not expected to be used as input.');
         }
       }
     });
@@ -189,21 +200,21 @@ const generateComponentCellCode = (component: ComponentSpec, config: Value) => {
     });
   }
 
-  // the output of TrainOps (e.g. trained model) will be stored in a context variable
-  // variable name is the same as output_uri
-  const modelCtxVars: string[] | undefined = TrainOps.includes(
+  // some outputs (e.g. trained model, binning rule) will be exposed to a context variable
+  // whose name is the same as output_uri so that can be referred to in the following cells
+  const outputCtxVars: string[] | undefined = ExposeOutputOps.includes(
     `${componentConfig.domain}.${componentConfig.name}` as any,
   )
     ? [...componentConfig.output_uris]
     : undefined;
-  const modelCtxVarsDecl = modelCtxVars ? `${modelCtxVars.join(' = ')} = None` : '';
-  const modelCtxVarsAssign = modelCtxVars
-    ? `global ${modelCtxVars.join(', ')}\n` +
-      modelCtxVars.map((v, i) => `  ${v} = res.outputs[${i}]`).join('\n')
+  const outputCtxVarsDecl = outputCtxVars ? `${outputCtxVars.join(' = ')} = None` : '';
+  const outputCtxVarsAssign = outputCtxVars
+    ? `global ${outputCtxVars.join(', ')}\n` +
+      outputCtxVars.map((v, i) => `  ${v} = res.outputs[${i}]`).join('\n')
     : '';
 
   return `
-${modelCtxVarsDecl}
+${outputCtxVarsDecl}
 def __run_component(): # limit the scope to avoid polluting global
   from secretflow.spec.v1.evaluation_pb2 import NodeEvalParam
   from secretflow.spec.v1.data_pb2 import StorageConfig
@@ -228,6 +239,7 @@ def __run_component(): # limit the scope to avoid polluting global
   node_eval_config = NodeEvalParam()
   Parse(component_config_str, node_eval_config)
   ${componentConfig[__extra].model ? `node_eval_config.inputs.insert(0, ${componentConfig[__extra].model})` : ''}
+  ${componentConfig[__extra].rule ? `node_eval_config.inputs.append(${componentConfig[__extra].rule})` : ''}
   
   storage_config = StorageConfig(
       type="local_fs",
@@ -238,7 +250,7 @@ def __run_component(): # limit the scope to avoid polluting global
 
   print(f"The execution is complete and the result is: \\n{res}")
 
-  ${modelCtxVarsAssign}
+  ${outputCtxVarsAssign}
 
   Comm().send(data={"$type": "component-cell.result", "payload": MessageToJson(res, indent=0)})
 
