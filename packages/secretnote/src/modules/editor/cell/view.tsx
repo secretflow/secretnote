@@ -28,7 +28,7 @@ import { forwardRef } from 'react';
 
 import { Ribbon } from '@/components/ribbon';
 import { SecretNoteKernelManager } from '@/modules/kernel';
-import { SecretNoteServerManager } from '@/modules/server';
+import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import { compareDateString } from '@/utils';
 
 import type { SecretNoteModel } from '../model';
@@ -67,7 +67,9 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   parties: string[] = [];
 
   get partyList() {
-    return this.serverManager.servers.map((server) => server.name);
+    return this.serverManager.servers
+      .filter((s) => s.status === ServerStatus.running)
+      .map((server) => server.name);
   }
 
   constructor(

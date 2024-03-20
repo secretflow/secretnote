@@ -44,8 +44,8 @@ export const createResponseError = async (response: Response) => {
   }
 };
 
-const normalizeUrl = (url: string, serverId: string, origin: string) => {
-  const urlObj = new URL(LibroURL.join(getRemoteBaseUrl(serverId, origin), url));
+const normalizeUrl = (url: string, serverId: string) => {
+  const urlObj = new URL(LibroURL.join(getRemoteBaseUrl(serverId), url));
   return urlObj.href;
 };
 
@@ -56,14 +56,8 @@ const getCookie = (name: string): string | undefined => {
 };
 
 // serverId: 请求会被代理到的目标服务，serverId 为 0 时代表请求本地服务
-// origin: 请求的源地址，用于跨域请求
-export const request = async (
-  url: string,
-  init: RequestInit,
-  serverId = '0',
-  origin = location.origin,
-) => {
-  let requestUrl = normalizeUrl(url, serverId, origin);
+export const request = async (url: string, init: RequestInit, serverId = '0') => {
+  let requestUrl = normalizeUrl(url, serverId);
 
   const cache = init.cache ?? 'no-store';
   if (cache === 'no-store') {

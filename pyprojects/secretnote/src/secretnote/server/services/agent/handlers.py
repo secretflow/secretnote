@@ -1,4 +1,4 @@
-from typing import List, Tuple, Type
+from typing import Dict, List, Tuple, Type
 
 from jupyter_server.base.handlers import JupyterHandler
 from jupyter_server.utils import ensure_async
@@ -50,6 +50,17 @@ class AgentHandler(ProxyHandler):
         return super().proxy(host, port, proxied_path)
 
 
-agent_handlers: List[Tuple[str, Type[JupyterHandler]]] = [
-    (r"/secretnoteagent/(\d)+/(.*)", AgentHandler),
+def host_allowlist(handler, host):
+    handler.log.info("Request to proxy to host " + host)
+    return True
+
+
+agent_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
+    (
+        r"/secretnoteagent/(\d)+/(.*)",
+        AgentHandler,
+        {
+            "host_allowlist": host_allowlist,
+        },
+    ),
 ]

@@ -1,7 +1,6 @@
-import { ServerConnection } from '@difizen/libro-jupyter';
-import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
+import { Emitter, prop, singleton } from '@difizen/mana-app';
 
-import { request, getLocalBaseUrl, getLocalWsUrl } from '@/utils';
+import { request } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus, ServerType } from './protocol';
@@ -11,18 +10,12 @@ export class SecretNoteServerManager {
   @prop()
   servers: IServer[] = [];
 
-  protected readonly serverConnection: ServerConnection;
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
   readonly onServerAdded = this.onServerAddedEmitter.event;
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
 
-  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
-    this.serverConnection = serverConnection;
-    this.serverConnection.updateSettings({
-      baseUrl: getLocalBaseUrl(),
-      wsUrl: getLocalWsUrl(),
-    });
+  constructor() {
     this.getServerList();
   }
 
@@ -49,37 +42,39 @@ export class SecretNoteServerManager {
   }
 
   async addServer(server: Partial<IServer>) {
-    const newServer = {
+    const newServer: IServer = {
+      id: '',
       name: server.name || 'Someone',
       address: server.address || '',
       type: server.type || ServerType.common,
       status: ServerStatus.closed,
       kernelspec: undefined,
     };
+
+    const url = 'api/nodes';
+    const init = {
+      method: 'POST',
+      body: JSON.stringify({
+        name: newServer.name,
+        address: newServer.address,
+        type: newServer.type,
+      }),
+    };
+    const data = await request(url, init);
+
+    newServer.id = data.id;
+
     const spec = await this.getServerSpec(newServer as IServer);
     if (spec) {
-      const url = 'api/nodes';
-      const init = {
-        method: 'POST',
-        body: JSON.stringify({
-          name: newServer.name,
-          address: newServer.address,
-          type: newServer.type,
-        }),
-      };
-      const data = await request(url, init);
       newServer.status = ServerStatus.running;
       newServer.kernelspec = spec;
-      const added = {
-        ...newServer,
-        id: data.id,
-      };
-      this.servers.push(added);
-      this.onServerAddedEmitter.fire(added);
-      return added;
     } else {
-      throw new Error('Cannot connect to the node.');
+      newServer.status = ServerStatus.error;
     }
+
+    this.servers.push(newServer);
+    this.onServerAddedEmitter.fire(newServer);
+    return newServer;
   }
 
   async deleteServer(id: string) {
@@ -131,8 +126,7 @@ export class SecretNoteServerManager {
   private async getServerSpec(server: IServer) {
     const url = 'api/kernelspecs';
     try {
-      const origin = `http://${server.address}`;
-      const data = await request(url, {}, '0', origin);
+      const data = await request(url, {}, server.id);
       return data;
     } catch (e) {
       // eslint-disable-next-line no-console

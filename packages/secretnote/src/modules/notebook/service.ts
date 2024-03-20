@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
-import { ContentsManager } from '@difizen/libro-jupyter';
+import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { downloadFileByUrl, getLocalBaseUrl } from '@/utils';
+import { downloadFileByUrl, getLocalBaseUrl, getLocalWsUrl } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
 
 @singleton()
 export class NotebookFileService {
+  protected readonly serverConnection: ServerConnection;
   protected readonly contentsManager: ContentsManager;
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
     pre: IContentsModel | null;
@@ -29,8 +30,16 @@ export class NotebookFileService {
   @prop()
   renameNotebookFile: { path: string; name: string } | null = null;
 
-  constructor(@inject(ContentsManager) contentsManager: ContentsManager) {
+  constructor(
+    @inject(ContentsManager) contentsManager: ContentsManager,
+    @inject(ServerConnection) serverConnection: ServerConnection,
+  ) {
     this.contentsManager = contentsManager;
+    this.serverConnection = serverConnection;
+    this.serverConnection.updateSettings({
+      baseUrl: getLocalBaseUrl(),
+      wsUrl: getLocalWsUrl(),
+    });
   }
 
   openFile(file: IContentsModel) {
