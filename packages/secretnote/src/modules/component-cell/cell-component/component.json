@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "comps": [
     {
-      "domain": "feature",
+      "domain": "preprocessing",
       "name": "vert_bin_substitution",
       "desc": "Substitute datasets' value by bin substitution rules.",
       "version": "0.0.1",
@@ -260,25 +260,18 @@
       ],
       "inputs": [
         {
-          "name": "labels",
-          "desc": "Input table with labels",
+          "name": "in_ds",
+          "desc": "Input table with predictions.",
           "types": ["sf.table.vertical_table", "sf.table.individual"],
           "attrs": [
             {
-              "name": "col",
-              "desc": "The column name to use in the dataset. If not provided, the label of dataset will be used by default.",
+              "name": "label",
+              "desc": "Label column name of input data.",
               "colMaxCntInclusive": "1"
-            }
-          ]
-        },
-        {
-          "name": "predictions",
-          "desc": "Input table with predictions",
-          "types": ["sf.table.vertical_table", "sf.table.individual"],
-          "attrs": [
+            },
             {
-              "name": "col",
-              "desc": "The column name to use in the dataset. If not provided, the label of dataset will be used by default.",
+              "name": "prediction",
+              "desc": "Prediction column name of input data.",
               "colMaxCntInclusive": "1"
             }
           ]
@@ -347,25 +340,18 @@
       ],
       "inputs": [
         {
-          "name": "labels",
-          "desc": "Input table with labels.",
-          "types": ["sf.table.vertical_table", "sf.table.individual"],
-          "attrs": [
-            {
-              "name": "col",
-              "desc": "The column name to use in the dataset. If not provided, the label of dataset will be used by default.",
-              "colMaxCntInclusive": "1"
-            }
-          ]
-        },
-        {
-          "name": "predictions",
+          "name": "in_ds",
           "desc": "Input table with predictions.",
           "types": ["sf.table.vertical_table", "sf.table.individual"],
           "attrs": [
             {
-              "name": "col",
-              "desc": "The column name to use in the dataset. If not provided, the label of dataset will be used by default.",
+              "name": "label",
+              "desc": "Label column name of input data.",
+              "colMaxCntInclusive": "1"
+            },
+            {
+              "name": "prediction",
+              "desc": "Prediction column name of input data.",
               "colMaxCntInclusive": "1"
             }
           ]
@@ -408,7 +394,7 @@
       "domain": "ml.predict",
       "name": "sgb_predict",
       "desc": "Predict using SGB model.",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "attrs": [
         {
           "name": "receiver",
@@ -663,7 +649,14 @@
         {
           "name": "feature_dataset",
           "desc": "Input vertical table.",
-          "types": ["sf.table.vertical_table"]
+          "types": ["sf.table.vertical_table"],
+          "attrs": [
+            {
+              "name": "saved_features",
+              "desc": "Features to save into output pred file.",
+              "colMinCntInclusive": "1"
+            }
+          ]
         }
       ],
       "outputs": [
@@ -1054,6 +1047,11 @@
               "desc": "Label of train dataset.",
               "colMinCntInclusive": "1",
               "colMaxCntInclusive": "1"
+            },
+            {
+              "name": "feature_selects",
+              "desc": "Features to be trained with.",
+              "colMinCntInclusive": "1"
             }
           ]
         }
@@ -1263,6 +1261,11 @@
               "desc": "Label of train dataset.",
               "colMinCntInclusive": "1",
               "colMaxCntInclusive": "1"
+            },
+            {
+              "name": "feature_selects",
+              "desc": "Features to be trained with.",
+              "colMinCntInclusive": "1"
             }
           ]
         }
@@ -1272,6 +1275,11 @@
           "name": "output_model",
           "desc": "Output model.",
           "types": ["sf.model.ss_glm"]
+        },
+        {
+          "name": "output_report",
+          "desc": "Output report.",
+          "types": ["sf.report"]
         }
       ]
     },
@@ -1405,6 +1413,11 @@
               "desc": "Label of train dataset.",
               "colMinCntInclusive": "1",
               "colMaxCntInclusive": "1"
+            },
+            {
+              "name": "feature_selects",
+              "desc": "Features to be trained with.",
+              "colMinCntInclusive": "1"
             }
           ]
         }
@@ -1599,6 +1612,11 @@
           "types": ["sf.table.vertical_table"],
           "attrs": [
             {
+              "name": "feature_selects",
+              "desc": "Features to be trained with.",
+              "colMinCntInclusive": "1"
+            },
+            {
               "name": "label",
               "desc": "Label of train dataset.",
               "colMinCntInclusive": "1",
@@ -1616,7 +1634,7 @@
       ]
     },
     {
-      "domain": "preprocessing",
+      "domain": "data_filter",
       "name": "feature_filter",
       "desc": "Drop features from the dataset.",
       "version": "0.0.1",
@@ -1642,7 +1660,7 @@
       ]
     },
     {
-      "domain": "preprocessing",
+      "domain": "data_prep",
       "name": "psi",
       "desc": "PSI between two parties.",
       "version": "0.0.1",
@@ -1733,7 +1751,7 @@
       ]
     },
     {
-      "domain": "preprocessing",
+      "domain": "data_prep",
       "name": "train_test_split",
       "desc": "Split datasets into random train and test subsets.\n- Please check: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html",
       "version": "0.0.1",

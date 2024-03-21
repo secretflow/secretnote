@@ -3,6 +3,7 @@ import type {
   KernelMessage,
   IOutput,
   CellViewOptions,
+  JSONObject,
 } from '@difizen/libro-jupyter';
 import {
   LibroExecutableCellView,
@@ -11,6 +12,7 @@ import {
   DocumentCommands,
   isStreamMsg,
   isErrorMsg,
+  isCommMsgMsg,
 } from '@difizen/libro-jupyter';
 import {
   transient,
@@ -36,7 +38,14 @@ import {
   getComponentIds,
   generateComponentCellCode,
 } from './cell-component';
-import type { ComponentCellModel, ComponentMetadata } from './model';
+import type { ComponentCellModel, ComponentMetadata, SFReport } from './model';
+
+// customized comm messages to pass wanted data from kernel to frontend
+type CustomizedCommMsgDataType = 'component-cell.result'; // | ...
+type CustomizedCommMsgData = {
+  $type: CustomizedCommMsgDataType;
+  payload?: string;
+} & JSONObject;
 
 export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<ComponentCellView>(ViewInstance);
@@ -58,6 +67,7 @@ export const SFComponentCellComponent = forwardRef<HTMLDivElement>((props, ref) 
       <CellComponent
         loading={instance.launching}
         outputs={instance.cellModel.outputs}
+        report={instance.cellModel.report}
         component={instance.component}
         onComponentChange={(c) => {
           instance.onComponentChange(c);
@@ -218,14 +228,65 @@ export class ComponentCellView extends LibroExecutableCellView {
     return getOrigin(libroModel.kernelConnections);
   }
 
+  /**
+   * Handle messages from kernel.
+   */
   handleMessages(msg: KernelMessage.IIOPubMessage | KernelMessage.IExecuteReplyMsg) {
     this.launching = false;
+
     if (isStreamMsg(msg) || isErrorMsg(msg)) {
+      // concat the terminal output to the log tab
       const output: IOutput = {
         ...msg.content,
         output_type: msg.header.msg_type,
       };
       this.cellModel.outputs = [...this.cellModel.outputs, output];
+    }
+
+    if (isCommMsgMsg(msg)) {
+      // handle secretnote customized comm messages
+      if (
+        (msg.content.data as CustomizedCommMsgData)?.$type === 'component-cell.result'
+      ) {
+        const payload = JSON.parse((msg.content.data?.payload || '{}') as string);
+        // organize data for the report tab
+        const reports = payload.outputs.filter((v: any) => v.type === 'sf.report');
+        if (reports.length) {
+          // currently no operator has multiple reports, no report has multiple tabs, divs and children
+          const report = reports[0] as SFReport;
+          const activeChild = report.meta?.tabs?.[0]?.divs?.[0]?.children?.[0] || {};
+
+          const commonInfo = {
+            name: report.name,
+            metaName: report.meta.name,
+            metaDesc: report.meta.desc,
+          };
+          // refactor report data to the format of Report tab according to sub-type of children
+          if (activeChild.type === 'table') {
+            this.cellModel.report = {
+              ...commonInfo,
+              metaColumnNames: activeChild.table.headers.map((v) => v.name),
+              metaRowNames: activeChild.table.rows.map((v) => v.name),
+              metaRowItems: activeChild.table.rows.map((v) => v.items),
+            };
+          } else if (activeChild.type === 'descriptions') {
+            this.cellModel.report = {
+              ...commonInfo,
+              metaColumnNames: ['value'],
+              metaRowNames: activeChild.descriptions.items.map((v) => v.name),
+              metaRowItems: activeChild.descriptions.items.map((v) => [v.value]),
+            };
+          } else {
+            // unknown type
+            this.cellModel.report = {
+              ...commonInfo,
+              metaColumnNames: [],
+              metaRowNames: [],
+              metaRowItems: [],
+            };
+          }
+        }
+      }
     }
   }
 
@@ -240,6 +301,7 @@ export class ComponentCellView extends LibroExecutableCellView {
       source,
       metadata: this.cellModel.metadata,
       outputs: this.cellModel.outputs,
+      report: this.cellModel.report,
     };
   }
 

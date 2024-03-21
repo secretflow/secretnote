@@ -7,12 +7,22 @@ export type IOType =
   // table
   | 'sf.table.individual'
   | 'sf.table.vertical_table'
+  // binning rule
+  | 'sf.rule.binning'
   // model
   | 'sf.model.ss_sgd'
   | 'sf.model.ss_glm'
   | 'sf.model.sgb'
   | 'sf.model.ss_xgb'
+  // report
   | 'sf.report';
+
+//         String            Delim                                  Part          Remainder
+type Split<S extends string, D extends string> = S extends `${infer P}${D}${infer R}`
+  ? [P, ...Split<R, D>]
+  : [S];
+
+export type IOTypeKind = Split<IOType, '.'>[1];
 
 export type AtomicValue = Record<ValueKey, any>;
 
