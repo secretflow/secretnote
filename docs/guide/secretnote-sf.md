@@ -2,7 +2,11 @@
 
 ### 准备环境
 
-在一台机器上（暂时不支持 Mac M1 机器）使用 docker compose 启动两个容器，容器启动时会安装 SecretFLow、SecretNote，并且分别启动 Ray 服务以及 SecretNote 服务。
+在一台机器上使用 docker compose 启动两个容器，容器启动时会安装 SecretFLow、SecretNote，并且分别启动 Ray 服务以及 SecretNote 服务。
+
+**注意：当前 docker 镜像暂时不支持 Mac M1、M2 机器以及 ARM 架构机器**
+
+在一个文件夹下面新建文件 `docker-compose.yml`，内容如下：
 
 ```yml
 services:
@@ -30,6 +34,8 @@ services:
     volumes:
       - /root/scripts
 ```
+
+然后在新建的文件夹中执行以下命令：
 
 ```bash
 docker compose up
