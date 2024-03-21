@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
-import { ContentsManager } from '@difizen/libro-jupyter';
+import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { downloadFileByUrl } from '@/utils';
+import { downloadFileByUrl, getLocalBaseUrl, getLocalWsUrl } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
 
 @singleton()
 export class NotebookFileService {
+  protected readonly serverConnection: ServerConnection;
   protected readonly contentsManager: ContentsManager;
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
     pre: IContentsModel | null;
@@ -29,8 +30,16 @@ export class NotebookFileService {
   @prop()
   renameNotebookFile: { path: string; name: string } | null = null;
 
-  constructor(@inject(ContentsManager) contentsManager: ContentsManager) {
+  constructor(
+    @inject(ContentsManager) contentsManager: ContentsManager,
+    @inject(ServerConnection) serverConnection: ServerConnection,
+  ) {
     this.contentsManager = contentsManager;
+    this.serverConnection = serverConnection;
+    this.serverConnection.updateSettings({
+      baseUrl: getLocalBaseUrl(),
+      wsUrl: getLocalWsUrl(),
+    });
   }
 
   openFile(file: IContentsModel) {
@@ -45,7 +54,10 @@ export class NotebookFileService {
   }
 
   async getFileList() {
-    const list = await this.contentsManager.get(BASE_PATH);
+    const list = await this.contentsManager.get(BASE_PATH, {
+      baseUrl: getLocalBaseUrl(),
+      content: true,
+    });
     const notebookFileList = list.content.filter((file: any) =>
       file.name.endsWith(FILE_EXT),
     );
@@ -66,7 +78,9 @@ export class NotebookFileService {
             if (isExisted) {
               throw new Error('The notebook is already existed.');
             }
-            const newFile = await this.contentsManager.rename(path, newPath);
+            const newFile = await this.contentsManager.rename(path, newPath, {
+              baseUrl: getLocalBaseUrl(),
+            });
             await this.getFileList();
             if (this.currentNotebookFile?.path === path) {
               this.currentNotebookFile = newFile;
@@ -82,6 +96,7 @@ export class NotebookFileService {
     const file = await this.contentsManager.newUntitled({
       path: BASE_PATH,
       type: 'notebook',
+      baseUrl: getLocalBaseUrl(),
     });
     await this.getFileList();
     this.openFile(file);
@@ -89,7 +104,7 @@ export class NotebookFileService {
   }
 
   async deleteFile(file: IContentsModel) {
-    await this.contentsManager.delete(file.path);
+    await this.contentsManager.delete(file.path, { baseUrl: getLocalBaseUrl() });
     await this.getFileList();
     if (this.currentNotebookFile?.path === file.path) {
       this.currentNotebookFile = null;
@@ -97,18 +112,25 @@ export class NotebookFileService {
   }
 
   async exportFile(file: IContentsModel) {
-    const data = await this.contentsManager.getDownloadUrl(file.path);
+    const data = await this.contentsManager.getDownloadUrl(file.path, {
+      baseUrl: getLocalBaseUrl(),
+    });
     downloadFileByUrl(data, file.name);
   }
 
   async copyFile(file: IContentsModel) {
-    const newFile = await this.contentsManager.copy(file.path, BASE_PATH);
+    const newFile = await this.contentsManager.copy(file.path, BASE_PATH, {
+      baseUrl: getLocalBaseUrl(),
+    });
     await this.getFileList();
     this.openFile(newFile);
   }
 
   async isFileExisted(path: string) {
-    const list = await this.contentsManager.get(BASE_PATH);
+    const list = await this.contentsManager.get(BASE_PATH, {
+      baseUrl: getLocalBaseUrl(),
+      content: true,
+    });
     return list.content.some((file: any) => file.path === path);
   }
 
@@ -118,6 +140,7 @@ export class NotebookFileService {
       type: 'notebook',
       content: JSON.parse(content),
       format: 'json',
+      baseUrl: getLocalBaseUrl(),
     });
     await this.getFileList();
   }

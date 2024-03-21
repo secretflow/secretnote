@@ -41,7 +41,7 @@ const DataTableDetails = (props: { data?: DataTable }) => {
   const instance = useInject<DataTableView>(ViewInstance);
 
   const getTableCCL = async (tableName: string) => {
-    const ccl = await instance.service.getTableCCL(tableName);
+    const { ccl } = await instance.service.getTableCCL(tableName);
     setTableCCL(ccl);
   };
 

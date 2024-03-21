@@ -6,16 +6,17 @@
   "configurations": [
     {
       "name": "SecretNote: Server",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       // python -m secretnote.server
       "module": "secretnote.server",
+      "args": ["--no-browser"],
       "justMyCode": false,
       "cwd": "${workspaceFolder}/pyprojects/secretnote"
     },
     {
       "name": "Pytest",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": ["-s", "-v", "--no-cov", "-Werror", "pyprojects"],

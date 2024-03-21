@@ -40,7 +40,7 @@ export class NodeService {
     address: string;
     type: ServerType;
   }) {
-    await this.serverManager.addServer({
+    return await this.serverManager.addServer({
       name: name.trim(),
       address: address.trim(),
       type,

@@ -3,7 +3,7 @@ import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
-import { downloadFileByUrl as download } from '@/utils';
+import { downloadFileByUrl as download, getRemoteBaseUrl } from '@/utils';
 
 import { SecretNoteServerManager } from '../server';
 
@@ -42,7 +42,7 @@ export class FileService {
 
       try {
         const list = await this.contentsManager.get(BASE_PATH, {
-          baseUrl: this.serverManager.getServerUrl(server).baseUrl,
+          baseUrl: getRemoteBaseUrl(server.id),
           content: true,
         });
 
@@ -79,7 +79,7 @@ export class FileService {
       return false;
     }
     const list = await this.contentsManager.get(BASE_PATH, {
-      baseUrl: this.serverManager.getServerUrl(server).baseUrl,
+      baseUrl: getRemoteBaseUrl(server.id),
       content: true,
     });
 
@@ -90,7 +90,7 @@ export class FileService {
     const serverId = nodeData.key as string;
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
-      const baseUrl = this.serverManager.getServerUrl(server).baseUrl;
+      const baseUrl = getRemoteBaseUrl(server.id);
       const path = `${BASE_PATH}/${name}`;
       await this.contentsManager.save(path, {
         content,
@@ -108,7 +108,7 @@ export class FileService {
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.getDownloadUrl(path, {
-        baseUrl: this.serverManager.getServerUrl(server).baseUrl,
+        baseUrl: getRemoteBaseUrl(server.id),
       });
       download(data, nodeData.title as string);
     }
@@ -122,7 +122,7 @@ export class FileService {
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       await this.contentsManager.delete(path, {
-        baseUrl: this.serverManager.getServerUrl(server).baseUrl,
+        baseUrl: getRemoteBaseUrl(server.id),
       });
       await this.getFileTree();
     }
@@ -133,7 +133,7 @@ export class FileService {
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.get(decodedPath, {
-        baseUrl: this.serverManager.getServerUrl(server).baseUrl,
+        baseUrl: getRemoteBaseUrl(server.id),
         content: true,
       });
       return data;

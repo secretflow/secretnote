@@ -129,18 +129,17 @@ export const NodeComponent = () => {
       .validateFields()
       .then(async (values) => {
         setAddLoading(true);
-        try {
-          await instance.service.addNode(values);
-          setAddFormVisible(false);
-          form.resetFields();
+        const server = await instance.service.addNode(values);
+
+        if (server.status === ServerStatus.running) {
           message.success(l10n.t('节点添加成功'));
-        } catch (e) {
-          if (e instanceof Error) {
-            message.error(e.message);
-          }
-        } finally {
-          setAddLoading(false);
+        } else {
+          message.info('节点添加成功，但是节点处于离线状态');
         }
+
+        setAddFormVisible(false);
+        form.resetFields();
+        setAddLoading(false);
         return;
       })
       .catch(() => {

@@ -33,6 +33,9 @@ export class SQLCellModel
   @prop()
   executeCount: ExecutionCount = null;
 
+  @prop()
+  isEdit = false;
+
   msgChangeEmitter = new Emitter<KernelMessage.IIOPubMessage>();
 
   msgChange = this.msgChangeEmitter.event;

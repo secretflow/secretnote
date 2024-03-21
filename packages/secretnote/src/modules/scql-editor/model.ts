@@ -9,6 +9,8 @@ import {
 import { CommandRegistry, inject, ModalService, transient } from '@difizen/mana-app';
 import { debounce } from 'lodash-es';
 
+import { getLocalBaseUrl } from '@/utils';
+
 @transient()
 export class SecretNoteModel extends LibroModel {
   private readonly modalService: ModalService;
@@ -34,7 +36,7 @@ export class SecretNoteModel extends LibroModel {
     this.contentsManager = contentsManager;
     this.modalService = modalService;
     this.commandRegistry = commandRegistry;
-    this.onSourceChanged(this.autoSave.bind(this));
+    this.onChanged(this.autoSave.bind(this));
   }
 
   async saveNotebookContent(): Promise<void> {
@@ -51,6 +53,7 @@ export class SecretNoteModel extends LibroModel {
         type: this.currentFileContents.type,
         content: notebookContent,
         format: this.currentFileContents.format,
+        baseUrl: getLocalBaseUrl(),
       });
 
       if (!res) {
@@ -112,13 +115,17 @@ export class SecretNoteModel extends LibroModel {
 
   async createCheckpoint() {
     if (this.currentFileContents) {
-      await this.contentsManager.createCheckpoint(this.currentFileContents.path);
+      await this.contentsManager.createCheckpoint(this.currentFileContents.path, {
+        baseUrl: getLocalBaseUrl(),
+      });
     }
   }
 
   async listCheckpoints() {
     if (this.currentFileContents) {
-      await this.contentsManager.listCheckpoints(this.currentFileContents.path);
+      await this.contentsManager.listCheckpoints(this.currentFileContents.path, {
+        baseUrl: getLocalBaseUrl(),
+      });
     }
   }
 
@@ -127,6 +134,7 @@ export class SecretNoteModel extends LibroModel {
       await this.contentsManager.restoreCheckpoint(
         this.currentFileContents.path,
         checkpointID,
+        { baseUrl: getLocalBaseUrl() },
       );
     }
   }
@@ -136,6 +144,7 @@ export class SecretNoteModel extends LibroModel {
       await this.contentsManager.deleteCheckpoint(
         this.currentFileContents.path,
         checkpointID,
+        { baseUrl: getLocalBaseUrl() },
       );
     }
   }

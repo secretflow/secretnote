@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
 import { Modal, message, Select, Table } from 'antd';
@@ -10,11 +11,13 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
   const [tableCCL, setTableCCL] = useState<TableCCL[]>([]);
   const [loading, setLoading] = useState(false);
   const service = useInject<DataTableService>(DataTableService);
+  const [tableOwner, setTableOwner] = useState('');
 
   const getTableCCL = async () => {
     try {
       setLoading(true);
-      const ccl: TableCCL[] = await service.getTableCCL(data.tableName);
+      const { ccl, owner } = await service.getTableCCL(data!.tableName);
+      setTableOwner(owner);
       setTableCCL(ccl);
     } catch (e) {
       if (e instanceof Error) {
@@ -27,7 +30,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
 
   const changeCCL = async () => {
     try {
-      await service.grantTableCCL(data.tableName, tableCCL);
+      await service.grantTableCCL(data!.tableName, tableCCL);
       message.success('Ccl config successfully.');
       close();
     } catch (e) {
@@ -48,7 +51,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
             };
           }
           return {
-            title: `Grant to ${item}`,
+            title: `Grant to ${item === tableOwner ? item + '(you)' : item}`,
             dataIndex: item,
             key: item,
             render: (text: string, record: TableCCL) => (

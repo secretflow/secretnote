@@ -1,7 +1,7 @@
 [project]
 authors = [
-  {name = "wenyu.jqq", email = "wenyu.jqq@antgroup.com"},
-  {name = "Tony Wu", email = "tonywu6@protonmail.com"},
+  { name = "wenyu.jqq", email = "wenyu.jqq@antgroup.com" },
+  { name = "Tony Wu", email = "tonywu6@protonmail.com" },
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -15,6 +15,7 @@ dependencies = [
   "jupyter-resource-usage~=1.0",
   "jupyter-server~=2.7",
   "jupyter-lsp>=2.2.0",
+  "jupyter-server-proxy",
   "loguru>=0.7.2",
   "more-itertools>=10.1.0",
   "networkx>=2.8.8",
@@ -23,7 +24,7 @@ dependencies = [
   "orjson>=3.9.9",
   "packaging>=23.1",
   "pydantic>=1.10, <2",
-  "ray[default]~=2.6.3", # FIXME: ????????????
+  "ray[default]~=2.6.3",         # FIXME: ????????????
   "secretflow-ray==2.2.0",
   "rich>=13.7.0",
   "stack_data>=0.6.3",
