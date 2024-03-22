@@ -17,7 +17,9 @@ class AgentHandler(ProxyHandler):
                     [host_name, port] = address.split(":")
                     return host_name, port
 
-        [host_name, port] = self.request.host.split(":")
+        server_info = self.serverapp.server_info()
+        host_name = server_info.get("hostname", "localhost")
+        port = server_info.get("port", 8888)
         return host_name, port
 
     async def http_get(self, server_id: str, proxied_path: str):
