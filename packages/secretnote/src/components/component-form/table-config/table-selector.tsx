@@ -40,8 +40,7 @@ const TableSelector = (props: TableSelectorProps) => {
     const init = { method: 'GET' };
     const nodes = await request(url, init);
     for (const node of nodes) {
-      const { address } = node;
-      const res = await request(`http://${address}/api/contents`, { method: 'GET' });
+      const res = await request('api/contents', { method: 'GET' }, node.id);
       data.push({
         label: node.name,
         value: node.name,
