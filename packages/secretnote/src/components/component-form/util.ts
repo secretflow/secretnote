@@ -2,6 +2,9 @@
 import type { ComponentSpec } from './type';
 import type { SchemaItem, Attr } from './type';
 
+// slightly larger than Number.EPSILON to avoid floating point precision issue
+const NumberEpsilon = 2 * Number.EPSILON;
+
 const getOptions = (attr: Attr) => {
   if (attr.atomic.allowedValues) {
     return attr.atomic.allowedValues.ss;
@@ -14,7 +17,7 @@ const getRenderType = (attr: Attr): string => {
     case 'AT_BOOL':
       return 'boolean';
     case 'AT_INT':
-      return 'number';
+      return 'integer';
     case 'AT_STRING':
       return 'string';
     case 'AT_FLOAT':
@@ -24,15 +27,18 @@ const getRenderType = (attr: Attr): string => {
 };
 
 const getValue = (attr: Attr, key: 'defaultValue' | 'lowerBound' | 'upperBound') => {
+  if (JSON.stringify(attr.atomic?.[key]) === '{}') {
+    return 0; // e.g. lowerBound: {} means lowerBound is 0
+  }
   switch (attr.type) {
     case 'AT_BOOL':
-      return attr.atomic?.[key]?.b;
+      return attr.atomic?.[key]?.b as boolean;
     case 'AT_INT':
-      return attr.atomic?.[key]?.i64;
+      return attr.atomic?.[key]?.i64 as number;
     case 'AT_STRING':
-      return attr.atomic?.[key]?.s;
+      return attr.atomic?.[key]?.s as string;
     case 'AT_FLOAT':
-      return attr.atomic?.[key]?.f;
+      return attr.atomic?.[key]?.f as number;
   }
 };
 
@@ -40,10 +46,14 @@ const isFieldRequired = (attr: Attr) => {
   return !attr.atomic.isOptional;
 };
 
+const isMinimumInclusive = (attr: Attr) => attr.atomic.lowerBoundInclusive;
+
 const getMinimum = (attr: Attr) => {
+  const lowerBound = Number(getValue(attr, 'lowerBound'));
   if (attr.atomic.lowerBoundEnabled) {
-    return Number(getValue(attr, 'lowerBound'));
+    return lowerBound + (isMinimumInclusive(attr) ? 0 : NumberEpsilon);
   }
+  return undefined;
 };
 
 const getMaximum = (attr: Attr) => {
@@ -132,6 +142,14 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
     const { name, desc } = attr;
     const type = getRenderType(attr);
     const options = getOptions(attr);
+    const minimum = getMinimum(attr);
+    const $minimumMessage =
+      minimum === undefined
+        ? undefined
+        : 'Must be greater than ' +
+          (isMinimumInclusive(attr)
+            ? `or equal to ${minimum}`
+            : `${minimum - NumberEpsilon}`);
     const attrItem: any = {
       id: name,
       type,
@@ -144,7 +162,8 @@ const transformSpecToJsonSchema: (spec: ComponentSpec) => SchemaItem = (
       })),
       $defaultValue: getValue(attr, 'defaultValue'),
       $required: isFieldRequired(attr),
-      minimum: getMinimum(attr),
+      minimum,
+      $minimumMessage,
       maximum: getMaximum(attr),
     };
     setByPath(json, `properties/attrs/properties/${name}`, attrItem);
