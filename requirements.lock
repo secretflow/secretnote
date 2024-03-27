@@ -136,7 +136,7 @@ rich==13.7.0
 rpds-py==0.17.1
 rsa==4.9
 ruff==0.2.2
-ruff-lsp==0.0.50
+ruff-lsp==0.0.53
 secretflow-ray==2.2.0
 send2trash==1.8.2
 simpervisor==1.0.0

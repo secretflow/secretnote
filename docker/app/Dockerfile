@@ -38,7 +38,14 @@ RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 
 WORKDIR /root
 
+RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+RUN yum install -y nodejs
+RUN npm install @difizen/libro-analyzer
+
 COPY ./docker/app/root/scripts /root/scripts
+COPY ./docker/app/root/.jupyter /root/.jupyter
+
+RUN mkdir workspace
 
 ENV SELF_PARTY=alice
 ENV ALL_PARTIES=alice
