@@ -30,7 +30,7 @@ dependencies = [
   "stack_data>=0.6.3",
   "tqdm>=4.66.1",
   "dataset>=1.6.2",
-  "ruff-lsp==0.0.50",
+  "ruff-lsp>=0.0.53",
   "python-lsp-server==1.8.2",
 ]
 description = "Notebook suite for SecretFlow"
