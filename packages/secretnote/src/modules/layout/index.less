@@ -12,8 +12,33 @@
     padding: 24px;
   }
 
-  .libro-header-right {
-    padding-right: 12px;
+  .libro-view-top {
+    .libro-header-left {
+      width: 0;
+    }
+
+    .libro-header-center {
+      min-width: 620px; // at least 620px to show all buttons
+      padding-left: 72px; // centered according to cell width
+    }
+
+    .libro-header-right {
+      max-width: 100px;
+      padding-right: 12px;
+
+      .mana-toolbar-item {
+        margin: 0;
+
+        .libro-keybind-instructions-icon {
+          margin-top: 3px;
+        }
+
+        svg {
+          display: block !important;
+          margin: auto !important;
+        }
+      }
+    }
   }
 
   .libro-view-content {
