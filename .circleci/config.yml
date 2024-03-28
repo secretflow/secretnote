@@ -17,6 +17,9 @@ jobs:
       tag:
         type: string
         default: latest
+      file:
+        type: string
+        default: docker/app/Dockerfile
 
     steps:
       - checkout
@@ -29,7 +32,7 @@ jobs:
 
             docker buildx build \
               --platform=<< parameters.platform >> \
-              -f docker/app/Dockerfile \
+              -f << parameters.file >> \
               -t ${IMAGE_NAME} \
               --progress=plain \
               .
@@ -49,13 +52,22 @@ workflows:
                 - main
           platform: linux/amd64
           tag: unstable-amd64
-
-  devcontainer-publish-arm64:
+  devcontainer-publish-dev-1.5:
     jobs:
       - devcontainer-publish:
           filters:
             branches:
               only:
                 - main
-          platform: linux/arm64
-          tag: unstable-arm64
+          platform: linux/amd64
+          tag: 1.5.0.dev
+          file: docker/app/Dockerfile.dev
+  # devcontainer-publish-arm64:
+  #   jobs:
+  #     - devcontainer-publish:
+  #         filters:
+  #           branches:
+  #             only:
+  #               - main
+  #         platform: linux/arm64
+  #         tag: unstable-arm64
