@@ -126,13 +126,9 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
       const list: Promise<KernelMessage.IExecuteReplyMsg>[] = [];
       for (let i = 0, len = kernelConnections.length; i < len; i += 1) {
         const connection = kernelConnections[i];
-        const future = connection.requestExecute(
-          {
-            code: cellModel.value,
-          },
-          // Even after receiving a reply message, you can still receive other messages.
-          false,
-        );
+        const future = connection.requestExecute({
+          code: cellModel.value,
+        });
 
         future.onIOPub = (
           msg: KernelMessage.IIOPubMessage<KernelMessage.IOPubMessageType>,
@@ -248,6 +244,10 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     const execution = this.model.metadata.execution as ExecutionMeta;
     if (execution) {
       execution.parties = JSON.stringify(parties);
+    } else {
+      this.model.metadata.execution = {
+        parties: JSON.stringify(parties),
+      };
     }
   }
 }
