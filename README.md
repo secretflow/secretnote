@@ -10,14 +10,14 @@ SecretNote 是专为隐语开发者打造的高级工具套件。以 notebook �
 
 SecretNote 有单独的 [pip](https://pypi.org/project/secretnote/) 安装包，可以单独使用。为了避免安装、部署、启动等环境问题，推荐使用 docker 方式启动 SecretFlow 运行环境。
 
-**注意：当前 docker 镜像暂时不支持 Mac M1、M2 机器以及 ARM 架构机器**
+**注意：当前 docker 镜像提供 1.5.0b0 和 1.3.0b0 两个版本，和 secretflow 的版本是对应的，也就是说，如果你想使用 secretflow 1.5 版本，那就使用镜像 secretflow/secretnote:1.5.0b0**
 
 1. 启动两个容器，推荐使用 docker compose，这样方便管理容器之间的通信。新建文件夹，并新建文件 `docker-compose.yml`，内容如下：
 
 ```yml
 services:
   alice:
-    image: 'secretflow/secretnote:unstable-amd64'
+    image: 'secretflow/secretnote:1.5.0b0'
     platform: linux/amd64
     environment:
       - SELF_PARTY=alice
@@ -29,7 +29,7 @@ services:
       - /root/scripts
 
   bob:
-    image: 'secretflow/secretnote:unstable-amd64'
+    image: 'secretflow/secretnote:1.5.0b0'
     platform: linux/amd64
     environment:
       - SELF_PARTY=bob
