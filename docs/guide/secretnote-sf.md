@@ -4,14 +4,14 @@
 
 在一台机器上使用 docker compose 启动两个容器，容器启动时会安装 SecretFLow、SecretNote，并且分别启动 Ray 服务以及 SecretNote 服务。
 
-**注意：当前 docker 镜像提供 1.5.0b0 和 1.3.0b0 两个版本，和 secretflow 的版本是对应的，也就是说，如果你想使用 secretflow 1.5 版本，那就使用镜像 secretflow/secretnote:1.5.0b0**
+**注意：当前 docker 镜像提供 1.3.0-amd64 和 1.5.0-amd64 两个版本，和 secretflow 的版本是对应的，也就是说，如果你想使用 secretflow 1.5 版本，那就使用镜像 secretflow/secretnote:1.5.0-amd64**
 
 在一个文件夹下面新建文件 `docker-compose.yml`，内容如下：
 
 ```yml
 services:
   alice:
-    image: 'secretflow/secretnote:1.5.0b0'
+    image: 'secretflow/secretnote:1.3.0-amd64'
     platform: linux/amd64
     environment:
       - SELF_PARTY=alice
@@ -23,7 +23,7 @@ services:
       - /root/scripts
 
   bob:
-    image: 'secretflow/secretnote:1.5.0b0'
+    image: 'secretflow/secretnote:1.3.0-amd64'
     platform: linux/amd64
     environment:
       - SELF_PARTY=bob
