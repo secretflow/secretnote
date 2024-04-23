@@ -17,9 +17,9 @@ jobs:
       tag:
         type: string
         default: latest
-      file:
+      version:
         type: string
-        default: docker/app/Dockerfile
+        default: 1.3.0b0
 
     steps:
       - checkout
@@ -32,7 +32,8 @@ jobs:
 
             docker buildx build \
               --platform=<< parameters.platform >> \
-              -f << parameters.file >> \
+              --build-arg version=<< parameters.version >> \
+              -f docker/app/Dockerfile \
               -t ${IMAGE_NAME} \
               --progress=plain \
               .
@@ -43,7 +44,7 @@ jobs:
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  devcontainer-publish-amd64:
+  devcontainer-publish-1.3.0-amd64:
     jobs:
       - devcontainer-publish:
           filters:
@@ -51,8 +52,9 @@ workflows:
               only:
                 - main
           platform: linux/amd64
-          tag: unstable-amd64
-  devcontainer-publish-dev-1.5:
+          version: 1.3.0b0
+          tag: 1.3.0-amd64
+  devcontainer-publish-1.5.0-amd64:
     jobs:
       - devcontainer-publish:
           filters:
@@ -60,14 +62,15 @@ workflows:
               only:
                 - main
           platform: linux/amd64
-          tag: 1.5.0.dev
-          file: docker/app/Dockerfile.dev
-  # devcontainer-publish-arm64:
-  #   jobs:
-  #     - devcontainer-publish:
-  #         filters:
-  #           branches:
-  #             only:
-  #               - main
-  #         platform: linux/arm64
-  #         tag: unstable-arm64
+          version: 1.5.0b0
+          tag: 1.5.0-amd64
+  devcontainer-publish-1.5.0-arm64:
+    jobs:
+      - devcontainer-publish:
+          filters:
+            branches:
+              only:
+                - main
+          platform: linux/arm64
+          version: 1.5.0b0
+          tag: 1.5.0-arm64

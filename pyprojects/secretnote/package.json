@@ -4,13 +4,13 @@
   "files": [
     "static"
   ],
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "scripts": {
     "format:black": "python -m black --check src tests",
     "lint:ruff": "python -m ruff check src tests",
     "test:pytest": "python -m pytest",
-    "typecheck:pyright": "pyright --project ../.. src tests",
+    "typecheck:pyright": "pyright --project ../.. src/secretnote/server tests",
     "dev": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --no-browser",
     "build:py": "rye build --out ./dist",
     "publish:py": "python -m hatch publish ./dist",
