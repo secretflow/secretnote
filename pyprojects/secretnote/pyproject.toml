@@ -32,6 +32,7 @@ dependencies = [
   "python-lsp-server==1.8.2",
   # https://github.com/python/typing_extensions/issues/369#issuecomment-2051331676
   "typing_extensions>=4.6",
+  "secretflow==1.6.1b0"
 ]
 description = "Notebook suite for SecretFlow"
 dynamic = ["version"]

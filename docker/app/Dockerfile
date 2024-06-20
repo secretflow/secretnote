@@ -1,5 +1,3 @@
-ARG version=1.5.0b0
-
 FROM alpine:3.14 as source-tree
 
 RUN apk add --no-cache git
@@ -10,7 +8,7 @@ RUN git init \
   && rm -r /repo/docker
 
 
-FROM secretflow/devcontainer-web:latest as build
+FROM secretflow/devcontainer-web:amd64-v2 as build
 
 ENV CI=true
 
@@ -25,22 +23,27 @@ COPY --from=source-tree /repo /repo
 
 RUN pnpm install --frozen-lockfile --offline
 
+RUN cargo install gcc
 RUN pnpm exec nx run-many -t build:js -t build:py
 
 RUN apt-get update && apt-get install -y rsync
 RUN rsync -avm --include='pyprojects/**/dist/*.whl' -f 'hide,! */' /repo/./ /dist
 
 
-FROM secretflow/secretflow-anolis8:${version}
+FROM python:3.10-slim-bullseye
 
 COPY --from=build /dist /dist
 
+RUN apt update
+RUN apt install -y build-essential
+
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 
 WORKDIR /root
 
-RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
-RUN yum install -y nodejs
+RUN apt install -y nodejs
+RUN apt install -y npm
 RUN npm install @difizen/libro-analyzer
 
 COPY ./docker/app/root/ /root/
