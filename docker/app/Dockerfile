@@ -37,7 +37,6 @@ COPY --from=build /dist /dist
 RUN apt update
 RUN apt install -y build-essential
 
-RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 
 WORKDIR /root
