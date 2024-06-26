@@ -7,4 +7,8 @@ ray start \
   --disable-usage-stats \
   --resources="{\"$SELF_PARTY\": 4}"
 
-secretnote --allow-root --no-browser
+if [ -z "${PORT}" ]; then
+  PORT=8888
+fi
+
+secretnote --allow-root --no-browser --port $PORT

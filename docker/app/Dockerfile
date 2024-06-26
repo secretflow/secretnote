@@ -30,19 +30,16 @@ RUN apt-get update && apt-get install -y rsync
 RUN rsync -avm --include='pyprojects/**/dist/*.whl' -f 'hide,! */' /repo/./ /dist
 
 
-FROM python:3.10-slim-bullseye
+FROM secretflow/secretflow-anolis8:1.6.1b0
 
 COPY --from=build /dist /dist
-
-RUN apt update
-RUN apt install -y build-essential
 
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 
 WORKDIR /root
 
-RUN apt install -y nodejs
-RUN apt install -y npm
+RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+RUN yum install -y nodejs
 RUN npm install @difizen/libro-analyzer
 
 COPY ./docker/app/root/ /root/
