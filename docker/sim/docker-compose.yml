@@ -4,9 +4,8 @@ services:
     platform: linux/amd64
     environment:
       - SELF_PARTY=alice
-      - PORT=8090
     ports:
-      - 8090:8090
+      - 8090:8888
     volumes:
       - ./alice:/root/workspace
 
@@ -15,8 +14,7 @@ services:
     platform: linux/amd64
     environment:
       - SELF_PARTY=bob
-      - PORT=8092
     ports:
-      - 8092:8092
+      - 8092:8888
     volumes:
       - ./bob:/root/workspace
