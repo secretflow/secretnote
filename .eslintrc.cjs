@@ -12,7 +12,7 @@ module.exports = {
   ],
   plugins: ['import'],
 
-  ignorePatterns: ['dist', '.eslintrc.*'],
+  ignorePatterns: ['dist', '.eslintrc.*', 'tsup.config.js'],
 
   rules: {
     // common pitfalls
