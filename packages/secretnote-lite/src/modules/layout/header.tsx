@@ -1,5 +1,6 @@
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel } from '@difizen/mana-react';
+import React from 'react';
 
 import { Logo } from '@/assets/svg';
 
@@ -20,7 +21,7 @@ export const Header: React.FC = () => {
       <Pane flex={1}>
         <div className="logo" onClick={() => reload()}>
           <Logo style={{ width: 26, height: 26, marginRight: 4 }} />
-          <span className="title">SecretNote</span>
+          <span className="title">SecretNote1</span>
         </div>
       </Pane>
       <Pane flex={1} className="right">

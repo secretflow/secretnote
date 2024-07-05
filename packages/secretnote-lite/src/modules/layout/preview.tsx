@@ -1,5 +1,6 @@
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel } from '@difizen/mana-react';
+import React from 'react';
 import './index.less';
 
 export enum PreviewLayoutArea {

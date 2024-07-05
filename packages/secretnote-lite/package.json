@@ -1,6 +1,6 @@
 {
   "name": "@secretflow/secretnote-lite",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
@@ -18,7 +18,7 @@
     "dev": "tsup src/index.tsx --watch",
     "lint:eslint": "eslint src",
     "lint:stylelint": "stylelint 'src/**/*.{css,less}'",
-    "publish": "pnpm publish"
+    "pb": "pnpm publish --no-git-checks --filter @secretflow/secretnote-lite"
   },
   "dependencies": {
     "@antv/s2": "^1.52.0",

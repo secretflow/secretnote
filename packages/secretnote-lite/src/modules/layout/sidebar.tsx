@@ -12,6 +12,7 @@ import {
   inject,
 } from '@difizen/mana-app';
 import { Collapse } from 'antd';
+import React from 'react';
 
 import { SideBarContribution } from './protocol';
 
