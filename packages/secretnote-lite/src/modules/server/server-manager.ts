@@ -19,6 +19,10 @@ export class SecretNoteServerManager {
     this.getServerList();
   }
 
+  getDefaultServer() {
+    return this.servers.find((server) => server.default);
+  }
+
   async getServerList() {
     const url = 'api/nodes';
     const init = { method: 'GET' };
@@ -41,6 +45,7 @@ export class SecretNoteServerManager {
       id: '',
       name: server.name || 'Someone',
       status: ServerStatus.stopped,
+      default: false,
       kernelspec: undefined,
     };
 
@@ -54,6 +59,7 @@ export class SecretNoteServerManager {
     const data = await request(url, init);
 
     newServer.id = data.id;
+    newServer.default = data.default;
 
     const spec = await this.getServerSpec(newServer as IServer);
     if (spec) {

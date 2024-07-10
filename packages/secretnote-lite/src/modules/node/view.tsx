@@ -21,6 +21,7 @@ import {
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 import { invert } from '@/utils';
 
@@ -29,7 +30,6 @@ import { ServerStatus } from '../server';
 import './index.less';
 import type { Node, ServerStatusTag } from './service';
 import { NodeService } from './service';
-import React from 'react';
 
 const { Paragraph } = Typography;
 
@@ -51,6 +51,7 @@ const getNodeStatus = (
       text: l10n.t('离线'),
     };
   }
+
   return {
     status: 'default',
     badgeStatus: 'default',
@@ -102,7 +103,6 @@ const NodeDetails = (props: { node: Node }) => {
             {editableStr}
           </Paragraph>
         </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('地址')}>{node.address}</Descriptions.Item>
         <Descriptions.Item label={l10n.t('状态')}>
           <Badge status={status} text={text} />
         </Descriptions.Item>
@@ -167,16 +167,6 @@ export const NodeComponent = () => {
           ]}
         >
           <Input placeholder="Alice" />
-        </Form.Item>
-        <Form.Item
-          label={l10n.t('地址')}
-          name="address"
-          rules={[
-            { required: true, message: l10n.t('请输入地址') },
-            { max: 100, message: l10n.t('地址过长') },
-          ]}
-        >
-          <Input placeholder="127.0.0.1:8888" />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Space>

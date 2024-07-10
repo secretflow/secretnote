@@ -21,7 +21,7 @@ export const Header: React.FC = () => {
       <Pane flex={1}>
         <div className="logo" onClick={() => reload()}>
           <Logo style={{ width: 26, height: 26, marginRight: 4 }} />
-          <span className="title">SecretNote1</span>
+          <span className="title">SecretNote</span>
         </div>
       </Pane>
       <Pane flex={1} className="right">
