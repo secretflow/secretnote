@@ -1,12 +1,16 @@
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
-import { NodeModule } from '@/modules/node';
+import React from 'react';
+
 import { EditorModule } from '@/modules/editor';
 import { LayoutModule } from '@/modules/layout';
+import { MarkdownCellModule } from '@/modules/markdown-editor';
+import { NodeModule } from '@/modules/node';
+import { NotebookModule } from '@/modules/notebook';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
-import { NotebookModule } from '@/modules/notebook';
-import React from 'react';
+import { ToolbarModule } from '@/modules/toolbar';
+import { WelcomeModule } from '@/modules/welcome';
 
 const App = (): JSX.Element => {
   return (
@@ -21,6 +25,9 @@ const App = (): JSX.Element => {
         EditorModule,
         NodeModule,
         NotebookModule,
+        MarkdownCellModule,
+        ToolbarModule,
+        WelcomeModule,
       ]}
     />
   );
