@@ -1,6 +1,6 @@
 import { Emitter, prop, singleton } from '@difizen/mana-app';
 
-import { request } from '@/utils';
+import { request, wait } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus } from './protocol';
@@ -19,10 +19,6 @@ export class SecretNoteServerManager {
     this.getServerList();
   }
 
-  getDefaultServer() {
-    return this.servers.find((server) => server.default);
-  }
-
   async getServerList() {
     const url = 'api/nodes';
     const init = { method: 'GET' };
@@ -30,48 +26,33 @@ export class SecretNoteServerManager {
     for (const item of data) {
       const spec = await this.getServerSpec(item);
       if (spec) {
-        item.status = ServerStatus.running;
+        item.status = ServerStatus.Succeeded;
         item.kernelspec = spec;
-      } else {
-        item.status = ServerStatus.error;
       }
     }
+
     this.servers = data;
     return data;
   }
 
   async addServer(server: Partial<IServer>) {
-    const newServer: IServer = {
-      id: '',
-      name: server.name || 'Someone',
-      status: ServerStatus.stopped,
-      default: false,
-      kernelspec: undefined,
-    };
-
     const url = 'api/nodes';
     const init = {
       method: 'POST',
       body: JSON.stringify({
-        name: newServer.name,
+        name: server.name,
       }),
     };
-    const data = await request(url, init);
-
-    newServer.id = data.id;
-    newServer.default = data.default;
-
-    const spec = await this.getServerSpec(newServer as IServer);
+    const data: IServer = await request(url, init);
+    const spec = await this.getServerSpec(data);
     if (spec) {
-      newServer.status = ServerStatus.running;
-      newServer.kernelspec = spec;
-    } else {
-      newServer.status = ServerStatus.error;
+      data.status = ServerStatus.Succeeded;
+      data.kernelspec = spec;
     }
 
-    this.servers.push(newServer);
-    this.onServerAddedEmitter.fire(newServer);
-    return newServer;
+    this.servers.push(data);
+    this.onServerAddedEmitter.fire(data);
+    return data;
   }
 
   async deleteServer(id: string) {
@@ -119,7 +100,17 @@ export class SecretNoteServerManager {
   }
 
   private async getServerSpec(server: IServer) {
+    const status = server.status;
     const url = 'api/kernelspecs';
+
+    if (status === ServerStatus.Failed || status === ServerStatus.Unknown) {
+      return;
+    }
+
+    if (status === ServerStatus.Pending || status === ServerStatus.Running) {
+      await wait(1000);
+    }
+
     try {
       const data = await request(url, {}, server.id);
       return data;

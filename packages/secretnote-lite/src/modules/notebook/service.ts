@@ -49,11 +49,6 @@ export class NotebookFileService {
     this.serverManager.onServerDeleted(this.onServerChanged.bind(this));
   }
 
-  getDefaultServerBaseUrl() {
-    const server = this.serverManager.getDefaultServer();
-    return server ? getRemoteBaseUrl(server.id) : '';
-  }
-
   openFile(file: IContentsModel) {
     if (this.currentNotebookFile !== file) {
       const previous = this.currentNotebookFile;
@@ -66,13 +61,8 @@ export class NotebookFileService {
   }
 
   async getFileList() {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
-
     const list = await this.contentsManager.get(BASE_PATH, {
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
       content: true,
     });
     const notebookFileList = list.content.filter((file: any) =>
@@ -84,11 +74,6 @@ export class NotebookFileService {
   }
 
   async renameFile() {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
-
     if (this.renameNotebookFile) {
       const { path, name } = this.renameNotebookFile;
       if (path && name) {
@@ -101,7 +86,7 @@ export class NotebookFileService {
               throw new Error('The notebook is already existed.');
             }
             const newFile = await this.contentsManager.rename(path, newPath, {
-              baseUrl,
+              baseUrl: getRemoteBaseUrl(),
             });
             await this.getFileList();
             if (this.currentNotebookFile?.path === path) {
@@ -115,14 +100,10 @@ export class NotebookFileService {
   }
 
   async addFile() {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
     const file = await this.contentsManager.newUntitled({
       path: BASE_PATH,
       type: 'notebook',
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
     });
     await this.getFileList();
     this.openFile(file);
@@ -130,12 +111,8 @@ export class NotebookFileService {
   }
 
   async deleteFile(file: IContentsModel) {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
     await this.contentsManager.delete(file.path, {
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
     });
     await this.getFileList();
     if (this.currentNotebookFile?.path === file.path) {
@@ -144,51 +121,35 @@ export class NotebookFileService {
   }
 
   async exportFile(file: IContentsModel) {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
     const data = await this.contentsManager.getDownloadUrl(file.path, {
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
     });
     downloadFileByUrl(data, file.name);
   }
 
   async copyFile(file: IContentsModel) {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
     const newFile = await this.contentsManager.copy(file.path, BASE_PATH, {
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
     });
     await this.getFileList();
     this.openFile(newFile);
   }
 
   async isFileExisted(path: string) {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
     const list = await this.contentsManager.get(BASE_PATH, {
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
       content: true,
     });
     return list.content.some((file: any) => file.path === path);
   }
 
   async uploadFile(name: string, content: string) {
-    const baseUrl = this.getDefaultServerBaseUrl();
-    if (!baseUrl) {
-      return;
-    }
     const path = `${BASE_PATH}${name}`;
     await this.contentsManager.save(path, {
       type: 'notebook',
       content: JSON.parse(content),
       format: 'json',
-      baseUrl,
+      baseUrl: getRemoteBaseUrl(),
     });
     await this.getFileList();
   }

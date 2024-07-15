@@ -68,7 +68,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
 
   get partyList() {
     return this.serverManager.servers
-      .filter((s) => s.status === ServerStatus.running)
+      .filter((s) => s.status === ServerStatus.Succeeded)
       .map((server) => server.name);
   }
 
@@ -101,7 +101,9 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
       }
       const server = this.kernelManager.getServerByKernelConnection(connection);
       return (
-        server && server.status === 'running' && this.parties.includes(server.name)
+        server &&
+        server.status === ServerStatus.Succeeded &&
+        this.parties.includes(server.name)
       );
     });
   }

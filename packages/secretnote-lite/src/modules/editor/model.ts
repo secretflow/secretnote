@@ -101,7 +101,7 @@ export class SecretNoteModel extends LibroModel {
         type: this.currentFileContents.type,
         content: notebookContent,
         format: this.currentFileContents.format,
-        baseUrl: this.getDefaultServerBaseUrl(),
+        baseUrl: getRemoteBaseUrl(),
       });
 
       if (!res) {
@@ -156,11 +156,6 @@ export class SecretNoteModel extends LibroModel {
     return true;
   }
 
-  getDefaultServerBaseUrl() {
-    const defaultServer = this.serverManager.getDefaultServer();
-    return defaultServer ? getRemoteBaseUrl(defaultServer.id) : '';
-  }
-
   async interrupt() {
     await Promise.all(
       this.kernelConnections.map(async (item) => {
@@ -212,7 +207,7 @@ export class SecretNoteModel extends LibroModel {
   async createCheckpoint() {
     if (this.currentFileContents) {
       await this.contentsManager.createCheckpoint(this.currentFileContents.path, {
-        baseUrl: this.getDefaultServerBaseUrl(),
+        baseUrl: getRemoteBaseUrl(),
       });
     }
   }
@@ -220,7 +215,7 @@ export class SecretNoteModel extends LibroModel {
   async listCheckpoints() {
     if (this.currentFileContents) {
       await this.contentsManager.listCheckpoints(this.currentFileContents.path, {
-        baseUrl: this.getDefaultServerBaseUrl(),
+        baseUrl: getRemoteBaseUrl(),
       });
     }
   }
@@ -230,7 +225,7 @@ export class SecretNoteModel extends LibroModel {
       await this.contentsManager.restoreCheckpoint(
         this.currentFileContents.path,
         checkpointID,
-        { baseUrl: this.getDefaultServerBaseUrl() },
+        { baseUrl: getRemoteBaseUrl() },
       );
     }
   }
@@ -240,7 +235,7 @@ export class SecretNoteModel extends LibroModel {
       await this.contentsManager.deleteCheckpoint(
         this.currentFileContents.path,
         checkpointID,
-        { baseUrl: this.getDefaultServerBaseUrl() },
+        { baseUrl: getRemoteBaseUrl() },
       );
     }
   }

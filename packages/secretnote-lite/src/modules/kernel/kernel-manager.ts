@@ -11,7 +11,7 @@ import {
 } from '@difizen/libro-jupyter';
 import { inject, singleton, StorageService } from '@difizen/mana-app';
 
-import { SecretNoteServerManager } from '@/modules/server';
+import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import type { IServer } from '@/modules/server';
 import { getRemoteBaseUrl, getRemoteWsUrl } from '@/utils';
 
@@ -54,7 +54,7 @@ export class SecretNoteKernelManager {
 
   async createKernelConnections(fileInfo: IContentsModel) {
     const servers = (await this.serverManager.getServerList()).filter(
-      (s) => s.status === 'running',
+      (s) => s.status === ServerStatus.Succeeded,
     );
     const kernelConnections: IKernelConnection[] = [];
     const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(

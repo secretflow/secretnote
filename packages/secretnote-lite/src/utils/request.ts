@@ -87,9 +87,7 @@ export const request = async (url: string, init: RequestInit, targetId = '') => 
     }
   }
 
-  if (!req.headers.has('Content-Type')) {
-    req.headers.set('Content-Type', 'application/json');
-  }
+  req.headers.set('Content-Type', 'application/json');
 
   const response = await window.fetch(req);
 

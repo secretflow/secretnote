@@ -2,6 +2,8 @@ import type { NotebookModel, NotebookOption } from '@difizen/libro-jupyter';
 import { ContentContribution } from '@difizen/libro-jupyter';
 import { URI, singleton } from '@difizen/mana-app';
 
+import { getRemoteBaseUrl } from '@/utils';
+
 import type { SecretNoteModel } from '../model';
 
 @singleton({ contrib: ContentContribution })
@@ -16,7 +18,7 @@ export class SecretNoteContentContribution implements ContentContribution {
     const filePath = fireUri.path.toString();
 
     const currentFileContents = await secretNoteModel.contentsManager.get(filePath, {
-      baseUrl: secretNoteModel.getDefaultServerBaseUrl(),
+      baseUrl: getRemoteBaseUrl(),
       content: true,
     });
     if (currentFileContents) {
