@@ -40,7 +40,7 @@ export class SecretNoteModel extends LibroModel {
   filePath = '';
 
   @prop()
-  lspEnabled = true;
+  lspEnabled = false;
 
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {

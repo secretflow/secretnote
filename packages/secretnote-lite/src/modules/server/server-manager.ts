@@ -103,11 +103,15 @@ export class SecretNoteServerManager {
     const status = server.status;
     const url = 'api/kernelspecs';
 
-    if (status === ServerStatus.Failed || status === ServerStatus.Unknown) {
+    if (
+      status === ServerStatus.Terminated ||
+      status === ServerStatus.Failed ||
+      status === ServerStatus.Unknown
+    ) {
       return;
     }
 
-    if (status === ServerStatus.Pending || status === ServerStatus.Running) {
+    if (status === ServerStatus.Pending) {
       await wait(1000);
     }
 

@@ -6,6 +6,7 @@ export enum ServerStatus {
   Succeeded = 'Succeeded',
   Failed = 'Failed',
   Unknown = 'Unknown',
+  Terminated = 'Terminated', // not k8s status, but used in our app
 }
 
 export interface IServer {
