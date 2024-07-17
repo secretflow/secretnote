@@ -5,6 +5,7 @@ import { CommandRegistry, useInject, ViewInstance } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Tooltip } from 'antd';
 import { PlayCircle } from 'lucide-react';
+import React from 'react';
 
 export const SideToolbarRunItem = () => {
   const libroView = useInject<LibroView>(ViewInstance);

@@ -31,30 +31,24 @@ import './index.less';
 import type { Node, ServerStatusTag } from './service';
 import { NodeService } from './service';
 
-const { Paragraph } = Typography;
-
-const getNodeStatus = (
-  node: Node,
-): { status: ServerStatusTag; badgeStatus: ServerStatusTag; text: string } => {
+const getNodeStatus = (node: Node): { status: ServerStatusTag; text: string } => {
   const status = node.status;
-  if (status === ServerStatus.running) {
+  if (status === ServerStatus.Running || status === ServerStatus.Succeeded) {
     return {
       status: 'success',
-      badgeStatus: 'success',
       text: l10n.t('在线'),
     };
   }
-  if (status === ServerStatus.error) {
+
+  if (status === ServerStatus.Pending) {
     return {
-      status: 'error',
-      badgeStatus: 'error',
-      text: l10n.t('离线'),
+      status: 'processing',
+      text: l10n.t('启动中'),
     };
   }
 
   return {
-    status: 'default',
-    badgeStatus: 'default',
+    status: 'error',
     text: l10n.t('离线'),
   };
 };
@@ -63,7 +57,7 @@ const NodeDetails = (props: { node: Node }) => {
   const { node } = props;
   const instance = useInject<NodeView>(ViewInstance);
   const { status, text } = getNodeStatus(node);
-  const [editableStr, setEditableStr] = useState(node.name);
+  // const [editableStr, setEditableStr] = useState(node.name);
 
   const deleteNode = async (id: string) => {
     try {
@@ -76,32 +70,33 @@ const NodeDetails = (props: { node: Node }) => {
     }
   };
 
-  const onChangeNodeName = async (n: Node, name: string) => {
-    if (n.name === name) {
-      return;
-    }
-    try {
-      await instance.service.updateNodeName(n.id, name);
-      setEditableStr(name);
-    } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
-    }
-  };
+  // const onChangeNodeName = async (n: Node, name: string) => {
+  //   if (n.name === name) {
+  //     return;
+  //   }
+  //   try {
+  //     await instance.service.updateNodeName(n.id, name);
+  //     setEditableStr(name);
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       message.error(e.message);
+  //     }
+  //   }
+  // };
 
   return (
     <div className="secretnote-node-description">
       <Descriptions title={l10n.t('节点信息')} column={1}>
         <Descriptions.Item label={l10n.t('名称')}>
-          <Paragraph
+          {node.name}
+          {/* <Paragraph
             editable={{
               onChange: (str: string) => onChangeNodeName(node, str),
               tooltip: false,
             }}
           >
             {editableStr}
-          </Paragraph>
+          </Paragraph> */}
         </Descriptions.Item>
         <Descriptions.Item label={l10n.t('状态')}>
           <Badge status={status} text={text} />
@@ -132,7 +127,7 @@ export const NodeComponent = () => {
         setAddLoading(true);
         const server = await instance.service.addNode(values);
 
-        if (server.status === ServerStatus.running) {
+        if (server.status === ServerStatus.Succeeded) {
           message.success(l10n.t('节点添加成功'));
         } else {
           message.info('节点添加成功，但是节点处于离线状态');
@@ -164,9 +159,10 @@ export const NodeComponent = () => {
           rules={[
             { required: true, message: l10n.t('请输入名称') },
             { max: 16, message: l10n.t('名称过长') },
+            { pattern: /^[A-Za-z]+$/, message: l10n.t('名称只能包含英文字母') },
           ]}
         >
-          <Input placeholder="Alice" />
+          <Input placeholder="alice" />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Space>
@@ -194,13 +190,12 @@ export const NodeComponent = () => {
             key={item.id}
             content={<NodeDetails node={item} />}
             title=""
-            overlayClassName="secretnote-node-popover"
             overlayStyle={{ width: 280 }}
             trigger="click"
             placement="bottomLeft"
             arrow={false}
           >
-            <Badge status={getNodeStatus(item).badgeStatus} dot offset={[-28, 4]}>
+            <Badge status={getNodeStatus(item).status} dot offset={[-28, 4]}>
               <Avatar
                 shape="square"
                 style={{ backgroundColor: item.color, cursor: 'pointer' }}
@@ -216,7 +211,6 @@ export const NodeComponent = () => {
       <Popover
         content={addNodeFormContent}
         title=""
-        overlayClassName="secretnote-node-popover"
         overlayStyle={{ width: 446 }}
         trigger="click"
         placement="bottomLeft"

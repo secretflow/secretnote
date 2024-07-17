@@ -112,7 +112,7 @@ export class SecretNoteServerManager {
     }
 
     if (status === ServerStatus.Pending) {
-      await wait(1000);
+      await wait(3000);
     }
 
     try {

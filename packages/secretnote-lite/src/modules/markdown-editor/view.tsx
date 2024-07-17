@@ -1,7 +1,7 @@
 import type { CellCollapsible } from '@difizen/libro-jupyter';
 import { LibroEditorCellView } from '@difizen/libro-jupyter';
 import { prop, transient, useInject, view, ViewInstance } from '@difizen/mana-app';
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 
 import { Editor } from '@/components/markdown-editor';
 
