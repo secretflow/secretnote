@@ -1,12 +1,16 @@
-import { Emitter, prop, singleton } from '@difizen/mana-app';
+import type { ISpecModels } from '@difizen/libro-jupyter';
+import { ServerConnection } from '@difizen/libro-jupyter';
+import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { request, wait } from '@/utils';
+import { request, wait, getRemoteBaseUrl, getRemoteWsUrl, getToken } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus } from './protocol';
 
 @singleton()
 export class SecretNoteServerManager {
+  protected readonly serverConnection: ServerConnection;
+
   @prop()
   servers: IServer[] = [];
 
@@ -15,7 +19,9 @@ export class SecretNoteServerManager {
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
 
-  constructor() {
+  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
+    this.serverConnection = serverConnection;
+    this.updateServerConnectionSettings();
     this.getServerList();
   }
 
@@ -23,6 +29,7 @@ export class SecretNoteServerManager {
     const url = 'api/nodes';
     const init = { method: 'GET' };
     const data = (await request(url, init)) as IServer[];
+
     for (const item of data) {
       const spec = await this.getServerSpec(item);
       if (spec) {
@@ -32,6 +39,7 @@ export class SecretNoteServerManager {
     }
 
     this.servers = data;
+    this.updateServerConnectionSettings();
     return data;
   }
 
@@ -45,12 +53,14 @@ export class SecretNoteServerManager {
     };
     const data: IServer = await request(url, init);
     const spec = await this.getServerSpec(data);
+
     if (spec) {
       data.status = ServerStatus.Succeeded;
       data.kernelspec = spec;
     }
 
     this.servers.push(data);
+    this.updateServerConnectionSettings();
     this.onServerAddedEmitter.fire(data);
     return data;
   }
@@ -67,6 +77,7 @@ export class SecretNoteServerManager {
     await request(url, init);
     const server = this.servers[index];
     this.servers.splice(index, 1);
+    this.updateServerConnectionSettings();
     this.onServerAddedEmitter.fire(server);
   }
 
@@ -99,7 +110,7 @@ export class SecretNoteServerManager {
     return data;
   }
 
-  private async getServerSpec(server: IServer) {
+  private async getServerSpec(server: IServer): Promise<ISpecModels | undefined> {
     const status = server.status;
     const url = 'api/kernelspecs';
 
@@ -111,16 +122,29 @@ export class SecretNoteServerManager {
       return;
     }
 
-    if (status === ServerStatus.Pending) {
-      await wait(3000);
-    }
-
     try {
       const data = await request(url, {}, server.id);
       return data;
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
+      await wait(3000);
+      return await this.getServerSpec(server);
     }
+  }
+
+  private updateServerConnectionSettings() {
+    // update server connection settings
+    // Resolve requests such as kernelspaces/lsp are initiated in libro
+    const firstServer = this.servers[0];
+    this.serverConnection.updateSettings({
+      baseUrl: firstServer
+        ? getRemoteBaseUrl(firstServer.id, true)
+        : getRemoteBaseUrl(),
+      wsUrl: firstServer ? getRemoteWsUrl(firstServer.id, true) : getRemoteWsUrl(),
+      init: {
+        headers: {
+          Authorization: getToken(),
+        },
+      },
+    });
   }
 }

@@ -17,7 +17,6 @@ import {
   message,
   Popover,
   Space,
-  Typography,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -125,12 +124,18 @@ export const NodeComponent = () => {
       .validateFields()
       .then(async (values) => {
         setAddLoading(true);
-        const server = await instance.service.addNode(values);
 
-        if (server.status === ServerStatus.Succeeded) {
-          message.success(l10n.t('节点添加成功'));
-        } else {
-          message.info('节点添加成功，但是节点处于离线状态');
+        try {
+          const server = await instance.service.addNode(values);
+          if (server.status === ServerStatus.Succeeded) {
+            message.success(l10n.t('节点添加成功'));
+          } else {
+            message.info('节点添加成功，但是节点处于离线状态');
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            message.error(e.message);
+          }
         }
 
         setAddFormVisible(false);

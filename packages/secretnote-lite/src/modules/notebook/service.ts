@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
-import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
+import { ContentsManager } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { SecretNoteServerManager } from '@/modules/server';
-import { downloadFileByUrl, getRemoteBaseUrl, getRemoteWsUrl } from '@/utils';
+import { downloadFileByUrl, getRemoteBaseUrl } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
 
 @singleton()
 export class NotebookFileService {
-  protected readonly serverConnection: ServerConnection;
-  protected readonly serverManager: SecretNoteServerManager;
   protected readonly contentsManager: ContentsManager;
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
     pre: IContentsModel | null;
@@ -32,21 +29,8 @@ export class NotebookFileService {
   @prop()
   renameNotebookFile: { path: string; name: string } | null = null;
 
-  constructor(
-    @inject(ContentsManager) contentsManager: ContentsManager,
-    @inject(ServerConnection) serverConnection: ServerConnection,
-    @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
-  ) {
+  constructor(@inject(ContentsManager) contentsManager: ContentsManager) {
     this.contentsManager = contentsManager;
-    this.serverConnection = serverConnection;
-    this.serverManager = serverManager;
-    this.serverConnection.updateSettings({
-      baseUrl: getRemoteBaseUrl(),
-      wsUrl: getRemoteWsUrl(),
-    });
-
-    this.serverManager.onServerAdded(this.onServerChanged.bind(this));
-    this.serverManager.onServerDeleted(this.onServerChanged.bind(this));
   }
 
   openFile(file: IContentsModel) {
@@ -177,9 +161,5 @@ export class NotebookFileService {
       return '';
     }
     return name.endsWith(FILE_EXT) ? name : `${name}${FILE_EXT}`;
-  }
-
-  private onServerChanged() {
-    this.getFileList();
   }
 }

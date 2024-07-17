@@ -1,11 +1,16 @@
 import { URL as LibroURL } from '@difizen/libro-jupyter';
 
-export const getRemoteBaseUrl = (targetId = '') => {
-  return process.env.SECRETNOTE_BACKEND_URL + '/secretnote/' + targetId;
+export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
+  return (
+    process.env.SECRETNOTE_BACKEND_URL +
+    '/secretnote/' +
+    targetId +
+    `${endSlash ? '/' : ''}`
+  );
 };
 
-export const getRemoteWsUrl = (targetId = '') => {
-  return getRemoteBaseUrl(targetId).replace(/^http/, 'ws');
+export const getRemoteWsUrl = (targetId = '', endSlash = false) => {
+  return getRemoteBaseUrl(targetId, endSlash).replace(/^http/, 'ws');
 };
 
 export class ResponseError extends Error {
@@ -47,7 +52,7 @@ const getCookie = (name: string): string | undefined => {
   return matches?.[1];
 };
 
-const getToken = () => {
+export const getToken = () => {
   const auth = localStorage.getItem('pocketbase_auth');
   if (auth) {
     try {
