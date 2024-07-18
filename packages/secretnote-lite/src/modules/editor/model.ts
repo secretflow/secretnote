@@ -125,7 +125,7 @@ export class SecretNoteModel extends LibroModel {
       throw new Error('File Save Error');
     }
 
-    await this.createCheckpoint();
+    // await this.createCheckpoint();
   }
 
   async onServerAdded(server: IServer) {

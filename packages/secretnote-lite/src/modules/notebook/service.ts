@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
 import { ContentsManager } from '@difizen/libro-jupyter';
-import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 import { ServerConnection } from '@difizen/libro-jupyter';
+import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
 import { downloadFileByUrl, getRemoteBaseUrl, getRemoteWsUrl, getInit } from '@/utils';
 

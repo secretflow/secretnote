@@ -11,7 +11,7 @@ import { l10n } from '@difizen/mana-l10n';
 import type { InputRef } from 'antd';
 import { Input, message, Modal, Popover } from 'antd';
 import classnames from 'classnames';
-import { ArrowRightFromLine, Copy, PenLine, Trash } from 'lucide-react';
+import { Copy, PenLine, Trash } from 'lucide-react';
 import React from 'react';
 
 import { DropdownMenu } from '@/components/dropdown-menu';
@@ -121,11 +121,11 @@ export const NotebookFileComponent = () => {
               items={[
                 { key: 'rename', label: l10n.t('重命名'), icon: <PenLine size={12} /> },
                 { key: 'copy', label: l10n.t('复制'), icon: <Copy size={12} /> },
-                {
-                  key: 'export',
-                  label: l10n.t('导出为 .ipynb 文件'),
-                  icon: <ArrowRightFromLine size={12} />,
-                },
+                // {
+                //   key: 'export',
+                //   label: l10n.t('导出为 .ipynb 文件'),
+                //   icon: <ArrowRightFromLine size={12} />,
+                // },
                 { type: 'divider' },
                 {
                   key: 'delete',
