@@ -226,11 +226,13 @@ export const NodeComponent = () => {
         }}
         arrow={false}
       >
-        <Button
-          icon={<Plus size={16} />}
-          className="btn"
-          onClick={() => setAddFormVisible(true)}
-        />
+        {instance.service.nodes.length < 2 && (
+          <Button
+            icon={<Plus size={16} />}
+            className="btn"
+            onClick={() => setAddFormVisible(true)}
+          />
+        )}
       </Popover>
     </div>
   );

@@ -110,7 +110,10 @@ export class SecretNoteServerManager {
     return data;
   }
 
-  private async getServerSpec(server: IServer): Promise<ISpecModels | undefined> {
+  private async getServerSpec(
+    server: IServer,
+    retry = 3,
+  ): Promise<ISpecModels | undefined> {
     const status = server.status;
     const url = 'api/kernelspecs';
 
@@ -126,8 +129,10 @@ export class SecretNoteServerManager {
       const data = await request(url, {}, server.id);
       return data;
     } catch (e) {
-      await wait(3000);
-      return await this.getServerSpec(server);
+      if (retry > 0) {
+        await wait(4000);
+        return this.getServerSpec(server, retry - 1);
+      }
     }
   }
 
