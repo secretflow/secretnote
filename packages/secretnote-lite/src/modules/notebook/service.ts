@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
-import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
+import { ContentsManager } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
+import { ServerConnection } from '@difizen/libro-jupyter';
 
-import { downloadFileByUrl, getRemoteBaseUrl, getRemoteWsUrl } from '@/utils';
+import { downloadFileByUrl, getRemoteBaseUrl, getRemoteWsUrl, getInit } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
 
 @singleton()
 export class NotebookFileService {
-  protected readonly contentsManager: ContentsManager;
   protected readonly serverConnection: ServerConnection;
+  protected readonly contentsManager: ContentsManager;
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
     pre: IContentsModel | null;
     cur: IContentsModel;
@@ -34,19 +35,13 @@ export class NotebookFileService {
     @inject(ContentsManager) contentsManager: ContentsManager,
     @inject(ServerConnection) serverConnection: ServerConnection,
   ) {
-    this.contentsManager = contentsManager;
     this.serverConnection = serverConnection;
     this.serverConnection.updateSettings({
       baseUrl: getRemoteBaseUrl(),
       wsUrl: getRemoteWsUrl(),
-      init: {
-        cache: 'no-store',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+      init: getInit(),
     });
+    this.contentsManager = contentsManager;
   }
 
   openFile(file: IContentsModel) {

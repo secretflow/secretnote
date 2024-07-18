@@ -67,6 +67,17 @@ export const getToken = () => {
   return null;
 };
 
+export const getInit: () => RequestInit = () => {
+  return {
+    cache: 'no-store',
+    credentials: 'same-origin',
+    headers: {
+      Authorization: getToken(),
+      'Content-Type': 'application/json',
+    },
+  };
+};
+
 export const request = async (url: string, init: RequestInit, targetId = '') => {
   let requestUrl = normalizeUrl(url, targetId);
 

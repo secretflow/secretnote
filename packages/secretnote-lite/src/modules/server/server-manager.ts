@@ -2,7 +2,7 @@ import type { ISpecModels } from '@difizen/libro-jupyter';
 import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { request, wait, getRemoteBaseUrl, getRemoteWsUrl, getToken } from '@/utils';
+import { request, wait, getRemoteBaseUrl, getRemoteWsUrl, getInit } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus } from './protocol';
@@ -145,13 +145,7 @@ export class SecretNoteServerManager {
         ? getRemoteBaseUrl(firstServer.id, true)
         : getRemoteBaseUrl(),
       wsUrl: firstServer ? getRemoteWsUrl(firstServer.id, true) : getRemoteWsUrl(),
-      init: {
-        cache: 'no-store',
-        credentials: 'same-origin',
-        headers: {
-          Authorization: getToken(),
-        },
-      },
+      init: getInit(),
     });
   }
 }
