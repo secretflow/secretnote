@@ -58,6 +58,7 @@ export class SideBarView extends DefaultSlotView {
   readonly providers: Contribution.Provider<SideBarContribution>;
 
   constructor(
+    // @ts-ignore
     @contrib(SideBarContribution) providers: Contribution.Provider<SideBarContribution>,
     @inject(ViewManager) viewManager: ViewManager,
   ) {

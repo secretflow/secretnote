@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
-import { ContentsManager } from '@difizen/libro-jupyter';
+import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { downloadFileByUrl, getRemoteBaseUrl } from '@/utils';
+import { downloadFileByUrl, getRemoteBaseUrl, getRemoteWsUrl } from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
@@ -11,6 +11,7 @@ const FILE_EXT = '.ipynb';
 @singleton()
 export class NotebookFileService {
   protected readonly contentsManager: ContentsManager;
+  protected readonly serverConnection: ServerConnection;
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
     pre: IContentsModel | null;
     cur: IContentsModel;
@@ -29,8 +30,23 @@ export class NotebookFileService {
   @prop()
   renameNotebookFile: { path: string; name: string } | null = null;
 
-  constructor(@inject(ContentsManager) contentsManager: ContentsManager) {
+  constructor(
+    @inject(ContentsManager) contentsManager: ContentsManager,
+    @inject(ServerConnection) serverConnection: ServerConnection,
+  ) {
     this.contentsManager = contentsManager;
+    this.serverConnection = serverConnection;
+    this.serverConnection.updateSettings({
+      baseUrl: getRemoteBaseUrl(),
+      wsUrl: getRemoteWsUrl(),
+      init: {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    });
   }
 
   openFile(file: IContentsModel) {
@@ -48,6 +64,7 @@ export class NotebookFileService {
     const list = await this.contentsManager.get(BASE_PATH, {
       baseUrl: getRemoteBaseUrl(),
       content: true,
+      type: 'directory',
     });
     const notebookFileList = list.content.filter((file: any) =>
       file.name.endsWith(FILE_EXT),
@@ -123,6 +140,7 @@ export class NotebookFileService {
     const list = await this.contentsManager.get(BASE_PATH, {
       baseUrl: getRemoteBaseUrl(),
       content: true,
+      type: 'directory',
     });
     return list.content.some((file: any) => file.path === path);
   }
