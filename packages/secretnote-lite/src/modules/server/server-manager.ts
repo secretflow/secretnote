@@ -146,6 +146,8 @@ export class SecretNoteServerManager {
         : getRemoteBaseUrl(),
       wsUrl: firstServer ? getRemoteWsUrl(firstServer.id, true) : getRemoteWsUrl(),
       init: {
+        cache: 'no-store',
+        credentials: 'same-origin',
         headers: {
           Authorization: getToken(),
         },
