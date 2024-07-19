@@ -79,6 +79,7 @@ const NodeDetails = (props: { node: Node }) => {
   };
 
   const startNode = async (id: string) => {
+    setLoading(true);
     try {
       await instance.service.startNode(id);
       message.success(l10n.t('启动成功'));
@@ -92,6 +93,7 @@ const NodeDetails = (props: { node: Node }) => {
   };
 
   const stopNode = async (id: string) => {
+    setLoading(true);
     try {
       await instance.service.stopNode(id);
       message.success(l10n.t('停止成功'));
