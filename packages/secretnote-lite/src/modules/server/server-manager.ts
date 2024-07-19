@@ -22,7 +22,7 @@ export class SecretNoteServerManager {
   protected readonly onServerStartedEmitter = new Emitter<IServer>();
   readonly onServerStarted = this.onServerStartedEmitter.event;
   protected readonly onServerStoppedEmitter = new Emitter<IServer>();
-  readonly onServerStopped = this.onServerStartedEmitter.event;
+  readonly onServerStopped = this.onServerStoppedEmitter.event;
 
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;

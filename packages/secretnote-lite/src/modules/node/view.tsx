@@ -18,6 +18,7 @@ import {
   Popover,
   Space,
   Typography,
+  Spin,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -35,17 +36,18 @@ const { Paragraph } = Typography;
 
 const getNodeStatus = (node: Node): { status: ServerStatusTag; text: string } => {
   const status = node.status;
-  if (status === ServerStatus.Running || status === ServerStatus.Succeeded) {
-    return {
-      status: 'success',
-      text: l10n.t('在线'),
-    };
-  }
 
   if (status === ServerStatus.Pending) {
     return {
       status: 'processing',
       text: l10n.t('启动中'),
+    };
+  }
+
+  if (status === ServerStatus.Succeeded || status === ServerStatus.Running) {
+    return {
+      status: 'success',
+      text: l10n.t('在线'),
     };
   }
 
@@ -59,9 +61,11 @@ const NodeDetails = (props: { node: Node }) => {
   const { node } = props;
   const instance = useInject<NodeView>(ViewInstance);
   const { status, text } = getNodeStatus(node);
+  const [loading, setLoading] = useState(false);
   // const [editableStr, setEditableStr] = useState(node.name);
 
   const deleteNode = async (id: string) => {
+    setLoading(true);
     try {
       await instance.service.deleteNode(id);
       message.success(l10n.t('删除成功'));
@@ -69,6 +73,8 @@ const NodeDetails = (props: { node: Node }) => {
       if (e instanceof Error) {
         message.error(e.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,6 +86,8 @@ const NodeDetails = (props: { node: Node }) => {
       if (e instanceof Error) {
         message.error(e.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +99,8 @@ const NodeDetails = (props: { node: Node }) => {
       if (e instanceof Error) {
         message.error(e.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,10 +120,11 @@ const NodeDetails = (props: { node: Node }) => {
 
   return (
     <div className="secretnote-node-description">
-      <Descriptions title={l10n.t('节点信息')} column={1}>
-        <Descriptions.Item label={l10n.t('名称')}>
-          {node.name}
-          {/* <Paragraph
+      <Spin spinning={loading}>
+        <Descriptions title={l10n.t('节点信息')} column={1}>
+          <Descriptions.Item label={l10n.t('名称')}>
+            {node.name}
+            {/* <Paragraph
             editable={{
               onChange: (str: string) => onChangeNodeName(node, str),
               tooltip: false,
@@ -121,40 +132,45 @@ const NodeDetails = (props: { node: Node }) => {
           >
             {editableStr}
           </Paragraph> */}
-        </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('状态')}>
-          <Badge status={status} text={text} />
-        </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('服务 ID')}>
-          <Paragraph copyable>{node.service}</Paragraph>
-        </Descriptions.Item>
-      </Descriptions>
-      <Space>
-        <Button
-          type="link"
-          onClick={() => {
-            deleteNode(node.id);
-          }}
-        >
-          {l10n.t('删除')}
-        </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            startNode(node.id);
-          }}
-        >
-          {l10n.t('启动')}
-        </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            stopNode(node.id);
-          }}
-        >
-          {l10n.t('停止')}
-        </Button>
-      </Space>
+          </Descriptions.Item>
+          <Descriptions.Item label={l10n.t('状态')}>
+            <Badge status={status} text={text} />
+          </Descriptions.Item>
+          <Descriptions.Item label={l10n.t('服务 ID')}>
+            <Paragraph copyable>{node.service}</Paragraph>
+          </Descriptions.Item>
+        </Descriptions>
+        <Space>
+          <Button
+            type="link"
+            onClick={() => {
+              deleteNode(node.id);
+            }}
+          >
+            {l10n.t('删除')}
+          </Button>
+          {node.status === ServerStatus.Terminated && (
+            <Button
+              type="link"
+              onClick={() => {
+                startNode(node.id);
+              }}
+            >
+              {l10n.t('启动')}
+            </Button>
+          )}
+          {node.status === ServerStatus.Succeeded && (
+            <Button
+              type="link"
+              onClick={() => {
+                stopNode(node.id);
+              }}
+            >
+              {l10n.t('停止')}
+            </Button>
+          )}
+        </Space>
+      </Spin>
     </div>
   );
 };
@@ -241,7 +257,7 @@ export const NodeComponent = () => {
             key={item.id}
             content={<NodeDetails node={item} />}
             title=""
-            overlayStyle={{ width: 280 }}
+            overlayStyle={{ width: 380 }}
             trigger="click"
             placement="bottomLeft"
             arrow={false}
