@@ -25,6 +25,8 @@ export class FileService {
     this.serverManager = serverManager;
     this.serverManager.onServerAdded(this.onServerChanged.bind(this));
     this.serverManager.onServerDeleted(this.onServerChanged.bind(this));
+    this.serverManager.onServerStarted(this.onServerChanged.bind(this));
+    this.serverManager.onServerStopped(this.onServerChanged.bind(this));
   }
 
   async getFileTree() {

@@ -17,6 +17,7 @@ import {
   message,
   Popover,
   Space,
+  Typography,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -29,6 +30,8 @@ import { ServerStatus } from '../server';
 import './index.less';
 import type { Node, ServerStatusTag } from './service';
 import { NodeService } from './service';
+
+const { Paragraph } = Typography;
 
 const getNodeStatus = (node: Node): { status: ServerStatusTag; text: string } => {
   const status = node.status;
@@ -69,6 +72,28 @@ const NodeDetails = (props: { node: Node }) => {
     }
   };
 
+  const startNode = async (id: string) => {
+    try {
+      await instance.service.startNode(id);
+      message.success(l10n.t('启动成功'));
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+      }
+    }
+  };
+
+  const stopNode = async (id: string) => {
+    try {
+      await instance.service.stopNode(id);
+      message.success(l10n.t('停止成功'));
+    } catch (e) {
+      if (e instanceof Error) {
+        message.error(e.message);
+      }
+    }
+  };
+
   // const onChangeNodeName = async (n: Node, name: string) => {
   //   if (n.name === name) {
   //     return;
@@ -100,15 +125,36 @@ const NodeDetails = (props: { node: Node }) => {
         <Descriptions.Item label={l10n.t('状态')}>
           <Badge status={status} text={text} />
         </Descriptions.Item>
+        <Descriptions.Item label={l10n.t('服务 ID')}>
+          <Paragraph copyable>{node.service}</Paragraph>
+        </Descriptions.Item>
       </Descriptions>
-      <Button
-        type="link"
-        onClick={() => {
-          deleteNode(node.id);
-        }}
-      >
-        {l10n.t('删除')}
-      </Button>
+      <Space>
+        <Button
+          type="link"
+          onClick={() => {
+            deleteNode(node.id);
+          }}
+        >
+          {l10n.t('删除')}
+        </Button>
+        <Button
+          type="link"
+          onClick={() => {
+            startNode(node.id);
+          }}
+        >
+          {l10n.t('启动')}
+        </Button>
+        <Button
+          type="link"
+          onClick={() => {
+            stopNode(node.id);
+          }}
+        >
+          {l10n.t('停止')}
+        </Button>
+      </Space>
     </div>
   );
 };
