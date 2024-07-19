@@ -120,7 +120,8 @@ export class NotebookFileService {
     const data = await this.contentsManager.getDownloadUrl(file.path, {
       baseUrl: getRemoteBaseUrl(),
     });
-    downloadFileByUrl(data, file.name);
+    const resp = await this.serverConnection.makeRequest(data, { method: 'GET' });
+    downloadFileByUrl(window.URL.createObjectURL(await resp.blob()), file.name);
   }
 
   async copyFile(file: IContentsModel) {
