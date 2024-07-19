@@ -194,7 +194,7 @@ export const NodeComponent = () => {
           if (server.status === ServerStatus.Succeeded) {
             message.success(l10n.t('节点添加成功'));
           } else {
-            message.info('节点添加成功，但是节点处于离线状态');
+            message.info('节点添加成功，但是节点处于离线状态，请联系管理员');
           }
         } catch (e) {
           if (e instanceof Error) {
