@@ -9,6 +9,7 @@ export interface Node {
   name: string;
   color: string;
   status: ServerStatus;
+  service?: string;
 }
 
 export type ServerStatusTag = 'processing' | 'default' | 'error' | 'success';
@@ -37,6 +38,14 @@ export class NodeService {
 
   async deleteNode(id: string) {
     await this.serverManager.deleteServer(id);
+  }
+
+  async startNode(id: string) {
+    await this.serverManager.startServer(id);
+  }
+
+  async stopNode(id: string) {
+    await this.serverManager.stopServer(id);
   }
 
   async updateNodeName(id: string, name: string) {

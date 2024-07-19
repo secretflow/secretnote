@@ -19,6 +19,11 @@ export class SecretNoteServerManager {
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
 
+  protected readonly onServerStartedEmitter = new Emitter<IServer>();
+  readonly onServerStarted = this.onServerStartedEmitter.event;
+  protected readonly onServerStoppedEmitter = new Emitter<IServer>();
+  readonly onServerStopped = this.onServerStartedEmitter.event;
+
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
     this.updateServerConnectionSettings();
@@ -110,6 +115,54 @@ export class SecretNoteServerManager {
     return data;
   }
 
+  async startServer(id: string) {
+    const url = 'api/nodes/start/' + id;
+    const init = {
+      method: 'PATCH',
+    };
+    const server: IServer = await request(url, init);
+
+    if (server) {
+      const spec = await this.getServerSpec(server);
+      if (spec) {
+        server.status = ServerStatus.Succeeded;
+        server.kernelspec = spec;
+      }
+
+      this.servers = this.servers.map((item) => {
+        if (item.id === id) {
+          return server;
+        }
+        return item;
+      });
+      this.updateServerConnectionSettings();
+      this.onServerStartedEmitter.fire(server);
+      return server;
+    }
+  }
+
+  async stopServer(id: string) {
+    const url = 'api/nodes/stop/' + id;
+    const init = {
+      method: 'PATCH',
+    };
+    const server: IServer = await request(url, init);
+
+    if (server) {
+      server.status = ServerStatus.Terminated;
+      server.kernelspec = undefined;
+
+      this.servers = this.servers.map((item) => {
+        if (item.id === id) {
+          return server;
+        }
+        return item;
+      });
+      this.updateServerConnectionSettings();
+      this.onServerStoppedEmitter.fire(server);
+    }
+  }
+
   private async getServerSpec(
     server: IServer,
     retry = 3,
@@ -140,11 +193,16 @@ export class SecretNoteServerManager {
     // update server connection settings
     // Resolve requests such as kernelspaces/lsp are initiated in libro
     const firstServer = this.servers[0];
+    const firstServerOnline =
+      firstServer && firstServer.status === ServerStatus.Succeeded;
+
     this.serverConnection.updateSettings({
-      baseUrl: firstServer
+      baseUrl: firstServerOnline
         ? getRemoteBaseUrl(firstServer.id, true)
         : getRemoteBaseUrl(),
-      wsUrl: firstServer ? getRemoteWsUrl(firstServer.id, true) : getRemoteWsUrl(),
+      wsUrl: firstServerOnline
+        ? getRemoteWsUrl(firstServer.id, true)
+        : getRemoteWsUrl(),
       init: getInit(),
     });
   }

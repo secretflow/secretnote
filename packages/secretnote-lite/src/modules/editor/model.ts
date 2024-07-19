@@ -67,6 +67,8 @@ export class SecretNoteModel extends LibroModel {
     this.commandRegistry = commandRegistry;
     this.serverManager.onServerAdded(this.onServerAdded.bind(this));
     this.serverManager.onServerDeleted(this.onServerDeleted.bind(this));
+    this.serverManager.onServerStarted(this.onServerAdded.bind(this));
+    this.serverManager.onServerStopped(this.onServerDeleted.bind(this));
     this.onChanged(this.autoSave.bind(this));
   }
 
