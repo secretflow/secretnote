@@ -1,0 +1,45 @@
+.secretnote-dropdown-menu {
+  width: 224px;
+
+  .ant-dropdown-menu {
+    padding: 4px 0;
+    border: 1px solid var(--mana-secretnote-li-hover-background);
+    border-radius: 4px;
+    box-shadow: rgb(0 0 0 / 5%) 0 1px 2px 0;
+
+    .ant-dropdown-menu-item {
+      padding: 4px 8px;
+      border-radius: 0;
+      font-size: 12px;
+      font-weight: 400;
+
+      .ant-dropdown-menu-item-icon {
+        margin-top: -2px;
+        margin-right: 6px;
+      }
+    }
+
+    .ant-dropdown-menu-item:not(.ant-dropdown-menu-item-danger) {
+      .ant-dropdown-menu-title-content {
+        color: var(--mana-secretnote-text-color);
+      }
+
+      .ant-dropdown-menu-item-icon {
+        color: var(--mana-secretnote-icon-color);
+      }
+    }
+  }
+
+  .ant-upload {
+    padding-left: 30px;
+    margin-left: -30px;
+    color: var(--mana-secretnote-text-color);
+    font-size: 12px;
+  }
+}
+
+.ant-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  color: var(--mana-secretnote-icon-color);
+}
