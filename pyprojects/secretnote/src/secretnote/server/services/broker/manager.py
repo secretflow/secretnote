@@ -44,6 +44,9 @@ class BrokerManager:
             print("Error: " + str(e))
 
     def get_request_status(self, response):
+        if response is None:
+            return 500, "no response found."
+
         code = 0
         message = ""
         status = response.get("status", None)
@@ -70,7 +73,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         return response.get("project_id", "")
@@ -85,7 +88,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         return response.get("projects", [])
@@ -100,12 +103,12 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         project = response.get("projects", [])
 
-        return project[0] if len(project) > 0 else None
+        return project[0] if len(project) > 0 else None  # type: ignore
 
     async def get_invitation_list(
         self, party: str, address: str
@@ -119,7 +122,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         invite_list = response.get("invitations", [])
@@ -177,7 +180,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         return response.get("tables", [])
@@ -230,7 +233,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         table = response.get("tables", [])
@@ -252,7 +255,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         return response.get("column_control_list", [])
@@ -304,12 +307,13 @@ class BrokerManager:
             method="POST",
             body=body,
         )
+
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
-        return response.get("out_columns", [])
+        return response.get("result").get("out_columns", [])
 
     async def create_query_job(self, project_id: str, address: str, query: str) -> str:
         url = f"{address}{BROKER_SERVICE_PATH['submit_query']}"
@@ -324,7 +328,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         return response.get("job_id", "")
@@ -339,7 +343,7 @@ class BrokerManager:
         )
         code, message = self.get_request_status(response)
 
-        if code != 0:
+        if response is None or code != 0:
             raise Exception(message)
 
         return response.get("out_columns", [])
