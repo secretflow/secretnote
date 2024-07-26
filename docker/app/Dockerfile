@@ -21,7 +21,7 @@ RUN pnpm fetch
 
 COPY --from=source-tree /repo /repo
 
-RUN pnpm install --no-frozen-lockfile --offline
+RUN pnpm install --no-frozen-lockfile
 
 RUN cargo install gcc
 RUN pnpm exec nx run-many -t build:js -t build:py
