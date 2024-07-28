@@ -1,7 +1,7 @@
 import { URL as LibroURL } from '@difizen/libro-jupyter';
 
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
-  const backendUrl = process.env.SECRETNOTE_BACKEND_URL;
+  const backendUrl = process.env.PB_BACKEND_URL;
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 
