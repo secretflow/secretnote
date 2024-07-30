@@ -44,6 +44,8 @@ export class SecretNoteServerManager {
         if (spec) {
           item.status = ServerStatus.Succeeded;
           item.kernelspec = spec;
+        } else {
+          item.status = ServerStatus.Terminated;
         }
       }
       this.servers = data;

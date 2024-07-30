@@ -139,7 +139,7 @@ const NodeDetails = (props: { node: Node }) => {
             <Badge status={status} text={text} />
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('IP')}>
-            <Paragraph copyable={!!node.podIp}>{node.podIp || '暂无信息'}</Paragraph>
+            <Paragraph copyable={!!node.podIp}>{node.podIp || '暂无数据'}</Paragraph>
           </Descriptions.Item>
         </Descriptions>
         <Space>
@@ -298,6 +298,7 @@ export const NodeComponent = () => {
           />
         )}
       </Popover>
+      {instance.service.loading && <Spin size="small" className="ml-2" />}
     </div>
   );
 };
