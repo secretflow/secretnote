@@ -12,6 +12,9 @@ export class SecretNoteServerManager {
   protected readonly serverConnection: ServerConnection;
 
   @prop()
+  loading = false;
+
+  @prop()
   servers: IServer[] = [];
 
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
@@ -31,21 +34,26 @@ export class SecretNoteServerManager {
   }
 
   async getServerList() {
-    const url = 'api/nodes';
-    const init = { method: 'GET' };
-    const data = (await request(url, init)) as IServer[];
-
-    for (const item of data) {
-      const spec = await this.getServerSpec(item);
-      if (spec) {
-        item.status = ServerStatus.Succeeded;
-        item.kernelspec = spec;
+    this.loading = true;
+    try {
+      const url = 'api/nodes';
+      const init = { method: 'GET' };
+      const data = (await request(url, init)) as IServer[];
+      for (const item of data) {
+        const spec = await this.getServerSpec(item);
+        if (spec) {
+          item.status = ServerStatus.Succeeded;
+          item.kernelspec = spec;
+        }
       }
+      this.servers = data;
+      this.updateServerConnectionSettings();
+      return data;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.loading = false;
     }
-
-    this.servers = data;
-    this.updateServerConnectionSettings();
-    return data;
   }
 
   async addServer(server: Partial<IServer>) {
@@ -62,6 +70,11 @@ export class SecretNoteServerManager {
     if (spec) {
       data.status = ServerStatus.Succeeded;
       data.kernelspec = spec;
+    }
+
+    const serverDetail = await this.getServerDetail(data.id);
+    if (serverDetail) {
+      data.portIp = serverDetail.portIp;
     }
 
     this.servers.push(data);
@@ -129,6 +142,11 @@ export class SecretNoteServerManager {
         server.kernelspec = spec;
       }
 
+      const serverDetail = await this.getServerDetail(server.id);
+      if (serverDetail) {
+        server.portIp = serverDetail.portIp;
+      }
+
       this.servers = this.servers.map((item) => {
         if (item.id === id) {
           return server;
@@ -165,7 +183,7 @@ export class SecretNoteServerManager {
 
   private async getServerSpec(
     server: IServer,
-    retry = 3,
+    retry = 5,
   ): Promise<ISpecModels | undefined> {
     const status = server.status;
     const url = 'api/kernelspecs';
@@ -179,7 +197,14 @@ export class SecretNoteServerManager {
     }
 
     try {
-      const data = await request(url, {}, server.id);
+      const data = await Promise.race([
+        request(url, {}, server.id),
+        new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Error('timeout'));
+          }, 5000);
+        }),
+      ]);
       return data;
     } catch (e) {
       if (retry > 0) {

@@ -10,6 +10,7 @@ export interface Node {
   color: string;
   status: ServerStatus;
   service?: string;
+  podIp?: string;
 }
 
 export type ServerStatusTag = 'processing' | 'default' | 'error' | 'success';
@@ -21,6 +22,10 @@ export class NodeService {
 
   constructor(@inject(SecretNoteServerManager) serverManager: SecretNoteServerManager) {
     this.serverManager = serverManager;
+  }
+
+  get loading() {
+    return this.serverManager.loading;
   }
 
   get nodes() {
