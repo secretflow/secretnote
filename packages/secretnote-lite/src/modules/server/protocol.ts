@@ -14,5 +14,6 @@ export interface IServer {
   name: string;
   status: ServerStatus;
   service: string;
+  portIp: string;
   kernelspec?: ISpecModels;
 }

@@ -48,4 +48,4 @@ workflows:
               only:
                 - main
           platform: linux/amd64
-          tag: 1.6.1-amd64
+          tag: 1.6.1

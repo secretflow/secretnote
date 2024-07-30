@@ -32,6 +32,8 @@ RUN rsync -avm --include='pyprojects/**/dist/*.whl' -f 'hide,! */' /repo/./ /dis
 
 FROM secretflow/secretflow-anolis8:1.6.1b0
 
+RUN useradd -m secretnote
+
 COPY --from=build /dist /dist
 
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
@@ -45,6 +47,8 @@ RUN npm install @difizen/libro-analyzer
 COPY ./docker/app/root/ /root/
 
 RUN mkdir workspace
+
+RUN chown -R secretnote:secretnote /root
 
 ENV SELF_PARTY=alice
 ENV ALL_PARTIES=alice,bob

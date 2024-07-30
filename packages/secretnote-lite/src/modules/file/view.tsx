@@ -138,7 +138,7 @@ export const FileComponent = () => {
       { key: 'upload', label: uploadRender(nodeData), icon: <UploadIcon size={12} /> },
     ];
     const dataMenuItems: Menu[] = [
-      { key: 'view', label: l10n.t('查看'), icon: <Link size={12} /> },
+      // { key: 'view', label: l10n.t('查看'), icon: <Link size={12} /> },
       {
         key: 'copy',
         label: l10n.t('复制路径到剪切板'),

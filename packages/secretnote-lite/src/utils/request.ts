@@ -1,7 +1,11 @@
 import { URL as LibroURL } from '@difizen/libro-jupyter';
 
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
-  return window.location.origin + '/secretnote/' + targetId + `${endSlash ? '/' : ''}`;
+  const backendUrl = process.env.PB_BACKEND_URL;
+  const origin =
+    !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
+
+  return origin + '/secretnote/' + targetId + `${endSlash ? '/' : ''}`;
 };
 
 export const getRemoteWsUrl = (targetId = '', endSlash = false) => {

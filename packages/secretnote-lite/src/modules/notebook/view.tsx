@@ -120,7 +120,7 @@ export const NotebookFileComponent = () => {
             <DropdownMenu
               items={[
                 { key: 'rename', label: l10n.t('重命名'), icon: <PenLine size={12} /> },
-                { key: 'copy', label: l10n.t('复制'), icon: <Copy size={12} /> },
+                // { key: 'copy', label: l10n.t('复制'), icon: <Copy size={12} /> },
                 {
                   key: 'export',
                   label: l10n.t('导出为 .ipynb 文件'),
