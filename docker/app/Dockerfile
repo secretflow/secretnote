@@ -34,26 +34,27 @@ FROM secretflow/secretflow-anolis8:1.6.1b0
 
 RUN useradd -m secretnote
 
-COPY --from=build /dist /dist
-
-RUN pip install /dist/pyprojects/secretnote/dist/*.whl
-
-WORKDIR /root
-
 RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
 RUN yum install -y nodejs
+RUN npm config set registry https://registry.npmmirror.com
 RUN npm install @difizen/libro-analyzer
 
-COPY ./docker/app/root/ /root/
+COPY --from=build /dist /dist
+RUN pip install /dist/pyprojects/secretnote/dist/*.whl
+
+WORKDIR /home/secretnote
+
+COPY ./docker/app/root/ ./
 
 RUN mkdir workspace
 
-RUN chown -R secretnote:secretnote /root
+RUN chown -R secretnote:secretnote /home/secretnote
 USER secretnote
+
 
 ENV SELF_PARTY=alice
 ENV ALL_PARTIES=alice,bob
 
 EXPOSE 8888
 
-ENTRYPOINT [ "/root/scripts/start.sh" ]
+ENTRYPOINT [ "/home/secretnote/scripts/start.sh" ]

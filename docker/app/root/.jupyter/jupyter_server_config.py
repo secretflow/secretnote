@@ -15,7 +15,7 @@ c.ServerApp.token = ""
 
 c.ServerApp.ip = "*"
 
-c.ServerApp.root_dir = "/root/workspace"
+c.ServerApp.root_dir = "/home/secretnote/workspace"
 
 c.LanguageServerManager.autodetect = False
 
