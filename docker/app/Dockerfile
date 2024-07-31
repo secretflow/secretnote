@@ -49,6 +49,7 @@ COPY ./docker/app/root/ /root/
 RUN mkdir workspace
 
 RUN chown -R secretnote:secretnote /root
+USER secretnote
 
 ENV SELF_PARTY=alice
 ENV ALL_PARTIES=alice,bob
