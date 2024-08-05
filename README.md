@@ -10,44 +10,42 @@ SecretNote 是专为隐语开发者打造的高级工具套件。以 notebook �
 
 SecretNote 有单独的 [pip](https://pypi.org/project/secretnote/) 安装包，可以单独使用。为了避免安装、部署、启动等环境问题，推荐使用 docker 方式启动 SecretFlow 运行环境。
 
-**注意：当前 docker 镜像提供 1.3.0-amd64 和 1.5.0-amd64 两个版本，和 secretflow 的版本是对应的，也就是说，如果你想使用 secretflow 1.5 版本，那就使用镜像 secretflow/secretnote:1.5.0-amd64**
+**注意：secretnote 镜像版本 secretflow 的版本是对应的，也就是说，如果你想使用 secretflow 1.6.1 版本，那就使用镜像 secretflow/secretnote:1.6.1**
 
-1. 启动两个容器，推荐使用 docker compose，这样方便管理容器之间的通信。新建文件夹，并新建文件 `docker-compose.yml`，内容如下：
+1. 启动两个容器，推荐使用 docker compose，这样方便管理容器之间的通信。在工作目录，新建 alice 和 bob 两个目录，新建文件 `docker-compose.yml`，内容如下：
 
 ```yml
 services:
   alice:
-    image: 'secretflow/secretnote:1.3.0-amd64'
+    image: 'secretflow/secretnote:1.6.1'
     platform: linux/amd64
     environment:
       - SELF_PARTY=alice
       - ALL_PARTIES=alice,bob
     ports:
       - 8090:8888
-    entrypoint: /root/scripts/start.sh
     volumes:
-      - /root/scripts
+      - ./alice:/root/workspace
 
   bob:
-    image: 'secretflow/secretnote:1.3.0-amd64'
+    image: 'secretflow/secretnote:1.6.1'
     platform: linux/amd64
     environment:
       - SELF_PARTY=bob
       - ALL_PARTIES=alice,bob
     ports:
       - 8092:8888
-    entrypoint: /root/scripts/start.sh
     volumes:
-      - /root/scripts
+      - ./bob:/root/workspace
 ```
 
 然后在新建的文件夹中执行以下命令：
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
-2. 在浏览器中打开 `http://localhost:8090` 或者 `http://localhost:8092` 访问 Web Client 进行 SecretFlow 代码研发。详细步骤可以参考[文档](./docs/guide/secretnote-sf.md)。
+2. 在浏览器中打开 `http://localhost:8090` 或者 `http://localhost:8092` 访问 Web Client 进行 SecretFlow 代码研发。详细 操作步骤可以参考[文档](./docs/guide/secretnote-sf.md)。
 
 ### 与 SCQL 一起使用
 
@@ -67,4 +65,4 @@ pip install -U secretnote
 secretnote --mode=scql --party=alice --host=http://127.0.0.1:8991
 ```
 
-3. 分别打开两台机器的启动的 Web Client，然后在 Web Client 上完成整个 SCQL 研发流程。详细步骤可以参考[文档](./docs/guide/secretnote-scql.md)。
+3. 分别打开两台机器的启动的 Web Client，然后在 Web Client 上完成整个 SCQL 研发流程。详细操作步骤可以参考[文档](./docs/guide/secretnote-scql.md)。

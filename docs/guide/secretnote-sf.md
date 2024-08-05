@@ -4,44 +4,40 @@
 
 在一台机器上使用 docker compose 启动两个容器，容器启动时会安装 SecretFLow、SecretNote，并且分别启动 Ray 服务以及 SecretNote 服务。
 
-**注意：当前 docker 镜像提供 1.3.0-amd64 和 1.5.0-amd64 两个版本，和 secretflow 的版本是对应的，也就是说，如果你想使用 secretflow 1.5 版本，那就使用镜像 secretflow/secretnote:1.5.0-amd64**
-
-在一个文件夹下面新建文件 `docker-compose.yml`，内容如下：
+在一个文件夹下面新建文件夹 alice 和 bob， 新建文件 `docker-compose.yml`，内容如下：
 
 ```yml
 services:
   alice:
-    image: 'secretflow/secretnote:1.3.0-amd64'
+    image: 'secretflow/secretnote:1.6.1'
     platform: linux/amd64
     environment:
       - SELF_PARTY=alice
       - ALL_PARTIES=alice,bob
     ports:
       - 8090:8888
-    entrypoint: /root/scripts/start.sh
     volumes:
-      - /root/scripts
+      - ./alice:/root/workspace
 
   bob:
-    image: 'secretflow/secretnote:1.3.0-amd64'
+    image: 'secretflow/secretnote:1.6.1'
     platform: linux/amd64
     environment:
       - SELF_PARTY=bob
       - ALL_PARTIES=alice,bob
     ports:
       - 8092:8888
-    entrypoint: /root/scripts/start.sh
     volumes:
-      - /root/scripts
+      - ./bob:/root/workspace
 ```
 
 然后在新建的文件夹中执行以下命令：
 
 ```bash
-docker compose up
+docker compose up -d
 ```
 
-在浏览器中（推荐使用 Chrome）通过地址 `http://127.0.0.1:8090` 打开 Web Client，并在右上角节点管理区域将两个计算节点添加进来（两个节点地址为 `本机IP:8090` 和 `本机IP:8092`）。注意这里添加节点的时候需要输入本机的 IP 地址，不能直接输入 `localhost` 或者 `127.0.0.1`，因为它们都指向容器自身的网络接口。
+在浏览器中（推荐使用 Chrome）通过地址 `http://127.0.0.1:8090` 打开 Web Client，并在右上角节点管理区域将两个计算节点添加进来（因为 docker compose 内置 DNS 解析功能，允许节点之间通过服务名称互相访问，所以两个计算节点地址可以填 `alice:8888` 和 `bob:8888`）。
 
 ![image.png](./images/node.png)
 

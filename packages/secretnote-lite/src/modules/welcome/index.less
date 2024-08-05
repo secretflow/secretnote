@@ -1,10 +1,75 @@
 .secretnote-welcome-page {
-  display: flex;
+  overflow: auto;
   width: 100%;
   height: 100%;
-  align-items: center;
-  justify-content: center;
+  box-sizing: border-box;
+  padding: 32px 48px;
   color: var(--mana-secretnote-text-color);
-  font-size: 28px;
-  font-weight: 700;
+
+  a {
+    color: #1677ff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .list {
+    padding-left: 16px;
+    margin-left: 0;
+    list-style-type: decimal;
+  }
+
+  .process {
+    width: 800px;
+    height: 100%;
+
+    .header {
+      .title {
+        color: var(--mana-secretnote-text-color);
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        margin-top: 12px;
+        font-size: 14px;
+      }
+    }
+
+    .progress {
+      margin: 16px 0;
+    }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .step {
+      .text {
+        margin: 8px 0;
+        color: var(--mana-secretnote-text-color);
+        font-size: 14px;
+        font-weight: normal;
+      }
+
+      img {
+        width: 500px;
+        margin: 16px 0;
+      }
+
+      .links {
+        padding: 8px 0;
+
+        .link {
+          margin-right: 24px;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+      }
+    }
+
+    .ant-btn {
+      display: block;
+    }
+  }
 }

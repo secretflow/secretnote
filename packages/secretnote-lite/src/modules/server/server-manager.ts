@@ -210,7 +210,7 @@ export class SecretNoteServerManager {
       return data;
     } catch (e) {
       if (retry > 0) {
-        await wait(4000);
+        await wait(5000);
         return this.getServerSpec(server, retry - 1);
       }
     }
