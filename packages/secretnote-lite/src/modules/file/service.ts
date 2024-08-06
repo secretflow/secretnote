@@ -153,7 +153,7 @@ export class FileService {
 
   copyPath(nodeData: DataNode) {
     const { path } = this.parseNodeKey(nodeData.key as string);
-    navigator.clipboard.writeText(path);
+    navigator.clipboard.writeText(`/home/secretnote/workspace/${path}`);
   }
 
   getFileExt(nodeData: DataNode) {

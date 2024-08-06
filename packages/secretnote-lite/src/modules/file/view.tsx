@@ -16,7 +16,6 @@ import {
   Download,
   File,
   FileText,
-  Link,
   ScrollText,
   Table,
   Trash,

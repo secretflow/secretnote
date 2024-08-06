@@ -4,7 +4,12 @@ import { ContentsManager } from '@difizen/libro-jupyter';
 import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { downloadFileByUrl, getRemoteBaseUrl, getRemoteWsUrl, getInit } from '@/utils';
+import {
+  downloadFileByUrl,
+  getRemoteBaseUrl,
+  getRemoteWsUrl,
+  getDefaultConnectionSettings,
+} from '@/utils';
 
 const BASE_PATH = '/';
 const FILE_EXT = '.ipynb';
@@ -39,7 +44,7 @@ export class NotebookFileService {
     this.serverConnection.updateSettings({
       baseUrl: getRemoteBaseUrl(),
       wsUrl: getRemoteWsUrl(),
-      init: getInit(),
+      ...getDefaultConnectionSettings(),
     });
     this.contentsManager = contentsManager;
   }
@@ -121,7 +126,10 @@ export class NotebookFileService {
       baseUrl: getRemoteBaseUrl(),
     });
     const resp = await this.serverConnection.makeRequest(data, { method: 'GET' });
-    downloadFileByUrl(window.URL.createObjectURL(await resp.blob()), file.name);
+
+    if (resp.status === 200) {
+      downloadFileByUrl(window.URL.createObjectURL(await resp.blob()), file.name);
+    }
   }
 
   async copyFile(file: IContentsModel) {

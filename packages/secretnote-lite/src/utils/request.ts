@@ -1,3 +1,4 @@
+import type { ISettings } from '@difizen/libro-jupyter';
 import { URL as LibroURL } from '@difizen/libro-jupyter';
 
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
@@ -66,14 +67,17 @@ export const getToken = () => {
   return null;
 };
 
-export const getInit: () => RequestInit = () => {
+export const getDefaultConnectionSettings: () => Partial<ISettings> = () => {
   return {
-    cache: 'no-store',
-    credentials: 'same-origin',
-    headers: {
-      Authorization: getToken(),
-      'Content-Type': 'application/json',
+    init: {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
+    token: getToken(),
+    appendToken: true,
   };
 };
 

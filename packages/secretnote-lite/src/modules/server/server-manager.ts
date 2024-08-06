@@ -2,7 +2,7 @@ import type { ISpecModels } from '@difizen/libro-jupyter';
 import { ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import { request, wait, getRemoteBaseUrl, getRemoteWsUrl, getInit } from '@/utils';
+import { request, wait } from '@/utils';
 
 import type { IServer } from './protocol';
 import { ServerStatus } from './protocol';
@@ -185,7 +185,7 @@ export class SecretNoteServerManager {
 
   private async getServerSpec(
     server: IServer,
-    retry = 5,
+    retry = 6,
   ): Promise<ISpecModels | undefined> {
     const status = server.status;
     const url = 'api/kernelspecs';
@@ -219,18 +219,17 @@ export class SecretNoteServerManager {
   private updateServerConnectionSettings() {
     // update server connection settings
     // Resolve requests such as kernelspaces/lsp are initiated in libro
-    const firstServer = this.servers[0];
-    const firstServerOnline =
-      firstServer && firstServer.status === ServerStatus.Succeeded;
-
-    this.serverConnection.updateSettings({
-      baseUrl: firstServerOnline
-        ? getRemoteBaseUrl(firstServer.id, true)
-        : getRemoteBaseUrl(),
-      wsUrl: firstServerOnline
-        ? getRemoteWsUrl(firstServer.id, true)
-        : getRemoteWsUrl(),
-      init: getInit(),
-    });
+    // const firstServer = this.servers[0];
+    // const firstServerOnline =
+    //   firstServer && firstServer.status === ServerStatus.Succeeded;
+    // this.serverConnection.updateSettings({
+    //   baseUrl: firstServerOnline
+    //     ? getRemoteBaseUrl(firstServer.id, true)
+    //     : getRemoteBaseUrl(),
+    //   wsUrl: firstServerOnline
+    //     ? getRemoteWsUrl(firstServer.id, true)
+    //     : getRemoteWsUrl(),
+    //   ...getDefaultConnectionSettings(),
+    // });
   }
 }

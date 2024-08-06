@@ -53,7 +53,8 @@ export class SecretNoteKernelManager {
   }
 
   async createKernelConnections(fileInfo: IContentsModel) {
-    const servers = (await this.serverManager.getServerList()).filter(
+    const servers = await this.serverManager.getServerList();
+    const availableServers = (servers || []).filter(
       (s) => s.status === ServerStatus.Succeeded,
     );
     const kernelConnections: IKernelConnection[] = [];
@@ -62,8 +63,8 @@ export class SecretNoteKernelManager {
       [],
     );
 
-    for (let i = 0, len = servers.length; i < len; i++) {
-      const s = servers[i];
+    for (let i = 0, len = availableServers.length; i < len; i++) {
+      const s = availableServers[i];
       const hit = storedSessions.find((c) => c.serverId === s.id);
       let connection: IKernelConnection | undefined;
       if (hit) {
