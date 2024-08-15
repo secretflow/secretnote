@@ -2,7 +2,8 @@ import type { ISettings } from '@difizen/libro-jupyter';
 import { URL as LibroURL } from '@difizen/libro-jupyter';
 
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
-  const backendUrl = process.env.PB_BACKEND_URL;
+  const SECRETNOTE_BACKEND_URL = 'http://127.0.0.1:8091'; // for debug only
+  const backendUrl = process.env.SECRETNOTE_BACKEND_URL || SECRETNOTE_BACKEND_URL;
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 

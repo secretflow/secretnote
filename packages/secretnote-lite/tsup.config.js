@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-
+const { copyFileSync } = require('fs');
 const { yellow } = require('colorette');
 const svgr = require('esbuild-plugin-svgr');
 const { defineConfig } = require('tsup');
@@ -24,7 +24,7 @@ const emitDeclarations = (outDir) =>
         '--declarationDir',
         outDir,
       ],
-      { stdio: ['ignore', 'ignore', 'ignore'] },
+      { stdio: ['inherit', 'inherit', 'inherit'] },
     );
     proc.on('exit', () => {
       console.timeEnd(timer);
@@ -35,14 +35,16 @@ const emitDeclarations = (outDir) =>
 
 module.exports = defineConfig((overrides) => ({
   outDir: 'dist',
-  format: ['esm', 'cjs'],
-  outExtension: ({ format }) => ({ js: `.${format}.js` }),
+  format: ['esm'], //, 'cjs'],
+  outExtension: () => ({ js: `.js` }),
   sourcemap: true,
-  dts: false,
+  dts: true,
   loader: {
     '.less': 'copy',
   },
   esbuildPlugins: [svgr()],
-  onSuccess: () => emitDeclarations('./dist/typing'),
+  onSuccess: () => {
+    copyFileSync('./package.json', './dist/package.json');
+  },
   clean: overrides.clean || !overrides.watch,
 }));

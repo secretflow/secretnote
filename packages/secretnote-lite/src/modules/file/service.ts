@@ -30,7 +30,7 @@ export class FileService {
   }
 
   async getFileTree() {
-    const servers = (await this.serverManager.getServerList()).filter(
+    const servers = (await this.serverManager.getServerList())!.filter(
       (s) => s.status === ServerStatus.Succeeded,
     );
     const fileTree: DataNode[] = [];

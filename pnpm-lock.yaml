@@ -319,19 +319,19 @@ importers:
         specifier: ^1.52.0
         version: 1.55.8(@antv/g-base@0.5.16)
       '@difizen/libro-jupyter':
-        specifier: ^0.1.22
-        version: 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mapbox-gl@1.13.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.2.18
+        version: 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mapbox-gl@1.13.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app':
-        specifier: ^0.1.10
+        specifier: ^0.1.19
         version: 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-common':
-        specifier: ^0.1.10
+        specifier: ^0.1.19
         version: 0.1.19
       '@difizen/mana-l10n':
-        specifier: ^0.1.10
+        specifier: ^0.1.19
         version: 0.1.19(react@18.3.1)
       '@difizen/mana-react':
-        specifier: ^0.1.10
+        specifier: ^0.1.19
         version: 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@kanaries/web-data-loader':
         specifier: ^0.1.7
@@ -1987,35 +1987,73 @@ packages:
     peerDependencies:
       react: '>=16'
 
+  '@difizen/libro-code-cell@0.2.18':
+    resolution: {integrity: sha512-/d9fb526Ouj3VtsVN/vDg7arxe/TdhRUsb1Ky9T5l3yHXncR3Mmn6dr5lPEIcBr4quu63Rf7s5+/Z94wM/2ESQ==}
+    peerDependencies:
+      react: '>=16'
+
   '@difizen/libro-code-editor@0.1.37':
     resolution: {integrity: sha512-YGj8YVgUBiBrbSn/iUXG6m6frqi7QoRhYzK9v3MqbXdBg573xF2A38rz+WHNFbl+IaE9wuJzfqne5xG6WxnNTQ==}
+    peerDependencies:
+      react: '>=16'
+
+  '@difizen/libro-code-editor@0.2.18':
+    resolution: {integrity: sha512-6JHUDcJeC9ltCMe/nJ12TV/ai2Br+7anqTcUUCqgXBwP7bBntA9sVEdFYwZBMkU/WbdcuMtj+vXpt5QVkij82A==}
     peerDependencies:
       react: '>=16'
 
   '@difizen/libro-codemirror@0.1.37':
     resolution: {integrity: sha512-BIw9aonrluLrx5fNHv1ilS8xADDXSys7ToK3J21dxTz1ep580TDUWHsOJJ5Vegh2ooBMlfixu8QgwenFaPXgQg==}
 
+  '@difizen/libro-codemirror@0.2.18':
+    resolution: {integrity: sha512-+TpD99wKcSaY/hK28rUOqbgCE2g1Ck2SDXWDVeD7t08YmDbhZAGrqID5ljO6P5zY/PnNENifm7FBlg8DvpPfBA==}
+
   '@difizen/libro-cofine-editor-contribution@0.1.37':
     resolution: {integrity: sha512-ONHQ5foeZOE6fQvkZFZUfQ0rxy1pGLlTVlXass0aETRPoHWQHW3Bm0r/eT9WtNP7BNFDqBEOiWQ9snrPKVSxQA==}
 
+  '@difizen/libro-cofine-editor-contribution@0.2.18':
+    resolution: {integrity: sha512-zzt6E2E8HHXIe+N8fBQmlh56DfY9kQW397kIPVSBcPPoSO8Wvog5Oo94ylAQ2WPXAYkVOaTPZ+m9+EHcB/aQMQ==}
+
   '@difizen/libro-cofine-editor-core@0.1.37':
     resolution: {integrity: sha512-x0CBN1jYXG2UU+nPZFHGhqnsbYtdG+mk18w+LuoOlAnFfYFcrknuIq1Rf/cXk+PvGHj3FNaH57++g1t4zrH0Xw==}
+
+  '@difizen/libro-cofine-editor-core@0.2.18':
+    resolution: {integrity: sha512-2kq8yRuHzXq0ZqXMIx0EeDJW9TFm7ExdeI0QlYlUfS4fpk3nC8dK3pYrAOXCpDtEV2PRvYoJH3S2R32f2o7ZPw==}
 
   '@difizen/libro-cofine-editor@0.1.37':
     resolution: {integrity: sha512-Y3/ShBcedzoupygFjJOU71+5PuuDm4QCRunFm4gTdOz3bOqpMC4/Al/3IUybXMMmnSX9DQhO/UNkuz9tRi5ZAg==}
     peerDependencies:
       react: '>=16'
 
+  '@difizen/libro-cofine-editor@0.2.18':
+    resolution: {integrity: sha512-89vLUVnN3FH6OmT21dmxsi5B+/LiDcA2OXrT/JAYZjgTor3BG9CS8APUHNlpL5tKZrUYudReyWu2ychhlBlbOg==}
+    peerDependencies:
+      react: '>=16'
+
   '@difizen/libro-cofine-textmate@0.1.37':
     resolution: {integrity: sha512-f6JPZ0e5z8LY5Z2zYKx3+X4TbBb0bMsM4hdyGC0YIjEcXYqHjJ0S7VhsG7cytOwmqrGrqoghJADje0fnvU0Sfw==}
+
+  '@difizen/libro-cofine-textmate@0.2.18':
+    resolution: {integrity: sha512-LERrt0klvK6uhU/7gk0diJdKWOZTLkDwZjyGflNxuDzsByIN2jOj8Vxj1PHPyeYPZeQVHszc9MynGpy+Smdmhg==}
 
   '@difizen/libro-common@0.1.37':
     resolution: {integrity: sha512-RZUjqp2HKzoOXd5aKjZtcCJA4581QFWz2xOWHYg32YQm9Y4ynoFeVeP6SVjoWBzTSsAAQpRo8+g3VOoY3u6yoA==}
     peerDependencies:
       react: '>=16'
 
+  '@difizen/libro-common@0.2.18':
+    resolution: {integrity: sha512-JEFT/tcDEpcYs8M5RkYKscFgEd9PCgaB3AKK5t+q0DGv08fasiRvYOraWtHpzOIpFmlvMlDB4OAmqfWylFxYCw==}
+    peerDependencies:
+      react: '>=16'
+
   '@difizen/libro-core@0.1.37':
     resolution: {integrity: sha512-WtPm41uD9Erhy+iCsRx2BqGZcZnmGu0Jn8y/4m4s2LKqdGzfnk8u6TdDeJ/cFpTfBe7FKwPa6nAePPPJvA6+pA==}
+    peerDependencies:
+      antd: ^5.8.6
+      react: '>=16'
+
+  '@difizen/libro-core@0.2.18':
+    resolution: {integrity: sha512-yEYgPwNHMCKyKuJ4oGIIas6Ckn2R+Ht5h1ua3+yhJPgep/qFDjEqid1QKhf5E+3xHbdjg0kC3zyPBKP1FxE92g==}
     peerDependencies:
       antd: ^5.8.6
       react: '>=16'
@@ -2026,16 +2064,35 @@ packages:
       antd: ^5.8.6
       react: '>=16'
 
+  '@difizen/libro-jupyter@0.2.18':
+    resolution: {integrity: sha512-XApq8CdhEbAhXPkS//1huEq+XRADZKLC+4Qn7+Ga+HHzBcP8zoHJ0y3KyX4CDvssnquTFmdp0P2pNLHgpar1bQ==}
+    peerDependencies:
+      antd: ^5.8.6
+      react: '>=16'
+
   '@difizen/libro-kernel@0.1.37':
     resolution: {integrity: sha512-9JKWhi2yrbT4jjLvzHu8jv98/8V6eVpBoJwykMf2H7gc7yU6Y3jVFMHkKKLKG2G7ASGwDp4zWKsxWEs08hwYJw==}
+    peerDependencies:
+      react: '>=16'
+
+  '@difizen/libro-kernel@0.2.18':
+    resolution: {integrity: sha512-WW7gfG29/W4Ic/yiKwyXWU/I9k+FJkoXhiqWT7A4reOjwHNdpoLgPIg37TJw4L/RrwF3IMlhYe1sV1kMXuM0Zw==}
     peerDependencies:
       react: '>=16'
 
   '@difizen/libro-l10n@0.1.37':
     resolution: {integrity: sha512-O3BsMExwfdIFrlZnRTjUBR1UBN48pH0nXuFDSUBzDt00NLzD1T+hjnAeBx1bvssh7PZgQXZJO12vEWSNmtOjHw==}
 
+  '@difizen/libro-l10n@0.2.18':
+    resolution: {integrity: sha512-82DYHdgWuCtU2hlHPrdJ/pVXGupjZZFwkbVwuiQ7b9LNwEKoXXjZB68j0T0mrz27mFLYacvRn9sz10vFlDmEIg==}
+
   '@difizen/libro-language-client@0.1.37':
     resolution: {integrity: sha512-kpwdCI5ShXSY04Dq1pHO5LBpyZFqFvIgdvphQEjryxaOMgAjLw1lHLpULbExt326hwru/rQI96EIsRZtaMeLJw==}
+    peerDependencies:
+      react: '>=16'
+
+  '@difizen/libro-language-client@0.2.18':
+    resolution: {integrity: sha512-64+kYmKRLvolL6Os36OszX5LbZlJyAkoXwhBpTQVA8v33aMLFSD5TXrsQa8MwZlMPGH4SxG5hfg6aae1HXOXUw==}
     peerDependencies:
       react: '>=16'
 
@@ -2044,16 +2101,35 @@ packages:
     peerDependencies:
       react: '>=16'
 
+  '@difizen/libro-lsp@0.2.18':
+    resolution: {integrity: sha512-KjLnNH3M6+gZbiZcT66G+p/BBnBKXrLlPV3d5hHNVAf32iwAwqfDgruAO26FMUI1cPRRFOUYlVwdDfeBc5sduQ==}
+    peerDependencies:
+      react: '>=16'
+
   '@difizen/libro-markdown-cell@0.1.37':
     resolution: {integrity: sha512-PSmsMHpfU0RkzT1gdhRycXzdI1ri32Hv0ZPi68aYRtTPDvdjrNHl0Ii0UZd3+GRhYOPoTIYenzSSF+WJ1qG4pw==}
+    peerDependencies:
+      react: '>=16'
+
+  '@difizen/libro-markdown-cell@0.2.18':
+    resolution: {integrity: sha512-HE9iwroVivtFVeAOew6Oy36W011vpmwtjo16A+GqYQnX9gjPuq7ryPY19IwDmdFkxhCIZwG1Hf9Rl9A+3cKemA==}
     peerDependencies:
       react: '>=16'
 
   '@difizen/libro-markdown@0.1.37':
     resolution: {integrity: sha512-8VPvY6epJ42Ueu7ape9I9Paz2hmMxJaO5+nXVRHZShDlrK7TMADGCD8Mk1dVB+nUYQLc2sMWw6PSB8S5XlPXNA==}
 
+  '@difizen/libro-markdown@0.2.18':
+    resolution: {integrity: sha512-HkmxXNYGTA1BN41aq9HG66WoDw3yJsoeyxKRYRnRlSVnUksixX+DCjK5SCh17qLsOSb2ekpkpaxLc9CiMj+n+g==}
+
   '@difizen/libro-output@0.1.37':
     resolution: {integrity: sha512-DcvJk5xeSBwk/pzKMMDlYCCeJngSGQxEpskskQRPKmvzJGE2Z/OPfs/jqa0nqS2k6YvdwePSSCYwPvcF2Bw3Aw==}
+    peerDependencies:
+      antd: ^5.8.6
+      react: '>=16'
+
+  '@difizen/libro-output@0.2.18':
+    resolution: {integrity: sha512-10+oL5yhrwt987M+RDOeMIt5A2AvR8UvvelJs0zW+otjo4WtFdXPLFWbuwHvOlwljJiz+qQNnrG6S7fe1cx0rw==}
     peerDependencies:
       antd: ^5.8.6
       react: '>=16'
@@ -2063,13 +2139,26 @@ packages:
     peerDependencies:
       react: '>=16'
 
+  '@difizen/libro-raw-cell@0.2.18':
+    resolution: {integrity: sha512-M11kBXSWPPiW4xa5IbngLCmrIzWyPf6ksDaToDhMwyuKCvWDpfmaYPhKPnyneWoxe4bPPUIdGHDS2hTfIetLYQ==}
+    peerDependencies:
+      react: '>=16'
+
   '@difizen/libro-rendermime@0.1.37':
     resolution: {integrity: sha512-qcFBZJr8jmn8niJRKsGoDxJ5IQHoCdjXKj+ZJjQht7p7hludJ+kjK+co73uhyt6KXEGAHdnE3SEoGsnAJCK29Q==}
     peerDependencies:
       react: '>=16'
 
+  '@difizen/libro-rendermime@0.2.18':
+    resolution: {integrity: sha512-xZawMMGFKamldzD65cUZD28l0Ruj9IlX8p4wd/EkAifsBg0mKQ7aLQud1X83RqLozTPro0DNdw76RboCzszScA==}
+    peerDependencies:
+      react: '>=16'
+
   '@difizen/libro-search-code-cell@0.1.37':
     resolution: {integrity: sha512-2HGBgNVoacnsb/cK1VZnEnG8UK+Uq2D6qjZ/TOqutSljml3HPmxCCfAQXVEaBzcG66n2OWQtuTK+G5LzxeThPQ==}
+
+  '@difizen/libro-search-code-cell@0.2.18':
+    resolution: {integrity: sha512-MHRKPTJs1Wfn8Cur1WwF/F5M3jue8Xks4usCJKJ4zyfNcfgBqSWVaDTeFipDUEzb7QE9XKnnE1n8/NYxqzFXIg==}
 
   '@difizen/libro-search@0.1.37':
     resolution: {integrity: sha512-WnmXnEKomaSeXYlHgSt3ZP0c3caHZBZdsGg2bSyVJDgo0+7jW+sC16zUHaTzGnzR1W+TOS/siktRGVOYiyAecg==}
@@ -2077,11 +2166,26 @@ packages:
       antd: ^5.8.6
       react: '>=16'
 
+  '@difizen/libro-search@0.2.18':
+    resolution: {integrity: sha512-/e8yeJ8m9d+qVanDmCbyoukAlTo38XdIVSzE+l5ifjdCOImjiokqfykFtUvQkRMdfl3ZPTz3XlFpadnjYwY/ZA==}
+    peerDependencies:
+      antd: ^5.8.6
+      react: '>=16'
+
   '@difizen/libro-shared-model@0.1.37':
     resolution: {integrity: sha512-C/UribdIZxj9xGd+KY/vvImVe1WqTkpGZAVAvhmm/XsJeE/UiZfYGJSqpIdnHotBUmKC2PauRoksOitJHiYs1g==}
 
+  '@difizen/libro-shared-model@0.2.18':
+    resolution: {integrity: sha512-v00Ti23sch97K3QKLsKSOwe0Kj2h4que8dVMZ3nGKbmzqJofxxpL9GZtvm787NOYsZG0DBmmyVQGGqPt13gsvg==}
+
   '@difizen/libro-virtualized@0.1.37':
     resolution: {integrity: sha512-OAVnkpkOHegy4Sn/8UQbkUeXXcQOleJ0biHZN/ghJ55IfC9t4FgMiXy//ihu8Iofj5ddvty6WvnHkGBd4ZAoBQ==}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+
+  '@difizen/libro-virtualized@0.2.18':
+    resolution: {integrity: sha512-bkzHB7fGFmRw1EJi7Vtqakwvo9XcwksDcattqlZgqo/KQRoVv9kICKehqOFje2J8Vmxxi/CQTtUSlkwbxOhEsw==}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
@@ -4221,6 +4325,9 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.5.7
       '@tiptap/pm': ^2.5.7
+
+  '@traptitech/markdown-it-katex@3.6.0':
+    resolution: {integrity: sha512-CnJzTWxsgLGXFdSrWRaGz7GZ1kUUi8g3E9HzJmeveX1YwVJavrKYqysktfHZQsujdnRqV5O7g8FPKEA/aeTkOQ==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -19570,9 +19677,35 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-code-cell@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
   '@difizen/libro-code-editor@0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-l10n': 0.1.19(react@18.3.1)
+      react: 18.3.1
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-code-editor@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-l10n': 0.1.19(react@18.3.1)
       react: 18.3.1
@@ -19612,7 +19745,46 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-codemirror@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.29.0)(@lezer/common@1.2.1)
+      '@codemirror/commands': 6.6.0
+      '@codemirror/lang-markdown': 6.2.5
+      '@codemirror/lang-python': 6.1.6(@codemirror/view@6.29.0)
+      '@codemirror/language': 6.10.2
+      '@codemirror/lint': 6.8.1
+      '@codemirror/search': 6.5.6
+      '@codemirror/state': 6.4.1
+      '@codemirror/view': 6.29.0
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-lsp': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-rendermime': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@lezer/common': 1.2.1
+      '@lezer/highlight': 1.2.0
+      highlight.js: 11.10.0
+      markdown-it: 13.0.2
+      uuid: 9.0.1
+      vscode-languageserver-protocol: 3.17.5
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react
+      - react-dom
+      - supports-color
+
   '@difizen/libro-cofine-editor-contribution@0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    transitivePeerDependencies:
+      - react
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-cofine-editor-contribution@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     transitivePeerDependencies:
@@ -19623,6 +19795,18 @@ snapshots:
   '@difizen/libro-cofine-editor-core@0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-cofine-editor-contribution': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/monaco-editor-core': 0.39.4
+      debug: 4.3.5
+      reflect-metadata: 0.1.14
+    transitivePeerDependencies:
+      - react
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-cofine-editor-core@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-cofine-editor-contribution': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/monaco-editor-core': 0.39.4
       debug: 4.3.5
@@ -19654,9 +19838,43 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-cofine-editor@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-cofine-editor-core': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-cofine-textmate': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-lsp': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/monaco-editor-core': 0.39.4
+      react: 18.3.1
+      resize-observer-polyfill: 1.5.1
+      uuid: 9.0.1
+      vscode-languageserver-protocol: 3.17.5
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
   '@difizen/libro-cofine-textmate@0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-cofine-editor-core': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      fast-plist: 0.1.3
+      vscode-oniguruma: 1.7.0
+      vscode-textmate: 9.1.0
+    transitivePeerDependencies:
+      - react
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-cofine-textmate@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-cofine-editor-core': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       fast-plist: 0.1.3
       vscode-oniguruma: 1.7.0
@@ -19677,6 +19895,17 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-common@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      path-browserify: 1.0.1
+      react: 18.3.1
+      sanitize-html: 2.13.0
+      url-parse: 1.5.10
+    transitivePeerDependencies:
+      - react-dom
+      - supports-color
+
   '@difizen/libro-core@0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@ant-design/icons': 5.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -19684,6 +19913,32 @@ snapshots:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-shared-model': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-virtualized': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-l10n': 0.1.19(react@18.3.1)
+      '@difizen/mana-react': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      antd: 5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      dayjs: 1.11.12
+      dnd-core: 16.0.1
+      react: 18.3.1
+      react-dnd: 16.0.1(@types/node@20.5.1)(@types/react@18.3.3)(react@18.3.1)
+      react-dnd-html5-backend: 16.0.1
+      resize-observer-polyfill: 1.5.1
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-core@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@ant-design/icons': 5.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-shared-model': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-virtualized': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-l10n': 0.1.19(react@18.3.1)
       '@difizen/mana-react': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -19738,10 +19993,62 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-jupyter@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mapbox-gl@1.13.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@ant-design/colors': 7.1.0
+      '@ant-design/icons': 5.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-code-cell': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-codemirror': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-cofine-editor': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-kernel': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-l10n': 0.2.18(react@18.3.1)
+      '@difizen/libro-language-client': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-lsp': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-markdown-cell': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-output': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-raw-cell': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-rendermime': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-search': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-search-code-cell': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-l10n': 0.1.19(react@18.3.1)
+      antd: 5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      moment: 2.30.1
+      plotly.js: 2.34.0(mapbox-gl@1.13.3)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - mapbox-gl
+      - react-dom
+      - supports-color
+
   '@difizen/libro-kernel@0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-core': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      minimist: 1.2.8
+      query-string: 8.2.0
+      react: 18.3.1
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-kernel@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       minimist: 1.2.8
       query-string: 8.2.0
@@ -19761,6 +20068,12 @@ snapshots:
     transitivePeerDependencies:
       - react
 
+  '@difizen/libro-l10n@0.2.18(react@18.3.1)':
+    dependencies:
+      '@difizen/mana-l10n': 0.1.19(react@18.3.1)
+    transitivePeerDependencies:
+      - react
+
   '@difizen/libro-language-client@0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-code-editor': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -19768,6 +20081,30 @@ snapshots:
       '@difizen/libro-core': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-kernel': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-lsp': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-common': 0.1.19
+      '@difizen/monaco-editor-core': 0.39.4
+      '@difizen/vscode-languageserver-protocol': 3.17.6-next.2
+      minimatch: 9.0.5
+      react: 18.3.1
+      uuid: 9.0.1
+      vscode-uri: 3.0.8
+      vscode-ws-jsonrpc: 3.3.2
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-language-client@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-kernel': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-lsp': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-common': 0.1.19
       '@difizen/monaco-editor-core': 0.39.4
@@ -19806,12 +20143,52 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-lsp@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-kernel': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      lodash.mergewith: 4.6.2
+      react: 18.3.1
+      uuid: 9.0.1
+      vscode-jsonrpc: 6.0.0
+      vscode-languageserver-protocol: 3.17.5
+      vscode-ws-jsonrpc: 1.0.2
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
   '@difizen/libro-markdown-cell@0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-code-editor': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-core': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-markdown': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/markdown-it': 12.2.3
+      markdown-it: 13.0.2
+      markdown-it-anchor: 8.6.7(@types/markdown-it@12.2.3)(markdown-it@13.0.2)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-markdown-cell@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-markdown': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/markdown-it': 12.2.3
       markdown-it: 13.0.2
@@ -19836,11 +20213,40 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-markdown@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@traptitech/markdown-it-katex': 3.6.0
+      '@types/markdown-it': 12.2.3
+      katex: 0.16.11
+      markdown-it: 13.0.2
+      markdown-it-anchor: 8.6.7(@types/markdown-it@12.2.3)(markdown-it@13.0.2)
+    transitivePeerDependencies:
+      - react
+      - react-dom
+      - supports-color
+
   '@difizen/libro-output@0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-core': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-rendermime': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      antd: 5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      markdown-it: 13.0.2
+      react: 18.3.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-output@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-rendermime': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       antd: 5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       markdown-it: 13.0.2
@@ -19867,11 +20273,42 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-raw-cell@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
   '@difizen/libro-rendermime@0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-core': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-markdown': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      lodash.escape: 4.0.1
+      react: 18.3.1
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-rendermime@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-markdown': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lodash.escape: 4.0.1
       react: 18.3.1
@@ -19890,6 +20327,23 @@ snapshots:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-core': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/libro-search': 0.1.37(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - antd
+      - react
+      - react-dom
+      - supports-color
+
+  '@difizen/libro-search-code-cell@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-code-cell': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-search': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     transitivePeerDependencies:
       - '@types/hoist-non-react-statics'
@@ -19921,6 +20375,27 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-search@0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@ant-design/icons': 5.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-code-editor': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/libro-core': 0.2.18(@types/node@20.5.1)(@types/react@18.3.3)(antd@5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-l10n': 0.1.19(react@18.3.1)
+      '@types/lodash.debounce': 4.0.9
+      antd: 5.19.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      lodash.debounce: 4.0.8
+      react: 18.3.1
+      reflect-metadata: 0.1.14
+    transitivePeerDependencies:
+      - '@types/hoist-non-react-statics'
+      - '@types/node'
+      - '@types/react'
+      - react-dom
+      - supports-color
+
   '@difizen/libro-shared-model@0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@difizen/libro-common': 0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -19933,7 +20408,26 @@ snapshots:
       - react-dom
       - supports-color
 
+  '@difizen/libro-shared-model@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@difizen/libro-common': 0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      uuid: 9.0.1
+      y-protocols: 1.0.6(yjs@13.6.18)
+      yjs: 13.6.18
+    transitivePeerDependencies:
+      - react
+      - react-dom
+      - supports-color
+
   '@difizen/libro-virtualized@0.1.37(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      classnames: 2.5.1
+      dom-helpers: 5.2.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@difizen/libro-virtualized@0.2.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       classnames: 2.5.1
       dom-helpers: 5.2.1
@@ -20843,7 +21337,7 @@ snapshots:
 
   '@loadable/component@5.15.2(react@18.3.1)':
     dependencies:
-      '@babel/runtime': 7.23.6
+      '@babel/runtime': 7.24.8
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
       react-is: 16.13.1
@@ -20923,7 +21417,7 @@ snapshots:
 
   '@material-ui/core@4.7.1(@types/react@18.3.3)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       '@material-ui/styles': 4.11.5(@types/react@18.3.3)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       '@material-ui/system': 4.12.2(@types/react@18.3.3)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       '@material-ui/types': 4.1.1
@@ -20944,7 +21438,7 @@ snapshots:
 
   '@material-ui/styles@4.11.5(@types/react@18.3.3)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       '@emotion/hash': 0.8.0
       '@material-ui/types': 5.1.0(@types/react@18.3.3)
       '@material-ui/utils': 4.11.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
@@ -20967,7 +21461,7 @@ snapshots:
 
   '@material-ui/system@4.12.2(@types/react@18.3.3)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       '@material-ui/utils': 4.11.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       csstype: 2.6.21
       prop-types: 15.8.1
@@ -20986,11 +21480,11 @@ snapshots:
 
   '@material-ui/utils@4.11.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
-      react-is: 16.13.1
+      react-is: 17.0.2
 
   '@mdx-js/loader@1.5.1(react@16.14.0)':
     dependencies:
@@ -22665,6 +23159,10 @@ snapshots:
       '@tiptap/core': 2.5.7(@tiptap/pm@2.5.7)
       '@tiptap/pm': 2.5.7
 
+  '@traptitech/markdown-it-katex@3.6.0':
+    dependencies:
+      katex: 0.16.11
+
   '@trysound/sax@0.2.0': {}
 
   '@tsconfig/node10@1.0.11': {}
@@ -23830,7 +24328,7 @@ snapshots:
 
   '@umijs/history@5.3.1':
     dependencies:
-      '@babel/runtime': 7.23.6
+      '@babel/runtime': 7.24.8
       query-string: 6.14.1
 
   '@umijs/lint@4.3.10(eslint@7.18.0)(jest@29.7.0(@types/node@20.5.1)(ts-node@10.9.2(@swc/core@1.7.2)(@types/node@18.19.42)(typescript@5.5.4)))(postcss-less@6.0.0(postcss@8.4.40))(stylelint@15.11.0(typescript@4.2.3))(typescript@4.2.3)':
@@ -26582,7 +27080,7 @@ snapshots:
 
   css-vendor@2.0.8:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       is-in-browser: 1.1.3
 
   css-what@3.4.2: {}
@@ -27861,11 +28359,11 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-config-airbnb-base@14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0))(eslint@7.18.0):
+  eslint-config-airbnb-base@14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1)(eslint@7.18.0))(eslint@7.18.0):
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 7.18.0
-      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0)
       object.assign: 4.1.5
       object.entries: 1.1.8
 
@@ -27885,12 +28383,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5):
+  eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5):
     dependencies:
       array-find: 1.0.0
       debug: 2.6.9
       enhanced-resolve: 0.9.1
-      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0)
       find-root: 1.1.0
       has: 1.0.4
       interpret: 1.4.0
@@ -27922,14 +28420,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5))(eslint@7.18.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 4.18.0(eslint@7.18.0)(typescript@4.2.3)
       eslint: 7.18.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5)
+      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5)
     transitivePeerDependencies:
       - supports-color
 
@@ -27948,7 +28446,7 @@ snapshots:
       eslint: 7.18.0
       eslint-rule-composer: 0.3.0
 
-  eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0):
+  eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.flat: 1.3.2
@@ -27957,7 +28455,7 @@ snapshots:
       doctrine: 1.5.0
       eslint: 7.18.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5))(eslint@7.18.0)
       has: 1.0.4
       minimatch: 3.1.2
       object.values: 1.2.0
@@ -27965,7 +28463,7 @@ snapshots:
       resolve: 1.22.8
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 4.18.0(eslint@7.18.0)(typescript@4.2.3)
+      '@typescript-eslint/parser': 5.62.0(eslint@7.18.0)(typescript@4.2.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -29797,7 +30295,7 @@ snapshots:
 
   history@4.10.1:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       loose-envify: 1.4.0
       resolve-pathname: 3.0.0
       tiny-invariant: 1.3.3
@@ -29806,7 +30304,7 @@ snapshots:
 
   history@5.3.0:
     dependencies:
-      '@babel/runtime': 7.23.6
+      '@babel/runtime': 7.24.8
 
   hmac-drbg@1.0.1:
     dependencies:
@@ -31558,46 +32056,46 @@ snapshots:
 
   jss-plugin-camel-case@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       hyphenate-style-name: 1.1.0
       jss: 10.10.0
 
   jss-plugin-default-unit@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       jss: 10.10.0
 
   jss-plugin-global@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       jss: 10.10.0
 
   jss-plugin-nested@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       jss: 10.10.0
       tiny-warning: 1.0.3
 
   jss-plugin-props-sort@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       jss: 10.10.0
 
   jss-plugin-rule-value-function@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       jss: 10.10.0
       tiny-warning: 1.0.3
 
   jss-plugin-vendor-prefixer@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       css-vendor: 2.0.8
       jss: 10.10.0
 
   jss@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       csstype: 3.1.3
       is-in-browser: 1.1.3
       tiny-warning: 1.0.3
@@ -33023,7 +33521,7 @@ snapshots:
 
   mini-create-react-context@0.3.3(prop-types@15.8.1)(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       prop-types: 15.8.1
       react: 16.14.0
       tiny-warning: 1.0.3
@@ -34947,11 +35445,11 @@ snapshots:
       enzyme: 3.11.0
       enzyme-adapter-react-16: 1.15.8(enzyme@3.11.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       eslint: 7.18.0
-      eslint-config-airbnb-base: 14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0))(eslint@7.18.0)
+      eslint-config-airbnb-base: 14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1)(eslint@7.18.0))(eslint@7.18.0)
       eslint-config-prettier: 7.2.0(eslint@7.18.0)
-      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5)
+      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5)
       eslint-plugin-babel: 5.3.1(eslint@7.18.0)
-      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@5.62.0(eslint@7.18.0)(typescript@4.2.3))(eslint@7.18.0)
       eslint-plugin-react: 7.22.0(eslint@7.18.0)
       eslint-plugin-react-hooks: 4.2.0(eslint@7.18.0)
       file-loader: 5.0.2(webpack@4.41.5)
@@ -35833,7 +36331,7 @@ snapshots:
 
   react-helmet-async@1.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.23.6
+      '@babel/runtime': 7.24.8
       invariant: 2.2.4
       prop-types: 15.8.1
       react: 18.3.1
@@ -35892,7 +36390,7 @@ snapshots:
 
   react-router-dom@5.1.2(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       history: 4.10.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -35910,7 +36408,7 @@ snapshots:
 
   react-router@5.1.2(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -35946,7 +36444,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -36170,7 +36668,7 @@ snapshots:
 
   regenerator-transform@0.15.2:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.24.8
 
   regex-cache@0.4.4:
     dependencies:

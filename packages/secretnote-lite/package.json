@@ -1,17 +1,19 @@
 {
   "name": "@alipay/secretnote-lite",
-  "version": "0.0.34",
+  "version": "0.0.35-dev",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
   "bugs": "https://github.com/secretflow/secretnote/issues",
   "files": [
-    "dist",
-    "src"
+    "*.less",
+    "*.js",
+    "*.d.ts",
+    "*.js.map"
   ],
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/typing/index.d.ts",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "setup": "tsup src/index.tsx",
     "build": "tsup src/index.tsx",
@@ -22,11 +24,11 @@
   },
   "dependencies": {
     "@antv/s2": "^1.52.0",
-    "@difizen/libro-jupyter": "^0.1.22",
-    "@difizen/mana-app": "^0.1.10",
-    "@difizen/mana-common": "^0.1.10",
-    "@difizen/mana-l10n": "^0.1.10",
-    "@difizen/mana-react": "^0.1.10",
+    "@difizen/libro-jupyter": "^0.2.18",
+    "@difizen/mana-app": "^0.1.19",
+    "@difizen/mana-common": "^0.1.19",
+    "@difizen/mana-l10n": "^0.1.19",
+    "@difizen/mana-react": "^0.1.19",
     "@kanaries/web-data-loader": "^0.1.7",
     "@tiptap/core": "^2.1.11",
     "@tiptap/extension-color": "^2.1.11",

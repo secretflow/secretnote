@@ -47,6 +47,7 @@ export class FilePreviewView extends BaseView {
 
   constructor(
     @inject(FileService) fileService: FileService,
+    // @ts-ignore
     @contrib(FilePreviewContribution)
     providers: Contribution.Provider<FilePreviewContribution>,
   ) {

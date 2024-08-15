@@ -11,6 +11,9 @@ import {
 import { Button, Progress, Steps } from 'antd';
 import React from 'react';
 
+import { version as jupyterVer } from '@difizen/libro-jupyter/package.json';
+import { version as manaVer } from '@difizen/mana-app/package.json';
+
 import { useConfetti } from '@/components/confetti';
 
 import './index.less';
@@ -183,7 +186,9 @@ export const WelcomeComponent = () => {
     <div className="secretnote-welcome-page">
       <div className="process">
         <div className="header">
-          <div className="title">欢迎使用在线实验环境</div>
+          <div className="title">
+            欢迎使用在线实验环境。libro-jupyter: {jupyterVer}; mana-app: {manaVer}
+          </div>
           <div className="subtitle">
             下面是一个在两方节点上执行
             <a
