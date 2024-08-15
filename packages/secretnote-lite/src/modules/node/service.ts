@@ -2,7 +2,7 @@ import { inject, singleton } from '@difizen/mana-app';
 
 import type { ServerStatus } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
-import { randomHex } from '@/utils';
+import { randomColorByName } from '@/utils';
 
 export interface Node {
   id: string;
@@ -14,13 +14,14 @@ export interface Node {
 }
 
 export type ServerStatusTag = 'processing' | 'default' | 'error' | 'success';
-const NODE_COLOR = randomHex();
 
 @singleton()
 export class NodeService {
   protected readonly serverManager: SecretNoteServerManager;
 
-  constructor(@inject(SecretNoteServerManager) serverManager: SecretNoteServerManager) {
+  constructor(
+    @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
+  ) {
     this.serverManager = serverManager;
   }
 
@@ -31,7 +32,7 @@ export class NodeService {
   get nodes() {
     return this.serverManager.servers.map((server) => ({
       ...server,
-      color: NODE_COLOR,
+      color: randomColorByName(server.name),
     }));
   }
 

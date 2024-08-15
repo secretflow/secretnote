@@ -17,12 +17,11 @@ import {
   message,
   Popover,
   Space,
-  Typography,
   Spin,
+  Typography,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import React from 'react';
 
 import { invert } from '@/utils';
 
@@ -34,7 +33,9 @@ import { NodeService } from './service';
 
 const { Paragraph } = Typography;
 
-const getNodeStatus = (node: Node): { status: ServerStatusTag; text: string } => {
+const getNodeStatus = (
+  node: Node,
+): { status: ServerStatusTag; text: string } => {
   const status = node.status;
 
   if (status === ServerStatus.Pending) {
@@ -106,68 +107,33 @@ const NodeDetails = (props: { node: Node }) => {
     }
   };
 
-  // const onChangeNodeName = async (n: Node, name: string) => {
-  //   if (n.name === name) {
-  //     return;
-  //   }
-  //   try {
-  //     await instance.service.updateNodeName(n.id, name);
-  //     setEditableStr(name);
-  //   } catch (e) {
-  //     if (e instanceof Error) {
-  //       message.error(e.message);
-  //     }
-  //   }
-  // };
-
   return (
     <div className="secretnote-node-description">
       <Spin spinning={loading}>
         <Descriptions title={l10n.t('节点信息')} column={1}>
           <Descriptions.Item label={l10n.t('名称')}>
             {node.name}
-            {/* <Paragraph
-            editable={{
-              onChange: (str: string) => onChangeNodeName(node, str),
-              tooltip: false,
-            }}
-          >
-            {editableStr}
-          </Paragraph> */}
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('状态')}>
             <Badge status={status} text={text} />
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('IP')}>
-            <Paragraph copyable={!!node.podIp}>{node.podIp || '暂无数据'}</Paragraph>
+            <Paragraph copyable={!!node.podIp}>
+              {node.podIp || '暂无数据'}
+            </Paragraph>
           </Descriptions.Item>
         </Descriptions>
         <Space>
-          <Button
-            type="link"
-            onClick={() => {
-              deleteNode(node.id);
-            }}
-          >
+          <Button type="link" onClick={() => deleteNode(node.id)}>
             {l10n.t('删除')}
           </Button>
           {node.status === ServerStatus.Terminated && (
-            <Button
-              type="link"
-              onClick={() => {
-                startNode(node.id);
-              }}
-            >
+            <Button type="link" onClick={() => startNode(node.id)}>
               {l10n.t('启动')}
             </Button>
           )}
           {node.status === ServerStatus.Succeeded && (
-            <Button
-              type="link"
-              onClick={() => {
-                stopNode(node.id);
-              }}
-            >
+            <Button type="link" onClick={() => stopNode(node.id)}>
               {l10n.t('停止')}
             </Button>
           )}
@@ -233,7 +199,10 @@ export const NodeComponent = () => {
         >
           <Input placeholder="alice" />
         </Form.Item>
-        <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
+        <Form.Item
+          wrapperCol={{ offset: 4, span: 20 }}
+          style={{ marginBottom: 0 }}
+        >
           <Space>
             <Button
               type="primary"

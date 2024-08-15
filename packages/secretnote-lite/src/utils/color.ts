@@ -1,10 +1,13 @@
-export function randomHex() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i += 1) {
-    color += letters[Math.floor(Math.random() * 16)];
+/**
+ * Hash a string to a hex color.
+ */
+export function randomColorByName(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 3) - hash);
   }
-  return color;
+  const c = (hash & 0xffffff).toString(16).toUpperCase();
+  return `#${c.padStart(6, '0')}`;
 }
 
 export function hex2rgb(hex: string): [number, number, number] {
