@@ -1,35 +1,82 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { Contribution } from '@difizen/mana-app';
 import {
+  BaseView,
   contrib,
+  Contribution,
   DefaultSlotView,
+  inject,
   singleton,
   Slot,
   useInject,
   view,
   ViewInstance,
   ViewManager,
-  inject,
 } from '@difizen/mana-app';
-import { Collapse } from 'antd';
+import { Collapse, Space, Tooltip, Typography } from 'antd';
+import { InfoIcon } from 'lucide-react';
 import React from 'react';
+
+import LibroJupyterPkgJSON from '@difizen/libro-jupyter/package.json';
+import ManaAppPkgJSON from '@difizen/mana-app/package.json';
+import SecretNotePkgJSON from '../../../package.json';
 
 import { SideBarContribution } from './protocol';
 
-export enum SideBarArea {
-  notebook = 'notebook',
-  notebookExtra = 'notebookExtra',
-  file = 'file',
-  FileExtra = 'dataExtra',
-  integration = 'integration',
-  integrationExtra = 'integrationExtra',
+// About bar on the bottom of the sidebar
+const AboutBarComponent = () => {
+  const instance = useInject<AboutBarView>(ViewInstance);
+  const fmtPackageVersions = instance.fmtPackageVersions;
+
+  return (
+    <Space direction="horizontal" align="center" size="large">
+      <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
+        SecretFlow
+      </Typography.Link>
+      <Typography.Link
+        href="https://github.com/secretflow/secretnote"
+        target="_blank"
+      >
+        SecretNote
+      </Typography.Link>
+      <div className="icon-container">
+        <Tooltip title={fmtPackageVersions}>
+          <InfoIcon size={16} />
+        </Tooltip>
+      </div>
+    </Space>
+  );
+};
+
+export const aboutBarViewKey = 'about';
+@singleton()
+@view('secretnote-aboutbar-view')
+export class AboutBarView extends BaseView {
+  key = aboutBarViewKey;
+  view = AboutBarComponent;
+
+  // expose versions of important packages
+  packageVersions = {
+    'secretnote-lite': SecretNotePkgJSON.version,
+    'libro-jupyter': LibroJupyterPkgJSON.version,
+    'mana-app': ManaAppPkgJSON.version,
+  } as const;
+  fmtPackageVersions: string;
+
+  constructor() {
+    super();
+    this.fmtPackageVersions = Object.entries(this.packageVersions)
+      .map(([k, v]) => `${k}@${v ?? '?'}`)
+      .join('; ');
+  }
 }
 
 export const SideBar: React.FC = () => {
   const instance = useInject<SideBarView>(ViewInstance);
   const providers = instance.providers.getContributions();
   providers.sort((a, b) => a.order - b.order);
-  const defaultActiveKey = providers.filter((p) => !!p.defaultOpen).map((p) => p.key);
+  const defaultActiveKey = providers
+    .filter((p) => !!p.defaultOpen)
+    .map((p) => p.key);
 
   const items = providers
     .sort((a, b) => a.order - b.order)
@@ -47,6 +94,9 @@ export const SideBar: React.FC = () => {
   return (
     <div className="secretnote-sidebar">
       <Collapse defaultActiveKey={defaultActiveKey} ghost items={items} />
+      <div className="about-bar">
+        <Slot name={aboutBarViewKey} />
+      </div>
     </div>
   );
 };
@@ -59,7 +109,8 @@ export class SideBarView extends DefaultSlotView {
 
   constructor(
     // @ts-ignore
-    @contrib(SideBarContribution) providers: Contribution.Provider<SideBarContribution>,
+    @contrib(SideBarContribution)
+    providers: Contribution.Provider<SideBarContribution>,
     @inject(ViewManager) viewManager: ViewManager,
   ) {
     super(undefined, viewManager);
