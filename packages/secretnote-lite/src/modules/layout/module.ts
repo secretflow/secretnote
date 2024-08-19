@@ -1,4 +1,10 @@
-import { createSlotPreference, createViewPreference, ManaModule, RootSlotId } from '@difizen/mana-app';
+// Module for the layout of the whole page.
+
+import {
+  createSlotPreference,
+  ManaModule,
+  RootSlotId,
+} from '@difizen/mana-app';
 
 import { HeaderView } from './header';
 import { LayoutArea, LayoutView } from './layout';
@@ -25,11 +31,10 @@ export const LayoutModule = ManaModule.create()
       slot: LayoutArea.sidebar,
       view: SideBarView,
     }),
-    createViewPreference({
+    createSlotPreference({
       slot: aboutBarViewKey,
       view: AboutBarView,
-      autoCreate: true,
-    })
+    }),
   );
 
 export const PreviewLayoutModule = ManaModule.create().register(

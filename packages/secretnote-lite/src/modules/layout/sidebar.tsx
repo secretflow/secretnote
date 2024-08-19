@@ -1,3 +1,6 @@
+// Sidebar is the bar displayed on the left which displays notebook file list, server data file list,
+// node CPU/MEM usage, and "about" information of the application.
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import {
   BaseView,
@@ -21,6 +24,8 @@ import ManaAppPkgJSON from '@difizen/mana-app/package.json';
 import SecretNotePkgJSON from '../../../package.json';
 
 import { SideBarContribution } from './protocol';
+
+export const metricsMonitorKey = 'metricsMonitor';
 
 // About bar on the bottom of the sidebar
 const AboutBarComponent = () => {
@@ -47,9 +52,9 @@ const AboutBarComponent = () => {
   );
 };
 
-export const aboutBarViewKey = 'about';
+export const aboutBarViewKey = 'aboutBar';
 @singleton()
-@view('secretnote-aboutbar-view')
+@view('secretnote-aboutBar-view')
 export class AboutBarView extends BaseView {
   key = aboutBarViewKey;
   view = AboutBarComponent;
@@ -65,11 +70,12 @@ export class AboutBarView extends BaseView {
   constructor() {
     super();
     this.fmtPackageVersions = Object.entries(this.packageVersions)
-      .map(([k, v]) => `${k}@${v ?? '?'}`)
+      .map(([k, v]) => `${k}@${v ?? '-'}`)
       .join('; ');
   }
 }
 
+// Compose the sidebar with contributions from each part
 export const SideBar: React.FC = () => {
   const instance = useInject<SideBarView>(ViewInstance);
   const providers = instance.providers.getContributions();
@@ -94,9 +100,10 @@ export const SideBar: React.FC = () => {
   return (
     <div className="secretnote-sidebar">
       <Collapse defaultActiveKey={defaultActiveKey} ghost items={items} />
-      <div className="about-bar">
+      <Space className="bottom-bar" direction="vertical" size="middle">
+        <Slot name={metricsMonitorKey} />
         <Slot name={aboutBarViewKey} />
-      </div>
+      </Space>
     </div>
   );
 };

@@ -1,27 +1,30 @@
-import type { ISpecModels } from '@difizen/libro-jupyter';
-import { ServerConnection } from '@difizen/libro-jupyter';
-import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
+// Different from traditional Jupyter Server, SecretNote connects to multiple nodes,
+// i.e., multiple Jupyter Servers.
+// So we need to customize the server manager to manage multiple servers.
 
 import { request, wait } from '@/utils';
-
-import type { IServer } from './protocol';
-import { ServerStatus } from './protocol';
+import {
+  ServerConnection,
+  ServerManager,
+  type ISpecModels,
+} from '@difizen/libro-jupyter';
+import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
+import { ServerStatus, type IServer } from './protocol';
 
 @singleton()
 export class SecretNoteServerManager {
   protected readonly serverConnection: ServerConnection;
 
-  @prop()
-  loading = false;
+  // @ts-ignore
+  @inject(ServerManager) defaultServerManager: ServerManager;
+  @prop() loading = false;
+  @prop() servers: IServer[] = [];
 
-  @prop()
-  servers: IServer[] = [];
-
+  // events and emitters
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
   readonly onServerAdded = this.onServerAddedEmitter.event;
   protected readonly onServerDeletedEmitter = new Emitter<IServer>();
   readonly onServerDeleted = this.onServerDeletedEmitter.event;
-
   protected readonly onServerStartedEmitter = new Emitter<IServer>();
   readonly onServerStarted = this.onServerStartedEmitter.event;
   protected readonly onServerStoppedEmitter = new Emitter<IServer>();
@@ -30,15 +33,19 @@ export class SecretNoteServerManager {
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
     this.updateServerConnectionSettings();
-    this.getServerList();
+    this.getServerList().then(() => {
+      console.log('launch default server');
+      this.defaultServerManager.launch();
+    });
   }
 
+  /**
+   * Get the list of Jupyter Servers.
+   */
   async getServerList() {
     this.loading = true;
     try {
-      const url = 'api/nodes';
-      const init = { method: 'GET' };
-      const data = (await request(url, init)) as IServer[];
+      const data = (await request('api/nodes', { method: 'GET' })) as IServer[];
       for (const item of data) {
         const spec = await this.getServerSpec(item);
         if (spec) {
@@ -59,14 +66,12 @@ export class SecretNoteServerManager {
   }
 
   async addServer(server: Partial<IServer>) {
-    const url = 'api/nodes';
-    const init = {
+    const data: IServer = await request('api/nodes', {
       method: 'POST',
       body: JSON.stringify({
         name: server.name,
       }),
-    };
-    const data: IServer = await request(url, init);
+    });
     const spec = await this.getServerSpec(data);
 
     if (spec) {
@@ -90,11 +95,9 @@ export class SecretNoteServerManager {
     if (index === -1) {
       return;
     }
-    const url = 'api/nodes/' + id;
-    const init = {
+    await request('api/nodes/' + id, {
       method: 'DELETE',
-    };
-    await request(url, init);
+    });
     const server = this.servers[index];
     this.servers.splice(index, 1);
     this.updateServerConnectionSettings();
@@ -131,11 +134,9 @@ export class SecretNoteServerManager {
   }
 
   async startServer(id: string) {
-    const url = 'api/nodes/start/' + id;
-    const init = {
+    const server: IServer = await request(`api/nodes/start/${id}`, {
       method: 'PATCH',
-    };
-    const server: IServer = await request(url, init);
+    });
 
     if (server) {
       const spec = await this.getServerSpec(server);
@@ -161,12 +162,13 @@ export class SecretNoteServerManager {
     }
   }
 
+  /**
+   * Stop a server.
+   */
   async stopServer(id: string) {
-    const url = 'api/nodes/stop/' + id;
-    const init = {
+    const server: IServer = await request(`api/nodes/stop/${id}`, {
       method: 'PATCH',
-    };
-    const server: IServer = await request(url, init);
+    });
 
     if (server) {
       server.status = ServerStatus.Terminated;
@@ -183,24 +185,26 @@ export class SecretNoteServerManager {
     }
   }
 
+  /**
+   * Get kernelspecs of a server.
+   */
   private async getServerSpec(
     server: IServer,
     retry = 6,
   ): Promise<ISpecModels | undefined> {
-    const status = server.status;
-    const url = 'api/kernelspecs';
-
     if (
-      status === ServerStatus.Terminated ||
-      status === ServerStatus.Failed ||
-      status === ServerStatus.Unknown
+      [
+        ServerStatus.Terminated,
+        ServerStatus.Failed,
+        ServerStatus.Unknown,
+      ].includes(server.status)
     ) {
       return;
     }
 
     try {
       const data = await Promise.race([
-        request(url, {}, server.id),
+        request('api/kernelspecs', {}, server.id),
         new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('timeout'));

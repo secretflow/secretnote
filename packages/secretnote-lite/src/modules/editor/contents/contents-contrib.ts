@@ -17,19 +17,22 @@ export class SecretNoteContentContribution implements ContentContribution {
     const fireUri = new URI(options.resource);
     const filePath = fireUri.path.toString();
 
-    const currentFileContents = await secretNoteModel.contentsManager.get(filePath, {
-      baseUrl: getRemoteBaseUrl(),
-      content: true,
-    });
+    const currentFileContents = await secretNoteModel.contentsManager.get(
+      filePath,
+      {
+        baseUrl: getRemoteBaseUrl(),
+        content: true,
+      },
+    );
     if (currentFileContents) {
       currentFileContents.content.nbformat_minor = 5;
       secretNoteModel.currentFileContents = currentFileContents;
       secretNoteModel.filePath = currentFileContents.path;
 
       // @ts-ignore
-      if (!secretNoteModel.quickEditMode && !secretNoteModel.readOnly) {
-        secretNoteModel.startKernelConnection();
-      }
+      // if (!secretNoteModel.quickEditMode && !secretNoteModel.readOnly) {
+      secretNoteModel.startKernelConnection();
+      // }
 
       return secretNoteModel.currentFileContents.content;
     }

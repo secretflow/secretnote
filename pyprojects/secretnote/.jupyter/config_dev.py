@@ -19,6 +19,8 @@ c.ServerApp.token = ""
 
 c.ServerApp.root_dir = "../../.secretnote"
 
+c.ServerApp.port = 8889
+
 c.LanguageServerManager.autodetect = False
 
 c.LanguageServerManager.language_servers = {
@@ -45,3 +47,5 @@ c.LanguageServerManager.language_servers = {
         "display_name": "libro-analyzer",
     },
 }
+
+c.ResourceUseDisplay.track_cpu_percent = True

@@ -89,6 +89,8 @@ export class SecretNoteKernelManager {
       if (connection) {
         kernelConnections.push(connection);
         this.kernelConnection2Server.set(connection.id, s.id);
+
+        
       }
     }
 

@@ -16,8 +16,8 @@ import {
 import { debounce } from 'lodash-es';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
-import { SecretNoteServerManager } from '@/modules/server';
 import type { IServer } from '@/modules/server';
+import { SecretNoteServerManager } from '@/modules/server';
 import { getRemoteBaseUrl } from '@/utils';
 
 @transient()
@@ -83,8 +83,9 @@ export class SecretNoteModel extends LibroModel {
       this.kernelConnections = connections;
       this.kernelConnecting = false;
     } else {
-      this.kernelConnections =
-        await this.kernelManager.createKernelConnections(fileInfo);
+      this.kernelConnections = await this.kernelManager.createKernelConnections(
+        fileInfo,
+      );
       this.kernelConnecting = false;
     }
   }
@@ -168,7 +169,9 @@ export class SecretNoteModel extends LibroModel {
 
   async shutdown() {
     if (this.currentFileContents) {
-      await this.kernelManager.shutdownKernelConnections(this.currentFileContents);
+      await this.kernelManager.shutdownKernelConnections(
+        this.currentFileContents,
+      );
       this.kernelConnections = [];
     }
   }
@@ -208,17 +211,23 @@ export class SecretNoteModel extends LibroModel {
 
   async createCheckpoint() {
     if (this.currentFileContents) {
-      await this.contentsManager.createCheckpoint(this.currentFileContents.path, {
-        baseUrl: getRemoteBaseUrl(),
-      });
+      await this.contentsManager.createCheckpoint(
+        this.currentFileContents.path,
+        {
+          baseUrl: getRemoteBaseUrl(),
+        },
+      );
     }
   }
 
   async listCheckpoints() {
     if (this.currentFileContents) {
-      await this.contentsManager.listCheckpoints(this.currentFileContents.path, {
-        baseUrl: getRemoteBaseUrl(),
-      });
+      await this.contentsManager.listCheckpoints(
+        this.currentFileContents.path,
+        {
+          baseUrl: getRemoteBaseUrl(),
+        },
+      );
     }
   }
 
