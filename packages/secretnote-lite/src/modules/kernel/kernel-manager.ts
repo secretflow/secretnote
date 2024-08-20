@@ -1,3 +1,7 @@
+// Kernel Manager manages all kernel connections.
+// Different from common Jupyter Server, since SecretNote supports multiple parties executions,
+// the kernel manager is customized to manage multiple kernel connections properly.
+
 import type {
   IContentsModel,
   IKernelConnection,
@@ -11,8 +15,8 @@ import {
 } from '@difizen/libro-jupyter';
 import { inject, singleton, StorageService } from '@difizen/mana-app';
 
-import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import type { IServer } from '@/modules/server';
+import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import { getRemoteBaseUrl, getRemoteWsUrl } from '@/utils';
 
 interface StoredSessionInfo {
@@ -20,16 +24,16 @@ interface StoredSessionInfo {
   serverId: string;
   options: {
     model: {
-      id: string; // kernel.id,
-      name: string; // kernel.name,
+      id: string;
+      name: string;
     };
   };
 }
 
 @singleton()
 export class SecretNoteKernelManager {
-  private file2KernelConnections = new Map<string, IKernelConnection[]>();
-  private kernelConnection2Server = new Map<string, string>();
+  private fileToKernelConnections = new Map<string, IKernelConnection[]>();
+  private kernelConnectionToServer = new Map<string, string>();
 
   protected sessionRestAPI: SessionRestAPI;
   protected kernelRestAPI: KernelRestAPI;
@@ -52,16 +56,18 @@ export class SecretNoteKernelManager {
     this.storageService = storageService;
   }
 
+  /**
+   * Create kernel connections for the given file.
+   */
   async createKernelConnections(fileInfo: IContentsModel) {
-    const servers = await this.serverManager.getServerList();
-    const availableServers = (servers || []).filter(
-      (s) => s.status === ServerStatus.Succeeded,
-    );
+    // Get available servers
+    const availableServers = (
+      (await this.serverManager.getServerList()) || []
+    ).filter((s) => s.status === ServerStatus.Succeeded);
     const kernelConnections: IKernelConnection[] = [];
-    const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
-      this.storedKey(fileInfo),
-      [],
-    );
+    const storedSessions = await this.storageService.getData<
+      StoredSessionInfo[]
+    >(this.storedKey(fileInfo), []);
 
     for (let i = 0, len = availableServers.length; i < len; i++) {
       const s = availableServers[i];
@@ -88,45 +94,51 @@ export class SecretNoteKernelManager {
       }
       if (connection) {
         kernelConnections.push(connection);
-        this.kernelConnection2Server.set(connection.id, s.id);
-
-        
+        this.kernelConnectionToServer.set(connection.id, s.id);
       }
     }
 
-    this.file2KernelConnections.set(this.storedKey(fileInfo), kernelConnections);
+    this.fileToKernelConnections.set(
+      this.storedKey(fileInfo),
+      kernelConnections,
+    );
     return kernelConnections;
   }
 
   async addKernelConnectionOnServer(fileInfo: IContentsModel, server: IServer) {
     const connection = await this.createKernelConnection(fileInfo, server);
     if (connection) {
-      this.kernelConnection2Server.set(connection.id, server.id);
-      const existed = this.file2KernelConnections.get(this.storedKey(fileInfo)) || [];
-      this.file2KernelConnections.set(this.storedKey(fileInfo), [
+      this.kernelConnectionToServer.set(connection.id, server.id);
+      const existed =
+        this.fileToKernelConnections.get(this.storedKey(fileInfo)) || [];
+      this.fileToKernelConnections.set(this.storedKey(fileInfo), [
         ...existed,
         connection,
       ]);
     }
   }
 
-  async deleteKernelConnectionOnServer(fileInfo: IContentsModel, server: IServer) {
-    const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
-      this.storedKey(fileInfo),
-      [],
-    );
+  async deleteKernelConnectionOnServer(
+    fileInfo: IContentsModel,
+    server: IServer,
+  ) {
+    const storedSessions = await this.storageService.getData<
+      StoredSessionInfo[]
+    >(this.storedKey(fileInfo), []);
     const hit = storedSessions.find((s) => s.serverId === server.id);
     if (hit) {
       await this.removeStoredSession(fileInfo, hit);
     }
 
-    const kernelConnections = this.file2KernelConnections.get(this.storedKey(fileInfo));
+    const kernelConnections = this.fileToKernelConnections.get(
+      this.storedKey(fileInfo),
+    );
     if (kernelConnections) {
       const deleteIds: string[] = [];
       kernelConnections.forEach((kc) => {
         const ownerServer = this.getServerByKernelConnection(kc);
         if (ownerServer && ownerServer.id === server.id) {
-          this.kernelConnection2Server.delete(kc.id);
+          this.kernelConnectionToServer.delete(kc.id);
           kc.shutdown();
           deleteIds.push(kc.id);
         }
@@ -134,28 +146,35 @@ export class SecretNoteKernelManager {
       const newKernelConnections = kernelConnections.filter(
         (kc) => !deleteIds.includes(kc.id),
       );
-      this.file2KernelConnections.set(this.storedKey(fileInfo), newKernelConnections);
+      this.fileToKernelConnections.set(
+        this.storedKey(fileInfo),
+        newKernelConnections,
+      );
     }
   }
 
   async shutdownKernelConnections(fileInfo: IContentsModel) {
-    const kernelConnections = this.file2KernelConnections.get(this.storedKey(fileInfo));
+    const kernelConnections = this.fileToKernelConnections.get(
+      this.storedKey(fileInfo),
+    );
     if (kernelConnections) {
       kernelConnections.forEach((kc) => {
-        this.kernelConnection2Server.delete(kc.id);
+        this.kernelConnectionToServer.delete(kc.id);
         kc.shutdown();
       });
       await this.clearStoredSessions(fileInfo);
-      this.file2KernelConnections.delete(this.storedKey(fileInfo));
+      this.fileToKernelConnections.delete(this.storedKey(fileInfo));
     }
   }
 
   getKernelConnections(fileInfo: IContentsModel): IKernelConnection[] {
-    return this.file2KernelConnections.get(this.storedKey(fileInfo)) || [];
+    return this.fileToKernelConnections.get(this.storedKey(fileInfo)) || [];
   }
 
-  getServerByKernelConnection(connection: IKernelConnection): IServer | undefined {
-    const serverId = this.kernelConnection2Server.get(connection.id);
+  getServerByKernelConnection(
+    connection: IKernelConnection,
+  ): IServer | undefined {
+    const serverId = this.kernelConnectionToServer.get(connection.id);
     if (serverId) {
       return this.serverManager.servers.find((s) => s.id === serverId);
     }
@@ -226,11 +245,17 @@ export class SecretNoteKernelManager {
     }
   }
 
+  /**
+   * Generate a key for a file's session storage record.
+   */
   protected storedKey(fileInfo: IContentsModel): string {
     return `secretnote_${fileInfo.path}_${fileInfo.name}`;
   }
 
-  protected async addStoredSession(fileInfo: IContentsModel, info: StoredSessionInfo) {
+  protected async addStoredSession(
+    fileInfo: IContentsModel,
+    info: StoredSessionInfo,
+  ) {
     let sessions = await this.storageService.getData<StoredSessionInfo[]>(
       this.storedKey(fileInfo),
     );
@@ -260,7 +285,10 @@ export class SecretNoteKernelManager {
     await this.storageService.setData(this.storedKey(fileInfo), undefined);
   }
 
-  protected getDefaultKernelName(fileInfo: IContentsModel, server: IServer): string {
+  protected getDefaultKernelName(
+    fileInfo: IContentsModel,
+    server: IServer,
+  ): string {
     const kernelName =
       fileInfo.content.metadata.kernelspec?.name ||
       server.kernelspec?.default ||

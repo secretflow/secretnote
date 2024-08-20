@@ -38,7 +38,7 @@ c.LanguageServerManager.language_servers = {
         # if installed as a binary
         "argv": [
             "node",
-            "node_modules/@difizen/libro-analyzer/index.js",
+            "../node_modules/@difizen/libro-analyzer/index.js", # TODO
             "--stdio",
         ],
         "languages": ["python"],

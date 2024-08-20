@@ -30,9 +30,9 @@ export class SecretNoteContentContribution implements ContentContribution {
       secretNoteModel.filePath = currentFileContents.path;
 
       // @ts-ignore
-      // if (!secretNoteModel.quickEditMode && !secretNoteModel.readOnly) {
-      secretNoteModel.startKernelConnection();
-      // }
+      if (!secretNoteModel.quickEditMode && !secretNoteModel.readOnly) {
+        secretNoteModel.startKernelConnection();
+      }
 
       return secretNoteModel.currentFileContents.content;
     }

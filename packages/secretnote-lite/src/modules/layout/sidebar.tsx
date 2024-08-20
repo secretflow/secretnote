@@ -23,6 +23,7 @@ import LibroJupyterPkgJSON from '@difizen/libro-jupyter/package.json';
 import ManaAppPkgJSON from '@difizen/mana-app/package.json';
 import SecretNotePkgJSON from '../../../package.json';
 
+import { l10n } from '@difizen/mana-l10n';
 import { SideBarContribution } from './protocol';
 
 export const metricsMonitorKey = 'metricsMonitor';
@@ -74,9 +75,12 @@ export class AboutBarView extends BaseView {
 
   constructor() {
     super();
-    this.fmtPackageVersions = Object.entries(this.packageVersions)
-      .map(([k, v]) => `${k}@${v ?? '-'}`)
-      .join('; ');
+    this.fmtPackageVersions =
+      l10n.t('版本信息') +
+      ': ' +
+      Object.entries(this.packageVersions)
+        .map(([k, v]) => `${k}@${v ?? '-'}`)
+        .join('; ');
   }
 }
 

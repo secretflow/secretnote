@@ -1,10 +1,15 @@
+// Outputarea is the area below each cell displaying the output of the cell execution.
+// Different from common Jupyter Server, Since SecretNote supports multiple parties executions,
+// the output area is customized to display the output of each party properly.
+
 import type {
   ExecutableCellModel,
+  IDisplayData,
   IKernelConnection,
   IMimeBundle,
   IOutput,
-  KernelMessage,
   IOutputAreaOption,
+  KernelMessage,
 } from '@difizen/libro-jupyter';
 import {
   isDisplayDataMsg,
@@ -18,15 +23,15 @@ import {
   removeOverwrittenChars,
 } from '@difizen/libro-jupyter';
 import { inject, transient, view, ViewOption } from '@difizen/mana-app';
-import React from 'react';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
+import { l10n } from '@difizen/mana-l10n';
 
 @transient()
 @view('libro-output-area')
 export class SecretNoteOutputArea extends LibroOutputArea {
   kernelManager: SecretNoteKernelManager;
-  connectionId2Message: Record<string, IOutput[]> = {};
+  kernelOutputs: Record<string, IOutput[]> = {}; // kernel id -> outputs from it
 
   constructor(
     @inject(ViewOption) option: IOutputAreaOption,
@@ -34,28 +39,40 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   ) {
     super(option);
     this.kernelManager = kernelManager;
-    this.connectionId2Message = {};
-    this.handleMsg();
+    this.kernelOutputs = {};
+
+    this.startMsgHandler();
   }
 
-  handleMsg() {
+  /**
+   * Start handling the message from the kernel connection passed from `cell`.
+   * Transform it to proper outputs.
+   */
+  startMsgHandler() {
+    // cell that has output area is always an executable cell instead of a markdown cell, cast it
     const cellModel = this.cell.model as unknown as ExecutableCellModel;
+
+    // this event is fired inside `cell/view.tsx`
+    // about messaging, see https://jupyter-client.readthedocs.io/en/latest/messaging.html
     cellModel.msgChangeEmitter.event(
       ({
-        connection,
+        kernel,
         msg,
       }: {
-        connection: IKernelConnection;
+        kernel: IKernelConnection;
         msg: KernelMessage.IMessage;
       }) => {
+        // ignore heartbeat messages
         if (msg.header.msg_type === 'status') {
           return;
         }
-        if (msg.header.msg_type === 'execute_input') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // TODO ?
+        else if (msg.header.msg_type === 'execute_input') {
           cellModel.executeCount = (msg.content as any).execution_count;
         }
-        if (
+        // handle `display_data`, `stream`, `error`, `execute_result` messages
+        // these are most common output types
+        else if (
           isDisplayDataMsg(msg) ||
           isStreamMsg(msg) ||
           isErrorMsg(msg) ||
@@ -65,10 +82,11 @@ export class SecretNoteOutputArea extends LibroOutputArea {
             ...msg.content,
             output_type: msg.header.msg_type,
           };
-          this.addOutput(connection, output);
+          this.addOutput(kernel, output);
         }
-
-        if (isExecuteReplyMsg(msg)) {
+        // handle `execute_reply` message
+        else if (isExecuteReplyMsg(msg)) {
+          // TODO ?
           const content = msg.content;
           if (content.status !== 'ok') {
             return;
@@ -81,74 +99,99 @@ export class SecretNoteOutputArea extends LibroOutputArea {
           if (!pages.length) {
             return;
           }
-
           const page = JSON.parse(JSON.stringify(pages[0]));
           const output: IOutput = {
             output_type: 'display_data',
             data: page.data as IMimeBundle,
             metadata: {},
           };
-          this.addOutput(connection, output);
+          this.addOutput(kernel, output);
         }
       },
     );
   }
 
-  addOutput(connection: IKernelConnection, output: IOutput) {
-    const outputs = this.connectionId2Message[connection.id] || [];
+  /**
+   * Append a kernel's output to the output area.
+   */
+  addOutput(kernel: IKernelConnection, output: IOutput) {
+    const outputs = this.kernelOutputs[kernel.id] || [];
+    // add the leading output if the outputs are empty
     if (outputs.length === 0) {
-      outputs.push(this.getBreakOutput(connection));
+      outputs.push(this.makeLeadingOutput(kernel));
     }
+
     const lastIndex = outputs.length - 1;
     const preOutput = outputs[lastIndex];
-
-    if (isStream(output) && isStream(preOutput) && output.name === preOutput.name) {
-      output.text = removeOverwrittenChars(preOutput.text + normalize(output.text));
+    if (
+      isStream(output) &&
+      isStream(preOutput) &&
+      output.name === preOutput.name
+    ) {
+      // merge two continuous stream outputs
+      // hanlde backspace and carriage-return, concat the text
+      output.text = removeOverwrittenChars(
+        preOutput.text + normalize(output.text),
+      );
+      // just replace the previous output, don't push new
       outputs[lastIndex] = output;
       this.flushOutputs();
       return;
-    }
-
-    if (isStream(output)) {
+    } else if (isStream(output)) {
+      // handle first stream output
       output.text = removeOverwrittenChars(normalize(output.text));
     }
+    // no extra logics for other types of outputs
 
+    // update the outputs of the kernel and flush it
     outputs.push(output);
-    this.connectionId2Message[connection.id] = outputs;
-
+    this.kernelOutputs[kernel.id] = outputs;
     this.flushOutputs();
   }
 
+  /**
+   * Flush all kernel outputs to the output area.
+   */
   async flushOutputs() {
-    const connectionNum = Object.keys(this.connectionId2Message).length;
-    let outputs = Object.values(this.connectionId2Message).flat();
-    if (connectionNum < 2) {
-      outputs = outputs.filter((output) => !output.breakFlag);
+    const kernelCount = Object.keys(this.kernelOutputs).length;
+    let outputs = Object.values(this.kernelOutputs).flat();
+    if (kernelCount < 2) {
+      // remove the leading output title if there is only one kernel
+      outputs = outputs.filter((output) => !output.isLeading);
     }
-    this.outputs.forEach((output) => {
-      output.dispose();
-    });
+    // dispose all previous outputs
+    this.outputs.forEach((output) => output.dispose());
+    // create new outputs
     this.outputs = await Promise.all(
       outputs.map((output) => this.doCreateOutput(output)),
     );
   }
 
-  getBreakOutput(connection: IKernelConnection) {
-    const server = this.kernelManager.getServerByKernelConnection(connection);
-    const name = server?.name || connection.clientId;
-    const output: IOutput = {
+  /**
+   * Construct a special `leading output` (as display_data) displayed as title on
+   * the very first line of each kernel's output to indicate the output source.
+   */
+  makeLeadingOutput(kernel: IKernelConnection) {
+    const server = this.kernelManager.getServerByKernelConnection(kernel);
+    const name = server?.name || kernel.clientId;
+    const output: IDisplayData = {
       output_type: 'display_data',
       data: {
-        'text/html': `<h4>${name}'s Output:</h4>`,
+        'text/html': `<h4>${name} ${l10n.t('的输出')}</h4>`,
       },
       metadata: {},
-      breakFlag: true,
+      isLeading: true, // a flag to indicate the leading output
     };
+
     return output;
   }
 
+  /**
+   * Clear the all kernel outputs.
+   * FIXME
+   */
   clear() {
     super.clear();
-    this.connectionId2Message = {};
+    this.kernelOutputs = {};
   }
 }

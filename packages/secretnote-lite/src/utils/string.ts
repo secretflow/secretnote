@@ -20,14 +20,12 @@ export const getSearchParams = (...key: string[]) => {
   return res;
 };
 
+/**
+ * Compare two date strings and return 1 if a > b, -1 if a < b, 0 elsewise.
+ */
 export const compareDateString = (a: string, b: string) => {
-  const aDate = new Date(a);
-  const bDate = new Date(b);
-  if (aDate > bDate) {
-    return 1;
-  }
-  if (aDate < bDate) {
-    return -1;
-  }
-  return 0;
+  const aDate = new Date(a),
+    bDate = new Date(b);
+
+  return aDate > bDate ? 1 : aDate < bDate ? -1 : 0;
 };

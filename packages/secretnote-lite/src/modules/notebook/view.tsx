@@ -1,3 +1,5 @@
+// This is the "Notebooks" part of the sidebar on the left.
+
 import type { IContentsModel } from '@difizen/libro-jupyter';
 import {
   BaseView,
@@ -59,6 +61,9 @@ export const NotebookFileComponent = () => {
     }
   };
 
+  /**
+   * Commit the rename action.
+   */
   const renameFile = async () => {
     try {
       await notebookFileService.renameFile();
@@ -113,14 +118,23 @@ export const NotebookFileComponent = () => {
           <li
             onClick={() => notebookFileService.openFile(file)}
             className={classnames({
-              current: notebookFileService.currentNotebookFile?.path === file.path,
+              current:
+                notebookFileService.currentNotebookFile?.path === file.path,
             })}
           >
             <span>{notebookFileService.getFileNameWithoutExt(file.name)}</span>
             <DropdownMenu
               items={[
-                { key: 'rename', label: l10n.t('重命名'), icon: <PenLine size={12} /> },
-                // { key: 'copy', label: l10n.t('复制'), icon: <Copy size={12} /> },
+                {
+                  key: 'rename',
+                  label: l10n.t('重命名'),
+                  icon: <PenLine size={12} />,
+                },
+                {
+                  key: 'copy',
+                  label: l10n.t('复制'),
+                  icon: <Copy size={12} />,
+                },
                 {
                   key: 'export',
                   label: l10n.t('导出为 .ipynb 文件'),
@@ -157,7 +171,9 @@ export class NotebookFileView extends BaseView implements SideBarContribution {
   view = NotebookFileComponent;
   readonly notebookFileService: NotebookFileService;
 
-  constructor(@inject(NotebookFileService) notebookFileService: NotebookFileService) {
+  constructor(
+    @inject(NotebookFileService) notebookFileService: NotebookFileService,
+  ) {
     super();
     this.notebookFileService = notebookFileService;
     this.notebookFileService.getFileList();

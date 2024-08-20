@@ -1,3 +1,5 @@
+// The protocol definition for the server module.
+
 import type { ISpecModels } from '@difizen/libro-jupyter';
 
 export enum ServerStatus {
@@ -6,7 +8,7 @@ export enum ServerStatus {
   Succeeded = 'Succeeded',
   Failed = 'Failed',
   Unknown = 'Unknown',
-  Terminated = 'Terminated', // not k8s status, but used in our app
+  Terminated = 'Terminated', // not K8s status, but used in our app
 }
 
 export interface IServer {

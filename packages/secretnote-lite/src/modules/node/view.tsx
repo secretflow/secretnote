@@ -12,6 +12,7 @@ import {
   Badge,
   Button,
   Descriptions,
+  Divider,
   Form,
   Input,
   message,
@@ -122,18 +123,23 @@ const NodeDetails = (props: { node: Node }) => {
               {node.podIp || '暂无数据'}
             </Paragraph>
           </Descriptions.Item>
+          <Descriptions.Item label={l10n.t('镜像版本')}>
+            {/* TODO */}
+            secretflow/secretnote:1.6.1
+          </Descriptions.Item>
         </Descriptions>
+        <Divider style={{ marginTop: '0', marginBottom: '1em' }} />
         <Space>
-          <Button type="link" onClick={() => deleteNode(node.id)}>
+          <Button type="default" danger onClick={() => deleteNode(node.id)}>
             {l10n.t('删除')}
           </Button>
           {node.status === ServerStatus.Terminated && (
-            <Button type="link" onClick={() => startNode(node.id)}>
+            <Button type="primary" onClick={() => startNode(node.id)}>
               {l10n.t('启动')}
             </Button>
           )}
           {node.status === ServerStatus.Succeeded && (
-            <Button type="link" onClick={() => stopNode(node.id)}>
+            <Button type="default" onClick={() => stopNode(node.id)}>
               {l10n.t('停止')}
             </Button>
           )}
@@ -225,7 +231,7 @@ export const NodeComponent = () => {
 
   return (
     <div className="secretnote-node">
-      <span className='title'>节点列表:&nbsp;</span>
+      <span className="title">节点列表:&nbsp;</span>
       <Avatar.Group>
         {instance.service.nodes.map((item) => (
           <Popover
