@@ -3,7 +3,8 @@ import { URL as LibroURL } from '@difizen/libro-jupyter';
 
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   const SECRETNOTE_BACKEND_URL = 'http://127.0.0.1:8091'; // for debug only
-  const backendUrl = process.env.SECRETNOTE_BACKEND_URL || SECRETNOTE_BACKEND_URL;
+  const backendUrl =
+    process.env.SECRETNOTE_BACKEND_URL || SECRETNOTE_BACKEND_URL;
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 
@@ -68,7 +69,7 @@ export const getToken = () => {
   return null;
 };
 
-export const getDefaultConnectionSettings: () => Partial<ISettings> = () => {
+export const getDefaultConnectionSettings = () => {
   return {
     init: {
       cache: 'no-store',
@@ -79,10 +80,14 @@ export const getDefaultConnectionSettings: () => Partial<ISettings> = () => {
     },
     token: getToken(),
     appendToken: true,
-  };
+  } as Partial<ISettings>;
 };
 
-export const request = async (url: string, init: RequestInit, targetId = '') => {
+export const request = async (
+  url: string,
+  init: RequestInit,
+  targetId = '',
+) => {
   let requestUrl = normalizeUrl(url, targetId);
 
   const cache = init.cache ?? 'no-store';

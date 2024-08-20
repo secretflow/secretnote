@@ -2,7 +2,13 @@
 // i.e., multiple Jupyter Servers.
 // So we need to customize the server manager to manage multiple servers.
 
-import { request, wait } from '@/utils';
+import {
+  getDefaultConnectionSettings,
+  getRemoteBaseUrl,
+  getRemoteWsUrl,
+  request,
+  wait,
+} from '@/utils';
 import {
   ServerConnection,
   ServerManager,
@@ -34,7 +40,6 @@ export class SecretNoteServerManager {
     this.serverConnection = serverConnection;
     this.updateServerConnectionSettings();
     this.getServerList().then(() => {
-      console.log('launch default server');
       this.defaultServerManager.launch();
     });
   }
@@ -222,18 +227,21 @@ export class SecretNoteServerManager {
 
   private updateServerConnectionSettings() {
     // update server connection settings
-    // Resolve requests such as kernelspaces/lsp are initiated in libro
-    // const firstServer = this.servers[0];
-    // const firstServerOnline =
-    //   firstServer && firstServer.status === ServerStatus.Succeeded;
-    // this.serverConnection.updateSettings({
-    //   baseUrl: firstServerOnline
-    //     ? getRemoteBaseUrl(firstServer.id, true)
-    //     : getRemoteBaseUrl(),
-    //   wsUrl: firstServerOnline
-    //     ? getRemoteWsUrl(firstServer.id, true)
-    //     : getRemoteWsUrl(),
-    //   ...getDefaultConnectionSettings(),
-    // });
+    // Resolve requests such as kernelspecs/lsp are initiated in libro
+    const firstServer = this.servers[0];
+    const firstServerOnline =
+      firstServer && firstServer.status === ServerStatus.Succeeded;
+
+    // FIXME currently libro-language-client doesn't use the internal ServerConnection
+    // to determine the request URL, so the Token will not be carried.
+    this.serverConnection.updateSettings({
+      baseUrl: firstServerOnline
+        ? getRemoteBaseUrl(firstServer.id, true)
+        : getRemoteBaseUrl(),
+      wsUrl: firstServerOnline
+        ? getRemoteWsUrl(firstServer.id, true)
+        : getRemoteWsUrl(),
+      ...getDefaultConnectionSettings(),
+    });
   }
 }

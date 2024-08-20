@@ -33,7 +33,12 @@ const AboutBarComponent = () => {
   const fmtPackageVersions = instance.fmtPackageVersions;
 
   return (
-    <Space direction="horizontal" align="center" size="large">
+    <Space
+      direction="horizontal"
+      align="center"
+      size="large"
+      className="about-bar"
+    >
       <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
         SecretFlow
       </Typography.Link>

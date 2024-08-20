@@ -8,6 +8,7 @@ import type { IServer, ServerStatus } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
 import { request } from '@/utils';
 
+import { IKernelConnection } from '@difizen/libro-jupyter';
 import { NotebookFileService } from '../notebook';
 
 // The metrics information of one single server.
@@ -16,6 +17,7 @@ interface ServerMetric {
   status: ServerStatus;
   cpu: number; // CPU usage percentage
   memory: number; // Memory usage in bytes
+  totalMemory: number; // Total memory in bytes
 }
 
 // The metrics information of all servers.
@@ -90,53 +92,93 @@ export class MetricsService {
    * or reset the metrics to default value.
    */
   async refresh(reset = false) {
-    const servers = await this.serverManager.getServerList();
+    // get current notebook file
+    const currentNotebookFile = this.notebookFileService.currentNotebookFile;
+    if (!currentNotebookFile) {
+      return;
+    }
 
-    servers?.forEach(async (server) => {
-      if (reset) {
-        this.metrics[server.id] = {
-          name: server.name,
-          status: server.status,
-          cpu: 0,
-          memory: 0,
-        };
-      } else {
-        const data = await this.fetchServerStatus(server);
-        this.metrics[server.id] = {
-          name: server.name,
-          status: server.status,
-          cpu: data.cpu || 0,
-          memory: data.memory || 0,
-        };
+    // get all kernel connections
+    const kernelConnections =
+      this.kernelManager.getKernelConnections(currentNotebookFile);
+
+    const serverIds: string[] = [];
+    kernelConnections.forEach(async (kernelConnection) => {
+      // get corresponding server
+      const server =
+        this.kernelManager.getServerByKernelConnection(kernelConnection);
+      // fetch metrics
+      if (server) {
+        serverIds.push(server.id);
+        if (reset) {
+          this.metrics[server.id] = {
+            name: server.name,
+            status: server.status,
+            cpu: 0,
+            memory: 0,
+            totalMemory: 0,
+          };
+        } else {
+          const data = await this.fetchKernelUsage(kernelConnection, server);
+          this.metrics[server.id] = {
+            name: server.name,
+            status: server.status,
+            cpu: data.cpu || 0,
+            memory: data.memory || 0,
+            totalMemory: data.totalMemory || 0,
+          };
+        }
       }
     });
+
+    // remove unavailable servers' metrics
+    for (const id in this.metrics) {
+      if (!serverIds.includes(id)) {
+        delete this.metrics[id];
+      }
+    }
   }
 
   /**
-   * Fetch current server status from Jupyter Server's jupyter-resource-usage extension API.
+   * Fetch current kernel's resource usage from Jupyter Server's jupyter-resource-usage extension API.
    */
-  async fetchServerStatus(
+  async fetchKernelUsage(
+    kernel: IKernelConnection,
     server: IServer,
-  ): Promise<Partial<Pick<ServerMetric, 'cpu' | 'memory'>>> {
+  ): Promise<Partial<Pick<ServerMetric, 'cpu' | 'memory' | 'totalMemory'>>> {
     try {
-      const data = (await request(
-        '/api/metrics/v1',
+      const { content } = (await request(
+        `/api/metrics/v1/kernel_usage/get_usage/${kernel.id}`,
         { method: 'GET' },
         server.id,
-      )) as Partial<{
-        rss: number; // resident set size [bytes]
-        pss: number; // proportional set size [bytes]
-        cpu_percent: number; // CPU usage percentage
-      }>;
+      )) as {
+        content: Partial<{
+          reason: string;
+          host_cpu_percent: number;
+          host_virtual_memory: {
+            total: number;
+            used: number;
+            percent: number;
+          };
+        }>;
+      } & { [key: string]: any };
+
+      if (content?.reason) {
+        throw new Error(content.reason);
+      }
+
+      const { host_virtual_memory: vm } = content;
 
       return {
-        cpu: data.cpu_percent,
-        memory: data.pss ?? data.rss,
+        cpu: content.host_cpu_percent,
+        memory:
+          vm?.total && vm?.percent ? (vm.total * vm.percent) / 100 : void 0,
+        totalMemory: vm?.total,
       };
     } catch (e) {
       // simply skip current tick
       // eslint-disable-next-line no-console
-      console.error(e);
+      console.log(e);
     }
     return {};
   }

@@ -8,13 +8,13 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { useEffect } from 'react';
 
-import { MetricsService } from './service';
-import Smoothie from './smoothie';
-
-import { l10n } from '@difizen/mana-l10n';
+import { convertSizeUnit } from '@/utils';
+import { Tag } from 'antd';
 import './index.less';
+import { MetricsService } from './service';
 
 const MetricsComponent = () => {
   const instance = useInject<MetricsView>(ViewInstance);
@@ -29,32 +29,29 @@ const MetricsComponent = () => {
     };
   }, []);
 
+  const formatMetric = (v: (typeof metrics)[1]) =>
+    `${l10n.t('CPU')} ${v.cpu.toFixed(1)} (%)` +
+    ` / ${l10n.t('内存')} ` +
+    `${convertSizeUnit(v.memory, 'GB').toFixed(1)} (GB)`;
+
   return (
     <div className="secretnote-kernel-status">
-      <p>TODO Metrics</p>
-      {Object.entries(metrics).map(([id, v]) => (
-        <div key={id} className="kernel-status-item">
-          <div className="server-name">{v.name}:</div>
-          <div className="metrics-item">
-            <span className="label">{l10n.t('CPU (%)')}</span>
-            <span>{v.cpu.toFixed(2)}</span>
+      <p className="title">{l10n.t('节点监控')}</p>
+
+      {Object.keys(metrics).length > 0 ? (
+        Object.entries(metrics).map(([id, v]) => (
+          <div key={id} className="kernel-status-item">
+            <div className="server-name">{v.name}</div>
+            <Tag style={{ fontFamily: 'monospace, monospace' }}>
+              {formatMetric(v)}
+            </Tag>
           </div>
-          <Smoothie
-            data={{ time: Date.now(), value: v.cpu }}
-            min={0}
-            max={100}
-          />
-          <div className="metrics-item">
-            <span className="label">{l10n.t('内存 (MB)')}</span>
-            <span>{(v.memory / 1024 / 1024).toFixed(2)}</span>
-          </div>
-          <Smoothie
-            data={{ time: Date.now(), value: v.memory / 1024 / 1024 }}
-            min={0}
-            max={4 * 1024} /* 4GB */
-          />
+        ))
+      ) : (
+        <div className="kernel-status-item">
+          <span className="placeholder">{l10n.t('暂无数据')}</span>
         </div>
-      ))}
+      )}
     </div>
   );
 };

@@ -73,7 +73,11 @@ export const parseCSV = (csv: string, header?: string[]) => {
   return dsvFormat(DELIMITER).parse(content);
 };
 
-export const downloadFileByBlob = (url: string, filename = '', method = 'GET') => {
+export const downloadFileByBlob = (
+  url: string,
+  filename = '',
+  method = 'GET',
+) => {
   getBlob(url, method)
     .then((blob: Blob) => {
       saveAs(blob, filename);
@@ -84,7 +88,11 @@ export const downloadFileByBlob = (url: string, filename = '', method = 'GET') =
     });
 };
 
-export const downloadFileByUrl = (url: string, filename: string, target?: string) => {
+export const downloadFileByUrl = (
+  url: string,
+  filename: string,
+  target?: string,
+) => {
   const downloadElement = document.createElement('a');
   downloadElement.style.display = 'none';
   downloadElement.href = url;
@@ -98,4 +106,20 @@ export const downloadFileByUrl = (url: string, filename: string, target?: string
   document.body.appendChild(downloadElement);
   downloadElement.click();
   document.body.removeChild(downloadElement);
+};
+
+/**
+ * Convert byte to other size unit.
+ */
+export const convertSizeUnit = (
+  byte: number,
+  unit: 'B' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB',
+) => {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const index = units.indexOf(unit);
+  let size = byte;
+  for (let i = 0; i < index; i++) {
+    size /= 1024;
+  }
+  return size;
 };

@@ -194,7 +194,10 @@ export const NodeComponent = () => {
           rules={[
             { required: true, message: l10n.t('请输入名称') },
             { max: 16, message: l10n.t('名称过长') },
-            { pattern: /^[A-Za-z]+$/, message: l10n.t('名称只能包含英文字母') },
+            {
+              pattern: /^[a-z]+$/,
+              message: l10n.t('名称只能包含小写英文字母'),
+            },
           ]}
         >
           <Input placeholder="alice" />
@@ -222,6 +225,7 @@ export const NodeComponent = () => {
 
   return (
     <div className="secretnote-node">
+      <span className='title'>节点列表:&nbsp;</span>
       <Avatar.Group>
         {instance.service.nodes.map((item) => (
           <Popover
