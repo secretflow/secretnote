@@ -1,11 +1,11 @@
-import type { LibroView } from '@difizen/libro-jupyter';
-import type { LibroJupyterModel } from '@difizen/libro-jupyter';
+// The "Run" button in the side toolbar of each cell.
+
+import type { LibroJupyterModel, LibroView } from '@difizen/libro-jupyter';
 import { NotebookCommands } from '@difizen/libro-jupyter';
 import { CommandRegistry, useInject, ViewInstance } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Tooltip } from 'antd';
 import { PlayCircle } from 'lucide-react';
-import React from 'react';
 
 export const SideToolbarRunItem = () => {
   const libroView = useInject<LibroView>(ViewInstance);
@@ -34,15 +34,15 @@ export const SideToolbarRunItem = () => {
         />
       </Tooltip>
     );
+  } else {
+    return (
+      <Tooltip
+        overlayClassName="libro-tooltip-placement-right"
+        placement="right"
+        title={l10n.t('Kernel 准备中，无法执行')}
+      >
+        <PlayCircle size={16} color="#bfbfbf" />
+      </Tooltip>
+    );
   }
-
-  return (
-    <Tooltip
-      overlayClassName="libro-tooltip-placement-right"
-      placement="right"
-      title={l10n.t('kernel准备中，无法执行')}
-    >
-      <PlayCircle size={16} color="#bfbfbf" />
-    </Tooltip>
-  );
 };

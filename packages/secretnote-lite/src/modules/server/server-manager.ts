@@ -16,7 +16,7 @@ import {
   type ISpecModels,
 } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
-import type { Node as SecretNoteNode } from '../node/service';
+import type { SecretNoteNode } from '../node/service';
 import { ServerStatus, type IServer } from './protocol';
 
 @singleton()
@@ -49,12 +49,15 @@ export class SecretNoteServerManager {
   }
 
   /**
-   * Refresh and get versions of server's internal.
+   * Refresh and get versions of server's internal softwares.
    */
   async getVersions() {
-    return (this.versions = await request('api/versions', {
-      method: 'GET',
-    })) as SecretNoteNode['versions'];
+    return (this.versions = await request<SecretNoteNode['versions']>(
+      'api/versions',
+      {
+        method: 'GET',
+      },
+    ));
   }
 
   /**
@@ -63,9 +66,9 @@ export class SecretNoteServerManager {
   async getServerList() {
     this.loading = true;
     try {
-      const data = (await request('api/nodes', {
+      const data = await request<SecretNoteNode[]>('api/nodes', {
         method: 'GET',
-      })) as SecretNoteNode[];
+      });
       for (const item of data) {
         const spec = await this.getServerSpec(item);
         if (spec) {

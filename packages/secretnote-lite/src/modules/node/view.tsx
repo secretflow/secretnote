@@ -29,7 +29,7 @@ import { useState } from 'react';
 import { genericErrorHandler, invert, randomColorByName } from '@/utils';
 import { ServerStatus } from '../server';
 import './index.less';
-import type { Node, NodeStatusTag } from './service';
+import type { NodeStatusTag, SecretNoteNode } from './service';
 import { NodeService } from './service';
 
 const { Paragraph } = Typography;
@@ -38,7 +38,7 @@ const { Paragraph } = Typography;
  * Format the node status to a badge.
  */
 const formatNodeStatus = (
-  node: Node,
+  node: SecretNoteNode,
 ): { status: NodeStatusTag; text: string } => {
   const { status } = node;
   if (status === ServerStatus.Pending) {
@@ -62,7 +62,7 @@ const formatNodeStatus = (
 /**
  * The detailed information component of a node.
  */
-const NodeDetails = (props: { node: Node }) => {
+const NodeDetails = (props: { node: SecretNoteNode }) => {
   const instance = useInject<NodeView>(ViewInstance);
   const service = instance.service;
   const { node } = props;
@@ -79,7 +79,7 @@ const NodeDetails = (props: { node: Node }) => {
   ) => {
     setLoading(true);
     try {
-      await method(id);
+      await method.call(service, id);
       message.success(l10n.t(successText));
     } catch (e) {
       genericErrorHandler(e);
@@ -149,31 +149,23 @@ export const NodeComponent = () => {
   const instance = useInject<NodeView>(ViewInstance);
   const service = instance.service;
 
-  const addNode = () => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        setAddLoading(true);
-
-        try {
-          const server = await service.addNode(values);
-          if (server.status === ServerStatus.Succeeded) {
-            message.success(l10n.t('节点添加成功'));
-          } else {
-            message.info('节点添加成功，但是节点处于离线状态，请联系管理员');
-          }
-        } catch (e) {
-          genericErrorHandler(e);
-        }
-
-        setAddFormVisible(false);
-        form.resetFields();
-        setAddLoading(false);
-        return;
-      })
-      .catch(() => {
-        //
-      });
+  const handleAddNode = async () => {
+    const values = await form.validateFields();
+    setAddLoading(true);
+    try {
+      const server = await service.addNode(values);
+      if (server.status === ServerStatus.Succeeded) {
+        message.success(l10n.t('节点添加成功'));
+      } else {
+        message.info('节点添加成功，但处于离线状态，请刷新页面或联系管理员');
+      }
+    } catch (e) {
+      genericErrorHandler(e);
+    } finally {
+      setAddFormVisible(false);
+      form.resetFields();
+      setAddLoading(false);
+    }
   };
 
   const addNodeFormContent = (
@@ -208,9 +200,7 @@ export const NodeComponent = () => {
             <Button
               type="primary"
               htmlType="submit"
-              onClick={() => {
-                addNode();
-              }}
+              onClick={handleAddNode}
               loading={addLoading}
             >
               {l10n.t('添加')}
@@ -245,7 +235,12 @@ export const NodeComponent = () => {
                   cursor: 'pointer',
                 }}
               >
-                <span style={{ color: invert(randomColorByName(node.name)) }}>
+                <span
+                  style={{
+                    color: invert(randomColorByName(node.name)),
+                    userSelect: 'none',
+                  }}
+                >
                   {node.name.slice(0, 1).toUpperCase()}
                 </span>
               </Avatar>

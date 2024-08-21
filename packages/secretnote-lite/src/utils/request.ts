@@ -84,11 +84,11 @@ export const getDefaultConnectionSettings = () => {
   } as Partial<ISettings>;
 };
 
-export const request = async (
+export const request = async <T = any>(
   url: string,
   init: RequestInit,
   targetId = '',
-) => {
+): Promise<T> => {
   let requestUrl = normalizeUrl(url, targetId);
 
   const cache = init.cache ?? 'no-store';

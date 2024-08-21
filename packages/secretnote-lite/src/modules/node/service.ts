@@ -1,5 +1,4 @@
 import { inject, singleton } from '@difizen/mana-app';
-import { l10n } from '@difizen/mana-l10n';
 
 import type { IServer } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
@@ -9,7 +8,7 @@ import { SecretNoteServerManager } from '@/modules/server';
  * Except those fields that Jupyter Server should have, we also have some
  * additional fields because it's running inside K8s cluster.
  */
-export type Node = IServer & {
+export type SecretNoteNode = IServer & {
   service?: string; // service name inside K8s cluster
   podIp?: string; // pod ip address inside K8s cluster
   // versions of internals
@@ -42,7 +41,7 @@ export class NodeService {
   /**
    * Get all remote nodes serving as Jupyter Server.
    */
-  get nodes(): Node[] {
+  get nodes(): SecretNoteNode[] {
     return this.serverManager.servers.map((server) => ({
       ...server,
       versions: this.serverManager.versions,
@@ -50,19 +49,9 @@ export class NodeService {
   }
 
   /**
-   * Check if the node name is in use.
-   */
-  protected isNameInUse(name: string) {
-    return this.nodes.every((node) => node.name !== name);
-  }
-
-  /**
    * Add a remote node serving as Jupyter Server to under management.
    */
   async addNode({ name }: { name: string; address: string }) {
-    if (this.isNameInUse(name)) {
-      throw new Error(l10n.t('节点名称已存在'));
-    }
     return await this.serverManager.addServer(name);
   }
 
