@@ -1,9 +1,16 @@
+// Customized request definitions and functions for SecretNote.
+
 import type { ISettings } from '@difizen/libro-jupyter';
 import { URL as LibroURL } from '@difizen/libro-jupyter';
-import { message } from 'antd';
+import { genericErrorHandler } from './error';
 
+/**
+ * Get the base URL of a remote server for HTTP requests.
+ * If `targetId` is provided, the base URL goes into a specific K8s Pod.
+ * Otherwise it goes to the default web server.
+ */
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
-  const SECRETNOTE_BACKEND_URL = 'http://127.0.0.1:8091'; // for debug only
+  const SECRETNOTE_BACKEND_URL = 'http://127.0.0.1:8091'; // DEBUG ONLY
   const backendUrl =
     process.env.SECRETNOTE_BACKEND_URL || SECRETNOTE_BACKEND_URL;
   const origin =
@@ -12,6 +19,11 @@ export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   return origin + '/secretnote/' + targetId + `${endSlash ? '/' : ''}`;
 };
 
+/**
+ * Get the base URL of a remote server for WebSocket requests.
+ * If `targetId` is provided, the base URL goes into a specific K8s Pod.
+ * Otherwise it goes to the default web server.
+ */
 export const getRemoteWsUrl = (targetId = '', endSlash = false) => {
   return getRemoteBaseUrl(targetId, endSlash).replace(/^http/, 'ws');
 };
@@ -30,46 +42,58 @@ export class ResponseError extends Error {
   }
 }
 
+/**
+ * Create a ResponseError from a Response object.
+ */
 export const createResponseError = async (response: Response) => {
   try {
     const data = await response.json();
-    if (data.message) {
-      return new ResponseError(response, data.message);
-    }
-    return new ResponseError(response);
+    return new ResponseError(response, data?.message);
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
+    genericErrorHandler(e);
     return new ResponseError(response);
   }
 };
 
-const normalizeUrl = (url: string, targetId = '') => {
+/**
+ * Normalize a URL, prepending the base URL of a remote server.
+ * If `targetId` is provided, the base URL goes into a specific K8s Pod.
+ * Otherwise it goes to the default web server.
+ */
+const normalizeURL = (url: string, targetId = '') => {
   const urlObj = new URL(LibroURL.join(getRemoteBaseUrl(targetId), url));
   return urlObj.href;
 };
 
-const getCookie = (name: string): string | undefined => {
+/**
+ * Get a cookie by name.
+ */
+const getCookie = (name: string) => {
   // From http://www.tornadoweb.org/en/stable/guide/security.html
   const matches = document.cookie.match('\\b' + name + '=([^;]*)\\b');
   return matches?.[1];
 };
 
-export const getToken = () => {
-  const auth = localStorage.getItem('pocketbase_auth');
+/**
+ * Get the authentication token from the local storage.
+ */
+export const getToken = (key = 'pocketbase_auth'): string | null => {
+  const auth = localStorage.getItem(key);
   if (auth) {
     try {
-      const parsedAuth = JSON.parse(auth);
-      return parsedAuth.token;
+      return JSON.parse(auth).token;
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
+      genericErrorHandler(e);
       return null;
     }
   }
   return null;
 };
 
+/**
+ * Default request settings for API about notebooks.
+ * // TODO
+ */
 export const getDefaultConnectionSettings = () => {
   return {
     init: {
@@ -84,58 +108,47 @@ export const getDefaultConnectionSettings = () => {
   } as Partial<ISettings>;
 };
 
+/**
+ * Make a never-cache HTTP request to the server.
+ * If `targetId` is provided, the request goes into a specific K8s Pod.
+ * Otherwise it goes to the default web server.
+ */
 export const request = async <T = any>(
   url: string,
   init: RequestInit,
   targetId = '',
 ): Promise<T> => {
-  let requestUrl = normalizeUrl(url, targetId);
+  // normalize the URL
+  let requestUrl = normalizeURL(url, targetId);
+  // forcely avoid caching by adding a timestamp
+  // because some clients or servers might not handle cache headers properly
+  requestUrl += (/\?/.test(url) ? '&' : '?') + new Date().getTime();
 
-  const cache = init.cache ?? 'no-store';
-  if (cache === 'no-store') {
-    requestUrl += (/\?/.test(url) ? '&' : '?') + new Date().getTime();
-  }
-
+  // construct the Request for fetch API
   const req = new window.Request(requestUrl, {
     cache: 'no-store',
     credentials: 'same-origin',
     ...init,
   });
-
+  // handle authentication
   const token = getToken();
-  if (token) {
-    req.headers.append('Authorization', token);
-  }
-  if (typeof document !== 'undefined' && document?.cookie) {
+  token && req.headers.append('Authorization', token);
+  // handle XSRF protection
+  if (document?.cookie) {
     const xsrfToken = getCookie('_xsrf');
-    if (xsrfToken !== undefined) {
-      req.headers.append('X-XSRFToken', xsrfToken);
-    }
+    xsrfToken && req.headers.append('X-XSRFToken', xsrfToken);
   }
-
+  // all requests are JSON
   req.headers.set('Content-Type', 'application/json');
 
+  // fire the request
   const response = await window.fetch(req);
-
+  // handle the response
   if (response.status === 204) {
-    return;
+    return {} as T; // TODO
   }
-
   if (response.status === 200) {
-    const data = await response.json();
-    return data;
+    return await response.json();
   }
-
-  const err = await createResponseError(response);
-
-  throw err;
+  throw await createResponseError(response);
 };
-
-export function genericErrorHandler(e: any, reThrow = false) {
-  message.error(e?.message || e.toString());
-  // eslint-disable-next-line no-console
-  console.error(e);
-  if (reThrow) {
-    throw e;
-  }
-}

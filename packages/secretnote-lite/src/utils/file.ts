@@ -88,7 +88,10 @@ export const downloadFileByBlob = (
     });
 };
 
-export const downloadFileByUrl = (
+/**
+ * Create a download link and click it to download the file.
+ */
+export const downloadFileByURL = (
   url: string,
   filename: string,
   target?: string,

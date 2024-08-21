@@ -3,7 +3,7 @@ import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
-import { downloadFileByUrl as download, getRemoteBaseUrl } from '@/utils';
+import { downloadFileByURL as download, getRemoteBaseUrl } from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
@@ -14,8 +14,7 @@ export class FileService {
   protected readonly contentsManager: ContentsManager;
   protected readonly serverManager: SecretNoteServerManager;
 
-  @prop()
-  fileTree: DataNode[] = [];
+  @prop() fileTree: DataNode[] = [];
 
   constructor(
     @inject(ContentsManager) contentsManager: ContentsManager,

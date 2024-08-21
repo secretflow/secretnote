@@ -42,9 +42,6 @@ export class MetricsService {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.notebookFileService = notebookFileService;
-    // this.notebookFileService.onNotebookFileChanged(() => {
-    //   this.refresh();
-    // });
 
     this._poller = new Poll({
       auto: false,
