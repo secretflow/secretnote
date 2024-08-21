@@ -9,7 +9,6 @@ import {
 import { l10n } from '@difizen/mana-l10n';
 import { message, Tooltip } from 'antd';
 import { RefreshCw } from 'lucide-react';
-import React from 'react';
 
 import { FileService } from './service';
 

@@ -39,8 +39,8 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   ) {
     super(option);
     this.kernelManager = kernelManager;
+    // manually control the outputs of each kernel and synchronize them with LibroOutputArea.outputs
     this.kernelOutputs = {};
-
     this.startMsgHandler();
   }
 
@@ -187,11 +187,12 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   }
 
   /**
-   * Clear the all kernel outputs.
-   * FIXME
+   * Clear the all kernel outputs of current cell.
+   * @override LibroOutputArea.clear
    */
   clear() {
-    super.clear();
+    super.clear.call(this, false);
     this.kernelOutputs = {};
+    this.flushOutputs();
   }
 }

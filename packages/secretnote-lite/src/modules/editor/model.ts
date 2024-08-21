@@ -30,17 +30,10 @@ export class SecretNoteModel extends LibroModel {
   public currentFileContents!: IContentsModel;
   public readonly contentsManager: ContentsManager;
 
-  @prop()
-  kernelConnecting = false;
-
-  @prop()
-  kernelConnections: IKernelConnection[] = [];
-
-  @prop()
-  filePath = '';
-
-  @prop()
-  lspEnabled = true;
+  @prop() kernelConnecting = false;
+  @prop() kernelConnections: IKernelConnection[] = [];
+  @prop() filePath = '';
+  @prop() lspEnabled = true;
 
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {
@@ -176,6 +169,9 @@ export class SecretNoteModel extends LibroModel {
     }
   }
 
+  /**
+   * Restart all kernels.
+   */
   async restart() {
     if (this.kernelConnections.length === 0) {
       await this.startKernelConnection();
