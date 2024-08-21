@@ -3,6 +3,7 @@
 // So we need to customize the server manager to manage multiple servers.
 
 import {
+  genericErrorHandler,
   getDefaultConnectionSettings,
   getRemoteBaseUrl,
   getRemoteWsUrl,
@@ -15,6 +16,7 @@ import {
   type ISpecModels,
 } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
+import type { Node as SecretNoteNode } from '../node/service';
 import { ServerStatus, type IServer } from './protocol';
 
 @singleton()
@@ -24,6 +26,7 @@ export class SecretNoteServerManager {
   // @ts-ignore
   @inject(ServerManager) defaultServerManager: ServerManager;
   @prop() loading = false;
+  @prop() versions: SecretNoteNode['versions'] = {};
   @prop() servers: IServer[] = [];
 
   // events and emitters
@@ -39,18 +42,30 @@ export class SecretNoteServerManager {
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
     this.updateServerConnectionSettings();
+    this.getVersions();
     this.getServerList().then(() => {
       this.defaultServerManager.launch();
     });
   }
 
   /**
-   * Get the list of Jupyter Servers.
+   * Refresh and get versions of server's internal.
+   */
+  async getVersions() {
+    return (this.versions = await request('api/versions', {
+      method: 'GET',
+    })) as SecretNoteNode['versions'];
+  }
+
+  /**
+   * Refresh and get the list of nodes.
    */
   async getServerList() {
     this.loading = true;
     try {
-      const data = (await request('api/nodes', { method: 'GET' })) as IServer[];
+      const data = (await request('api/nodes', {
+        method: 'GET',
+      })) as SecretNoteNode[];
       for (const item of data) {
         const spec = await this.getServerSpec(item);
         if (spec) {
@@ -64,37 +79,44 @@ export class SecretNoteServerManager {
       this.updateServerConnectionSettings();
       return data;
     } catch (e) {
-      console.error(e);
+      genericErrorHandler(e);
     } finally {
       this.loading = false;
     }
   }
 
-  async addServer(server: Partial<IServer>) {
-    const data: IServer = await request('api/nodes', {
+  /*
+   * Add a new remote server.
+   */
+  async addServer(name: string) {
+    // request to create a new server
+    const data: SecretNoteNode = await request('api/nodes', {
       method: 'POST',
       body: JSON.stringify({
-        name: server.name,
+        name,
       }),
     });
+    // check if it's created successfully according to the kernelspecs response
     const spec = await this.getServerSpec(data);
-
     if (spec) {
       data.status = ServerStatus.Succeeded;
       data.kernelspec = spec;
     }
-
+    // TODO FIXME ?
     const serverDetail = await this.getServerDetail(data.id);
     if (serverDetail) {
       data.portIp = serverDetail.portIp;
     }
-
+    // store the server
     this.servers.push(data);
     this.updateServerConnectionSettings();
     this.onServerAddedEmitter.fire(data);
     return data;
   }
 
+  /**
+   * Delete a server.
+   */
   async deleteServer(id: string) {
     const index = this.servers.findIndex((server) => server.id === id);
     if (index === -1) {
@@ -109,35 +131,19 @@ export class SecretNoteServerManager {
     this.onServerAddedEmitter.fire(server);
   }
 
-  async updateServer(id: string, server: Partial<IServer>) {
-    const url = 'api/nodes/' + id;
-    const init = {
-      method: 'PATCH',
-      body: JSON.stringify({
-        name: server.name,
-      }),
-    };
-    await request(url, init);
-    this.servers = this.servers.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          ...server,
-        };
-      }
-      return item;
-    });
-  }
-
+  /**
+   * TODO FIXME Looks like it's useless?
+   */
   async getServerDetail(id: string): Promise<IServer | undefined> {
-    const url = 'api/nodes/' + id;
-    const init = {
+    const data = (await request('api/nodes/' + id, {
       method: 'GET',
-    };
-    const data = (await request(url, init)) as IServer;
+    })) as IServer;
     return data;
   }
 
+  /**
+   * Start a server.
+   */
   async startServer(id: string) {
     const server: IServer = await request(`api/nodes/start/${id}`, {
       method: 'PATCH',
@@ -232,7 +238,7 @@ export class SecretNoteServerManager {
     const firstServerOnline =
       firstServer && firstServer.status === ServerStatus.Succeeded;
 
-    // FIXME currently libro-language-client doesn't use the internal ServerConnection
+    // ! FIXME currently libro-language-client doesn't use the internal ServerConnection
     // to determine the request URL, so the Token will not be carried.
     this.serverConnection.updateSettings({
       baseUrl: firstServerOnline

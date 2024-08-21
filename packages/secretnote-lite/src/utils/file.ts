@@ -53,7 +53,7 @@ export async function readFile(file: File): Promise<string> {
   });
 }
 
-export async function readCsvFile(file: File): Promise<unknown> {
+export async function readCSVFile(file: File): Promise<unknown> {
   return await CsvFileReader.csvReader({
     file: file,
     config: {

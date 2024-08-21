@@ -1,5 +1,6 @@
 import type { ISettings } from '@difizen/libro-jupyter';
 import { URL as LibroURL } from '@difizen/libro-jupyter';
+import { message } from 'antd';
 
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   const SECRETNOTE_BACKEND_URL = 'http://127.0.0.1:8091'; // for debug only
@@ -129,3 +130,12 @@ export const request = async (
 
   throw err;
 };
+
+export function genericErrorHandler(e: any, reThrow = false) {
+  message.error(e?.message || e.toString());
+  // eslint-disable-next-line no-console
+  console.error(e);
+  if (reThrow) {
+    throw e;
+  }
+}

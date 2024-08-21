@@ -1,3 +1,6 @@
+/**
+ * Generate a random UUID.
+ */
 export function uuid(): string {
   let res = '';
   const template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';

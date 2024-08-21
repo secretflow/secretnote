@@ -11,11 +11,14 @@ export enum ServerStatus {
   Terminated = 'Terminated', // not K8s status, but used in our app
 }
 
+/**
+ * Essentials of a Jupyter Server.
+ */
 export interface IServer {
   id: string;
   name: string;
   status: ServerStatus;
-  service: string;
+  // service: string;
   portIp: string;
   kernelspec?: ISpecModels;
 }

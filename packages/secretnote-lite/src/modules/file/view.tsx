@@ -23,13 +23,13 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
+import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-import { readFile } from '@/utils';
+import { genericErrorHandler, readFile } from '@/utils';
 
 import './index.less';
-import { FileService, FILE_EXTS } from './service';
+import { FILE_EXTS, FileService } from './service';
 
 const { DirectoryTree } = Tree;
 
@@ -54,7 +54,9 @@ export const FileComponent = () => {
         Modal.confirm({
           title: l10n.t('删除文件'),
           centered: true,
-          content: l10n.t('文件 {name} 将被删除', { name: node.title as string }),
+          content: l10n.t('文件 {name} 将被删除', {
+            name: node.title as string,
+          }),
           okText: l10n.t('删除文件'),
           cancelText: l10n.t('取消'),
           okType: 'danger',
@@ -83,9 +85,7 @@ export const FileComponent = () => {
       await fileService.getFileTree();
       message.success(l10n.t('文件上传成功'));
     } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
+      genericErrorHandler(e);
     }
   };
 
@@ -98,7 +98,9 @@ export const FileComponent = () => {
           Modal.confirm({
             title: l10n.t('上传文件'),
             centered: true,
-            content: l10n.t('文件 {name} 已经存在，是否覆盖？', { name: file.name }),
+            content: l10n.t('文件 {name} 已经存在，是否覆盖？', {
+              name: file.name,
+            }),
             okText: 'Overwrite',
             cancelText: l10n.t('取消'),
             okType: 'danger',
@@ -134,7 +136,11 @@ export const FileComponent = () => {
     const isLeaf = nodeData.isLeaf;
 
     const folderMenuItems: Menu[] = [
-      { key: 'upload', label: uploadRender(nodeData), icon: <UploadIcon size={12} /> },
+      {
+        key: 'upload',
+        label: uploadRender(nodeData),
+        icon: <UploadIcon size={12} />,
+      },
     ];
     const dataMenuItems: Menu[] = [
       // { key: 'view', label: l10n.t('查看'), icon: <Link size={12} /> },
@@ -145,7 +151,12 @@ export const FileComponent = () => {
       },
       { key: 'download', label: l10n.t('下载'), icon: <Download size={12} /> },
       { type: 'divider' },
-      { key: 'delete', label: l10n.t('删除'), icon: <Trash size={12} />, danger: true },
+      {
+        key: 'delete',
+        label: l10n.t('删除'),
+        icon: <Trash size={12} />,
+        danger: true,
+      },
     ];
 
     return (

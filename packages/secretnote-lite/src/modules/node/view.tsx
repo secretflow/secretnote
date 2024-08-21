@@ -1,3 +1,5 @@
+// The node management popover component.
+
 import {
   BaseView,
   inject,
@@ -24,85 +26,63 @@ import {
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import { invert } from '@/utils';
-
+import { genericErrorHandler, invert, randomColorByName } from '@/utils';
 import { ServerStatus } from '../server';
-
 import './index.less';
-import type { Node, ServerStatusTag } from './service';
+import type { Node, NodeStatusTag } from './service';
 import { NodeService } from './service';
 
 const { Paragraph } = Typography;
 
-const getNodeStatus = (
+/**
+ * Format the node status to a badge.
+ */
+const formatNodeStatus = (
   node: Node,
-): { status: ServerStatusTag; text: string } => {
-  const status = node.status;
-
+): { status: NodeStatusTag; text: string } => {
+  const { status } = node;
   if (status === ServerStatus.Pending) {
     return {
       status: 'processing',
       text: l10n.t('启动中'),
     };
   }
-
   if (status === ServerStatus.Succeeded || status === ServerStatus.Running) {
     return {
       status: 'success',
       text: l10n.t('在线'),
     };
   }
-
   return {
     status: 'error',
     text: l10n.t('离线'),
   };
 };
 
+/**
+ * The detailed information component of a node.
+ */
 const NodeDetails = (props: { node: Node }) => {
-  const { node } = props;
   const instance = useInject<NodeView>(ViewInstance);
-  const { status, text } = getNodeStatus(node);
+  const service = instance.service;
+  const { node } = props;
+  const { status, text } = formatNodeStatus(node);
   const [loading, setLoading] = useState(false);
-  // const [editableStr, setEditableStr] = useState(node.name);
 
-  const deleteNode = async (id: string) => {
+  /**
+   * Alter the status of a node.
+   */
+  const altNode = async (
+    method: (id: string) => Promise<void>,
+    id: string,
+    successText: string,
+  ) => {
     setLoading(true);
     try {
-      await instance.service.deleteNode(id);
-      message.success(l10n.t('删除成功'));
+      await method(id);
+      message.success(l10n.t(successText));
     } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const startNode = async (id: string) => {
-    setLoading(true);
-    try {
-      await instance.service.startNode(id);
-      message.success(l10n.t('启动成功'));
-    } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const stopNode = async (id: string) => {
-    setLoading(true);
-    try {
-      await instance.service.stopNode(id);
-      message.success(l10n.t('停止成功'));
-    } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
+      genericErrorHandler(e);
     } finally {
       setLoading(false);
     }
@@ -120,26 +100,39 @@ const NodeDetails = (props: { node: Node }) => {
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('IP')}>
             <Paragraph copyable={!!node.podIp}>
-              {node.podIp || '暂无数据'}
+              {node.podIp || l10n.t('暂无数据')}
             </Paragraph>
           </Descriptions.Item>
-          <Descriptions.Item label={l10n.t('镜像版本')}>
-            {/* TODO */}
-            secretflow/secretnote:1.6.1
+          <Descriptions.Item label={l10n.t('镜像')}>
+            {node.versions?.image || l10n.t('暂无数据')}
+          </Descriptions.Item>
+          <Descriptions.Item label={l10n.t('Python 和 SecretFlow 版本')}>
+            {node.versions?.python || l10n.t('暂无数据')} /{' '}
+            {node.versions?.secretflow || l10n.t('暂无数据')}
           </Descriptions.Item>
         </Descriptions>
         <Divider style={{ marginTop: '0', marginBottom: '1em' }} />
         <Space>
-          <Button type="default" danger onClick={() => deleteNode(node.id)}>
+          <Button
+            type="default"
+            danger
+            onClick={() => altNode(service.deleteNode, node.id, '删除成功')}
+          >
             {l10n.t('删除')}
           </Button>
           {node.status === ServerStatus.Terminated && (
-            <Button type="primary" onClick={() => startNode(node.id)}>
+            <Button
+              type="primary"
+              onClick={() => altNode(service.startNode, node.id, '启动成功')}
+            >
               {l10n.t('启动')}
             </Button>
           )}
           {node.status === ServerStatus.Succeeded && (
-            <Button type="default" onClick={() => stopNode(node.id)}>
+            <Button
+              type="default"
+              onClick={() => altNode(service.stopNode, node.id, '停止成功')}
+            >
               {l10n.t('停止')}
             </Button>
           )}
@@ -154,6 +147,7 @@ export const NodeComponent = () => {
   const [addFormVisible, setAddFormVisible] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const instance = useInject<NodeView>(ViewInstance);
+  const service = instance.service;
 
   const addNode = () => {
     form
@@ -162,16 +156,14 @@ export const NodeComponent = () => {
         setAddLoading(true);
 
         try {
-          const server = await instance.service.addNode(values);
+          const server = await service.addNode(values);
           if (server.status === ServerStatus.Succeeded) {
             message.success(l10n.t('节点添加成功'));
           } else {
             message.info('节点添加成功，但是节点处于离线状态，请联系管理员');
           }
         } catch (e) {
-          if (e instanceof Error) {
-            message.error(e.message);
-          }
+          genericErrorHandler(e);
         }
 
         setAddFormVisible(false);
@@ -233,23 +225,28 @@ export const NodeComponent = () => {
     <div className="secretnote-node">
       <span className="title">节点列表:&nbsp;</span>
       <Avatar.Group>
-        {instance.service.nodes.map((item) => (
+        {service.nodes.map((node) => (
           <Popover
-            key={item.id}
-            content={<NodeDetails node={item} />}
+            key={node.id}
+            // @ts-ignore
+            content={<NodeDetails node={node} />}
             title=""
             overlayStyle={{ width: 380 }}
             trigger="click"
             placement="bottomLeft"
             arrow={false}
           >
-            <Badge status={getNodeStatus(item).status} dot offset={[-28, 4]}>
+            {/* @ts-ignore */}
+            <Badge status={formatNodeStatus(node).status} dot offset={[-28, 4]}>
               <Avatar
                 shape="square"
-                style={{ backgroundColor: item.color, cursor: 'pointer' }}
+                style={{
+                  backgroundColor: randomColorByName(node.name),
+                  cursor: 'pointer',
+                }}
               >
-                <span style={{ color: invert(item.color) }}>
-                  {item.name.slice(0, 1).toUpperCase()}
+                <span style={{ color: invert(randomColorByName(node.name)) }}>
+                  {node.name.slice(0, 1).toUpperCase()}
                 </span>
               </Avatar>
             </Badge>
@@ -269,6 +266,7 @@ export const NodeComponent = () => {
         }}
         arrow={false}
       >
+        {/* Add two nodes at most */}
         {instance.service.nodes.length < 2 && (
           <Button
             icon={<Plus size={16} />}
