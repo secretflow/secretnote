@@ -26,7 +26,7 @@ export class SecretNoteServerManager {
   // @ts-ignore
   @inject(ServerManager) defaultServerManager: ServerManager;
   @prop() loading = false;
-  @prop() versions: SecretNoteNode['versions'] = {};
+  @prop() resourcesAndVersions: SecretNoteNode['resourcesAndVersions'] = {};
   @prop() servers: IServer[] = [];
 
   // events and emitters
@@ -42,7 +42,7 @@ export class SecretNoteServerManager {
   constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
     this.serverConnection = serverConnection;
     this.updateServerConnectionSettings();
-    this.getVersions();
+    this.getResourcesAndVersions();
     this.getServerList().then(() => {
       this.defaultServerManager.launch();
     });
@@ -51,13 +51,12 @@ export class SecretNoteServerManager {
   /**
    * Refresh and get versions of server's internal softwares.
    */
-  async getVersions() {
-    return (this.versions = await request<SecretNoteNode['versions']>(
-      'api/versions',
-      {
-        method: 'GET',
-      },
-    ));
+  async getResourcesAndVersions() {
+    return (this.resourcesAndVersions = await request<
+      SecretNoteNode['resourcesAndVersions']
+    >('api/resources-versions', {
+      method: 'GET',
+    }));
   }
 
   /**

@@ -35,12 +35,22 @@ export class SecretNoteModel extends LibroModel {
   @prop() filePath = '';
   @prop() lspEnabled = true;
 
+  protected readonly autoSave = debounce(() => {
+    this.commandRegistry.executeCommand(DocumentCommands.Save.id);
+  }, 500);
+
+  /**
+   * Check whether all kernels are idle.
+   */
   get isKernelIdle() {
     return this.kernelConnections.every((item) => {
       return item.status === 'idle';
     });
   }
 
+  /**
+   * Get a representative kernel connection.
+   */
   get kernelConnection() {
     return this.kernelConnections[0];
   }
@@ -121,6 +131,7 @@ export class SecretNoteModel extends LibroModel {
       throw new Error('File Save Error');
     }
 
+    // checkpoint (see https://stackoverflow.com/questions/46421663/) is not supported in SecretNote
     // await this.createCheckpoint();
   }
 
@@ -204,50 +215,4 @@ export class SecretNoteModel extends LibroModel {
       this.scrollToView(this.cells[runningCellIndex]);
     }
   }
-
-  async createCheckpoint() {
-    if (this.currentFileContents) {
-      await this.contentsManager.createCheckpoint(
-        this.currentFileContents.path,
-        {
-          baseUrl: getRemoteBaseUrl(),
-        },
-      );
-    }
-  }
-
-  async listCheckpoints() {
-    if (this.currentFileContents) {
-      await this.contentsManager.listCheckpoints(
-        this.currentFileContents.path,
-        {
-          baseUrl: getRemoteBaseUrl(),
-        },
-      );
-    }
-  }
-
-  async restoreCheckpoint(checkpointID: string) {
-    if (this.currentFileContents) {
-      await this.contentsManager.restoreCheckpoint(
-        this.currentFileContents.path,
-        checkpointID,
-        { baseUrl: getRemoteBaseUrl() },
-      );
-    }
-  }
-
-  async deleteCheckpoint(checkpointID: string) {
-    if (this.currentFileContents) {
-      await this.contentsManager.deleteCheckpoint(
-        this.currentFileContents.path,
-        checkpointID,
-        { baseUrl: getRemoteBaseUrl() },
-      );
-    }
-  }
-
-  autoSave = debounce(() => {
-    this.commandRegistry.executeCommand(DocumentCommands.Save.id);
-  }, 500);
 }

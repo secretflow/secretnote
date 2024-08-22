@@ -11,8 +11,10 @@ import { SecretNoteServerManager } from '@/modules/server';
 export type SecretNoteNode = IServer & {
   service?: string; // service name inside K8s cluster
   podIp?: string; // pod ip address inside K8s cluster
-  // versions of internals
-  versions?: Partial<{
+  // resources and versions of internals
+  resourcesAndVersions?: Partial<{
+    cpu: number;
+    memory: string;
     image: string;
     python: string;
     secretflow: string;
@@ -44,7 +46,7 @@ export class NodeService {
   get nodes(): SecretNoteNode[] {
     return this.serverManager.servers.map((server) => ({
       ...server,
-      versions: this.serverManager.versions,
+      resourcesAndVersions: this.serverManager.resourcesAndVersions,
     }));
   }
 

@@ -103,12 +103,16 @@ const NodeDetails = (props: { node: SecretNoteNode }) => {
               {node.podIp || l10n.t('暂无数据')}
             </Paragraph>
           </Descriptions.Item>
+          <Descriptions.Item label={l10n.t('CPU 和内存配额')}>
+            {`${node.resourcesAndVersions?.cpu}C` || l10n.t('暂无数据')} /{' '}
+            {node.resourcesAndVersions?.memory || l10n.t('暂无数据')}
+          </Descriptions.Item>
           <Descriptions.Item label={l10n.t('镜像')}>
-            {node.versions?.image || l10n.t('暂无数据')}
+            {node.resourcesAndVersions?.image || l10n.t('暂无数据')}
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('Python 和 SecretFlow 版本')}>
-            {node.versions?.python || l10n.t('暂无数据')} /{' '}
-            {node.versions?.secretflow || l10n.t('暂无数据')}
+            {node.resourcesAndVersions?.python || l10n.t('暂无数据')} /{' '}
+            {node.resourcesAndVersions?.secretflow || l10n.t('暂无数据')}
           </Descriptions.Item>
         </Descriptions>
         <Divider style={{ marginTop: '0', marginBottom: '1em' }} />

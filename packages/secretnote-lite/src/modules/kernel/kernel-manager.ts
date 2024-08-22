@@ -167,23 +167,30 @@ export class SecretNoteKernelManager {
     }
   }
 
-  getKernelConnections(fileInfo: IContentsModel): IKernelConnection[] {
+  /**
+   * Get all kernel connections for a file.
+   */
+  getKernelConnections(fileInfo: IContentsModel) {
     return this.fileToKernelConnections.get(this.storedKey(fileInfo)) || [];
   }
 
-  getServerByKernelConnection(
-    connection: IKernelConnection,
-  ): IServer | undefined {
+  /**
+   * Get the server of a kernel connection.
+   */
+  getServerByKernelConnection(connection: IKernelConnection) {
     const serverId = this.kernelConnectionToServer.get(connection.id);
     if (serverId) {
       return this.serverManager.servers.find((s) => s.id === serverId);
     }
   }
 
+  /**
+   * Create a kernel connection on a server for a file.
+   */
   protected async createKernelConnection(
     fileInfo: IContentsModel,
     server: IServer,
-  ): Promise<IKernelConnection | undefined> {
+  ) {
     const kernelName = this.getDefaultKernelName(fileInfo, server);
     const newSession = await this.sessionRestAPI.startSession(
       {
@@ -233,9 +240,12 @@ export class SecretNoteKernelManager {
     return kernelConnection;
   }
 
-  protected async isKernelAlive(id: string, server: IServer): Promise<boolean> {
+  /**
+   * Test if a kernel is alive.
+   */
+  protected async isKernelAlive(kernelId: string, server: IServer) {
     try {
-      const data = await this.kernelRestAPI.getKernelModel(id, {
+      const data = await this.kernelRestAPI.getKernelModel(kernelId, {
         baseUrl: getRemoteBaseUrl(server.id),
         wsUrl: getRemoteWsUrl(server.id),
       });
@@ -248,7 +258,7 @@ export class SecretNoteKernelManager {
   /**
    * Generate a key for a file's session storage record.
    */
-  protected storedKey(fileInfo: IContentsModel): string {
+  protected storedKey(fileInfo: IContentsModel) {
     return `secretnote_${fileInfo.path}_${fileInfo.name}`;
   }
 
@@ -285,10 +295,7 @@ export class SecretNoteKernelManager {
     await this.storageService.setData(this.storedKey(fileInfo), undefined);
   }
 
-  protected getDefaultKernelName(
-    fileInfo: IContentsModel,
-    server: IServer,
-  ): string {
+  protected getDefaultKernelName(fileInfo: IContentsModel, server: IServer) {
     const kernelName =
       fileInfo.content.metadata.kernelspec?.name ||
       server.kernelspec?.default ||
