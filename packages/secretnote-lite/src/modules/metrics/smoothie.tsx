@@ -52,7 +52,5 @@ export default function Smoothie(props: {
     seriesRef.current && seriesRef.current.append(data.time, data.value);
   }, [data]);
 
-  return (
-    <canvas ref={canvasRef} width={width ?? 120} height={height ?? 30}></canvas>
-  );
+  return <canvas ref={canvasRef} width={width ?? 120} height={height ?? 30}></canvas>;
 }

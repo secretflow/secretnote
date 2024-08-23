@@ -6,7 +6,7 @@ import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
 import { downloadFileByURL, requestNoUnpack } from '@/utils';
 import { l10n } from '@difizen/mana-l10n';
-import { AtLeast } from 'typings';
+
 import { DriveName, SecretNoteContentsDrive } from './drive';
 
 const USER_ROOT_DIR = '/'; // the root path for a user's notebook files with trailing slash
@@ -80,7 +80,7 @@ export class NotebookFileService {
     const { content } = (await this.contentsManager.get(drived(USER_ROOT_DIR), {
       content: true,
       type: 'directory',
-    })) as AtLeast<{ content: IContentsModel[] }>;
+    })) as { content: IContentsModel[] } & { [key: string]: any };
     // show only notebook files, sort by name
     this.notebookFileList = content
       .filter(({ name }) => name.endsWith(FILE_EXT))
@@ -160,19 +160,14 @@ export class NotebookFileService {
    * Export (download) a notebook file.
    */
   async exportFile(file: IContentsModel) {
-    const downloadURL = await this.contentsManager.getDownloadUrl(
-      drived(file.path),
-    );
+    const downloadURL = await this.contentsManager.getDownloadUrl(drived(file.path));
     const resp = await requestNoUnpack(downloadURL, {
       method: 'GET',
     });
     if (resp.status === 200) {
       // it's guaranteed that the response is the file content itself instead of some error message
       // when the status code is 200
-      downloadFileByURL(
-        window.URL.createObjectURL(await resp.blob()),
-        file.name,
-      );
+      downloadFileByURL(window.URL.createObjectURL(await resp.blob()), file.name);
     }
   }
 
@@ -195,7 +190,7 @@ export class NotebookFileService {
     const { content } = (await this.contentsManager.get(drived(USER_ROOT_DIR), {
       content: true,
       type: 'directory',
-    })) as AtLeast<{ content: IContentsModel[] }>;
+    })) as { content: IContentsModel[] } & { [key: string]: any };
     // in SecretNote there is no nested directory, so we can check by name or path
     return content.some((file) => file.name === name || file.path === name);
   }

@@ -86,9 +86,8 @@ export class SecretNoteModel extends LibroModel {
       this.kernelConnections = connections;
       this.kernelConnecting = false;
     } else {
-      this.kernelConnections = await this.kernelManager.createKernelConnections(
-        fileInfo,
-      );
+      this.kernelConnections =
+        await this.kernelManager.createKernelConnections(fileInfo);
       this.kernelConnecting = false;
     }
   }
@@ -173,9 +172,7 @@ export class SecretNoteModel extends LibroModel {
 
   async shutdown() {
     if (this.currentFileContents) {
-      await this.kernelManager.shutdownKernelConnections(
-        this.currentFileContents,
-      );
+      await this.kernelManager.shutdownKernelConnections(this.currentFileContents);
       this.kernelConnections = [];
     }
   }

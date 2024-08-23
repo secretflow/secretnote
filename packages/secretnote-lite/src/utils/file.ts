@@ -73,11 +73,7 @@ export const parseCSV = (csv: string, header?: string[]) => {
   return dsvFormat(DELIMITER).parse(content);
 };
 
-export const downloadFileByBlob = (
-  url: string,
-  filename = '',
-  method = 'GET',
-) => {
+export const downloadFileByBlob = (url: string, filename = '', method = 'GET') => {
   getBlob(url, method)
     .then((blob: Blob) => {
       saveAs(blob, filename);
@@ -91,11 +87,7 @@ export const downloadFileByBlob = (
 /**
  * Create a download link and click it to download the file.
  */
-export const downloadFileByURL = (
-  url: string,
-  filename: string,
-  target?: string,
-) => {
+export const downloadFileByURL = (url: string, filename: string, target?: string) => {
   const downloadElement = document.createElement('a');
   downloadElement.style.display = 'none';
   downloadElement.href = url;

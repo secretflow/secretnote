@@ -10,10 +10,7 @@ import {
   requestNoUnpack,
 } from '@/utils';
 import type { ServerConnection } from '@difizen/libro-jupyter';
-import type {
-  IContentsChangedArgs,
-  IContentsDrive,
-} from '@difizen/libro-kernel';
+import type { IContentsChangedArgs, IContentsDrive } from '@difizen/libro-kernel';
 import { Drive as DefaultDrive } from '@difizen/libro-kernel';
 import { Emitter, singleton } from '@difizen/mana-app';
 
@@ -75,13 +72,9 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   getDownloadUrl = async (localPath: string, ...args: any) => {
     const baseUrl = getRemoteBaseUrl();
     // so we need to override its baseUrl temporarily to let it work
-    const fullURL = await DefaultDrive.prototype.getDownloadUrl.call(
-      this,
-      localPath,
-      {
-        baseUrl,
-      },
-    );
+    const fullURL = await DefaultDrive.prototype.getDownloadUrl.call(this, localPath, {
+      baseUrl,
+    });
     // and to make it consistent with other API in this drive
     // we manually remove the baseUrl from the result then
     return fullURL.replace(new RegExp(`^${baseUrl}/?`), '');

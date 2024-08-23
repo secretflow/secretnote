@@ -1,10 +1,7 @@
 // Mocked workspace concept for SecretNote to allow LSP (mainly `libro-analyzer`
 // because the code intelligence is cross-file) to work properly.
 
-import {
-  BaseWorkspaceService,
-  ILibroWorkspaceService,
-} from '@difizen/libro-jupyter';
+import { BaseWorkspaceService, ILibroWorkspaceService } from '@difizen/libro-jupyter';
 import { ApplicationContribution, singleton, URI } from '@difizen/mana-app';
 
 @singleton({ contrib: [ILibroWorkspaceService, ApplicationContribution] })

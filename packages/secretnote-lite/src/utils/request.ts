@@ -11,8 +11,7 @@ import { genericErrorHandler } from './error';
  */
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   const SECRETNOTE_BACKEND_URL = 'http://127.0.0.1:8091'; // DEBUG ONLY
-  const backendUrl =
-    process.env.SECRETNOTE_BACKEND_URL || SECRETNOTE_BACKEND_URL;
+  const backendUrl = process.env.SECRETNOTE_BACKEND_URL || SECRETNOTE_BACKEND_URL;
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 

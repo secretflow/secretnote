@@ -120,8 +120,7 @@ export const NotebookFileComponent = () => {
           <li
             onClick={() => notebookFileService.openFile(file)}
             className={classnames({
-              current:
-                notebookFileService.currentNotebookFile?.path === file.path,
+              current: notebookFileService.currentNotebookFile?.path === file.path,
             })}
           >
             <span>{notebookFileService.getFileNameWithoutExt(file.name)}</span>
@@ -173,9 +172,7 @@ export class NotebookFileView extends BaseView implements SideBarContribution {
   view = NotebookFileComponent;
   readonly notebookFileService: NotebookFileService;
 
-  constructor(
-    @inject(NotebookFileService) notebookFileService: NotebookFileService,
-  ) {
+  constructor(@inject(NotebookFileService) notebookFileService: NotebookFileService) {
     super();
     this.notebookFileService = notebookFileService;
     this.notebookFileService.getFileList();

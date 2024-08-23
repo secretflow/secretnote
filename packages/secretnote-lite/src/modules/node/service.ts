@@ -27,9 +27,7 @@ export type NodeStatusTag = 'processing' | 'default' | 'error' | 'success';
 export class NodeService {
   protected readonly serverManager: SecretNoteServerManager;
 
-  constructor(
-    @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
-  ) {
+  constructor(@inject(SecretNoteServerManager) serverManager: SecretNoteServerManager) {
     this.serverManager = serverManager;
   }
 

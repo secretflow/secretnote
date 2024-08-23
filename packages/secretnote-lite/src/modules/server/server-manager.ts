@@ -12,11 +12,8 @@ import {
   wait,
 } from '@/utils';
 import type { ISpecModels } from '@difizen/libro-jupyter';
-import {
-  PageConfig,
-  ServerConnection,
-  ServerManager,
-} from '@difizen/libro-jupyter';
+import { PageConfig, ServerConnection, ServerManager } from '@difizen/libro-jupyter';
+
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 import type { SecretNoteNode } from '../node/service';
 import { ServerStatus, type IServer } from './protocol';
@@ -214,11 +211,9 @@ export class SecretNoteServerManager {
     retry = 6,
   ): Promise<ISpecModels | undefined> {
     if (
-      [
-        ServerStatus.Terminated,
-        ServerStatus.Failed,
-        ServerStatus.Unknown,
-      ].includes(server.status)
+      [ServerStatus.Terminated, ServerStatus.Failed, ServerStatus.Unknown].includes(
+        server.status,
+      )
     ) {
       return;
     }
@@ -241,10 +236,9 @@ export class SecretNoteServerManager {
 
   /**
    * Update ServerConnection's settings.
-   * Since contents API are taken over by our customized drive without using injected ServerConnection,
-   * and HTTP requests related to kernel management are taken over by customized SecretNoteKernelManager
-   * which handles request targetId properly to suit the multi-node environment,
-   * the settings we update here are only used for LSP WebSocket requests actually.
+   * Settings here will affect all the rest requests inside Libro (e.g., LSP),
+   * except Contents API that are taken over by SecretNoteContentsDrive,
+   * and kernel management REST API that are taken over by SecretNoteKernelManager.
    */
   private updateServerConnectionSettings() {
     const firstServer = this.servers[0];
@@ -259,30 +253,12 @@ export class SecretNoteServerManager {
       });
     }
 
-    console.log('PageConfig.getBaseUrl()', PageConfig.getBaseUrl());
-
     // !!! FIXME
     // libro-language-client doesn't use the injected ServerConnection to determine the
     // request URL for LSP (@see `createWebSocketLanguageClient`'s URL source in `libro-language-client`)
     // so the token will not be carried as query parameter of URL in WebSocket requests
     // even we set `appendToken` in `getDefaultServerConnectionSettings`, causing authentication
     // at default web server end to fail.
-    /**
-     * 
-  protected serverUri(languageServerId: string) {
-    const wsBase = PageConfig.getBaseUrl().replace(/^http/, 'ws');
-    return URL.join(wsBase, 'lsp', 'ws', languageServerId);
-  }
-     */
-
-    // this.serverConnection.updateSettings({
-    //   baseUrl: firstServerOnline
-    //     ? getRemoteBaseUrl(firstServer.id, true)
-    //     : getRemoteBaseUrl(),
-    //   wsUrl: firstServerOnline
-    //     ? getRemoteWsUrl(firstServer.id, true)
-    //     : getRemoteWsUrl(),
-    //   ...getDefaultServerConnectionSettings(),
-    // });
+    console.log('PageConfig.getBaseUrl()', PageConfig.getBaseUrl());
   }
 }

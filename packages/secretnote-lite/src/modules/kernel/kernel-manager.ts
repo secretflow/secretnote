@@ -61,13 +61,14 @@ export class SecretNoteKernelManager {
    */
   async createKernelConnections(fileInfo: IContentsModel) {
     // get available servers
-    const availableServers = (
-      (await this.serverManager.getServerList()) || []
-    ).filter((s) => s.status === ServerStatus.Succeeded);
+    const availableServers = ((await this.serverManager.getServerList()) || []).filter(
+      (s) => s.status === ServerStatus.Succeeded,
+    );
     const kernelConnections: IKernelConnection[] = [];
-    const storedSessions = await this.storageService.getData<
-      StoredSessionInfo[]
-    >(this.storedKey(fileInfo), []);
+    const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
+      this.storedKey(fileInfo),
+      [],
+    );
 
     for (let i = 0, len = availableServers.length; i < len; i++) {
       const s = availableServers[i];
@@ -98,10 +99,7 @@ export class SecretNoteKernelManager {
       }
     }
 
-    this.fileToKernelConnections.set(
-      this.storedKey(fileInfo),
-      kernelConnections,
-    );
+    this.fileToKernelConnections.set(this.storedKey(fileInfo), kernelConnections);
     return kernelConnections;
   }
 
@@ -109,8 +107,7 @@ export class SecretNoteKernelManager {
     const connection = await this.createKernelConnection(fileInfo, server);
     if (connection) {
       this.kernelConnectionToServer.set(connection.id, server.id);
-      const existed =
-        this.fileToKernelConnections.get(this.storedKey(fileInfo)) || [];
+      const existed = this.fileToKernelConnections.get(this.storedKey(fileInfo)) || [];
       this.fileToKernelConnections.set(this.storedKey(fileInfo), [
         ...existed,
         connection,
@@ -118,13 +115,11 @@ export class SecretNoteKernelManager {
     }
   }
 
-  async deleteKernelConnectionOnServer(
-    fileInfo: IContentsModel,
-    server: IServer,
-  ) {
-    const storedSessions = await this.storageService.getData<
-      StoredSessionInfo[]
-    >(this.storedKey(fileInfo), []);
+  async deleteKernelConnectionOnServer(fileInfo: IContentsModel, server: IServer) {
+    const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
+      this.storedKey(fileInfo),
+      [],
+    );
     const hit = storedSessions.find((s) => s.serverId === server.id);
     if (hit) {
       await this.removeStoredSession(fileInfo, hit);
@@ -146,10 +141,7 @@ export class SecretNoteKernelManager {
       const newKernelConnections = kernelConnections.filter(
         (kc) => !deleteIds.includes(kc.id),
       );
-      this.fileToKernelConnections.set(
-        this.storedKey(fileInfo),
-        newKernelConnections,
-      );
+      this.fileToKernelConnections.set(this.storedKey(fileInfo), newKernelConnections);
     }
   }
 
@@ -187,10 +179,7 @@ export class SecretNoteKernelManager {
   /**
    * Create a kernel connection on a server for a file.
    */
-  protected async createKernelConnection(
-    fileInfo: IContentsModel,
-    server: IServer,
-  ) {
+  protected async createKernelConnection(fileInfo: IContentsModel, server: IServer) {
     const kernelName = this.getDefaultKernelName(fileInfo, server);
     const newSession = await this.sessionRestAPI.startSession(
       {
@@ -262,10 +251,7 @@ export class SecretNoteKernelManager {
     return `secretnote_${fileInfo.path}_${fileInfo.name}`;
   }
 
-  protected async addStoredSession(
-    fileInfo: IContentsModel,
-    info: StoredSessionInfo,
-  ) {
+  protected async addStoredSession(fileInfo: IContentsModel, info: StoredSessionInfo) {
     let sessions = await this.storageService.getData<StoredSessionInfo[]>(
       this.storedKey(fileInfo),
     );

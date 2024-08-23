@@ -103,14 +103,11 @@ export class MetricsService {
     const serverIds: string[] = [];
     kernelConnections.forEach(async (kernelConnection) => {
       // get corresponding server
-      const server =
-        this.kernelManager.getServerByKernelConnection(kernelConnection);
+      const server = this.kernelManager.getServerByKernelConnection(kernelConnection);
       // fetch metrics
       if (server) {
         serverIds.push(server.id);
-        const data = reset
-          ? {}
-          : await this.fetchKernelUsage(kernelConnection, server);
+        const data = reset ? {} : await this.fetchKernelUsage(kernelConnection, server);
         this.metrics[server.id] = {
           name: server.name,
           status: server.status,
@@ -163,8 +160,7 @@ export class MetricsService {
         const { host_virtual_memory: vm } = content;
         return {
           cpu: content?.host_cpu_percent,
-          memory:
-            vm?.total && vm?.percent ? (vm.total * vm.percent) / 100 : void 0,
+          memory: vm?.total && vm?.percent ? (vm.total * vm.percent) / 100 : void 0,
           totalMemory: vm?.total,
         };
       } catch (e) {
