@@ -111,6 +111,7 @@ export const getDefaultServerConnectionSettings = () => {
  * Make a never-cache HTTP request to the server.
  * If `targetId` is provided, the request goes into a specific K8s Pod.
  * Otherwise it goes to the default web server.
+ * Token will be carried if there are any.
  * This method will not unpack the Response to JSON.
  */
 export const requestNoUnpack = async (
@@ -149,6 +150,7 @@ export const requestNoUnpack = async (
  * Make a never-cache HTTP request to the server.
  * If `targetId` is provided, the request goes into a specific K8s Pod.
  * Otherwise it goes to the default web server.
+ * Token will be carried if there are any.
  */
 export const request = async <T = any>(
   url: string,

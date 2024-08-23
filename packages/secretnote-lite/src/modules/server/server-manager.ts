@@ -1,6 +1,7 @@
 // Different from traditional Jupyter Server, SecretNote connects to multiple nodes,
-// i.e., multiple Jupyter Servers.
-// So we need to customize the server manager to manage multiple servers.
+// i.e., multiple Jupyter Servers, and the server start/stop/... operations are
+// handled by the default web server instead of the Jupyter itself.
+// So we need to customize the server manager to manage them.
 
 import {
   genericErrorHandler,
@@ -10,10 +11,11 @@ import {
   request,
   wait,
 } from '@/utils';
+import type { ISpecModels } from '@difizen/libro-jupyter';
 import {
+  PageConfig,
   ServerConnection,
   ServerManager,
-  type ISpecModels,
 } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 import type { SecretNoteNode } from '../node/service';
@@ -22,12 +24,13 @@ import { ServerStatus, type IServer } from './protocol';
 @singleton()
 export class SecretNoteServerManager {
   protected readonly serverConnection: ServerConnection;
+  // the server manager shipped with Libro without our customization
+  // we need to use it to fire some signals
+  protected readonly defaultServerManager: ServerManager;
 
-  // @ts-ignore
-  @inject(ServerManager) defaultServerManager: ServerManager;
   @prop() loading = false;
-  @prop() resourcesAndVersions: SecretNoteNode['resourcesAndVersions'] = {};
   @prop() servers: IServer[] = [];
+  @prop() resourcesAndVersions: SecretNoteNode['resourcesAndVersions'] = {};
 
   // events and emitters
   protected readonly onServerAddedEmitter = new Emitter<IServer>();
@@ -39,8 +42,12 @@ export class SecretNoteServerManager {
   protected readonly onServerStoppedEmitter = new Emitter<IServer>();
   readonly onServerStopped = this.onServerStoppedEmitter.event;
 
-  constructor(@inject(ServerConnection) serverConnection: ServerConnection) {
+  constructor(
+    @inject(ServerConnection) serverConnection: ServerConnection,
+    @inject(ServerManager) defaultServerManager: ServerManager,
+  ) {
     this.serverConnection = serverConnection;
+    this.defaultServerManager = defaultServerManager;
     this.updateServerConnectionSettings();
     this.getResourcesAndVersions();
     this.getServerList().then(() => {
@@ -232,24 +239,50 @@ export class SecretNoteServerManager {
     }
   }
 
+  /**
+   * Update ServerConnection's settings.
+   * Since contents API are taken over by our customized drive without using injected ServerConnection,
+   * and HTTP requests related to kernel management are taken over by customized SecretNoteKernelManager
+   * which handles request targetId properly to suit the multi-node environment,
+   * the settings we update here are only used for LSP WebSocket requests actually.
+   */
   private updateServerConnectionSettings() {
-    // update server connection settings
-    // Resolve requests such as kernelspecs/lsp are initiated in libro
     const firstServer = this.servers[0];
-    const firstServerOnline =
+    const isFirstServerOnline =
       firstServer && firstServer.status === ServerStatus.Succeeded;
+    // we only use the language server running on the first server as the representative
+    if (isFirstServerOnline) {
+      this.serverConnection.updateSettings({
+        baseUrl: getRemoteBaseUrl(firstServer.id, true),
+        wsUrl: getRemoteWsUrl(firstServer.id, true),
+        ...getDefaultServerConnectionSettings(),
+      });
+    }
 
-    // !!! FIXME currently libro-language-client doesn't use the internal ServerConnection
-    // to determine the request URL, so the Token will not be carried in WebSocket requests,
-    // causing authentication in web server end to fail.
-    this.serverConnection.updateSettings({
-      baseUrl: firstServerOnline
-        ? getRemoteBaseUrl(firstServer.id, true)
-        : getRemoteBaseUrl(),
-      wsUrl: firstServerOnline
-        ? getRemoteWsUrl(firstServer.id, true)
-        : getRemoteWsUrl(),
-      ...getDefaultServerConnectionSettings(),
-    });
+    console.log('PageConfig.getBaseUrl()', PageConfig.getBaseUrl());
+
+    // !!! FIXME
+    // libro-language-client doesn't use the injected ServerConnection to determine the
+    // request URL for LSP (@see `createWebSocketLanguageClient`'s URL source in `libro-language-client`)
+    // so the token will not be carried as query parameter of URL in WebSocket requests
+    // even we set `appendToken` in `getDefaultServerConnectionSettings`, causing authentication
+    // at default web server end to fail.
+    /**
+     * 
+  protected serverUri(languageServerId: string) {
+    const wsBase = PageConfig.getBaseUrl().replace(/^http/, 'ws');
+    return URL.join(wsBase, 'lsp', 'ws', languageServerId);
+  }
+     */
+
+    // this.serverConnection.updateSettings({
+    //   baseUrl: firstServerOnline
+    //     ? getRemoteBaseUrl(firstServer.id, true)
+    //     : getRemoteBaseUrl(),
+    //   wsUrl: firstServerOnline
+    //     ? getRemoteWsUrl(firstServer.id, true)
+    //     : getRemoteWsUrl(),
+    //   ...getDefaultServerConnectionSettings(),
+    // });
   }
 }

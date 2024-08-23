@@ -6,6 +6,7 @@
 import {
   createNotImplemented,
   getDefaultServerConnectionSettings,
+  getRemoteBaseUrl,
   requestNoUnpack,
 } from '@/utils';
 import type { ServerConnection } from '@difizen/libro-jupyter';
@@ -41,7 +42,7 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   } = {
     makeRequest: async (url, init, settings) => {
       // Settings are always globally defined, temporarily overriden is not allowed.
-      // Also, the hatch by setting options.baseUrl is not recommended unless you know what you are doing.
+      // Also, the escape hatch by setting options.baseUrl is not recommended unless you know what you are doing.
       if (settings) {
         throw new Error('`settings` is not allowed to be overriden.');
       }
@@ -65,12 +66,26 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   // inherited implementations
   dispose = DefaultDrive.prototype.dispose.bind(this);
   get = DefaultDrive.prototype.get.bind(this);
-  getDownloadUrl = DefaultDrive.prototype.getDownloadUrl.bind(this);
   newUntitled = DefaultDrive.prototype.newUntitled.bind(this);
   delete = DefaultDrive.prototype.delete.bind(this);
   rename = DefaultDrive.prototype.rename.bind(this);
   save = DefaultDrive.prototype.save.bind(this);
   copy = DefaultDrive.prototype.copy.bind(this);
+  // this one is special because its internal doesn't use `makeRequest` directly
+  getDownloadUrl = async (localPath: string, ...args: any) => {
+    const baseUrl = getRemoteBaseUrl();
+    // so we need to override its baseUrl temporarily to let it work
+    const fullURL = await DefaultDrive.prototype.getDownloadUrl.call(
+      this,
+      localPath,
+      {
+        baseUrl,
+      },
+    );
+    // and to make it consistent with other API in this drive
+    // we manually remove the baseUrl from the result then
+    return fullURL.replace(new RegExp(`^${baseUrl}/?`), '');
+  };
 
   // omit all checkpoint APIs because SecretNote doesn't support this feature
   createCheckpoint = createNotImplemented('createCheckpoint');
@@ -79,7 +94,7 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   deleteCheckpoint = createNotImplemented('deleteCheckpoint');
 
   // utilities
-  getUrl = DefaultDrive.prototype['getUrl'].bind(this);
+  getUrl = DefaultDrive.prototype['getUrl'].bind(this); // bypass the `protected` annotation
   /**
    * Not allowed to override settings used by makeRequest here. Return nothing.
    * @override Drive._getSettings

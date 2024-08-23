@@ -60,7 +60,7 @@ export class SecretNoteKernelManager {
    * Create kernel connections for the given file.
    */
   async createKernelConnections(fileInfo: IContentsModel) {
-    // Get available servers
+    // get available servers
     const availableServers = (
       (await this.serverManager.getServerList()) || []
     ).filter((s) => s.status === ServerStatus.Succeeded);
@@ -175,7 +175,7 @@ export class SecretNoteKernelManager {
   }
 
   /**
-   * Get the server of a kernel connection.
+   * Get the server that a kernel connection belongs to.
    */
   getServerByKernelConnection(connection: IKernelConnection) {
     const serverId = this.kernelConnectionToServer.get(connection.id);
