@@ -19,3 +19,13 @@ export function genericErrorHandler(
     throw e;
   }
 }
+
+/**
+ * Create an not-implemented function placeholder.
+ */
+export function createNotImplemented(name: string) {
+  return (...args: any) => {
+    throw new Error(`Method \`${name}\` is not implemented.`);
+    return void 0 as any;
+  };
+}
