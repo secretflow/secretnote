@@ -1,3 +1,5 @@
+// Module for markdown cell.
+
 import { CellOptions } from '@difizen/libro-jupyter';
 import { ManaModule } from '@difizen/mana-app';
 

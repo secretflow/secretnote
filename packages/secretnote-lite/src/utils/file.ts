@@ -126,3 +126,12 @@ export const convertSizeUnit = (
   }
   return size;
 };
+
+/**
+ * Normalize a extension name, guarantee it starts with a dot.
+ */
+export function normalizeExtension(extension: string): string {
+  return extension.length > 0 && extension.indexOf('.') !== 0
+    ? `.${extension}`
+    : extension;
+}

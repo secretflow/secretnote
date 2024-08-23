@@ -139,21 +139,23 @@ export class MetricsService {
     // prefer to use kernel_usage API
     if (this.dataSource === 'kernel_usage') {
       try {
-        const { content } = (await request(
+        const { content } = await request<
+          {
+            content: Partial<{
+              reason: string;
+              host_cpu_percent: number;
+              host_virtual_memory: {
+                total: number;
+                used: number;
+                percent: number;
+              };
+            }>;
+          } & { [key: string]: any }
+        >(
           `/api/metrics/v1/kernel_usage/get_usage/${kernel.id}`,
           { method: 'GET' },
           server.id,
-        )) as {
-          content: Partial<{
-            reason: string;
-            host_cpu_percent: number;
-            host_virtual_memory: {
-              total: number;
-              used: number;
-              percent: number;
-            };
-          }>;
-        } & { [key: string]: any };
+        );
         if (content?.reason) {
           throw new Error(content.reason);
         }

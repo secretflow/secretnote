@@ -65,9 +65,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
         // ignore heartbeat messages
         if (msg.header.msg_type === 'status') {
           return;
-        }
-        // TODO ?
-        else if (msg.header.msg_type === 'execute_input') {
+        } else if (msg.header.msg_type === 'execute_input') {
           cellModel.executeCount = (msg.content as any).execution_count;
         }
         // handle `display_data`, `stream`, `error`, `execute_result` messages
@@ -86,7 +84,6 @@ export class SecretNoteOutputArea extends LibroOutputArea {
         }
         // handle `execute_reply` message
         else if (isExecuteReplyMsg(msg)) {
-          // TODO ?
           const content = msg.content;
           if (content.status !== 'ok') {
             return;

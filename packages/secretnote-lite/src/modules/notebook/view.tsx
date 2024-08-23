@@ -32,8 +32,7 @@ export const NotebookFileComponent = () => {
     switch (key) {
       case 'rename':
         // pend a rename action
-        notebookFileService.pendingRename =
-          notebookFileService.createPendingRename(file);
+        notebookFileService.pendRenameAction(file);
         break;
       case 'delete':
         Modal.confirm({

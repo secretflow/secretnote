@@ -4,7 +4,7 @@
 
 import {
   genericErrorHandler,
-  getDefaultConnectionSettings,
+  getDefaultServerConnectionSettings,
   getRemoteBaseUrl,
   getRemoteWsUrl,
   request,
@@ -104,7 +104,7 @@ export class SecretNoteServerManager {
       data.status = ServerStatus.Succeeded;
       data.kernelspec = spec;
     }
-    // TODO FIXME ?
+    // update the portIp if present TODO useless?
     const serverDetail = await this.getServerDetail(data.id);
     if (serverDetail) {
       data.portIp = serverDetail.portIp;
@@ -134,12 +134,13 @@ export class SecretNoteServerManager {
   }
 
   /**
-   * TODO FIXME Looks like it's useless?
+   * Get details of a server.
    */
-  async getServerDetail(id: string): Promise<IServer | undefined> {
-    const data = (await request('api/nodes/' + id, {
+  async getServerDetail(id: string) {
+    const data = await request<SecretNoteNode>(`api/nodes/${id}`, {
       method: 'GET',
-    })) as IServer;
+    });
+
     return data;
   }
 
@@ -147,7 +148,7 @@ export class SecretNoteServerManager {
    * Start a server.
    */
   async startServer(id: string) {
-    const server: IServer = await request(`api/nodes/start/${id}`, {
+    const server = await request<SecretNoteNode>(`api/nodes/start/${id}`, {
       method: 'PATCH',
     });
 
@@ -218,10 +219,8 @@ export class SecretNoteServerManager {
     try {
       const data = await Promise.race([
         request('api/kernelspecs', {}, server.id),
-        new Promise((resolve, reject) => {
-          setTimeout(() => {
-            reject(new Error('timeout'));
-          }, 5000);
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('timeout')), 5000);
         }),
       ]);
       return data;
@@ -240,8 +239,9 @@ export class SecretNoteServerManager {
     const firstServerOnline =
       firstServer && firstServer.status === ServerStatus.Succeeded;
 
-    // ! FIXME currently libro-language-client doesn't use the internal ServerConnection
-    // to determine the request URL, so the Token will not be carried.
+    // !!! FIXME currently libro-language-client doesn't use the internal ServerConnection
+    // to determine the request URL, so the Token will not be carried in WebSocket requests,
+    // causing authentication in web server end to fail.
     this.serverConnection.updateSettings({
       baseUrl: firstServerOnline
         ? getRemoteBaseUrl(firstServer.id, true)
@@ -249,7 +249,7 @@ export class SecretNoteServerManager {
       wsUrl: firstServerOnline
         ? getRemoteWsUrl(firstServer.id, true)
         : getRemoteWsUrl(),
-      ...getDefaultConnectionSettings(),
+      ...getDefaultServerConnectionSettings(),
     });
   }
 }

@@ -175,10 +175,10 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
       if (notOks.length === 0) {
         return true;
       } else {
-        // TODO FIXME: handle all the error messages
-        const error = presents.find((msg) => msg.content.status !== 'ok');
-        if (error) {
-          throw new KernelError(error.content);
+        // TODO: handle all the error messages
+        const errors = presents.filter((msg) => msg.content.status !== 'ok');
+        if (errors) {
+          throw new KernelError(errors[0].content);
         }
         return false;
       }

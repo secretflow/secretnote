@@ -14,15 +14,6 @@ export function uuid(): string {
   return res;
 }
 
-export const getSearchParams = (...key: string[]) => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const res: string[] = [];
-  key.forEach((k) => {
-    res.push(searchParams.get(k) || '');
-  });
-  return res;
-};
-
 /**
  * Compare two date strings and return 1 if a > b, -1 if a < b, 0 elsewise.
  */

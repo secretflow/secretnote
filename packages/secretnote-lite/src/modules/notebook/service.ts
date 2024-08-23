@@ -4,17 +4,23 @@ import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
 import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
-import {
-  downloadFileByURL,
-  getDefaultConnectionSettings,
-  getRemoteBaseUrl,
-  getRemoteWsUrl,
-} from '@/utils';
+import { downloadFileByURL } from '@/utils';
 import { l10n } from '@difizen/mana-l10n';
 import { AtLeast } from 'typings';
+import { DriveName, SecretNoteContentsDrive } from './drive';
 
 const USER_ROOT_DIR = '/'; // the root path for a user's notebook files with trailing slash
 const FILE_EXT = '.ipynb'; // the default extname of notebook files
+/**
+ * Add the customized drive name to the path so that
+ * ContentsManager will call that drive to fire requests.
+ */
+const drived = (path: string) => `${DriveName}:${path}`;
+/**
+ * Remove the drive name from the path if any.
+ */
+const undrived = (path: string) =>
+  path.replace(new RegExp(`^${DriveName}:`), '');
 
 @singleton()
 export class NotebookFileService {
@@ -22,6 +28,8 @@ export class NotebookFileService {
   // contents manager is for notebook file management
   // @see https://jupyter-server.readthedocs.io/en/latest/developers/contents.html
   protected readonly contentsManager: ContentsManager;
+  // with a new drive
+  protected readonly contentsDrive: SecretNoteContentsDrive;
   // notebook file changed event
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
     pre: IContentsModel | null;
@@ -37,19 +45,16 @@ export class NotebookFileService {
   constructor(
     @inject(ServerConnection) serverConnection: ServerConnection,
     @inject(ContentsManager) contentsManager: ContentsManager,
+    @inject(SecretNoteContentsDrive) contentsDrive: SecretNoteContentsDrive,
   ) {
     this.serverConnection = serverConnection;
     this.contentsManager = contentsManager;
-    // API call inside ContentsManager requires request URL to start with ServerConnection's baseUrl
-    // so we must update the baseUrl of ServerConnection here
-    this.serverConnection.updateSettings({
-      // all notebook files API (except execution) goes to the default web server
-      baseUrl: getRemoteBaseUrl(),
-      wsUrl: getRemoteWsUrl(),
-      ...getDefaultConnectionSettings(),
-    });
-    // baseUrl of ContentsManager cannot be globally overridden
-    // so we must specified it in every API call
+    // Contents API has been taken over by the default web server.
+    // However, the default drive for ContentsManager will send contents API requests
+    // to the Jupyter Server instead. So we must use a new Drive to customize
+    // our requests here.
+    this.contentsDrive = contentsDrive;
+    this.contentsManager.addDrive(this.contentsDrive);
   }
 
   /**
@@ -71,14 +76,17 @@ export class NotebookFileService {
    * @see https://jupyter-server.readthedocs.io/en/latest/developers/rest-api.html#get--api-contents-path
    */
   async getFileList() {
-    const { content } = (await this.contentsManager.get(USER_ROOT_DIR, {
-      baseUrl: getRemoteBaseUrl(), // contents API has been migrated to the default web server
+    const { content } = (await this.contentsManager.get(drived(USER_ROOT_DIR), {
       content: true,
       type: 'directory',
     })) as AtLeast<{ content: IContentsModel[] }>;
     // show only notebook files, sort by name
     this.notebookFileList = content
       .filter(({ name }) => name.endsWith(FILE_EXT))
+      .map((v) => ({
+        ...v,
+        path: undrived(v.path), // do not let the upstream see the drive
+      }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
@@ -102,9 +110,11 @@ export class NotebookFileService {
             throw new Error(l10n.t('目标文件名已存在'));
           }
           // fire the rename action
-          const newFile = await this.contentsManager.rename(path, newPath, {
-            baseUrl: getRemoteBaseUrl(),
-          });
+          console.log('passed to', drived(path), drived(newPath));
+          const newFile = await this.contentsManager.rename(
+            drived(path),
+            drived(newPath),
+          );
           await this.getFileList();
           // replace the current file if it's the one being renamed
           if (this.currentNotebookFile?.path === path) {
@@ -121,8 +131,7 @@ export class NotebookFileService {
    */
   async addFile() {
     const file = await this.contentsManager.newUntitled({
-      baseUrl: getRemoteBaseUrl(),
-      path: USER_ROOT_DIR, // no nested directory is allowed currently
+      path: drived(USER_ROOT_DIR), // no nested directory is allowed currently
       type: 'notebook',
     });
     // update the file list and open the new file
@@ -138,9 +147,7 @@ export class NotebookFileService {
    * Delete a notebook file.
    */
   async deleteFile(file: IContentsModel) {
-    await this.contentsManager.delete(file.path, {
-      baseUrl: getRemoteBaseUrl(),
-    });
+    await this.contentsManager.delete(drived(file.path));
     // close the file if the being-deleted is the current one
     if (this.currentNotebookFile?.path === file.path) {
       this.currentNotebookFile = null;
@@ -152,9 +159,9 @@ export class NotebookFileService {
    * Export (download) a notebook file.
    */
   async exportFile(file: IContentsModel) {
-    const downloadURL = await this.contentsManager.getDownloadUrl(file.path, {
-      baseUrl: getRemoteBaseUrl(),
-    });
+    const downloadURL = await this.contentsManager.getDownloadUrl(
+      drived(file.path),
+    );
     const resp = await this.serverConnection.makeRequest(downloadURL, {
       method: 'GET',
     });
@@ -172,9 +179,10 @@ export class NotebookFileService {
    * Copy a notebook file.
    */
   async copyFile(file: IContentsModel) {
-    const newFile = await this.contentsManager.copy(file.path, USER_ROOT_DIR, {
-      baseUrl: getRemoteBaseUrl(),
-    });
+    const newFile = await this.contentsManager.copy(
+      drived(file.path),
+      drived(USER_ROOT_DIR),
+    );
     await this.getFileList();
     this.openFile(newFile);
   }
@@ -183,8 +191,7 @@ export class NotebookFileService {
    * Check if a file exists.
    */
   async isFileExisted(name: string) {
-    const { content } = (await this.contentsManager.get(USER_ROOT_DIR, {
-      baseUrl: getRemoteBaseUrl(),
+    const { content } = (await this.contentsManager.get(drived(USER_ROOT_DIR), {
       content: true,
       type: 'directory',
     })) as AtLeast<{ content: IContentsModel[] }>;
@@ -196,18 +203,20 @@ export class NotebookFileService {
    * Upload a notebook file.
    */
   async uploadFile(name: string, content: string) {
-    await this.contentsManager.save(`${USER_ROOT_DIR}${name}`, {
-      baseUrl: getRemoteBaseUrl(),
+    await this.contentsManager.save(drived(`${USER_ROOT_DIR}${name}`), {
       type: 'notebook',
-      content: JSON.parse(content),
       format: 'json',
+      content: JSON.parse(content),
     });
     // refresh the file list
     await this.getFileList();
   }
 
-  createPendingRename(file: IContentsModel) {
-    return {
+  /**
+   * Pend a rename action.
+   */
+  pendRenameAction(file: IContentsModel) {
+    this.pendingRename = {
       path: file.path,
       name: file.name,
     };

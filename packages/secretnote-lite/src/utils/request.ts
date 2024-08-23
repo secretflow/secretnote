@@ -1,6 +1,6 @@
 // Customized request definitions and functions for SecretNote.
 
-import type { ISettings } from '@difizen/libro-jupyter';
+import type { ISettings, JSONPrimitive } from '@difizen/libro-jupyter';
 import { URL as LibroURL } from '@difizen/libro-jupyter';
 import { genericErrorHandler } from './error';
 
@@ -69,7 +69,7 @@ const normalizeURL = (url: string, targetId = '') => {
  * Get a cookie by name.
  */
 const getCookie = (name: string) => {
-  // From http://www.tornadoweb.org/en/stable/guide/security.html
+  // from http://www.tornadoweb.org/en/stable/guide/security.html
   const matches = document.cookie.match('\\b' + name + '=([^;]*)\\b');
   return matches?.[1];
 };
@@ -91,10 +91,9 @@ export const getToken = (key = 'pocketbase_auth'): string | null => {
 };
 
 /**
- * Default request settings for API about notebooks.
- * // TODO
+ * Default server connection settings and token for API about notebooks.
  */
-export const getDefaultConnectionSettings = () => {
+export const getDefaultServerConnectionSettings = () => {
   return {
     init: {
       cache: 'no-store',
@@ -112,12 +111,13 @@ export const getDefaultConnectionSettings = () => {
  * Make a never-cache HTTP request to the server.
  * If `targetId` is provided, the request goes into a specific K8s Pod.
  * Otherwise it goes to the default web server.
+ * This method will not unpack the Response to JSON.
  */
-export const request = async <T = any>(
+export const requestNoUnpack = async (
   url: string,
   init: RequestInit,
   targetId = '',
-): Promise<T> => {
+) => {
   // normalize the URL
   let requestUrl = normalizeURL(url, targetId);
   // forcely avoid caching by adding a timestamp
@@ -142,13 +142,50 @@ export const request = async <T = any>(
   req.headers.set('Content-Type', 'application/json');
 
   // fire the request
-  const response = await window.fetch(req);
+  return await window.fetch(req);
+};
+
+/**
+ * Make a never-cache HTTP request to the server.
+ * If `targetId` is provided, the request goes into a specific K8s Pod.
+ * Otherwise it goes to the default web server.
+ */
+export const request = async <T = any>(
+  url: string,
+  init: RequestInit,
+  targetId = '',
+): Promise<T> => {
+  const response = await requestNoUnpack(url, init, targetId);
   // handle the response
   if (response.status === 204) {
-    return {} as T; // TODO
+    return {} as T;
   }
   if (response.status === 200) {
     return await response.json();
   }
   throw await createResponseError(response);
+};
+
+/**
+ * node:querystring.stringify replacement for unnested values.
+ */
+export function querystringStringify(
+  params: Record<string, JSONPrimitive | undefined>,
+) {
+  return Object.entries(params)
+    .filter(([_, v]) => v !== void 0)
+    .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+    .join('&');
+}
+
+/**
+ * Get search parameters of current location by keys.
+ */
+export const getSearchParams = (...key: string[]) => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const res: string[] = [];
+  key.forEach((k) => {
+    res.push(searchParams.get(k) || '');
+  });
+  return res;
 };
