@@ -34,7 +34,8 @@ const PrepareNodeDes = (props: DescriptionProps) => {
         <li>节点名称也就是节点标识，后续会在初始化代码中使用。</li>
         <li>添加过程大概需要 30s，请耐心等待。</li>
         <li>
-          添加成功后，在节点详情中可以看到节点 IP，这个 IP 作为节点之间的通信地址。
+          添加成功后，在节点详情中可以看到节点 IP，这个 IP
+          作为节点之间的通信地址。
         </li>
       </ul>
       {!props.finished && (
@@ -115,7 +116,9 @@ const RunningNotebookDes = (props: DescriptionProps) => {
         style={{ width: 660 }}
       />
       <ul className="list">
-        <li>需要将示例代码中的 address 替换成对应节点的 IP，端口号不需要修改。</li>
+        <li>
+          需要将示例代码中的 address 替换成对应节点的 IP，端口号不需要修改。
+        </li>
         <li>
           如果需要安装额外的 pip 包，请使用阿里云镜像 pip install --index
           https://mirrors.aliyun.com/pypi/simple/ package_name
@@ -211,25 +214,37 @@ export const WelcomeComponent = () => {
             {
               title: <div className="step-title">准备节点</div>,
               description: (
-                <PrepareNodeDes finished={instance.currentStep > 0} done={done} />
+                <PrepareNodeDes
+                  finished={instance.currentStep > 0}
+                  done={done}
+                />
               ),
             },
             {
               title: <div className="step-title">准备数据</div>,
               description: (
-                <PrepareDatasetDes finished={instance.currentStep > 1} done={done} />
+                <PrepareDatasetDes
+                  finished={instance.currentStep > 1}
+                  done={done}
+                />
               ),
             },
             {
               title: <div className="step-title">运行 Notebook</div>,
               description: (
-                <RunningNotebookDes finished={instance.currentStep > 2} done={done} />
+                <RunningNotebookDes
+                  finished={instance.currentStep > 2}
+                  done={done}
+                />
               ),
             },
             {
               title: <div className="step-title">验证结果</div>,
               description: (
-                <CheckResultDes finished={instance.currentStep > 3} done={done} />
+                <CheckResultDes
+                  finished={instance.currentStep > 3}
+                  done={done}
+                />
               ),
             },
           ]}

@@ -42,7 +42,9 @@ const MetricsComponent = () => {
         Object.entries(metrics).map(([id, v]) => (
           <div key={id} className="kernel-status-item">
             <div className="server-name">{v.name}</div>
-            <Tag style={{ fontFamily: 'monospace, monospace' }}>{formatMetric(v)}</Tag>
+            <Tag style={{ fontFamily: 'monospace, monospace' }}>
+              {formatMetric(v)}
+            </Tag>
           </div>
         ))
       ) : (

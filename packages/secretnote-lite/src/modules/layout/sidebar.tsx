@@ -34,11 +34,19 @@ const AboutBarComponent = () => {
   const fmtPackageVersions = instance.fmtPackageVersions;
 
   return (
-    <Space direction="horizontal" align="center" size="large" className="about-bar">
+    <Space
+      direction="horizontal"
+      align="center"
+      size="large"
+      className="about-bar"
+    >
       <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
         SecretFlow
       </Typography.Link>
-      <Typography.Link href="https://github.com/secretflow/secretnote" target="_blank">
+      <Typography.Link
+        href="https://github.com/secretflow/secretnote"
+        target="_blank"
+      >
         SecretNote
       </Typography.Link>
       <div className="icon-container">
@@ -81,7 +89,9 @@ export const SideBar: React.FC = () => {
   const instance = useInject<SideBarView>(ViewInstance);
   const providers = instance.providers.getContributions();
   providers.sort((a, b) => a.order - b.order);
-  const defaultActiveKey = providers.filter((p) => !!p.defaultOpen).map((p) => p.key);
+  const defaultActiveKey = providers
+    .filter((p) => !!p.defaultOpen)
+    .map((p) => p.key);
 
   const items = providers
     .sort((a, b) => a.order - b.order)

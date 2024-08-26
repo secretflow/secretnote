@@ -92,7 +92,9 @@ const NodeDetails = (props: { node: SecretNoteNode }) => {
     <div className="secretnote-node-description">
       <Spin spinning={loading}>
         <Descriptions title={l10n.t('节点信息')} column={1}>
-          <Descriptions.Item label={l10n.t('名称')}>{node.name}</Descriptions.Item>
+          <Descriptions.Item label={l10n.t('名称')}>
+            {node.name}
+          </Descriptions.Item>
           <Descriptions.Item label={l10n.t('状态')}>
             <Badge status={status} text={text} />
           </Descriptions.Item>
@@ -194,7 +196,10 @@ export const NodeComponent = () => {
         >
           <Input placeholder="alice" />
         </Form.Item>
-        <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
+        <Form.Item
+          wrapperCol={{ offset: 4, span: 20 }}
+          style={{ marginBottom: 0 }}
+        >
           <Space>
             <Button
               type="primary"

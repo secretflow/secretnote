@@ -23,7 +23,9 @@ export enum EditorArea {
 }
 
 export const EditorComponent = () => {
-  const [libroView, setLibroView] = useState<NotebookView | undefined>(undefined);
+  const [libroView, setLibroView] = useState<NotebookView | undefined>(
+    undefined,
+  );
   const instance = useInject<EditorView>(ViewInstance);
   const currentNotebookFile = instance.notebookFileService.currentNotebookFile;
 
