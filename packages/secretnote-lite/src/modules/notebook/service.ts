@@ -1,6 +1,11 @@
 // Services for notebook manupulation.
 
-import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
+import type {
+  ContentsFileFormat,
+  IContentsModel,
+  INotebookContent,
+  LibroView,
+} from '@difizen/libro-jupyter';
 import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
@@ -29,7 +34,8 @@ export class NotebookFileService {
   // contents manager is for notebook file management
   // @see https://jupyter-server.readthedocs.io/en/latest/developers/contents.html
   protected readonly contentsManager: ContentsManager;
-  // with a new drive
+  // With a new drive. The `drived` and `undrived` operations are constrained inside
+  // the service and the downstream should not be aware of the drive.
   protected readonly contentsDrive: SecretNoteContentsDrive;
   // notebook file changed event
   protected readonly onNotebookFileChangedEmitter = new Emitter<{
@@ -60,6 +66,7 @@ export class NotebookFileService {
 
   /**
    * Open a new notebook file.
+   * @see `loadContent` in `/editor/contents/contents-contrib.ts`
    */
   openFile(file: IContentsModel) {
     if (this.currentNotebookFile !== file) {
@@ -92,6 +99,34 @@ export class NotebookFileService {
   }
 
   /**
+   * Open a notebook file to get its ContentsModel by path.
+   */
+  async getFile(path: string) {
+    const file = await this.contentsManager.get(drived(path), {
+      content: true,
+      type: 'file',
+    });
+    file.path = undrived(file.path); // do not let the upstream see the drive
+    return file;
+  }
+
+  /**
+   * Save a notebook file.
+   */
+  async saveFile(
+    path: string,
+    options: {
+      type: string;
+      content: INotebookContent;
+      format?: ContentsFileFormat;
+    },
+  ) {
+    const file = await this.contentsManager.save(drived(path), options);
+    file.path = undrived(file.path); // do not let the upstream see the drive
+    return file;
+  }
+
+  /**
    * Commit the rename action.
    * The renaming is a two-step process.
    */
@@ -111,7 +146,6 @@ export class NotebookFileService {
             throw new Error(l10n.t('目标文件名已存在'));
           }
           // fire the rename action
-          console.log('passed to', drived(path), drived(newPath));
           const newFile = await this.contentsManager.rename(
             drived(path),
             drived(newPath),

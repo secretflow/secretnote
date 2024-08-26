@@ -1,6 +1,5 @@
 import type { IContentsModel, IKernelConnection } from '@difizen/libro-jupyter';
 import {
-  ContentsManager,
   DocumentCommands,
   ExecutedWithKernelCellModel,
   LibroModel,
@@ -18,7 +17,7 @@ import { debounce } from 'lodash-es';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import type { IServer } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
-import { getRemoteBaseUrl } from '@/utils';
+import { NotebookFileService } from '../notebook';
 
 @transient()
 export class SecretNoteModel extends LibroModel {
@@ -26,9 +25,9 @@ export class SecretNoteModel extends LibroModel {
   private readonly serverManager: SecretNoteServerManager;
   private readonly modalService: ModalService;
   private readonly commandRegistry: CommandRegistry;
+  private readonly notebookFileService: NotebookFileService;
 
   public currentFileContents!: IContentsModel;
-  public readonly contentsManager: ContentsManager;
 
   @prop() kernelConnecting = false;
   @prop() kernelConnections: IKernelConnection[] = [];
@@ -58,16 +57,16 @@ export class SecretNoteModel extends LibroModel {
   constructor(
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
     @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
-    @inject(ContentsManager) contentsManager: ContentsManager,
     @inject(ModalService) modalService: ModalService,
     @inject(CommandRegistry) commandRegistry: CommandRegistry,
+    @inject(NotebookFileService) notebookFileService: NotebookFileService,
   ) {
     super();
     this.kernelManager = kernelManager;
     this.serverManager = serverManager;
-    this.contentsManager = contentsManager;
     this.modalService = modalService;
     this.commandRegistry = commandRegistry;
+    this.notebookFileService = notebookFileService;
     this.serverManager.onServerAdded(this.onServerAdded.bind(this));
     this.serverManager.onServerDeleted(this.onServerDeleted.bind(this));
     this.serverManager.onServerStarted(this.onServerAdded.bind(this));
@@ -102,11 +101,10 @@ export class SecretNoteModel extends LibroModel {
     let res: IContentsModel | undefined;
 
     try {
-      res = await this.contentsManager.save(this.currentFileContents.path, {
+      res = await this.notebookFileService.saveFile(this.currentFileContents.path, {
         type: this.currentFileContents.type,
         content: notebookContent,
         format: this.currentFileContents.format,
-        baseUrl: getRemoteBaseUrl(),
       });
 
       if (!res) {

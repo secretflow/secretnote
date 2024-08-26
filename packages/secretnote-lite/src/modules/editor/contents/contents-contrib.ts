@@ -1,13 +1,18 @@
 import type { NotebookModel, NotebookOption } from '@difizen/libro-jupyter';
 import { ContentContribution } from '@difizen/libro-jupyter';
-import { URI, singleton } from '@difizen/mana-app';
+import { URI, inject, singleton } from '@difizen/mana-app';
 
-import { getRemoteBaseUrl } from '@/utils';
-
+import { NotebookFileService } from '@/modules/notebook';
 import type { SecretNoteModel } from '../model';
 
 @singleton({ contrib: ContentContribution })
 export class SecretNoteContentContribution implements ContentContribution {
+  protected readonly notebookFileService: NotebookFileService;
+
+  constructor(@inject(NotebookFileService) notebookFileService: NotebookFileService) {
+    this.notebookFileService = notebookFileService;
+  }
+
   canHandle = () => {
     return 3;
   };
@@ -16,11 +21,8 @@ export class SecretNoteContentContribution implements ContentContribution {
     const secretNoteModel = model as SecretNoteModel;
     const fireUri = new URI(options.resource);
     const filePath = fireUri.path.toString();
+    const currentFileContents = await this.notebookFileService.getFile(filePath);
 
-    const currentFileContents = await secretNoteModel.contentsManager.get(filePath, {
-      baseUrl: getRemoteBaseUrl(),
-      content: true,
-    });
     if (currentFileContents) {
       currentFileContents.content.nbformat_minor = 5;
       secretNoteModel.currentFileContents = currentFileContents;

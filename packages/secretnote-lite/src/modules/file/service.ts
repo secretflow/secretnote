@@ -3,7 +3,11 @@ import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
-import { downloadFileByURL as download, getRemoteBaseUrl } from '@/utils';
+import {
+  downloadFileByURL as download,
+  genericErrorHandler,
+  getRemoteBaseUrl,
+} from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
@@ -63,8 +67,7 @@ export class FileService {
         serverNode.children = sortedFileNodeList;
         fileTree.push(serverNode);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log(err);
+        genericErrorHandler(err);
       }
     }
 
