@@ -12,7 +12,7 @@ import {
   wait,
 } from '@/utils';
 import type { ISpecModels } from '@difizen/libro-jupyter';
-import { PageConfig, ServerConnection, ServerManager } from '@difizen/libro-jupyter';
+import { ServerConnection, ServerManager } from '@difizen/libro-jupyter';
 
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 import type { SecretNoteNode } from '../node/service';
@@ -252,13 +252,10 @@ export class SecretNoteServerManager {
         ...getDefaultServerConnectionSettings(),
       });
     }
-
-    // !!! FIXME
-    // libro-language-client doesn't use the injected ServerConnection to determine the
-    // request URL for LSP (@see `createWebSocketLanguageClient`'s URL source in `libro-language-client`)
-    // so the token will not be carried as query parameter of URL in WebSocket requests
-    // even we set `appendToken` in `getDefaultServerConnectionSettings`, causing authentication
-    // at default web server end to fail.
-    console.log('PageConfig.getBaseUrl()', PageConfig.getBaseUrl());
+    // It's worth mentioning that libro-language-client doesn't use the ServerConnection singleton
+    // to determine the URL for LSP (see `createWebSocketLanguageClient` in `libro-language-client`)
+    // so the token will not be carried as query parameter in WebSocket connection URL
+    // even if we set `appendToken`, causing authentication at default web server end to fail.
+    // To solve this, we use a customized LanguageClientManager. See `SecretNoteLanguageClientManager`.
   }
 }
