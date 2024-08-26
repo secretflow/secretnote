@@ -77,10 +77,12 @@ export class SecretNoteModel extends LibroModel {
   async startKernelConnection() {
     this.kernelConnecting = true;
     const fileInfo = this.currentFileContents;
+
     if (!fileInfo) {
       return;
     }
     const connections = this.kernelManager.getKernelConnections(fileInfo);
+
     if (connections.length > 0) {
       this.kernelConnections = connections;
       this.kernelConnecting = false;

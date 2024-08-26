@@ -1,4 +1,4 @@
-// The "Run" button in the side toolbar of each cell.
+// The "Run" button in the top toolbar.
 
 import type { LibroJupyterModel, LibroView } from '@difizen/libro-jupyter';
 import { NotebookCommands } from '@difizen/libro-jupyter';
@@ -6,8 +6,9 @@ import { CommandRegistry, useInject, ViewInstance } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Tooltip } from 'antd';
 import { PlayCircle } from 'lucide-react';
+import './index.less';
 
-export const SideToolbarRunItem = () => {
+export const TopToolbarRunItem = () => {
   const libroView = useInject<LibroView>(ViewInstance);
   const libroModel = libroView ? libroView.model : undefined;
   const command = useInject<CommandRegistry>(CommandRegistry);
@@ -23,14 +24,16 @@ export const SideToolbarRunItem = () => {
         overlayClassName="libro-tooltip-placement-right"
         title={
           <span>
-            <div>{l10n.t('运行')}</div>
-            <div>Cmd+Enter / Ctrl+Enter</div>
+            <div>{l10n.t('运行所有 Cell')}</div>
           </span>
         }
       >
         <PlayCircle
           size={16}
-          onClick={() => command.executeCommand(NotebookCommands.RunCell.id)}
+          onClick={() =>
+            command.executeCommand(NotebookCommands.RunAllCells.id)
+          }
+          className="libro-top-toolbar-run-icon"
         />
       </Tooltip>
     );
@@ -41,7 +44,11 @@ export const SideToolbarRunItem = () => {
         placement="right"
         title={l10n.t('Kernel 准备中，无法执行')}
       >
-        <PlayCircle size={16} color="#bfbfbf" />
+        <PlayCircle
+          size={16}
+          color="#bfbfbf"
+          className="libro-top-toolbar-run-icon"
+        />
       </Tooltip>
     );
   }
