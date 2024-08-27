@@ -19,6 +19,7 @@ import {
   Input,
   message,
   Popover,
+  Progress,
   Space,
   Spin,
   Typography,
@@ -26,7 +27,7 @@ import {
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import { genericErrorHandler, invert, randomColorByName } from '@/utils';
+import { genericErrorHandler, invert, randomColorByName, wait } from '@/utils';
 import { ServerStatus } from '../server';
 import './index.less';
 import type { NodeStatusTag, SecretNoteNode } from './service';
@@ -150,31 +151,45 @@ export const NodeComponent = () => {
   const [form] = Form.useForm();
   const [addFormVisible, setAddFormVisible] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
+  const [addProgress, setAddProgress] = useState(0);
   const instance = useInject<NodeView>(ViewInstance);
   const service = instance.service;
 
   const handleAddNode = async () => {
     const values = await form.validateFields();
     setAddLoading(true);
+    // Simulate the progress of adding a node
+    const interval = setInterval(
+      () => setAddProgress((prev) => (prev >= 95 ? prev : prev + 5)),
+      1000, // ~20s in total
+    );
     try {
       const server = await service.addNode(values);
+      setAddProgress(100);
       if (server.status === ServerStatus.Succeeded) {
         message.success(l10n.t('节点添加成功'));
       } else {
-        message.info('节点添加成功，但处于离线状态，请刷新页面或联系管理员');
+        message.info(
+          l10n.t('节点添加成功，但处于离线状态，请刷新页面或联系管理员'),
+        );
       }
+      await wait(1000);
     } catch (e) {
       genericErrorHandler(e);
     } finally {
       setAddFormVisible(false);
       form.resetFields();
       setAddLoading(false);
+      clearInterval(interval);
+      setAddProgress(0);
     }
   };
 
   const addNodeFormContent = (
     <div className="secretnote-add-node">
+      <div className="title">{l10n.t('添加节点')}</div>
       <Form
+        labelAlign="left"
         form={form}
         autoComplete="off"
         requiredMark={false}
@@ -193,23 +208,33 @@ export const NodeComponent = () => {
               message: l10n.t('名称只能包含小写英文字母'),
             },
           ]}
+          style={{ marginBottom: '12px' }}
         >
           <Input placeholder="alice" />
         </Form.Item>
+        {addLoading && (
+          <Form.Item
+            wrapperCol={{ offset: 4, span: 20 }}
+            style={{
+              marginTop: '-12px',
+              marginBottom: 0,
+            }}
+          >
+            <Progress percent={addProgress} size="small" />
+          </Form.Item>
+        )}
         <Form.Item
           wrapperCol={{ offset: 4, span: 20 }}
           style={{ marginBottom: 0 }}
         >
-          <Space>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={handleAddNode}
-              loading={addLoading}
-            >
-              {l10n.t('添加')}
-            </Button>
-          </Space>
+          <Button
+            type="primary"
+            htmlType="submit"
+            onClick={handleAddNode}
+            loading={addLoading}
+          >
+            {l10n.t('添加')}
+          </Button>
         </Form.Item>
       </Form>
     </div>
@@ -222,7 +247,6 @@ export const NodeComponent = () => {
         {service.nodes.map((node) => (
           <Popover
             key={node.id}
-            // @ts-ignore
             content={<NodeDetails node={node} />}
             title=""
             overlayStyle={{ width: 380 }}
@@ -230,7 +254,6 @@ export const NodeComponent = () => {
             placement="bottomLeft"
             arrow={false}
           >
-            {/* @ts-ignore */}
             <Badge status={formatNodeStatus(node).status} dot offset={[-28, 4]}>
               <Avatar
                 shape="square"
@@ -254,8 +277,7 @@ export const NodeComponent = () => {
       </Avatar.Group>
       <Popover
         content={addNodeFormContent}
-        title=""
-        overlayStyle={{ width: 446 }}
+        overlayStyle={{ width: 360 }}
         trigger="click"
         placement="bottomLeft"
         open={addFormVisible}

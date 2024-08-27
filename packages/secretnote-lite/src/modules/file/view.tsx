@@ -1,3 +1,5 @@
+// Views about file (file tree, file operations, etc.) management.
+
 import {
   BaseView,
   inject,
@@ -8,7 +10,7 @@ import {
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import type { UploadProps } from 'antd';
-import { message, Modal, Space, Tree, Upload } from 'antd';
+import { message, Modal, Space, Spin, Tree, Upload } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import {
   ChevronDown,
@@ -19,9 +21,9 @@ import {
   ScrollText,
   Table,
   Trash,
-  Upload as UploadIcon,
+  UploadIcon,
 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { Menu } from '@/components/dropdown-menu';
 import { DropdownMenu } from '@/components/dropdown-menu';
@@ -43,6 +45,7 @@ const IconMap: Record<string, React.ReactElement> = {
 export const FileComponent = () => {
   const instance = useInject<FileView>(ViewInstance);
   const fileService = instance.fileService;
+  const [isUploading, setIsUploading] = useState(false);
 
   const onMenuClick = (key: string, node: DataNode) => {
     switch (key) {
@@ -79,6 +82,7 @@ export const FileComponent = () => {
   };
 
   const uploadFile = async (nodeData: DataNode, file: File) => {
+    setIsUploading(true);
     const content = await readFile(file);
     try {
       await fileService.uploadFile(nodeData, file.name, content);
@@ -86,6 +90,8 @@ export const FileComponent = () => {
       message.success(l10n.t('文件上传成功'));
     } catch (e) {
       genericErrorHandler(e);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -101,7 +107,7 @@ export const FileComponent = () => {
             content: l10n.t('文件 {name} 已经存在，是否覆盖？', {
               name: file.name,
             }),
-            okText: 'Overwrite',
+            okText: l10n.t('覆盖'),
             cancelText: l10n.t('取消'),
             okType: 'danger',
             async onOk(close) {
@@ -161,15 +167,19 @@ export const FileComponent = () => {
 
     return (
       <div className="ant-tree-title-content">
-        <span>
-          <Space>
-            {getFileIcon(nodeData)}
-            <span>{nodeData.title as string}</span>
-          </Space>
-        </span>
+        <Space>
+          {getFileIcon(nodeData)}
+          <span>{nodeData.title as string}</span>
+        </Space>
+        {/* TODO */}
         <DropdownMenu
+          icon={isUploading ? <Spin size="small" /> : void 0} // undefined fallbacks to default "..." icon
           items={isLeaf ? dataMenuItems : folderMenuItems}
+          disabled={isUploading}
           onClick={(key) => {
+            if (isUploading) {
+              return;
+            }
             onMenuClick(key, nodeData);
           }}
         />

@@ -33,6 +33,7 @@ export class MetricsService {
 
   @prop() metrics: ServerMetrics = {};
   @prop() dataSource: 'kernel_usage' | 'fallback' = 'kernel_usage';
+  @prop() status: 'working' | 'no_notebook' | 'no_data' = 'no_data';
   @prop() enabled = false;
 
   constructor(
@@ -93,6 +94,7 @@ export class MetricsService {
     // get current notebook file
     const currentNotebookFile = this.notebookFileService.currentNotebookFile;
     if (!currentNotebookFile) {
+      this.status = 'no_notebook';
       return;
     }
 
@@ -124,6 +126,8 @@ export class MetricsService {
         delete this.metrics[id];
       }
     }
+
+    this.status = 'working';
   }
 
   /**
@@ -197,6 +201,7 @@ export class MetricsService {
     }
 
     // noway to get metrics, give up
+    this.status = 'no_data';
     return {};
   }
 }

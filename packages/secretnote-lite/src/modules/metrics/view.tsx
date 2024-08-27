@@ -19,7 +19,7 @@ import { MetricsService } from './service';
 const MetricsComponent = () => {
   const instance = useInject<MetricsView>(ViewInstance);
   const service = instance.service;
-  const { metrics } = service;
+  const { metrics, status } = service;
 
   useEffect(() => {
     service.enable();
@@ -49,7 +49,11 @@ const MetricsComponent = () => {
         ))
       ) : (
         <div className="kernel-status-item">
-          <span className="placeholder">{l10n.t('暂无数据')}</span>
+          <span className="placeholder">
+            {status === 'no_notebook'
+              ? l10n.t('暂无打开的 Notebook')
+              : l10n.t('暂无数据')}
+          </span>
         </div>
       )}
     </div>

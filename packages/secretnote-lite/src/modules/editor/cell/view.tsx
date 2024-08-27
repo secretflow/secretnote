@@ -113,13 +113,15 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   }
 
   /**
-   * Execute the cell.
+   * Execute a single cell.
    */
   async run() {
     const cellModel = this.model;
     const kernels = this.getUsableKernels();
     if (kernels.length === 0) {
-      message.info(l10n.t('没有可用的 Kernel 连接来执行代码'));
+      message.info(
+        l10n.t('无可用的 Kernel 连接，请检查是否存在并选中可用节点'),
+      );
       return false;
     }
 

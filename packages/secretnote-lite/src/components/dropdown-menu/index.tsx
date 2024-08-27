@@ -11,10 +11,11 @@ interface IProps {
   onClick?: (key: string) => void;
   trigger?: ('click' | 'hover' | 'contextMenu')[];
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 function DropdownMenu(props: IProps) {
-  const { items, onClick, icon, trigger } = props;
+  const { items, onClick, icon, trigger, disabled } = props;
 
   if (items.length === 0) {
     return null;
@@ -34,6 +35,7 @@ function DropdownMenu(props: IProps) {
       }}
       overlayClassName="secretnote-dropdown-menu"
       trigger={trigger || ['click']}
+      disabled={disabled}
     >
       <span onClick={(e) => e.stopPropagation()}>
         {icon ? icon : <MoreHorizontal size={14} />}

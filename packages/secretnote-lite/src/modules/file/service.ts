@@ -33,9 +33,13 @@ export class FileService {
   }
 
   async getFileTree() {
-    const servers = (await this.serverManager.getServerList())!.filter(
-      (s) => s.status === ServerStatus.Succeeded,
-    );
+    const maybeServerList = await this.serverManager.getServerList();
+    if (!maybeServerList) {
+      genericErrorHandler('Failed to get server list');
+      return;
+    }
+
+    const servers = maybeServerList.filter((s) => s.status === ServerStatus.Succeeded);
     const fileTree: DataNode[] = [];
 
     for (const server of servers) {

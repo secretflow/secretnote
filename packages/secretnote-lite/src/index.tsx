@@ -1,5 +1,6 @@
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
+import { message } from 'antd';
 
 import { EditorModule } from '@/modules/editor';
 import { FileModule } from '@/modules/file';
@@ -33,6 +34,12 @@ const App = (): JSX.Element => {
         ToolbarModule,
         WelcomeModule,
       ]}
+      onReady={() => {
+        // do some initialization
+        message.config({
+          maxCount: 1,
+        });
+      }}
     />
   );
 };

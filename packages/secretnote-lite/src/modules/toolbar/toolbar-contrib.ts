@@ -8,9 +8,13 @@ import { TopToolbarRunItem } from './top-toolbar-run-item';
 
 @singleton({ contrib: ToolbarContribution })
 export class SecretNoteToolbarContribution implements ToolbarContribution {
-  registerToolbarItems(registry: ToolbarRegistry): void {
+  registerToolbarItems(registry: ToolbarRegistry) {
     // don't allow manually kernel switch
     registry.unregisterItem(KernelCommands.ShowKernelStatusAndSelector.id);
+    // those that are not working and not that useful
+    registry.unregisterItem(NotebookCommands.SelectLastRunCell.id);
+    registry.unregisterItem(NotebookCommands.UndoCellAction.id);
+    registry.unregisterItem(NotebookCommands.RedoCellAction.id);
     // Libro's internal cannot judge kernel status correctly due to customized `SecretNoteModel`
     // making the RunSelect buttons always disabled. So we replace them with our own buttons and logics.
     // (see `libro-jupyter/src/toolbar/run-selector.tsx` and `libro-core/src/toolbar/libro-toolbar.tsx`)

@@ -39,7 +39,7 @@ export const SideToolbarRunItem = () => {
       <Tooltip
         overlayClassName="libro-tooltip-placement-right"
         placement="right"
-        title={l10n.t('Kernel 准备中，无法执行')}
+        title={l10n.t('Kernel 忙或不存在，无法执行')}
       >
         <PlayCircle size={16} color="#bfbfbf" />
       </Tooltip>
