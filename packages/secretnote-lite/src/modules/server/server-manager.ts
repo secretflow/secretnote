@@ -47,8 +47,13 @@ export class SecretNoteServerManager {
     this.defaultServerManager = defaultServerManager;
     this.updateServerConnectionSettings();
     this.getResourcesAndVersions();
-    this.getServerList().then(() => {
-      this.defaultServerManager.launch();
+    this.getServerList().then((servers) => {
+      // the default ServerManager must be launched to get LSP to work
+      // if there exists servers at the beginning, just launch directly
+      // otherwise we postpone the launch until a server is added
+      servers?.length &&
+        !this.defaultServerManager.loaded &&
+        this.defaultServerManager.launch();
     });
   }
 
@@ -117,6 +122,8 @@ export class SecretNoteServerManager {
     this.servers.push(data);
     this.updateServerConnectionSettings();
     this.onServerAddedEmitter.fire(data);
+    // launch the defaultServerManager if not yet
+    !this.defaultServerManager.loaded && this.defaultServerManager.launch();
     return data;
   }
 
