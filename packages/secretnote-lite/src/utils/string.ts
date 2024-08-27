@@ -1,3 +1,4 @@
+import Markdown from 'markdown-it';
 /**
  * Generate a random UUID.
  */
@@ -23,3 +24,37 @@ export const compareDateString = (a: string, b: string) => {
 
   return aDate > bDate ? 1 : aDate < bDate ? -1 : 0;
 };
+
+/**
+ * Convert a markdown string to HTML.
+ */
+export function mdToHTML(
+  mdstr: string,
+  options?: { openInNewTab?: boolean; ignoreDivider?: boolean },
+) {
+  const md = Markdown();
+
+  if (options?.openInNewTab) {
+    const defaultRender =
+      md.renderer.rules.link_open ||
+      function (tokens, idx, options, env, self) {
+        return self.renderToken(tokens, idx, options);
+      };
+    // let the user open links in a new tab
+    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+      tokens[idx].attrSet('target', '_blank');
+      return defaultRender(tokens, idx, options, env, self);
+    };
+  }
+
+  return md.render(mdstr);
+}
+
+/**
+ * Convert a markdown string to HTML segments separated by '---'.
+ */
+export function mdToHTMLSegments(mdstr: string) {
+  const parts = mdstr.split('---');
+
+  return parts.map((v) => mdToHTML(v, { openInNewTab: true }));
+}
