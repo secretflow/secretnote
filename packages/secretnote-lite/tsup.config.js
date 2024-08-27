@@ -41,6 +41,7 @@ module.exports = defineConfig((overrides) => ({
   dts: true,
   loader: {
     '.less': 'copy',
+    '.md': 'text',
   },
   esbuildPlugins: [svgr()],
   onSuccess: () => {
