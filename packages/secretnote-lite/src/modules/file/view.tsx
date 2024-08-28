@@ -171,9 +171,19 @@ export const FileComponent = () => {
           {getFileIcon(nodeData)}
           <span>{nodeData.title as string}</span>
         </Space>
-        {/* TODO */}
         <DropdownMenu
-          icon={isUploading ? <Spin size="small" /> : void 0} // undefined fallbacks to default "..." icon
+          icon={
+            isUploading ? (
+              <>
+                <Space direction="horizontal" size="small">
+                  <Spin size="small" />
+                  {l10n.t('正忙...')}
+                </Space>
+              </>
+            ) : (
+              void 0
+            )
+          } // undefined fallbacks to default "..." icon
           items={isLeaf ? dataMenuItems : folderMenuItems}
           disabled={isUploading}
           onClick={(key) => {

@@ -48,9 +48,9 @@ export class SecretNoteServerManager {
     this.updateServerConnectionSettings();
     this.getResourcesAndVersions();
     this.getServerList().then((servers) => {
-      // the default ServerManager must be launched to get LSP to work
-      // if there exists servers at the beginning, just launch directly
-      // otherwise we postpone the launch until a server is added
+      // The default ServerManager must be launched to get LSP to work.
+      // If there exists servers at the beginning, just launch directly.
+      // Otherwise postpone the launch until a server is added.
       servers?.length &&
         !this.defaultServerManager.loaded &&
         this.defaultServerManager.launch();
@@ -215,7 +215,7 @@ export class SecretNoteServerManager {
    */
   private async getServerSpec(
     server: IServer,
-    retry = 6,
+    retry = 10,
   ): Promise<ISpecModels | undefined> {
     if (
       [ServerStatus.Terminated, ServerStatus.Failed, ServerStatus.Unknown].includes(

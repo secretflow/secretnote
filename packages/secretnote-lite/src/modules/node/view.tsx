@@ -160,12 +160,12 @@ export const NodeComponent = () => {
     setAddLoading(true);
     // Simulate the progress of adding a node
     const interval = setInterval(
-      () => setAddProgress((prev) => (prev >= 95 ? prev : prev + 5)),
-      1000, // ~20s in total
+      () =>
+        setAddProgress((prev) => (prev >= 95 ? prev : Math.min(prev + 3, 95))),
+      1000, // ~30s in total
     );
     try {
       const server = await service.addNode(values);
-      setAddProgress(100);
       if (server.status === ServerStatus.Succeeded) {
         message.success(l10n.t('节点添加成功'));
       } else {
@@ -173,15 +173,16 @@ export const NodeComponent = () => {
           l10n.t('节点添加成功，但处于离线状态，请刷新页面或联系管理员'),
         );
       }
+      setAddProgress(100);
       await wait(1000);
     } catch (e) {
       genericErrorHandler(e);
     } finally {
-      setAddFormVisible(false);
-      form.resetFields();
       setAddLoading(false);
       clearInterval(interval);
+      form.resetFields();
       setAddProgress(0);
+      setAddFormVisible(false);
     }
   };
 

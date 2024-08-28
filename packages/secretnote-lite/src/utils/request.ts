@@ -49,7 +49,7 @@ export const createResponseError = async (response: Response) => {
     const data = await response.json();
     return new ResponseError(response, data?.message);
   } catch (e) {
-    genericErrorHandler(e);
+    genericErrorHandler(e, { silent: true });
     return new ResponseError(response);
   }
 };

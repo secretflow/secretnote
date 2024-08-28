@@ -23,10 +23,10 @@ const FILE_EXT = '.ipynb'; // the default extname of notebook files
  */
 const drived = (path: string, driveName = DriveName) => `${driveName}:${path}`;
 /**
- * Remove the drive name from the path if any.
+ * Remove the drive name and leading slash from the path if any.
  */
 const undrived = (path: string, driveName = DriveName) =>
-  path.replace(new RegExp(`^${driveName}:`), '');
+  path.replace(new RegExp(`^${driveName}:/?`), '');
 
 @singleton()
 export class NotebookFileService {
@@ -93,7 +93,7 @@ export class NotebookFileService {
       .filter(({ name }) => name.endsWith(FILE_EXT))
       .map((v) => ({
         ...v,
-        path: undrived(v.path), // do not let the upstream see the drive
+        path: undrived(v.path), // do not let the downstream see the drive
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -150,6 +150,7 @@ export class NotebookFileService {
             drived(path),
             drived(newPath),
           );
+          newFile.path = undrived(newFile.path); // do not let the downstream see the drive
           await this.getFileList();
           // replace the current file if it's the one being renamed
           if (this.currentNotebookFile?.path === path) {
@@ -169,13 +170,10 @@ export class NotebookFileService {
       path: drived(USER_ROOT_DIR), // no nested directory is allowed currently
       type: 'notebook',
     });
+    file.path = undrived(file.path); // do not let the upstream see the drive
     // update the file list and open the new file
     await this.getFileList();
     this.openFile(file);
-    this.pendingRename = {
-      path: file.path,
-      name: file.name,
-    };
   }
 
   /**
@@ -213,6 +211,7 @@ export class NotebookFileService {
       drived(file.path),
       drived(USER_ROOT_DIR),
     );
+    newFile.path = undrived(newFile.path); // do not let the downstream see the drive
     await this.getFileList();
     this.openFile(newFile);
   }

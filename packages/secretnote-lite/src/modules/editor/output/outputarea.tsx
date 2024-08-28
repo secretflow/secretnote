@@ -86,7 +86,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
         else if (isExecuteReplyMsg(msg)) {
           const content = msg.content;
           if (content.status !== 'ok') {
-            return;
+            return; // TODO just ignore?
           }
           const payload = content && content.payload;
           if (!payload || !payload.length) {
@@ -125,8 +125,8 @@ export class SecretNoteOutputArea extends LibroOutputArea {
       isStream(preOutput) &&
       output.name === preOutput.name
     ) {
-      // merge two continuous stream outputs
-      // hanlde backspace and carriage-return, concat the text
+      // merge two continuous outputs to the same stream
+      // handle backspace and carriage-return, concat the text
       output.text = removeOverwrittenChars(
         preOutput.text + normalize(output.text),
       );
@@ -135,7 +135,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
       this.flushOutputs();
       return;
     } else if (isStream(output)) {
-      // handle first stream output
+      // handle the first stream output
       output.text = removeOverwrittenChars(normalize(output.text));
     }
     // no extra logics for other types of outputs
@@ -171,6 +171,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   makeLeadingOutput(kernel: IKernelConnection) {
     const server = this.kernelManager.getServerByKernelConnection(kernel);
     const name = server?.name || kernel.clientId;
+
     const output: IDisplayData = {
       output_type: 'display_data',
       data: {
