@@ -19,8 +19,6 @@ c.ServerApp.token = ""
 
 c.ServerApp.root_dir = "../../.secretnote"
 
-c.ServerApp.port = 8889
-
 c.LanguageServerManager.autodetect = False
 
 c.LanguageServerManager.language_servers = {
@@ -42,7 +40,7 @@ c.LanguageServerManager.language_servers = {
         # if installed as a binary
         "argv": [
             "node",
-            "../node_modules/@difizen/libro-analyzer/index.js",
+            "node_modules/@difizen/libro-analyzer/index.js",
             "--stdio",
         ],
         "languages": ["python"],
