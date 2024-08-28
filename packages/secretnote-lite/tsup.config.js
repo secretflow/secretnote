@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-const { copyFileSync } = require('fs');
+const { writeFileSync } = require('fs');
 const { yellow } = require('colorette');
 const svgr = require('esbuild-plugin-svgr');
 const { defineConfig } = require('tsup');
@@ -33,16 +33,22 @@ const emitDeclarations = (outDir) =>
     proc.on('error', reject);
   });
 
+const dtsIndex = `declare const App: () => JSX.Element;
+export { App as default };`;
+
 module.exports = defineConfig((overrides) => ({
   outDir: 'dist',
   format: ['esm'], //, 'cjs'],
   outExtension: () => ({ js: `.js` }),
   sourcemap: true,
-  dts: true,
+  dts: false,
   loader: {
     '.less': 'copy',
     '.md': 'text',
   },
   esbuildPlugins: [svgr()],
+  onSuccess() {
+    writeFileSync('./dist/index.d.ts', dtsIndex);
+  },
   clean: overrides.clean || !overrides.watch,
 }));
