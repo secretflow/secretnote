@@ -28,13 +28,8 @@ export const WelcomeComponent = () => {
     zIndex: 2000,
     spread: 500,
     predicate: () => {
-      if (
-        instance.currentStep > contentMarkdowns.length - 1 &&
-        !instance.finished
-      ) {
-        return new Promise((resolve) =>
-          setTimeout(() => resolve('confetti'), 100),
-        );
+      if (instance.currentStep > contentMarkdowns.length - 1 && !instance.finished) {
+        return new Promise((resolve) => setTimeout(() => resolve('confetti'), 100));
       }
       return Promise.resolve(undefined);
     },

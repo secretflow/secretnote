@@ -40,12 +40,7 @@ const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const { partyList, parties } = instance;
 
   return (
-    <div
-      className={instance.className}
-      ref={ref}
-      tabIndex={10}
-      onBlur={instance.blur}
-    >
+    <div className={instance.className} ref={ref} tabIndex={10} onBlur={instance.blur}>
       <Ribbon
         items={partyList.map((name) => ({ label: name, key: name }))}
         value={parties}
@@ -119,9 +114,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     const cellModel = this.model;
     const kernels = this.getUsableKernels();
     if (kernels.length === 0) {
-      message.info(
-        l10n.t('无可用的 Kernel 连接，请检查是否存在并选中可用节点'),
-      );
+      message.info(l10n.t('无可用的 Kernel 连接，请检查是否存在并选中可用节点'));
       return false;
     }
 
@@ -201,14 +194,10 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
    * `executing` means the application is executing the cell.
    * `kernelExecuting` means some kernel is executing the cell.
    */
-  updateExecutionStatus(status: {
-    executing?: boolean;
-    kernelExecuting?: boolean;
-  }) {
+  updateExecutionStatus(status: { executing?: boolean; kernelExecuting?: boolean }) {
     const { executing, kernelExecuting } = status;
     !isUndefined(executing) && (this.model.executing = executing);
-    !isUndefined(kernelExecuting) &&
-      (this.model.kernelExecuting = kernelExecuting);
+    !isUndefined(kernelExecuting) && (this.model.kernelExecuting = kernelExecuting);
   }
 
   /**
@@ -217,11 +206,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
    * `start` is the time when the kernel starts to execute the code.
    * `end` is the time when the kernel finishes the execution.
    */
-  updateExecutionTime(times: {
-    toExecute?: string;
-    start?: string;
-    end?: string;
-  }) {
+  updateExecutionTime(times: { toExecute?: string; start?: string; end?: string }) {
     const meta = this.model.metadata.execution as ExecutionMeta;
     if (meta) {
       const { start, end, toExecute } = times;

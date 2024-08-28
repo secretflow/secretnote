@@ -16,9 +16,7 @@ function Ribbon(props: RibbonProps) {
   const { items, value, onChange } = props;
 
   const handleChange = (tag: string, checked: boolean) => {
-    const nextSelectedTags = checked
-      ? [...value, tag]
-      : value.filter((t) => t !== tag);
+    const nextSelectedTags = checked ? [...value, tag] : value.filter((t) => t !== tag);
     if (onChange) {
       onChange(nextSelectedTags);
     }
@@ -42,9 +40,7 @@ function Ribbon(props: RibbonProps) {
           overlayClassName="secretnote-ribbon-popover"
           content={
             <>
-              <div className="title">
-                {l10n.t('下面是将要执行该代码的节点列表')}:
-              </div>
+              <div className="title">{l10n.t('下面是将要执行该代码的节点列表')}:</div>
               <Space size={[0, 8]} wrap>
                 {items.map((item) => (
                   <CheckableTag

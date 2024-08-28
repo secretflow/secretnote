@@ -72,11 +72,7 @@ export const TopToolbarRunItem = () => {
         trigger="hover"
         overlayClassName="libro-tooltip-placement-right"
       >
-        <PlayCircle
-          size={18}
-          color="#bfbfbf"
-          className="libro-top-toolbar-run-icon"
-        />
+        <PlayCircle size={18} color="#bfbfbf" className="libro-top-toolbar-run-icon" />
       </Tooltip>
     );
   }

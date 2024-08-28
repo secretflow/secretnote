@@ -55,13 +55,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
     // this event is fired inside `cell/view.tsx`
     // about messaging, see https://jupyter-client.readthedocs.io/en/latest/messaging.html
     cellModel.msgChangeEmitter.event(
-      ({
-        kernel,
-        msg,
-      }: {
-        kernel: IKernelConnection;
-        msg: KernelMessage.IMessage;
-      }) => {
+      ({ kernel, msg }: { kernel: IKernelConnection; msg: KernelMessage.IMessage }) => {
         // ignore heartbeat messages
         if (msg.header.msg_type === 'status') {
           return;
@@ -120,16 +114,10 @@ export class SecretNoteOutputArea extends LibroOutputArea {
 
     const lastIndex = outputs.length - 1;
     const preOutput = outputs[lastIndex];
-    if (
-      isStream(output) &&
-      isStream(preOutput) &&
-      output.name === preOutput.name
-    ) {
+    if (isStream(output) && isStream(preOutput) && output.name === preOutput.name) {
       // merge two continuous outputs to the same stream
       // handle backspace and carriage-return, concat the text
-      output.text = removeOverwrittenChars(
-        preOutput.text + normalize(output.text),
-      );
+      output.text = removeOverwrittenChars(preOutput.text + normalize(output.text));
       // just replace the previous output, don't push new
       outputs[lastIndex] = output;
       this.flushOutputs();

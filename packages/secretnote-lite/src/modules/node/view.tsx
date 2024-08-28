@@ -93,9 +93,7 @@ const NodeDetails = (props: { node: SecretNoteNode }) => {
     <div className="secretnote-node-description">
       <Spin spinning={loading}>
         <Descriptions title={l10n.t('节点信息')} column={1}>
-          <Descriptions.Item label={l10n.t('名称')}>
-            {node.name}
-          </Descriptions.Item>
+          <Descriptions.Item label={l10n.t('名称')}>{node.name}</Descriptions.Item>
           <Descriptions.Item label={l10n.t('状态')}>
             <Badge status={status} text={text} />
           </Descriptions.Item>
@@ -160,8 +158,7 @@ export const NodeComponent = () => {
     setAddLoading(true);
     // Simulate the progress of adding a node
     const interval = setInterval(
-      () =>
-        setAddProgress((prev) => (prev >= 95 ? prev : Math.min(prev + 3, 95))),
+      () => setAddProgress((prev) => (prev >= 95 ? prev : Math.min(prev + 3, 95))),
       1000, // ~30s in total
     );
     try {
@@ -169,9 +166,7 @@ export const NodeComponent = () => {
       if (server.status === ServerStatus.Succeeded) {
         message.success(l10n.t('节点添加成功'));
       } else {
-        message.info(
-          l10n.t('节点添加成功，但处于离线状态，请刷新页面或联系管理员'),
-        );
+        message.info(l10n.t('节点添加成功，但处于离线状态，请刷新页面或联系管理员'));
       }
       setAddProgress(100);
       await wait(1000);
@@ -224,10 +219,7 @@ export const NodeComponent = () => {
             <Progress percent={addProgress} size="small" />
           </Form.Item>
         )}
-        <Form.Item
-          wrapperCol={{ offset: 4, span: 20 }}
-          style={{ marginBottom: 0 }}
-        >
+        <Form.Item wrapperCol={{ offset: 4, span: 20 }} style={{ marginBottom: 0 }}>
           <Button
             type="primary"
             htmlType="submit"

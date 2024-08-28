@@ -44,8 +44,5 @@ module.exports = defineConfig((overrides) => ({
     '.md': 'text',
   },
   esbuildPlugins: [svgr()],
-  onSuccess: () => {
-    copyFileSync('./package.json', './dist/package.json');
-  },
   clean: overrides.clean || !overrides.watch,
 }));
