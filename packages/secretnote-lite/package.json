@@ -24,8 +24,7 @@
   },
   "dependencies": {
     "@antv/s2": "^1.52.0",
-    "@difizen/libro-jupyter": "^0.2.18",
-    "@difizen/libro-kernel": "^0.2.20",
+    "@difizen/libro-jupyter": "^0.2.20",
     "@difizen/libro-language-client": "^0.2.20",
     "@difizen/mana-app": "^0.1.19",
     "@difizen/mana-common": "^0.1.19",

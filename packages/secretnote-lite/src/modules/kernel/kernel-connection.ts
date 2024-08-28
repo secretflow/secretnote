@@ -1,5 +1,5 @@
 // In SecretFlow, many APIs spawn new processes or new threads, which means some subsequent
-// cell's outputs might internally belongs to previous cells even if previous cells are settled
+// cell's outputs might internally belong to previous cells even if previous cells are settled
 // already after `execute_reply` message and `idle` status. (To reproduce, catch some WebSocket
 // messages when a cell makes SecretFlow error, observe their `parent_header`'s `msg_id`
 // and you'll know the issue.) This leads to some unwanted behaviors.

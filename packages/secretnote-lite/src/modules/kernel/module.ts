@@ -3,7 +3,7 @@ import { ManaModule } from '@difizen/mana-app';
 import {
   KernelConnectionOptions,
   LibroKernelConnectionFactory,
-} from '@difizen/libro-kernel';
+} from '@difizen/libro-jupyter';
 import { SecretNoteKernelConnection } from './kernel-connection';
 import { SecretNoteKernelManager } from './kernel-manager';
 

@@ -9,9 +9,12 @@ import {
   getRemoteBaseUrl,
   requestNoUnpack,
 } from '@/utils';
-import type { ServerConnection } from '@difizen/libro-jupyter';
-import type { IContentsChangedArgs, IContentsDrive } from '@difizen/libro-kernel';
-import { Drive as DefaultDrive } from '@difizen/libro-kernel';
+import type {
+  IContentsChangedArgs,
+  IContentsDrive,
+  ServerConnection,
+} from '@difizen/libro-jupyter';
+import { Drive as DefaultDrive } from '@difizen/libro-jupyter';
 import { Emitter, singleton } from '@difizen/mana-app';
 
 /**
