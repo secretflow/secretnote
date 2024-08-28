@@ -14,13 +14,13 @@ import { useConfetti } from '@/components/confetti';
 import { mdToHTMLSegments } from '@/utils';
 
 import './index.less';
-import StepsMarkdown from './steps.md';
+import WelcomeMarkdown from './welcome.md';
 
 export const WelcomeComponent = () => {
   const instance = useInject<WelcomeView>(ViewInstance);
 
   // Parse markdown content.
-  const _markdowns = mdToHTMLSegments(StepsMarkdown as unknown as string);
+  const _markdowns = mdToHTMLSegments(WelcomeMarkdown as unknown as string);
   const titleMarkdown = _markdowns[0];
   const contentMarkdowns = _markdowns.slice(1);
 
