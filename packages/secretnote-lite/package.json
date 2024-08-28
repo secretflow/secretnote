@@ -1,15 +1,13 @@
 {
   "name": "@alipay/secretnote-lite",
-  "version": "0.0.35",
+  "version": "0.0.38",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
   "bugs": "https://github.com/secretflow/secretnote/issues",
   "files": [
-    "*.less",
-    "*.js",
-    "*.d.ts",
-    "*.js.map"
+    "dist",
+    "src"
   ],
   "main": "index.js",
   "module": "index.js",
