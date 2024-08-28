@@ -1,3 +1,4 @@
+import { l10n } from '@difizen/mana-l10n';
 import { InputRule } from '@tiptap/core';
 import { Color } from '@tiptap/extension-color';
 import { Highlight } from '@tiptap/extension-highlight';
@@ -9,9 +10,7 @@ import { TaskList } from '@tiptap/extension-task-list';
 import { TextStyle } from '@tiptap/extension-text-style';
 import TiptapUnderline from '@tiptap/extension-underline';
 import { StarterKit } from '@tiptap/starter-kit';
-import React from 'react';
 import { Markdown } from 'tiptap-markdown';
-
 import SlashCommand from './slash-command';
 
 export const defaultExtensions = [
@@ -88,9 +87,9 @@ export const defaultExtensions = [
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === 'heading') {
-        return `Heading ${node.attrs.level}`;
+        return `标题 ${node.attrs.level}`;
       }
-      return "Press '/' for commands";
+      return l10n.t('键入 / 查看更多命令');
     },
     includeChildren: true,
   }),

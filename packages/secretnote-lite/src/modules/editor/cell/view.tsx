@@ -137,9 +137,12 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
 
       // dispatch the code to all usable kernels
       kernels.forEach((kernel) => {
-        const future = kernel.requestExecute({
-          code: cellModel.value,
-        });
+        const future = kernel.requestExecute(
+          {
+            code: cellModel.value,
+          },
+          /* disposeOnDone */ true,
+        );
         // handle IOPub messages
         future.onIOPub = (
           msg: KernelMessage.IIOPubMessage<KernelMessage.IOPubMessageType>,

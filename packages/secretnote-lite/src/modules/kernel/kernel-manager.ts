@@ -32,8 +32,8 @@ interface StoredSessionInfo {
 
 @singleton()
 export class SecretNoteKernelManager {
-  private fileToKernelConnections = new Map<string, IKernelConnection[]>();
-  private kernelConnectionToServer = new Map<string, string>();
+  private fileToKernelConnections = new Map<string, IKernelConnection[]>(); // File's stored key -> Kernel connections
+  private kernelConnectionToServer = new Map<string, string>(); // Kernel id -> Server id
 
   protected sessionRestAPI: SessionRestAPI;
   protected kernelRestAPI: KernelRestAPI;
@@ -65,6 +65,7 @@ export class SecretNoteKernelManager {
       (s) => s.status === ServerStatus.Succeeded,
     );
     const kernelConnections: IKernelConnection[] = [];
+    // get stored sessions
     const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
       this.storedKey(fileInfo),
       [],
@@ -103,6 +104,9 @@ export class SecretNoteKernelManager {
     return kernelConnections;
   }
 
+  /**
+   * Add a kernel connection on a server for a file.
+   */
   async addKernelConnectionOnServer(fileInfo: IContentsModel, server: IServer) {
     const connection = await this.createKernelConnection(fileInfo, server);
     if (connection) {
@@ -115,6 +119,9 @@ export class SecretNoteKernelManager {
     }
   }
 
+  /**
+   * Delete a kernel connection on a server for a file.
+   */
   async deleteKernelConnectionOnServer(fileInfo: IContentsModel, server: IServer) {
     const storedSessions = await this.storageService.getData<StoredSessionInfo[]>(
       this.storedKey(fileInfo),
@@ -145,6 +152,9 @@ export class SecretNoteKernelManager {
     }
   }
 
+  /**
+   * Shutdown all kernel connections for a file.
+   */
   async shutdownKernelConnections(fileInfo: IContentsModel) {
     const kernelConnections = this.fileToKernelConnections.get(
       this.storedKey(fileInfo),
@@ -251,6 +261,9 @@ export class SecretNoteKernelManager {
     return `secretnote_${fileInfo.path}_${fileInfo.name}`;
   }
 
+  /**
+   * Append a stored session for a file.
+   */
   protected async addStoredSession(fileInfo: IContentsModel, info: StoredSessionInfo) {
     let sessions = await this.storageService.getData<StoredSessionInfo[]>(
       this.storedKey(fileInfo),
@@ -277,6 +290,9 @@ export class SecretNoteKernelManager {
     await this.storageService.setData(this.storedKey(fileInfo), sessions);
   }
 
+  /**
+   * Clear all stored sessions for a file.
+   */
   protected async clearStoredSessions(fileInfo: IContentsModel) {
     await this.storageService.setData(this.storedKey(fileInfo), undefined);
   }
