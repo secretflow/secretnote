@@ -1,10 +1,14 @@
-export function randomHex() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i += 1) {
-    color += letters[Math.floor(Math.random() * 16)];
+/**
+ * Hash an ascii string to a hex color.
+ */
+export function randomColorByName(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + hash * 7; // 7 is a prime number randomly picked
   }
-  return color;
+  const c = (hash & 0x00ffffff).toString(16).padStart(6, '0');
+
+  return `#${c}`;
 }
 
 export function hex2rgb(hex: string): [number, number, number] {
@@ -25,6 +29,9 @@ export function hex2rgb(hex: string): [number, number, number] {
   return [bgr[2], bgr[1], bgr[0]];
 }
 
+/**
+ * Determine a suitable text color (black or white) for a given background color.
+ */
 export function invert(hex: string): string {
   const [r, g, b] = hex2rgb(hex);
   return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? '#000000' : '#ffffff';

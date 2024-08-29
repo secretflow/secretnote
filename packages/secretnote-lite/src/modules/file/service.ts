@@ -3,7 +3,11 @@ import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
-import { downloadFileByUrl as download, getRemoteBaseUrl } from '@/utils';
+import {
+  downloadFileByURL as download,
+  genericErrorHandler,
+  getRemoteBaseUrl,
+} from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
@@ -14,8 +18,7 @@ export class FileService {
   protected readonly contentsManager: ContentsManager;
   protected readonly serverManager: SecretNoteServerManager;
 
-  @prop()
-  fileTree: DataNode[] = [];
+  @prop() fileTree: DataNode[] = [];
 
   constructor(
     @inject(ContentsManager) contentsManager: ContentsManager,
@@ -30,9 +33,13 @@ export class FileService {
   }
 
   async getFileTree() {
-    const servers = (await this.serverManager.getServerList()).filter(
-      (s) => s.status === ServerStatus.Succeeded,
-    );
+    const maybeServerList = await this.serverManager.getServerList();
+    if (!maybeServerList) {
+      genericErrorHandler('Failed to get server list');
+      return;
+    }
+
+    const servers = maybeServerList.filter((s) => s.status === ServerStatus.Succeeded);
     const fileTree: DataNode[] = [];
 
     for (const server of servers) {
@@ -64,8 +71,7 @@ export class FileService {
         serverNode.children = sortedFileNodeList;
         fileTree.push(serverNode);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log(err);
+        genericErrorHandler(err);
       }
     }
 

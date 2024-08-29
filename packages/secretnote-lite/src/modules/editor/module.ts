@@ -20,6 +20,7 @@ export const EditorModule = ManaModule.create()
     SecretNoteContentContribution,
     SecretNoteOutputArea,
     JupyterWorkspaceService,
+    // Local customization
     { token: LibroModel, useClass: SecretNoteModel },
     { token: LibroCodeCellModel, useClass: SecretNoteCodeCellModel },
     { token: LibroCodeCellView, useClass: SecretNoteCodeCellView },

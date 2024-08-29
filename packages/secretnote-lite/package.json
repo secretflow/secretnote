@@ -1,6 +1,6 @@
 {
   "name": "@alipay/secretnote-lite",
-  "version": "0.0.34",
+  "version": "0.0.42",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
@@ -9,12 +9,12 @@
     "dist",
     "src"
   ],
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/typing/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "setup": "tsup src/index.tsx",
-    "build": "tsup src/index.tsx",
+    "build": "tsup src/index.tsx --inject ./react-shim.js",
     "dev": "tsup src/index.tsx --watch",
     "lint:eslint": "eslint src",
     "lint:stylelint": "stylelint 'src/**/*.{css,less}'",
@@ -22,12 +22,14 @@
   },
   "dependencies": {
     "@antv/s2": "^1.52.0",
-    "@difizen/libro-jupyter": "^0.1.22",
-    "@difizen/mana-app": "^0.1.10",
-    "@difizen/mana-common": "^0.1.10",
-    "@difizen/mana-l10n": "^0.1.10",
-    "@difizen/mana-react": "^0.1.10",
+    "@difizen/libro-jupyter": "^0.2.20",
+    "@difizen/libro-language-client": "^0.2.20",
+    "@difizen/mana-app": "^0.1.19",
+    "@difizen/mana-common": "^0.1.19",
+    "@difizen/mana-l10n": "^0.1.19",
+    "@difizen/mana-react": "^0.1.19",
     "@kanaries/web-data-loader": "^0.1.7",
+    "@lumino/polling": "^2.1.3",
     "@tiptap/core": "^2.1.11",
     "@tiptap/extension-color": "^2.1.11",
     "@tiptap/extension-highlight": "^2.1.11",
@@ -43,11 +45,13 @@
     "@tiptap/starter-kit": "^2.1.11",
     "@tiptap/suggestion": "^2.1.11",
     "ahooks": "^3.7.8",
+    "canvas-confetti": "^1.9.0",
     "classnames": "^2.3.2",
     "d3-dsv": "^3.0.1",
     "highlight.js": "^11.9.0",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.284.0",
+    "markdown-it": "^14.1.0",
     "monaco-editor": "^0.45.0",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "styled-components": "^6.1.0",
@@ -57,8 +61,7 @@
     "xterm-addon-canvas": "^0.5.0",
     "xterm-addon-fit": "^0.8.0",
     "xterm-addon-search": "^0.13.0",
-    "xterm-addon-web-links": "^0.9.0",
-    "canvas-confetti": "^1.9.0"
+    "xterm-addon-web-links": "^0.9.0"
   },
   "peerDependencies": {
     "antd": "^5.10.1",
@@ -71,7 +74,9 @@
     "@types/react": "^18.2.28",
     "@types/react-dom": "^18.2.13",
     "colorette": "^2.0.19",
-    "esbuild-plugin-svgr": "^1.1.0"
+    "esbuild-plugin-svgr": "^1.1.0",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
   },
   "publishConfig": {
     "registry": "https://registry.antgroup-inc.cn"

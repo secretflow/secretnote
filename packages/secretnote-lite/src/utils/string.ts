@@ -1,3 +1,7 @@
+import Markdown from 'markdown-it';
+/**
+ * Generate a random UUID.
+ */
 export function uuid(): string {
   let res = '';
   const template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
@@ -11,23 +15,46 @@ export function uuid(): string {
   return res;
 }
 
-export const getSearchParams = (...key: string[]) => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const res: string[] = [];
-  key.forEach((k) => {
-    res.push(searchParams.get(k) || '');
-  });
-  return res;
+/**
+ * Compare two date strings and return 1 if a > b, -1 if a < b, 0 elsewise.
+ */
+export const compareDateString = (a: string, b: string) => {
+  const aDate = new Date(a),
+    bDate = new Date(b);
+
+  return aDate > bDate ? 1 : aDate < bDate ? -1 : 0;
 };
 
-export const compareDateString = (a: string, b: string) => {
-  const aDate = new Date(a);
-  const bDate = new Date(b);
-  if (aDate > bDate) {
-    return 1;
+/**
+ * Convert a markdown string to HTML.
+ */
+export function mdToHTML(
+  mdstr: string,
+  options?: { openInNewTab?: boolean; ignoreDivider?: boolean },
+) {
+  const md = Markdown();
+
+  if (options?.openInNewTab) {
+    const defaultRender =
+      md.renderer.rules.link_open ||
+      function (tokens, idx, options, env, self) {
+        return self.renderToken(tokens, idx, options);
+      };
+    // let the user open links in a new tab
+    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+      tokens[idx].attrSet('target', '_blank');
+      return defaultRender(tokens, idx, options, env, self);
+    };
   }
-  if (aDate < bDate) {
-    return -1;
-  }
-  return 0;
-};
+
+  return md.render(mdstr);
+}
+
+/**
+ * Convert a markdown string to HTML segments separated by '---'.
+ */
+export function mdToHTMLSegments(mdstr: string) {
+  const parts = mdstr.split('---');
+
+  return parts.map((v) => mdToHTML(v, { openInNewTab: true }));
+}

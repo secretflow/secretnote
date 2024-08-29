@@ -1,5 +1,5 @@
 const { spawn } = require('child_process');
-
+const { writeFileSync } = require('fs');
 const { yellow } = require('colorette');
 const svgr = require('esbuild-plugin-svgr');
 const { defineConfig } = require('tsup');
@@ -24,7 +24,7 @@ const emitDeclarations = (outDir) =>
         '--declarationDir',
         outDir,
       ],
-      { stdio: ['ignore', 'ignore', 'ignore'] },
+      { stdio: ['inherit', 'inherit', 'inherit'] },
     );
     proc.on('exit', () => {
       console.timeEnd(timer);
@@ -33,16 +33,22 @@ const emitDeclarations = (outDir) =>
     proc.on('error', reject);
   });
 
+const dtsIndex = `declare const App: () => JSX.Element;
+export { App as default };`;
+
 module.exports = defineConfig((overrides) => ({
   outDir: 'dist',
-  format: ['esm', 'cjs'],
-  outExtension: ({ format }) => ({ js: `.${format}.js` }),
+  format: ['esm'], //, 'cjs'],
+  outExtension: () => ({ js: `.js` }),
   sourcemap: true,
   dts: false,
   loader: {
     '.less': 'copy',
+    '.md': 'text',
   },
   esbuildPlugins: [svgr()],
-  onSuccess: () => emitDeclarations('./dist/typing'),
+  onSuccess() {
+    writeFileSync('./dist/index.d.ts', dtsIndex);
+  },
   clean: overrides.clean || !overrides.watch,
 }));

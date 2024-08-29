@@ -1,11 +1,10 @@
 import { singleton } from '@difizen/mana-app';
 import hljs from 'highlight.js';
 import { useEffect } from 'react';
-import React from 'react';
 import styled from 'styled-components';
 
-import { FilePreviewContribution } from './protocol';
 import 'highlight.js/styles/xcode.css'; // 选择主题 https://highlightjs.org/demo
+import { FilePreviewContribution } from '../protocol';
 
 const CodeWrapper = styled.pre`
   width: 100%;

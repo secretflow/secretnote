@@ -1,3 +1,5 @@
+// The very main editor area.
+
 import type { NotebookView } from '@difizen/libro-jupyter';
 import { LibroService } from '@difizen/libro-jupyter';
 import {
@@ -8,12 +10,12 @@ import {
   useInject,
   view,
   ViewInstance,
-  ViewRender,
   ViewManager,
+  ViewRender,
 } from '@difizen/mana-app';
 import { useEffect, useState } from 'react';
-import React from 'react';
 
+import { genericErrorHandler } from '@/utils';
 import { NotebookFileService } from './service';
 
 export enum EditorArea {
@@ -41,12 +43,11 @@ export const EditorComponent = () => {
           setLibroView(v);
           return;
         })
-        .catch((e) => {
-          console.error('getOrCreateView fail', e);
-        });
+        .catch(genericErrorHandler);
     }
   }, [currentNotebookFile, instance]);
 
+  // If there is no notebook file opened, show the welcome view.
   if (!currentNotebookFile || !libroView || !libroView.view) {
     return <Slot name={EditorArea.welcome} />;
   }

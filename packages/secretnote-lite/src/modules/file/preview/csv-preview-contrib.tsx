@@ -1,10 +1,10 @@
 import { TableSheet } from '@antv/s2';
 import { singleton } from '@difizen/mana-app';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { parseCSV } from '@/utils';
 
-import { FilePreviewContribution } from './protocol';
+import { FilePreviewContribution } from '../protocol';
 
 const TableView = (props: { data: string }) => {
   const ref = useRef<HTMLDivElement>(null);

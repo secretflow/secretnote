@@ -1,14 +1,16 @@
+// This is the customized view for a single cell (editable area).
+
 import type {
+  CellViewOptions,
   ExecutionMeta,
   KernelMessage,
-  CellViewOptions,
 } from '@difizen/libro-jupyter';
 import {
   CellEditorMemo,
   CellService,
+  CodeEditorManager,
   JupyterCodeCellView,
   KernelError,
-  CodeEditorManager,
 } from '@difizen/libro-jupyter';
 import {
   getOrigin,
@@ -24,7 +26,7 @@ import {
 import { l10n } from '@difizen/mana-l10n';
 import { message } from 'antd';
 import { isUndefined } from 'lodash-es';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 import { Ribbon } from '@/components/ribbon';
 import { SecretNoteKernelManager } from '@/modules/kernel';
@@ -42,9 +44,7 @@ const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
       <Ribbon
         items={partyList.map((name) => ({ label: name, key: name }))}
         value={parties}
-        onChange={(val) => {
-          instance.onPartiesChange(val);
-        }}
+        onChange={(val) => instance.onPartiesChange(val)}
       >
         <CellEditorMemo />
       </Ribbon>
@@ -63,8 +63,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
 
   view = SecretNoteCodeCellComponent;
 
-  @prop()
-  parties: string[] = [];
+  @prop() parties: string[] = [];
 
   get partyList() {
     return this.serverManager.servers
@@ -86,16 +85,16 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     this.parties = this.getInitializedParties();
   }
 
-  getUsableConnections() {
+  /**
+   * Get usable kernel connections for the cell to execute.
+   */
+  getUsableKernels() {
     const libroModel = this.parent.model as unknown as SecretNoteModel;
-
     if (!libroModel) {
       return [];
     }
 
-    const kernelConnections = getOrigin(libroModel.kernelConnections);
-
-    return kernelConnections.filter((connection) => {
+    return getOrigin(libroModel.kernelConnections).filter((connection) => {
       if (connection.isDisposed) {
         return false;
       }
@@ -108,86 +107,106 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     });
   }
 
+  /**
+   * Execute a single cell.
+   */
   async run() {
     const cellModel = this.model;
-    const kernelConnections = this.getUsableConnections();
-
-    if (kernelConnections.length === 0) {
-      message.info(l10n.t('No available node to execute'));
+    const kernels = this.getUsableKernels();
+    if (kernels.length === 0) {
+      message.info(l10n.t('无可用的 Kernel 连接，请检查是否存在并选中可用节点'));
       return false;
     }
 
-    this.clearExecution();
-    this.updateExecutionStatus({ executing: true });
+    this.clearExecution(); // clear the previous execution output area
+    this.updateExecutionStatus({ executing: true }); // mark the cell as executing
     this.updateExecutionTime({
-      toExecute: new Date().toISOString(),
+      toExecute: new Date().toISOString(), // record the time when execution is fired
     });
-    this.savePartiesToMeta();
+    this.savePartiesToMeta(); // ensure the parties are saved to the cell metadata
 
     try {
-      const list: Promise<KernelMessage.IExecuteReplyMsg>[] = [];
-      for (let i = 0, len = kernelConnections.length; i < len; i += 1) {
-        const connection = kernelConnections[i];
-        const future = connection.requestExecute({
-          code: cellModel.value,
-        });
+      const futures: Promise<KernelMessage.IExecuteReplyMsg>[] = [];
 
+      // dispatch the code to all usable kernels
+      kernels.forEach((kernel) => {
+        const future = kernel.requestExecute(
+          {
+            code: cellModel.value,
+          },
+          /* disposeOnDone */ true,
+        );
+        // handle IOPub messages
         future.onIOPub = (
           msg: KernelMessage.IIOPubMessage<KernelMessage.IOPubMessageType>,
         ) => {
           if (msg.header.msg_type === 'execute_input') {
+            // the execution request is accpeted by the kernel and started to execute
             this.updateExecutionStatus({ kernelExecuting: true });
             this.updateExecutionTime({ start: msg.header.date });
           }
+          // This event will be handled inside `output/outputarea.tsx`
           cellModel.msgChangeEmitter.fire({
-            connection,
+            kernel,
             msg,
           });
         };
-
+        // handle Reply messages
         future.onReply = (msg: KernelMessage.IExecuteReplyMsg) => {
+          // This event will be handled inside `output/outputarea.tsx`
           cellModel.msgChangeEmitter.fire({
-            connection,
+            kernel,
             msg,
           });
         };
+        // store the done signal
+        futures.push(future.done);
+      });
 
-        list.push(future.done);
-      }
-
-      const futureDoneList = await Promise.all(list);
+      // wait for all kernels to finish the execution and update corresponding status
+      const presents = await Promise.all(futures);
       this.updateExecutionStatus({ executing: false, kernelExecuting: false });
-      this.updateExecutionTime(this.parseMessageTime(futureDoneList));
+      this.updateExecutionTime(this.parseMessagesTimeRange(presents));
 
-      const ok = futureDoneList.every((msg) => msg.content.status === 'ok');
-      if (ok) {
+      // check if all kernels finish the execution successfully
+      const notOks = presents.filter((msg) => msg.content.status !== 'ok');
+      if (notOks.length === 0) {
         return true;
       } else {
-        const error = futureDoneList.find((msg) => msg.content.status !== 'ok');
-        if (error) {
-          throw new KernelError(error.content);
+        // TODO: handle all the error messages
+        const errors = presents.filter((msg) => msg.content.status !== 'ok');
+        if (errors) {
+          throw new KernelError(errors[0].content);
         }
         return false;
       }
-    } catch (reason) {
-      if (reason instanceof Error && reason.message.startsWith('Canceled')) {
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith('Canceled')) {
         return false;
       }
-      throw reason;
+
+      throw e;
     }
   }
 
+  /**
+   * Update the execution status of the cell.
+   * `executing` means the application is executing the cell.
+   * `kernelExecuting` means some kernel is executing the cell.
+   */
   updateExecutionStatus(status: { executing?: boolean; kernelExecuting?: boolean }) {
     const { executing, kernelExecuting } = status;
-    if (!isUndefined(executing)) {
-      this.model.executing = executing;
-    }
-    if (!isUndefined(kernelExecuting)) {
-      this.model.kernelExecuting = kernelExecuting;
-    }
+    !isUndefined(executing) && (this.model.executing = executing);
+    !isUndefined(kernelExecuting) && (this.model.kernelExecuting = kernelExecuting);
   }
 
-  updateExecutionTime(times: { start?: string; end?: string; toExecute?: string }) {
+  /**
+   * Update the execution time of the cell.
+   * `toExecute` is the time when the execution request is sent to the kernel by the application.
+   * `start` is the time when the kernel starts to execute the code.
+   * `end` is the time when the kernel finishes the execution.
+   */
+  updateExecutionTime(times: { toExecute?: string; start?: string; end?: string }) {
     const meta = this.model.metadata.execution as ExecutionMeta;
     if (meta) {
       const { start, end, toExecute } = times;
@@ -203,9 +222,12 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     }
   }
 
-  parseMessageTime(msgs: KernelMessage.IExecuteReplyMsg[]) {
-    let start = '';
-    let end = '';
+  /**
+   * Parse the execution time from a section of Websocket messages.
+   */
+  parseMessagesTimeRange(msgs: KernelMessage.IExecuteReplyMsg[]) {
+    let start = '',
+      end = '';
     msgs.forEach((msg) => {
       const startTime = msg.metadata.started as string;
       const endTime = msg.header.date;
@@ -220,6 +242,9 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     return { start, end };
   }
 
+  /**
+   * Handle the change of parties user selected on the right-top corner of the cell.
+   */
   onPartiesChange(parties: string[]) {
     this.parties = parties;
     this.savePartiesToMeta(parties);
@@ -242,6 +267,9 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     return this.partyList;
   }
 
+  /**
+   * Save the parties user selected to the cell model metadata.
+   */
   savePartiesToMeta(parties: string[] = this.parties) {
     const execution = this.model.metadata.execution as ExecutionMeta;
     if (execution) {

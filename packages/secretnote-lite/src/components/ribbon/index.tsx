@@ -25,7 +25,7 @@ function Ribbon(props: RibbonProps) {
   const getLabel = (values: string[]) => {
     const filterItems = items.filter((item) => values.includes(item.key));
     if (filterItems.length === 0) {
-      return 'Select Nodes';
+      return l10n.t('选择执行节点...');
     }
     return filterItems.map((item) => item.label).join(',');
   };

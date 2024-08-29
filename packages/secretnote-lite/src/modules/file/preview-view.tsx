@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { Contribution } from '@difizen/mana-app';
 import {
   BaseView,
   contrib,
+  Contribution,
   inject,
   prop,
   singleton,
@@ -39,14 +39,12 @@ export class FilePreviewView extends BaseView {
   readonly fileService: FileService;
   readonly providers: Contribution.Provider<FilePreviewContribution>;
 
-  @prop()
-  data = '';
-
-  @prop()
-  type = '';
+  @prop() data = '';
+  @prop() type = '';
 
   constructor(
     @inject(FileService) fileService: FileService,
+    // @ts-ignore
     @contrib(FilePreviewContribution)
     providers: Contribution.Provider<FilePreviewContribution>,
   ) {

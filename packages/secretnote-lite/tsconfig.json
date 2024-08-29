@@ -6,7 +6,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "noEmit": true,
+    // "noEmit": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "sourceMap": true,
@@ -15,10 +15,10 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["src/*"]
     },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "importHelpers": false,
-  },
+    "importHelpers": false
+  }
 }

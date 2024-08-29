@@ -1,6 +1,6 @@
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
-import React from 'react';
+import { message } from 'antd';
 
 import { EditorModule } from '@/modules/editor';
 import { FileModule } from '@/modules/file';
@@ -12,6 +12,7 @@ import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
+import { MetricsModule } from './modules/metrics';
 import './override.less';
 
 const App = (): JSX.Element => {
@@ -25,6 +26,7 @@ const App = (): JSX.Element => {
         ThemeModule,
         StorageModule,
         EditorModule,
+        MetricsModule,
         NodeModule,
         NotebookModule,
         FileModule,
@@ -32,6 +34,12 @@ const App = (): JSX.Element => {
         ToolbarModule,
         WelcomeModule,
       ]}
+      onReady={() => {
+        // do some initialization
+        message.config({
+          maxCount: 1,
+        });
+      }}
     />
   );
 };

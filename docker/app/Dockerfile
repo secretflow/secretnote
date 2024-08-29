@@ -40,6 +40,7 @@ RUN npm config set registry https://registry.npmmirror.com
 RUN npm install @difizen/libro-analyzer
 
 COPY --from=build /dist /dist
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 
 WORKDIR /home/secretnote

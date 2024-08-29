@@ -1,20 +1,27 @@
 import { inject, singleton } from '@difizen/mana-app';
 
-import type { ServerStatus } from '@/modules/server';
+import type { IServer } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
-import { randomHex } from '@/utils';
 
-export interface Node {
-  id: string;
-  name: string;
-  color: string;
-  status: ServerStatus;
-  service?: string;
-  podIp?: string;
-}
+/**
+ * Definition of a remote Node serving as Jupyter Server.
+ * Except those fields that Jupyter Server should have, we also have some
+ * additional fields because it's running inside K8s cluster.
+ */
+export type SecretNoteNode = IServer & {
+  service?: string; // service name inside K8s cluster
+  podIp?: string; // pod ip address inside K8s cluster
+  // resources and versions of internals
+  resourcesAndVersions?: Partial<{
+    cpu: number;
+    memory: string;
+    image: string;
+    python: string;
+    secretflow: string;
+  }>;
+};
 
-export type ServerStatusTag = 'processing' | 'default' | 'error' | 'success';
-const NODE_COLOR = randomHex();
+export type NodeStatusTag = 'processing' | 'default' | 'error' | 'success';
 
 @singleton()
 export class NodeService {
@@ -24,41 +31,48 @@ export class NodeService {
     this.serverManager = serverManager;
   }
 
+  /**
+   * Get loading status of the server manager.
+   */
   get loading() {
     return this.serverManager.loading;
   }
 
-  get nodes() {
+  /**
+   * Get all remote nodes serving as Jupyter Server.
+   */
+  get nodes(): SecretNoteNode[] {
     return this.serverManager.servers.map((server) => ({
       ...server,
-      color: NODE_COLOR,
+      resourcesAndVersions: this.serverManager.resourcesAndVersions,
     }));
   }
 
+  /**
+   * Add a remote node serving as Jupyter Server to under management.
+   */
   async addNode({ name }: { name: string; address: string }) {
-    return await this.serverManager.addServer({
-      name: name.trim(),
-    });
+    return await this.serverManager.addServer(name);
   }
 
+  /**
+   * Delete a remote node serving as Jupyter Server.
+   */
   async deleteNode(id: string) {
     await this.serverManager.deleteServer(id);
   }
 
+  /**
+   * Start a remote node serving as Jupyter Server.
+   */
   async startNode(id: string) {
     await this.serverManager.startServer(id);
   }
 
+  /**
+   * Stop a remote node serving as Jupyter Server.
+   */
   async stopNode(id: string) {
     await this.serverManager.stopServer(id);
-  }
-
-  async updateNodeName(id: string, name: string) {
-    await this.serverManager.updateServer(id, { name });
-  }
-
-  protected checkName(name: string) {
-    const isValid = this.nodes.every((node) => node.name !== name);
-    return isValid;
   }
 }

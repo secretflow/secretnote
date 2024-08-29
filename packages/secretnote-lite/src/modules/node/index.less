@@ -5,6 +5,10 @@
   padding-right: 24px;
   float: right;
 
+  .title {
+    color: var(--mana-secretnote-text-color) !important;
+  }
+
   .ant-avatar-group .ant-badge:not(:first-child) {
     margin-left: -8px;
   }
@@ -29,8 +33,8 @@
 .secretnote-node-description {
   padding: 16px;
 
-  .ant-btn {
-    padding: 0;
+  .ant-descriptions-item {
+    padding-bottom: 8px !important;
   }
 
   .ant-typography {
@@ -43,8 +47,15 @@
 }
 
 .secretnote-add-node {
-  width: 400px;
+  width: 320px;
   padding: 16px;
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(45, 55, 72, 0.88);
+    margin-bottom: 20px;
+  }
 
   label {
     color: var(--mana-secretnote-text-color) !important;
