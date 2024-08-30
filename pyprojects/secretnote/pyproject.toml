@@ -28,7 +28,7 @@ dependencies = [
   "stack_data>=0.6.3",
   "tqdm>=4.66.1",
   "dataset>=1.6.2",
-  "ruff-lsp>=0.0.53",
+  # "ruff-lsp>=0.0.53",
   "python-lsp-server==1.8.2",
   # https://github.com/python/typing_extensions/issues/369#issuecomment-2051331676
   "typing_extensions>=4.6",
@@ -88,8 +88,8 @@ sources = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
-[tool.ruff]
-extend = "../../pyproject.toml"
+# [tool.ruff]
+# extend = "../../pyproject.toml"
 
-[tool.ruff.extend-per-file-ignores]
-"src/secretnote/proto/**/*" = ["E501", "I001"]
+# [tool.ruff.extend-per-file-ignores]
+# "src/secretnote/proto/**/*" = ["E501", "I001"]

@@ -34,11 +34,6 @@ FROM secretflow/secretflow-anolis8:1.6.1b0
 
 RUN useradd -m secretnote
 
-RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
-RUN yum install -y nodejs
-RUN npm config set registry https://registry.npmmirror.com
-RUN npm install @difizen/libro-analyzer
-
 COPY --from=build /dist /dist
 RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
@@ -46,6 +41,11 @@ RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 WORKDIR /home/secretnote
 
 COPY ./docker/app/root/ ./
+
+RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+RUN yum install -y nodejs
+RUN npm config set registry https://registry.npmmirror.com
+RUN npm install @difizen/libro-analyzer
 
 RUN mkdir workspace
 

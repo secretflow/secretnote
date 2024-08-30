@@ -20,16 +20,7 @@ c.ServerApp.root_dir = "/home/secretnote/workspace"
 c.LanguageServerManager.autodetect = False
 
 c.LanguageServerManager.language_servers = {
-    "ruff-lsp": {
-        # if installed as a binary
-        "argv": [
-            "ruff-lsp",
-        ],
-        "languages": ["python"],
-        "version": 2,
-        "mime_types": ["text/x-python"],
-        "display_name": "ruff-lsp",
-    },
+    # whole notebook LSP ability.
     "libro-analyzer": {
         # if installed as a binary
         "argv": [
@@ -43,3 +34,5 @@ c.LanguageServerManager.language_servers = {
         "display_name": "libro-analyzer",
     },
 }
+
+c.ResourceUseDisplay.track_cpu_percent = True
