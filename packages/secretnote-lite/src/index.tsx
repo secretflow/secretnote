@@ -18,7 +18,7 @@ import './override.less';
 const App = (): JSX.Element => {
   return (
     <ManaComponents.Application
-      key="secretnote-lite-app"
+      key="secretnote-lite"
       asChild={true}
       modules={[
         ManaAppPreset,

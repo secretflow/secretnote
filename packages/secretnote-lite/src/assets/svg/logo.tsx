@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react';
-import React from 'react';
 
 export const Logo = ({ style }: { style: CSSProperties }) => {
   return (

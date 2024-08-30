@@ -1,9 +1,0 @@
-{
-  "bin": "node",
-  "version": "v18.18.2",
-  "cwd": "***",
-  "resolved": {
-    "loremipsum/dolor.js": "lorem/dolor.js"
-  },
-  "errors": []
-}
