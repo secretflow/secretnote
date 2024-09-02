@@ -13,7 +13,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.tsx --inject ./react-shim.js",
+    "build": "tsup src/index.tsx --inject react-shim.js",
     "dev": "tsup src/index.tsx --watch",
     "pb": "pnpm publish --no-git-checks --filter @secretflow/secretnote-lite"
   },

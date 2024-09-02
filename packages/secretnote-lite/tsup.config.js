@@ -2,8 +2,12 @@ const { writeFileSync } = require('fs');
 const svgr = require('esbuild-plugin-svgr');
 const { defineConfig } = require('tsup');
 
-const dtsIndex = `declare const App: () => JSX.Element;
-export { App as default };`;
+const dtsIndex = `
+declare const App: (props: {
+  backendURL?: string;
+  tokenKey?: string;
+}) => JSX.Element;
+export { App as default };`.trim();
 
 module.exports = defineConfig((overrides) => ({
   outDir: 'dist',

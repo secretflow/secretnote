@@ -29,7 +29,7 @@ class SinglePageApplicationHandler(
 
 
 single_page_static_path = os.path.join(
-    __dirname__, "../../../../../packages/secretnote-lite-page/dist/index.html"
+    __dirname__, "../../../../../packages/secretnote-scql-page/dist/index.html"
 )
 
 pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [

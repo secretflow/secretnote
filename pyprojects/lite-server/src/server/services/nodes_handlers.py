@@ -2,7 +2,6 @@
 
 import json
 from typing import List, Tuple, Type
-
 from jupyter_client.jsonutil import json_default
 from jupyter_server.base.handlers import APIHandler, JupyterHandler
 from tornado import web

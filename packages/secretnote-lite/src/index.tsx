@@ -12,10 +12,16 @@ import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
-import { MetricsModule } from './modules/metrics';
+import { MetricsModule } from '@/modules/metrics';
 import './override.less';
+import { localStorageService } from './modules/storage/local-storage-service';
 
-const App = (): JSX.Element => {
+export interface ISecretNoteAppProps {
+  backendURL?: string; // backend URL before `/secretnote/*`
+  tokenKey?: string; // token key in local storage
+}
+
+const App = (props: ISecretNoteAppProps): JSX.Element => {
   return (
     <ManaComponents.Application
       key="secretnote-lite"
@@ -39,6 +45,7 @@ const App = (): JSX.Element => {
         message.config({
           maxCount: 1,
         });
+        localStorageService.setData('globalConfig', props);
       }}
     />
   );
