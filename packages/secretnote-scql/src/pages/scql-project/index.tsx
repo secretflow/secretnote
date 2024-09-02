@@ -1,3 +1,5 @@
+// This is the project view page for SCQL.
+
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 
@@ -9,7 +11,7 @@ import { ThemeModule } from '@/modules/theme';
 const App = (): JSX.Element => {
   return (
     <ManaComponents.Application
-      key={'libro-app'}
+      key={'scql-project'}
       asChild={true}
       modules={[
         ManaAppPreset,

@@ -11,7 +11,6 @@ import {
 import { Table, Input, Button } from 'antd';
 import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
-import { history } from 'umi';
 
 import './index.less';
 import { ProjectConfigModal } from './add-modal';

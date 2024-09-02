@@ -1,5 +1,4 @@
 import { singleton } from '@difizen/mana-app';
-import { history } from 'umi';
 
 import { transpose, request } from '@/utils';
 
@@ -56,7 +55,7 @@ export class SCQLQueryService {
   }
 
   getProjectId() {
-    const list = history.location.pathname.split('/');
+    const list = window.location.pathname.split('/');
     return list[list.length - 1];
   }
 }

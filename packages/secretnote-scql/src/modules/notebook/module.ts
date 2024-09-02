@@ -6,6 +6,7 @@ import {
 
 import { LayoutArea } from '@/modules/layout';
 
+import { SecretNoteContentsDrive } from './drive';
 import { EditorView } from './editor-view';
 import { ExtraView } from './extra-view';
 import { NotebookFileService } from './service';
@@ -16,6 +17,7 @@ export const NotebookModule = ManaModule.create().register(
   NotebookFileView,
   ExtraView,
   NotebookFileService,
+  SecretNoteContentsDrive,
   createSlotPreference({
     slot: LayoutArea.main,
     view: EditorView,

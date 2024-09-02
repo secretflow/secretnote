@@ -1,7 +1,6 @@
 import { singleton, prop } from '@difizen/mana-app';
-import { history } from 'umi';
 
-import { randomHex, request } from '@/utils';
+import { randomColorByName, request } from '@/utils';
 
 export interface Member {
   name: string;
@@ -27,7 +26,7 @@ export class MemberService {
       this.members = project.members.map((item: string) => ({
         name: item === party ? `${item} (you)` : item,
         creator: item === project.creator,
-        color: randomHex(),
+        color: randomColorByName(item),
       }));
     }
     return this.members;
@@ -55,7 +54,7 @@ export class MemberService {
   }
 
   getProjectId() {
-    const list = history.location.pathname.split('/');
+    const list = window.location.pathname.split('/');
     return list[list.length - 1];
   }
 }

@@ -1,3 +1,5 @@
+// This is the "Notebooks" part of the sidebar on the left.
+
 import type { IContentsModel } from '@difizen/libro-jupyter';
 import {
   BaseView,
@@ -17,6 +19,7 @@ import React from 'react';
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
 
+import { genericErrorHandler } from '@/utils';
 import './index.less';
 import { NotebookFileService } from './service';
 
@@ -28,8 +31,8 @@ export const NotebookFileComponent = () => {
   const onMenuClick = (key: string, file: IContentsModel) => {
     switch (key) {
       case 'rename':
-        notebookFileService.renameNotebookFile =
-          notebookFileService.createRenameNoteBookFile(file);
+        // pend a rename action
+        notebookFileService.pendRenameAction(file);
         break;
       case 'delete':
         Modal.confirm({
@@ -59,13 +62,16 @@ export const NotebookFileComponent = () => {
     }
   };
 
+  /**
+   * Commit the rename action.
+   */
   const renameFile = async () => {
     try {
       await notebookFileService.renameFile();
     } catch (e) {
+      genericErrorHandler(e);
       if (e instanceof Error) {
-        message.error(e.message);
-        notebookFileService.renameNotebookFile = null;
+        notebookFileService.pendingRename = null;
       }
     }
   };
@@ -74,16 +80,17 @@ export const NotebookFileComponent = () => {
     <ul className="secretnote-notebook-list">
       {notebookFileService.notebookFileList.map((file) => (
         <Popover
+          title={l10n.t('新文件名')}
           key={file.path}
           content={
             <Input
               ref={renameInputRef}
               value={notebookFileService.getFileNameWithoutExt(
-                notebookFileService.renameNotebookFile?.name,
+                notebookFileService.pendingRename?.name,
               )}
               onChange={(e) => {
-                if (notebookFileService.renameNotebookFile) {
-                  notebookFileService.renameNotebookFile.name =
+                if (notebookFileService.pendingRename) {
+                  notebookFileService.pendingRename.name =
                     notebookFileService.getFileNameWithExt(e.target.value);
                 }
               }}
@@ -94,7 +101,7 @@ export const NotebookFileComponent = () => {
               }}
             />
           }
-          open={notebookFileService.renameNotebookFile?.path === file.path}
+          open={notebookFileService.pendingRename?.path === file.path}
           placement="right"
           overlayClassName="secretnote-notebook-list-popover"
           trigger={['click']}
@@ -119,8 +126,16 @@ export const NotebookFileComponent = () => {
             <span>{notebookFileService.getFileNameWithoutExt(file.name)}</span>
             <DropdownMenu
               items={[
-                { key: 'rename', label: l10n.t('重命名'), icon: <PenLine size={12} /> },
-                { key: 'copy', label: l10n.t('复制'), icon: <Copy size={12} /> },
+                {
+                  key: 'rename',
+                  label: l10n.t('重命名'),
+                  icon: <PenLine size={12} />,
+                },
+                {
+                  key: 'copy',
+                  label: l10n.t('复制'),
+                  icon: <Copy size={12} />,
+                },
                 {
                   key: 'export',
                   label: l10n.t('导出为 .ipynb 文件'),

@@ -6,6 +6,9 @@ import { PreviewLayoutArea, PreviewLayoutView } from './preview';
 import { SideBarContribution } from './protocol';
 import { SideBarView } from './sidebar';
 
+/**
+ * The common layout module with header, sidebar and content.
+ */
 export const LayoutModule = ManaModule.create()
   .contribution(SideBarContribution)
   .register(
@@ -26,6 +29,10 @@ export const LayoutModule = ManaModule.create()
     }),
   );
 
+/**
+ * The preview layout with header and content but without sidebar.
+ * Used in file preview and SCQL project page.
+ */
 export const PreviewLayoutModule = ManaModule.create().register(
   HeaderView,
   PreviewLayoutView,

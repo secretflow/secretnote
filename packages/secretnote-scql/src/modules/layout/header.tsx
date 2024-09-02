@@ -2,7 +2,7 @@ import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel } from '@difizen/mana-react';
 import { history } from 'umi';
 
-import { ReactComponent as Logo } from '@/assets/image/logo.svg';
+import { Logo } from '@/assets/svg/logo';
 
 const { Pane } = BoxPanel;
 

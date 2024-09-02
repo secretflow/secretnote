@@ -16,7 +16,7 @@ import { WelcomeModule } from '@/modules/welcome';
 const App = (): JSX.Element => {
   return (
     <ManaComponents.Application
-      key={'libro-app'}
+      key={'scql-workspace'}
       asChild={true}
       modules={[
         ManaAppPreset,
