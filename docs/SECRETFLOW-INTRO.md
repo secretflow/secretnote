@@ -1,8 +1,10 @@
+# 完成一次 PSI
+
 下面演示在一台机器上使用 docker 启动两个容器环境来模拟不同参与方完成一次 PSI。
 
 ### 准备环境
 
-在一台机器上使用 docker compose 启动两个容器，容器启动时会安装 SecretFLow、SecretNote，并且分别启动 Ray 服务以及 SecretNote 服务。
+在一台机器上使用 docker compose 启动两个容器，容器启动时会安装 SecretFlow、SecretNote，并且分别启动 Ray 服务以及 SecretNote 服务。
 
 在一个文件夹下面新建文件夹 alice 和 bob， 新建文件 `docker-compose.yml`，内容如下：
 
