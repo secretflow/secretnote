@@ -1,3 +1,5 @@
+# This is the config file for the Jupyter Server in production phase.
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -6,19 +8,15 @@ if TYPE_CHECKING:
 c = get_config()
 
 c.ServerApp.allow_origin = "*"
-
 c.ServerApp.allow_remote_access = True
-
 c.ServerApp.disable_check_xsrf = True
-
 c.ServerApp.token = ""
-
 c.ServerApp.ip = "*"
-
 c.ServerApp.root_dir = "/home/secretnote/workspace"
 
-c.LanguageServerManager.autodetect = False
+c.ResourceUseDisplay.track_cpu_percent = True
 
+c.LanguageServerManager.autodetect = False
 c.LanguageServerManager.language_servers = {
     # whole notebook LSP ability.
     "libro-analyzer": {
@@ -34,5 +32,3 @@ c.LanguageServerManager.language_servers = {
         "display_name": "libro-analyzer",
     },
 }
-
-c.ResourceUseDisplay.track_cpu_percent = True

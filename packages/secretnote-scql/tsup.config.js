@@ -2,8 +2,10 @@ const { writeFileSync } = require('fs');
 const svgr = require('esbuild-plugin-svgr');
 const { defineConfig } = require('tsup');
 
-const dtsIndex = `declare const App: () => JSX.Element;
-export { App as default };`;
+const dtsIndex = `
+declare const SCQLProject: () => JSX.Element;
+declare const SCQLWorkspace: () => JSX.Element;
+export { SCQLProject, SCQLWorkspace };`.trim();
 
 module.exports = defineConfig((overrides) => ({
   outDir: 'dist',

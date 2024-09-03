@@ -5,9 +5,13 @@ export default defineConfig({
   base: '/secretnote/',
   publicPath: '/secretnote/',
   favicons: ['/secretnote/favicon.svg'],
-  title: 'SecretNote',
+  title: 'SecretNote SCQL Playground',
   exportStatic: {},
-  routes: [{ path: '/', component: 'index' }],
+  routes: [
+    { path: '/', redirect: '/project' },
+    { path: '/project', component: 'project' },
+    { path: '/workspace', component: 'workspace' },
+  ],
   writeToDisk: true,
   headScripts:
     process.env.NODE_ENV !== 'development'

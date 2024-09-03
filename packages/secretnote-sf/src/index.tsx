@@ -13,6 +13,8 @@ import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
 import { MetricsModule } from '@/modules/metrics';
+// import { ComponentCellModule } from '@/modules/component-cell'
+// import { SnippetModule } from '@/modules/snippet';
 import './override.less';
 import { localStorageService } from './modules/storage/local-storage-service';
 
@@ -39,6 +41,8 @@ const App = (props: ISecretNoteAppProps): JSX.Element => {
         MarkdownCellModule,
         ToolbarModule,
         WelcomeModule,
+        // ComponentCellModule,
+        // SnippetModule,
       ]}
       onReady={() => {
         // do some initialization

@@ -1,3 +1,5 @@
+// The module for SCQL project management.
+
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
 import { PreviewLayoutArea, HeaderArea } from '@/modules/layout';

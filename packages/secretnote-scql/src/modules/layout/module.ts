@@ -1,3 +1,5 @@
+// Module for the layout of the whole page.
+
 import { createSlotPreference, ManaModule, RootSlotId } from '@difizen/mana-app';
 
 import { HeaderView } from './header';

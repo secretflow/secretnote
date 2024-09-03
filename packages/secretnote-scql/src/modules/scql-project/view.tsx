@@ -15,6 +15,7 @@ import { useState } from 'react';
 import './index.less';
 import { ProjectConfigModal } from './add-modal';
 import { ProjectService, type Project } from './service';
+import { history } from '@/utils';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);

@@ -1,7 +1,7 @@
 import { prop, singleton } from '@difizen/mana-app';
 import { Modal } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import { history } from 'umi';
+import { history } from '@/utils';
 
 import { request } from '@/utils';
 

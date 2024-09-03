@@ -3,5 +3,6 @@ export * from './color';
 export * from './error';
 export * from './file';
 export * from './promise';
-export * from './req2';
+export * from './request';
 export * from './string';
+export * from './history';

@@ -1,6 +1,6 @@
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel } from '@difizen/mana-react';
-import { history } from 'umi';
+import { history } from '@/utils';
 
 import { Logo } from '@/assets/svg/logo';
 
