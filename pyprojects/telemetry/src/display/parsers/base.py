@@ -1,7 +1,7 @@
 import abc
 from typing import Callable, Generic, List, TypeVar
 
-from secretnote.utils.logging import log_dev_exception
+from ...utils.logging import log_dev_exception
 
 T = TypeVar("T", contravariant=True)
 A = TypeVar("A")

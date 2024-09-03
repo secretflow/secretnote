@@ -20,7 +20,7 @@ def get_version() -> str:
     try:
         # during development and after install
         # read from require
-        from secretnote._resources import require
+        from ._resources import require
 
         return normalize(require.package.info.version)
     except Exception:

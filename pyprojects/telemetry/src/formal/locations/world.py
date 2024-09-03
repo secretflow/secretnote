@@ -2,7 +2,7 @@ from typing import Dict, FrozenSet, Union
 
 from pydantic import BaseModel, validate_arguments
 
-from secretnote.formal.locations.utils import PortBinding
+from ...formal.locations.utils import PortBinding
 
 
 class SFConfigSimulation(BaseModel):

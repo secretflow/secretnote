@@ -20,7 +20,7 @@ from weakref import WeakValueDictionary
 
 from opentelemetry import trace
 
-from secretnote.formal.symbols import LogicalLocation
+from ..formal.symbols import LogicalLocation
 
 
 class LifetimeIdentityTracker:

@@ -26,8 +26,8 @@ from opentelemetry.util.types import Attributes
 from pydantic import BaseModel, Field, PrivateAttr
 from typing_extensions import Annotated, override
 
-from secretnote.formal.symbols import LogicalLocation
-from secretnote.utils.pydantic import (
+from ..formal.symbols import LogicalLocation
+from ..utils.pydantic import (
     ProxiedModel,
     Reference,
     ReferenceMap,

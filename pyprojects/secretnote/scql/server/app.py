@@ -23,9 +23,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     @property
     def static_paths(self):
         """The static paths of the SecretNote frontend."""
-        index = os.path.join(
-            __dirname__, "../../../../packages/secretnote-scql-page/dist/index.html"
-        )
+        index = os.path.join(__dirname__, "../static/index.html")
         return [
             index,
         ]

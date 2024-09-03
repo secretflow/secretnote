@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from secretnote.utils.pydantic import ORJSONConfig
+from ..utils.pydantic import ORJSONConfig
 
 from .parsers.timeline import Timeline
 

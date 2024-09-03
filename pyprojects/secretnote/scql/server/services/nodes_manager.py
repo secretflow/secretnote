@@ -3,7 +3,7 @@
 from typing import Dict, Optional
 from dataset import Table, connect
 
-from .utils import get_db_path
+from ..utils import get_db_path
 
 
 class NodesManager(object):

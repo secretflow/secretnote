@@ -1,4 +1,4 @@
-from secretnote.utils.node.resolve import create_require
+from .utils.node.resolve import create_require
 
 require = create_require(
     __package__,

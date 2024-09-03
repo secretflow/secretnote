@@ -1,5 +1,5 @@
-from secretnote.instrumentation.profiler import Profiler
-from secretnote.utils.warnings import development_preview_warning
+from ..instrumentation.profiler import Profiler
+from ..utils.warnings import development_preview_warning
 
 from .core.renderer import render
 from .models import Visualization

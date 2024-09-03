@@ -3,16 +3,16 @@ from typing import Dict, List, Optional, Union, cast
 import networkx as nx
 from pydantic import BaseModel
 
-from secretnote.formal.symbols import ExpressionType, LocalObject, RemoteObject
-from secretnote.instrumentation.models import (
+from ...formal.symbols import ExpressionType, LocalObject, RemoteObject
+from ...instrumentation.models import (
     APILevel,
     FunctionCheckpoint,
     OTelSpanDict,
     SnapshotType,
     TracedFrame,
 )
-from secretnote.instrumentation.sdk import get_traced_frame
-from secretnote.utils.pydantic import Reference
+from ...instrumentation.sdk import get_traced_frame
+from ...utils.pydantic import Reference
 
 from .expression import parser as parse_expression
 from .graph import Graph, GraphState

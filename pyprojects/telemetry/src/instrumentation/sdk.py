@@ -20,7 +20,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
-from secretnote.utils.warnings import development_preview_warning
+from ..utils.warnings import development_preview_warning
 
 from .checkpoint import CheckpointGroup
 from .envvars import (
@@ -128,7 +128,7 @@ def remote_trace(fn: Callable) -> Callable:
     context = dump_tracing_context()
 
     def remote_task(*args, **kwargs):
-        from secretnote.instrumentation.profiler import Profiler
+        from ..instrumentation.profiler import Profiler
 
         os.environ.update(context)
 

@@ -12,7 +12,7 @@ c.ServerApp.allow_remote_access = True
 c.ServerApp.allow_root = True
 c.ServerApp.disable_check_xsrf = True
 c.ServerApp.token = ""
-c.ServerApp.root_dir = "../../.secretnote"
+c.ServerApp.root_dir = "/Users/zhuoxu/workspace/secretnote/pyprojects/.secretnote"
 
 c.ResourceUseDisplay.track_cpu_percent = True
 

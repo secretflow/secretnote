@@ -19,7 +19,7 @@ from more_itertools import first
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
-from secretnote.formal.symbols import (
+from ...formal.symbols import (
     ExecExpression,
     ExpressionType,
     LocalObject,
@@ -28,8 +28,8 @@ from secretnote.formal.symbols import (
     RemoteObject,
     RevealExpression,
 )
-from secretnote.instrumentation.models import LogicalLocation
-from secretnote.utils.pydantic import Reference
+from ...instrumentation.models import LogicalLocation
+from ...utils.pydantic import Reference
 
 from .base import Parser
 

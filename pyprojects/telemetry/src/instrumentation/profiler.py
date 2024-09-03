@@ -23,8 +23,8 @@ from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
-from secretnote.utils.logging import log_dev_exception
-from secretnote.utils.pydantic import Reference, ReferenceMap
+from ..utils.logging import log_dev_exception
+from ..utils.pydantic import Reference, ReferenceMap
 
 from .checkpoint import CheckpointGroup
 from .envvars import OTEL_PYTHON_SECRETNOTE_PROFILER_FRAME
@@ -197,7 +197,7 @@ class Profiler:
         return False
 
     def visualize(self):
-        from secretnote.display.app import visualize_run
+        from ..display.app import visualize_run
 
         return visualize_run(self)
 

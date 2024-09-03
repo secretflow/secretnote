@@ -12,7 +12,7 @@ from typing import (
 
 from more_itertools import first
 
-from secretnote.formal.symbols import (
+from ...formal.symbols import (
     ExecExpression,
     ExpressionType,
     LocalObject,
@@ -21,7 +21,7 @@ from secretnote.formal.symbols import (
     RemoteObject,
     RevealExpression,
 )
-from secretnote.instrumentation.models import (
+from ...instrumentation.models import (
     DictSnapshot,
     FunctionInfo,
     ListSnapshot,
@@ -30,7 +30,7 @@ from secretnote.instrumentation.models import (
     SnapshotType,
     TracedFrame,
 )
-from secretnote.utils.pydantic import like_pytree
+from ...utils.pydantic import like_pytree
 
 from .base import Parser
 

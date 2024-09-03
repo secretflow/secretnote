@@ -4,7 +4,7 @@ from IPython.core.display import HTML
 from jinja2 import Template, select_autoescape
 from pydantic import BaseModel
 
-from secretnote._resources import require
+from ..._resources import require
 
 
 def get_ui_bundle() -> str:

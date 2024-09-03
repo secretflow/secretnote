@@ -8,8 +8,8 @@ from importlib_resources import as_file, files
 from pydantic import BaseModel
 from rich.tree import Tree
 
-from secretnote.utils.path import find_all_files
-from secretnote.utils.pprint import rformat
+from ...utils.path import find_all_files
+from ...utils.pprint import rformat
 
 RESOLVE_SCRIPT = files().joinpath("resolve.mjs")
 

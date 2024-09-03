@@ -38,14 +38,14 @@ allow-direct-references = true
 
 [tool.hatch.version]
 expression = "__version__"
-path = "./src/secretnote/__init__.py"
+path = "./__init__.py"
 search-paths = ["./src"]
 source = "code"
 
 [tool.hatch.build]
 artifacts = ["www/**/*"]
 directory = "www"
-only-include = ["src", "www", "package.json"]
+only-include = ["src", "static", "package.json"]
 
 [tool.hatch.build.targets.wheel]
 sources = ["src"]
