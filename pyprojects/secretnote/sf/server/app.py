@@ -3,9 +3,9 @@
 import sys
 import os
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
-from .services.agent_handlers import agent_handlers
-from .services.nodes_handlers import nodes_handlers
-from .services.pages_handlers import pages_handlers
+from .agent_handlers import agent_handlers
+from .nodes_handlers import nodes_handlers
+from .pages_handlers import pages_handlers
 
 __dirname__ = os.path.dirname(__file__)
 
@@ -22,9 +22,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     @property
     def static_paths(self):
         """The static paths of the SecretNote frontend."""
-        index = os.path.join(
-            __dirname__, "../../../../packages/secretnote-lite-page/dist/index.html"
-        )
+        index = os.path.join(__dirname__, "../../www/index.html")
         return [
             index,
         ]

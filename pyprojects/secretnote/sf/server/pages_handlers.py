@@ -28,9 +28,7 @@ class SinglePageApplicationHandler(
             self.write(self.render_template("index.html"))
 
 
-single_page_static_path = os.path.join(
-    __dirname__, "../../../../../packages/secretnote-lite-page/dist/index.html"
-)
+single_page_static_path = os.path.join(__dirname__, "../../../www/index.html")
 
 pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
     (
