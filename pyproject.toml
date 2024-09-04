@@ -2,9 +2,9 @@
 authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
 classifiers = ["Private :: Do Not Upload"]
 dependencies = []
-name = "monorepo"
+name = "secretnote-monorepo"
 readme = "README.md"
-requires-python = ">=3.8, <3.12"
+requires-python = ">=3.10, <3.12"
 version = "0.0.0"
 
 [project.scripts]

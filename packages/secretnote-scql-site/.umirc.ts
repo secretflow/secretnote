@@ -33,10 +33,7 @@ export default defineConfig({
       ws: true,
     },
   },
-  extraBabelPlugins: [
-    'babel-plugin-transform-typescript-metadata',
-    'babel-plugin-parameter-decorator',
-  ],
+  extraBabelPlugins: [],
   mfsu: false,
   npmClient: 'pnpm',
   esbuildMinifyIIFE: true,

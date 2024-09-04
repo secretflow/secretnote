@@ -1,80 +1,44 @@
-> Serves both Jupyter Server and static files.
-
 # SecretNote
 
-[Notebook] suite for [SecretFlow].
+This is the backend of the notebook suite named SecretNote. It serves both Jupyter Server, SecretNote specified APIs and static files of the playground, for both SecretFlow in Python and the SCQL.
 
-[Notebook]: https://jupyter.org
-[SecretFlow]: https://www.secretflow.org.cn
+## Installation
 
-**This is currently a developer preview.**
+We recommend you to install in a clean Python 3.10 environment. You can use your favorite virtual environment solution.
 
-**API may change without prior notice. No guarantee is made about the security, correctness, performance, or usefulness of this feature.**
+### From PyPI
 
-- [SecretNote](#secretnote)
-  - [Install](#install)
-  - [Start](#start)
-  - [Features](#features)
-    - [Using the profiler](#using-the-profiler)
-  - [FAQ](#faq)
-    - [Environment and dependency versioning](#environment-and-dependency-versioning)
+```sh
+# use conda for example
+conda create -n secretnote python=3.10
+conda activate secretnote
+pip install secretnote
+```
 
-## Install
+### From Source
 
-**Please read our [note about dependencies](#environment-and-dependency-versioning) first.**
+```sh
+# pnpm and rye are required
+pnpm install --frozen-lockfile
+rye sync --no-lock
+```
 
-We recommend installing in a clean Python environment.
+## Start Locally
+
+- Start SecretNote SF for SecretFlow Python programming
 
 ```bash
-python --version
-# Python 3.8.18
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install 'secretflow==1.2.0b0' 'secretnote==0.1.0.dev0'
+secretnote sf --config=/somewhere/config.py
 ```
 
-## Start
+- Start SecretNote SCQL for SCQL programming
 
-In your terminal, run:
+```sh
+secretnote scql --config=/somewhere/config.py
+```
+
+- Common [Jupyter Command Line Options][jupyter-options] are supported. For example, to change the port, use
 
 ```bash
-secretnote
+secretnote sf --ServerApp.port 8889
 ```
-
-Or:
-
-```bash
-python -m secretnote.server
-```
-
-Commonly-used [Jupyter command line options][jupyter-options] are supported. For example, to change the port:
-
-```bash
-secretnote --ServerApp.port 8889
-```
-
-[jupyter-options]: https://jupyterlab-server.readthedocs.io/en/latest/api/app-config.html
-
-## Features
-
-### Using the profiler
-
-```python
-from secretnote.instrumentation.sdk import create_profiler
-
-with create_profiler() as profiler:
-    # SecretFlow code here
-    weights = alice(...)(...)
-    bias = bob(...)(...)
-    result = spu(...)(...)
-
-profiler.visualize()
-```
-
-## FAQ
-
-### Environment and dependency versioning
-
-_For best results, install this project in a clean Python environment._
-
-SecretFlow has many platform-specific dependencies. As this project is in early stage, we do not yet guarantee that this project will work in all environments, or even that installation will succeed.

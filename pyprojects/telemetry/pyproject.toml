@@ -38,7 +38,7 @@ dynamic = ["version"]
 license.text = "Apache-2.0"
 name = "secretnote-telemetry"
 readme = "README.md"
-requires-python = ">=3.8, <3.12"
+requires-python = ">=3.10, <3.12"
 
 [project.scripts]
 secretnote = "secretnote.server.app:SecretNoteApp.launch"
@@ -70,7 +70,7 @@ allow-direct-references = true
 
 [tool.hatch.version]
 expression = "__version__"
-path = "./src/secretnote/__init__.py"
+path = "./__init__.py"
 search-paths = ["./src"]
 source = "code"
 

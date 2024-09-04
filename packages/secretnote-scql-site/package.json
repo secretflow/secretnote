@@ -17,8 +17,8 @@
   },
   "scripts": {
     "prepare": "umi setup && umi build",
-    "dev": "umi dev",
-    "build": "umi build"
+    "build:js": "umi build",
+    "dev": "umi dev"
   },
   "dependencies": {
     "@alipay/secretnote-scql": "file:../secretnote-scql",

@@ -104,9 +104,10 @@ export class NotebookFileService {
   async getFile(path: string) {
     const file = await this.contentsManager.get(drived(path), {
       content: true,
-      type: 'file',
+      type: 'notebook',
     });
-    file.path = undrived(file.path); // do not let the upstream see the drive
+    file.path = undrived(file.path); // do not
+
     return file;
   }
 

@@ -1,10 +1,10 @@
-import SecretNoteLite from '@alipay/secretnote-lite';
+import SecretNoteSF from '@alipay/secretnote-sf';
 import './index.less';
 
 export default function () {
   return (
     <div className="secretnote-sf-container">
-      <SecretNoteLite backendURL="/" />
+      <SecretNoteSF backendURL="/" />
     </div>
   );
 }

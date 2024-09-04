@@ -1,5 +1,5 @@
 {
-  "name": "monorepo",
+  "name": "secretnote-monorepo",
   "private": true,
   "license": "Apache-2.0",
   "author": "Tony Wu <tonywu6@protonmail.com>",
@@ -53,11 +53,6 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "stylelint": "^15.11.0",
-    "stylelint-config-css-modules": "^4.3.0",
-    "stylelint-config-idiomatic-order": "^9.0.0",
-    "stylelint-config-prettier": "^9.0.5",
-    "stylelint-config-standard": "^30.0.1",
-    "stylelint-order": "^6.0.3",
     "ts-node": "^10.9.1",
     "tsup": "^6.7.0",
     "typescript": "^5.2.2",
@@ -66,5 +61,5 @@
   "engines": {
     "node": ">=18.18.0"
   },
-  "packageManager": "pnpm@8.7.6"
+  "packageManager": "pnpm@9.7.0"
 }

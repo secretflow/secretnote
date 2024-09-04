@@ -10,7 +10,7 @@ from jupyter_server.extension.handler import (
 )
 
 single_page_static_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../www")
+    os.path.join(os.path.dirname(__file__), "../../www")
 )
 
 

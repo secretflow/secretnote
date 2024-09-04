@@ -1,5 +1,5 @@
 {
-  "name": "@secretflow/secretnote-lite-site",
+  "name": "@secretflow/secretnote-sf-site",
   "private": true,
   "version": "0.0.0",
   "license": "Apache-2.0",
@@ -18,10 +18,10 @@
   "scripts": {
     "prepare": "umi setup && umi build",
     "dev": "umi dev",
-    "build": "umi build"
+    "build:js": "umi build"
   },
   "dependencies": {
-    "@alipay/secretnote-lite": "file:../secretnote-lite",
+    "@alipay/secretnote-sf": "file:../secretnote-sf",
     "antd": "^5.10.1",
     "lucide-react": "^0.284.0",
     "umi": "^4.0.86"

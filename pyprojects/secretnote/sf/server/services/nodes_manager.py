@@ -6,12 +6,21 @@ from dataset import Table, connect
 from ..utils import get_db_path
 
 
+class SecretNoteNode:
+    def __init__(self, id: str, name: str, status: str, service: str, podIp: str):
+        self.id = id
+        self.name = name
+        self.status = status  # Pending, Running, Succeeded, Failed, Unknown, Terminated
+        self.service = service
+        self.podIp = podIp
+
+
 class NodesManager(object):
     def __init__(self):
         db = connect(get_db_path())
         self.table: Table = db.get_table("node")  # type: ignore
 
-    def ensure_node_name(self, name: Optional[str]) -> None:
+    def ensure_name(self, name: Optional[str]) -> None:
         """Ensure that the node name is unused."""
         if name is not None:
             node_item = self.get_node(name=name)
@@ -20,22 +29,22 @@ class NodesManager(object):
         else:
             raise Exception("node name is required.")
 
-    def ensure_node_address(self, address: Optional[str]) -> None:
+    def ensure_pod_ip(self, podIp: Optional[str]) -> None:
         """Ensure that the node address is unused."""
-        if address is not None:
-            node_item = self.get_node(address=address)
+        if podIp is not None:
+            node_item = self.get_node(podIp=podIp)
             if node_item is not None:
-                raise Exception("node address is already existed.")
+                raise Exception("node podIp is already existed.")
         else:
-            raise Exception("node address is required.")
+            raise Exception("node podIp is required.")
 
     def add_node(self, node: Dict[str, str]):
-        """Add a new node. `node` is like `{name, address}`. Returns the node id."""
+        """Add a new node. `node` is like `{name, podIp}`. Returns the node id."""
         name = node.get("name", None)
-        address = node.get("address", None)
+        pod_ip = node.get("pod_ip", None)
 
-        self.ensure_node_name(name)
-        self.ensure_node_address(address)
+        self.ensure_name(name)
+        self.ensure_pod_ip(pod_ip)
 
         return self.table.insert(node)
 
@@ -50,18 +59,6 @@ class NodesManager(object):
     def get_nodes(self):
         """Get all nodes from the database."""
         return [node for node in self.table.all()]
-
-    def update_node(self, node_id: str, node: Dict[str, str]) -> None:
-        """Update a node in the database according to `node_id`."""
-        name = node.get("name", None)
-        address = node.get("address", None)
-
-        if name is not None:
-            self.ensure_node_name(name)
-        if address is not None:
-            self.ensure_node_address(address)
-
-        self.table.update({"id": node_id, **node}, ["id"])
 
 
 nodes_manager = NodesManager()

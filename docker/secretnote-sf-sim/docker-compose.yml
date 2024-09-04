@@ -1,7 +1,8 @@
 services:
   alice:
-    image: 'secretflow/secretnote:1.6.1'
-    platform: linux/amd64
+    image: secretflow/secretnote:1.6.1-arm64
+    pull_policy: if_not_present
+    platform: linux/arm64
     environment:
       - SELF_PARTY=alice
     ports:
@@ -10,8 +11,9 @@ services:
       - ./alice:/root/workspace
 
   bob:
-    image: 'secretflow/secretnote:1.6.1'
-    platform: linux/amd64
+    image: secretflow/secretnote:1.6.1-arm64
+    pull_policy: if_not_present
+    platform: linux/arm64
     environment:
       - SELF_PARTY=bob
     ports:

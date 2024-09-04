@@ -5,7 +5,6 @@ import { forwardRef, type ForwardedRef, useMemo } from 'react';
 
 import { ComponentForm } from '@/components/component-form';
 import type { ComponentSpec, Value } from '@/components/component-form';
-import LogView from '@/components/log-viewer';
 
 import { generateComponentCellCode } from './cell-code';
 import { ComponentOptions, getComponentByIds, getComponentIds } from './options';

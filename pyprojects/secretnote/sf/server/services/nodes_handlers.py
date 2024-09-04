@@ -62,8 +62,10 @@ class NodeHandler(APIHandler):
         self.finish()
 
 
-_node_id_regex = r"(?P<node_id>.+)"
+# _node_id_regex = r"(?P<node_id>.+)"
 nodes_handlers: List[Tuple[str, Type[JupyterHandler]]] = [
-    (r"/api/nodes", NodeRootHandler),
-    (rf"/api/nodes/{_node_id_regex}", NodeHandler),
+    ("/secretnote/api/nodes", NodeRootHandler),  # GET POST
+    # ("/secretnote/api/nodes/(.*)", NodeWithIdHandler),
+    # ("/secretnote/api/nodes/start/(.*)", NotImplementedHandler),
+    # ("/secretnote/api/nodes/stop/(.*)", NotImplementedHandler)
 ]

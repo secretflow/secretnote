@@ -23,6 +23,19 @@
   - telemetry # 可观测后端服务
 ```
 
+## 调试方法
+
+### 如何通过 Playground 调试前端组件？
+
+以 secretnote-sf 为例。将 secretnote-sf-site 中的导入替换为
+
+```diff
+- import SecretNoteSF from '@alipay/secretnote-sf';
++ import SecretNoteSF from '../../../secretnote-sf';
+```
+
+随后在 secretnote-sf-site 和 secretnote-sf 分别 `pnpm run dev` 即可。如果需要无刷 Reload，需将 secretnote-sf 的 package.json 复制到 dist 下后，改从 `secretnote-sf/dist` 导入。
+
 ## 后端 API 列表
 
 为了让 SecretNote Lite 能够完整地正常工作，其后端需要实现以下 API。
@@ -87,7 +100,7 @@ type SecretNoteNode = {
 
 #### POST /secretnote/api/nodes
 
-为当前用户添加并启动一个节点，请求体为节点名 `{name: string}`，返回对应的 `SecretNoteNode`。启动后，应保证 `GET /secretnote/:nodeid/kernelspecs` 和 `GET /secretnote/api/nodes/:nodeid` 畅通。
+为当前用户添加并启动一个节点，请求体为节点名 `{name: string, podIp?: string}`，返回对应的 `SecretNoteNode`。启动后，应保证 `GET /secretnote/:nodeid/kernelspecs` 和 `GET /secretnote/api/nodes/:nodeid` 畅通。
 
 #### DELETE /secretnote/api/nodes/:nodeid
 
