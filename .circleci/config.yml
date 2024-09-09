@@ -29,7 +29,7 @@ jobs:
 
             docker buildx build \
               --platform=<< parameters.platform >> \
-              -f docker/app/Dockerfile \
+              -f docker/secretflow-secretnote/Dockerfile \
               -t ${IMAGE_NAME} \
               --progress=plain \
               .

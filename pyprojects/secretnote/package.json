@@ -4,8 +4,8 @@
   "version": "0.0.8",
   "type": "module",
   "scripts": {
-    "format:black": "python -m black --check src tests",
-    "dev": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --no-browser",
+    "dev:sf": "NODE_ENV=development python -m secretnote sf --config=./secretnote/sf/.jupyter/config_dev.py",
+    "dev:scql": "NODE_ENV=development python -m secretnote scql --config=./secretnote/scql/.jupyter/config_dev.py",
     "build": "nx build:py",
     "build:py": "rye build --out ./dist",
     "publish:py": "python -m hatch publish ./dist"

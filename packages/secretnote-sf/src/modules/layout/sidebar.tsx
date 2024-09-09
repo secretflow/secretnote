@@ -59,7 +59,7 @@ export class AboutBarView extends BaseView {
 
   // expose versions of important packages
   packageVersions = {
-    'secretnote-lite': SecretNotePkgJSON.version,
+    'secretnote-sf': SecretNotePkgJSON.version,
     'libro-jupyter': LibroJupyterPkgJSON.version,
     'mana-app': ManaAppPkgJSON.version,
   } as const;

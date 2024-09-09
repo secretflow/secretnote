@@ -5,7 +5,7 @@ export default defineConfig({
   base: '/secretnote/',
   publicPath: '/secretnote/',
   favicons: ['/secretnote/favicon.svg'],
-  title: 'SecretNote Lite Playground',
+  title: 'SecretNote SF Playground',
   exportStatic: {},
   routes: [{ path: '/', component: 'index' }],
   // devtool: 'source-map',
@@ -31,8 +31,7 @@ export default defineConfig({
     //   ws: true,
     // },
   },
-  extraBabelPlugins: [
-  ],
+  extraBabelPlugins: [],
   mfsu: false,
   npmClient: 'pnpm',
   esbuildMinifyIIFE: true,

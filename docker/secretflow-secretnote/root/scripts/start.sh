@@ -11,4 +11,4 @@ if [ -z "${PORT}" ]; then
   PORT=8888
 fi
 
-secretnote --allow-root --no-browser --port $PORT
+secretnote sf --config=/home/secretnote/.jupyter/jupyter_server_config.py --allow-root --no-browser --port $PORT

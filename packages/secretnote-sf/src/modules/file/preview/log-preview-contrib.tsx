@@ -7,6 +7,6 @@ import { FilePreviewContribution } from '../protocol';
 export class LogPreview implements FilePreviewContribution {
   type = 'log';
   render = (data: string) => {
-    return <div>Not Implemented.</div>
+    return <div>Not Implemented.</div>;
   };
 }

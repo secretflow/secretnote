@@ -18,17 +18,17 @@ WORKDIR /repo
 COPY --from=source-tree /repo/pnpm-lock.yaml /repo/.npmrc /repo/
 RUN pnpm fetch
 COPY --from=source-tree /repo /repo
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --frozen-lockfile
 RUN cargo install gcc
-RUN pnpm exec nx run-many -t build:js -t build:py
+RUN pnpm run ci:build
 RUN apt-get update && apt-get install -y rsync
 RUN rsync -avm --include='pyprojects/**/dist/*.whl' -f 'hide,! */' /repo/./ /dist
 
 # Config the runtime
+# TODO Update the version here
 FROM secretflow/secretflow-anolis8:1.6.1b0
 RUN useradd -m secretnote
 COPY --from=build /dist /dist
-RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl
 WORKDIR /home/secretnote
 COPY ./docker/app/root/ ./

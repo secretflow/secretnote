@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "prepare": "umi setup && umi build",
-    "build:js": "umi build",
+    "prepare": "umi setup",
+    "build:site": "umi build && cp -R ./dist/. ../../pyprojects/secretnote/secretnote/scql/www",
     "dev": "umi dev"
   },
   "dependencies": {

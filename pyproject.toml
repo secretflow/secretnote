@@ -51,15 +51,7 @@ _pb2\\.pyi?
 | secretnote/proto
 """
 line-length = 88
-target-version = ["py38", "py39", "py310"]
-
-[tool.ruff]
-line-length = 88
-select = ["E", "F", "W", "B", "I"]
-src = ["pyprojects/*/src"]
-
-[tool.ruff.extend-per-file-ignores]
-"*.ipynb" = ["E402", "I001"]
+target-version = ["py310", "py311", "py312"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]

@@ -1,4 +1,4 @@
-if __name__ == "__main__":
+def main():
     import argparse
 
     parser = argparse.ArgumentParser()
@@ -17,3 +17,7 @@ if __name__ == "__main__":
         SecretNoteApp().launch(rest_args)
     else:
         raise ValueError(f"Invalid mode argument: {args.mode}")
+
+
+if __name__ == "__main__":
+    main()

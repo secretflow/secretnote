@@ -16,9 +16,9 @@
     }
   },
   "scripts": {
-    "prepare": "umi setup && umi build",
-    "dev": "umi dev",
-    "build:js": "umi build"
+    "prepare": "umi setup",
+    "build:site": "umi build && cp -R ./dist/. ../../pyprojects/secretnote/secretnote/sf/www",
+    "dev": "umi dev"
   },
   "dependencies": {
     "@alipay/secretnote-sf": "file:../secretnote-sf",

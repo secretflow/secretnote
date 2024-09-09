@@ -208,6 +208,19 @@ export const NodeComponent = () => {
         >
           <Input placeholder="alice" />
         </Form.Item>
+        <Form.Item
+          label={l10n.t('地址')}
+          name="nodeAddress"
+          rules={[
+            {
+              pattern: /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\:\d{1,5}$/,
+              message: l10n.t('格式不正确'),
+            },
+          ]}
+          style={{ marginBottom: '12px' }}
+        >
+          <Input placeholder="127.0.0.1:8088" />
+        </Form.Item>
         {addLoading && (
           <Form.Item
             wrapperCol={{ offset: 4, span: 20 }}

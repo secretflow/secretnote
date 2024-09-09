@@ -4,7 +4,7 @@ SecretNote
 
 SecretNote 是为 SecretFlow (隐语) 学习者和开发者定制的高级工具套件，可帮助您快速开展隐语实验。它包括 SecretNote SF 和 SecretNote SCQL，均以 Notebook 的形式呈现。前者用于 Python 环境下的 [SecretFlow](https://www.secretflow.org.cn/zh-CN/docs/secretflow) 运行，支持多节点同时的代码执行和各节点的文件管理；后者用于进行 [SCQL](https://www.secretflow.org.cn/zh-CN/docs/scql) 相关实验。
 
-*需要注意的是，SecretNote 的设计是为了学习和原型实验，请不要在生产环境中直接使用。*
+_需要注意的是，SecretNote 的设计是为了学习和原型实验，请不要在生产环境中直接使用。_
 
 ## 使用
 
@@ -68,9 +68,8 @@ SecretNote SCQL 对 P2P SCQL 进行产品化封装，降低了开发者编写 SC
 
 ## 开发与贡献
 
-SecretNote 前端基于 [Mana](https://github.com/difizen/mana) 模块化框架和 [Libro](https://github.com/difizen/libro) Notebook 解决方案定制开发，开源的后端服务基于 [Jupyter Server](https://github.com/jupyter-server/jupyter_server) 定制开发。如需进一步了解项目结构和 API 约定，请查看 [CONTRIBUTING](docs/CONTRIBUTING.md) 。
+SecretNote 前端基于 [Mana](https://github.com/difizen/mana) 模块化框架和 [Libro](https://github.com/difizen/libro) Notebook 解决方案定制开发，开源的后端服务基于 [Jupyter Server](https://github.com/jupyter-server/jupyter_server) 定制开发。如需进一步了解项目结构和 API 约定，请查看 [CONTRIBUTING](CONTRIBUTING.md) 。
 
 ## 问题反馈
 
 请在 [issues](https://github.com/secretflow/secretnote/issues) 区反馈，或点击 [隐语实训平台](https://www.secret-flow.com/welcome) 右上角 “反馈” 按钮加群咨询。
-

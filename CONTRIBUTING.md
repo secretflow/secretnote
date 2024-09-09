@@ -38,7 +38,7 @@
 
 ## 后端 API 列表
 
-为了让 SecretNote Lite 能够完整地正常工作，其后端需要实现以下 API。
+为了让 SecretNote SF 能够完整地正常工作，其后端需要实现以下 API。
 
 ### 节点无关类
 
@@ -84,7 +84,7 @@
 
 ### 节点管理类
 
-可参考 `packages/secretnote-lite/src/modules/server/server-manager.ts`，请求-响应均使用 JSON Content-Type。如有鉴权需要，需自行实现（基于 Authorization 头或 Cookies）。
+可参考 `packages/secretnote-sf/src/modules/server/server-manager.ts`，请求-响应均使用 JSON Content-Type。如有鉴权需要，需自行实现（基于 Authorization 头或 Cookies）。
 
 #### 类型定义
 
@@ -138,7 +138,7 @@ Partial<{
 
 ### Notebook 文件管理类
 
-Notebook 文件管理与节点无关，文件储存的位置取决于具体实现。请求可参考 `packages/secretnote-lite/src/modules/notebook/drive.ts`。具体协议请参考 Jupyter Server [developers/contents.html](https://jupyter-server.readthedocs.io/en/latest/developers/contents.html) ，后文仅做简单说明。请求-响应均使用 JSON Content-Type。
+Notebook 文件管理与节点无关，文件储存的位置取决于具体实现。请求可参考 `packages/secretnote-sf/src/modules/notebook/drive.ts`。具体协议请参考 Jupyter Server [developers/contents.html](https://jupyter-server.readthedocs.io/en/latest/developers/contents.html) ，后文仅做简单说明。请求-响应均使用 JSON Content-Type。
 
 #### 类型定义
 

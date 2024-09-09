@@ -1,4 +1,4 @@
-**secretnote-lite-site** is a minimum web application that holds **secretnote-lite**
+**secretnote-sf-site** is a minimum web application that holds **secretnote-sf**
 in a page, i.e., a demo site or playground.
 
 ```

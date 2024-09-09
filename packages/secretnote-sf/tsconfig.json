@@ -6,7 +6,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    // "noEmit": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "sourceMap": true,

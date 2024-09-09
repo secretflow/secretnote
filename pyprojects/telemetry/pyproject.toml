@@ -41,7 +41,6 @@ readme = "README.md"
 requires-python = ">=3.10, <3.12"
 
 [project.scripts]
-secretnote = "secretnote.server.app:SecretNoteApp.launch"
 
 [build-system]
 build-backend = "hatchling.build"
@@ -87,9 +86,3 @@ sources = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-
-# [tool.ruff]
-# extend = "../../pyproject.toml"
-
-# [tool.ruff.extend-per-file-ignores]
-# "src/secretnote/proto/**/*" = ["E501", "I001"]

@@ -26,7 +26,7 @@ export interface ISecretNoteAppProps {
 const App = (props: ISecretNoteAppProps): JSX.Element => {
   return (
     <ManaComponents.Application
-      key="secretnote-lite"
+      key="secretnote-sf"
       asChild={true}
       modules={[
         ManaAppPreset,
