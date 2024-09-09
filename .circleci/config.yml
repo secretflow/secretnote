@@ -46,6 +46,6 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - dev
           platform: linux/amd64
-          tag: 1.6.1
+          tag: 1.6.1.dev
