@@ -1,10 +1,16 @@
-## 介绍
+<h1 align="center">
+SecretNote
+</h1>
 
-SecretNote 是专为隐语开发者打造的高级工具套件。以 notebook 的形式呈现，支持多节点代码执行和文件管理，同时提供运行状态追踪功能，能较大程度提升开发者的效率和工作体验。
+SecretNote 是为 SecretFlow (隐语) 学习者和开发者定制的高级工具套件，可帮助您快速开展隐语实验。它以 notebook 的形式呈现，支持多节点代码执行和文件管理，同时提供运行状态追踪功能，能较大程度提升开发者的效率和工作体验。
 
 **由于系统安全等问题，SecretNote 不是为生产设计的，请不要直接在生产环境中使用。**
 
 ## 使用
+
+### 隐语实训平台云 SecretNote
+
+SecretNote 现在隐语实训平台提供云上版本，开箱即用，无需环境配置直接拉起计算节点，欢迎 [立即体验](https://www.secret-flow.com/secretnote)。
 
 ### 与 SecretFlow 一起使用
 
