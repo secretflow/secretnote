@@ -40,12 +40,12 @@ jobs:
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  devcontainer-publish-1.6.1:
+  devcontainer-publish-1.9.0b0:
     jobs:
       - devcontainer-publish:
           filters:
             branches:
               only:
-                - dev
+                - main
           platform: linux/amd64
-          tag: 1.6.1.dev
+          tag: 1.9.0b0

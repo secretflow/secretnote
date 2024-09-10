@@ -10,12 +10,13 @@ RUN git init \
   && rm -rf .git \
   && rm -r /repo/docker
 
-# Build the project with pnpm and rye
-FROM nikolaik/python-nodejs:python3.10-nodejs18-slim AS build
+# Build the project
+FROM nikolaik/python-nodejs:python3.10-nodejs18 AS build
 ENV CI=true
 USER root
 WORKDIR /repo
-RUN corepack enable && corepack prepare pnpm@9.4.0 --activate
+RUN npm config set registry https://registry.npmmirror.com
+RUN npm install -g pnpm@9.4.0
 RUN pip install build --break-system-packages
 COPY --from=source-tree /repo/pnpm-lock.yaml /repo/.npmrc /repo/
 RUN pnpm fetch
@@ -27,7 +28,8 @@ RUN rsync -avm --include='pyprojects/**/dist/*.whl' -f 'hide,! */' /repo/./ /dis
 
 # Config the runtime
 # TODO Update the version here
-FROM secretflow/secretflow-anolis8:1.6.1b0
+FROM secretflow/secretflow-anolis8:1.9.0b0
+RUN python --version
 RUN useradd -m secretnote
 COPY --from=build /dist /dist
 RUN pip install /dist/pyprojects/secretnote/dist/*.whl

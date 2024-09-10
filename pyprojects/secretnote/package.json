@@ -12,8 +12,8 @@
     "test:pytest": "python -m pytest",
     "typecheck:pyright": "pyright --project ../.. src/secretnote/server tests",
     "dev": "NODE_ENV=development python -m secretnote.server --config=./.jupyter/config_dev.py --debug --no-browser",
-    "build:py": "python -m build --out ./dist",
-    "build:py:rye": "rye build --out ./dist",
+    "build:py:ci": "python -m build --out ./dist",
+    "build:py": "rye build --out ./dist",
     "publish:py": "python -m hatch publish ./dist",
     "build": "nx build:py"
   },
