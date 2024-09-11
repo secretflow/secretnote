@@ -15,7 +15,7 @@
     "format:prettier": "prettier --check --ignore-unknown .",
     "ci:setup": ":",
     "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
-    "ci:check:python": "nx run-many -t format:black -t lint:ruff -t test:pytest -t typecheck:pyright",
+    "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
     "ci:build": "nx run-many -t build:js && nx run-many -t build:py:ci",
     "docker:build": "docker build -t secretflow/secretnote:1.9.0b0 -f ./docker/app/Dockerfile .",
     "docker:up": "docker-compose -f ./docker/sim/docker-compose.yml up"

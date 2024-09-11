@@ -13,7 +13,7 @@ from .services.pages.handlers import pages_handlers
 
 class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     # -------------- Required traits --------------
-    name = JUPYTER_SERVER_EXTENSION_MODULE
+    name = JUPYTER_SERVER_EXTENSION_MODULE or "secretnote"
 
     load_other_extensions = True
     extension_url = "/secretnote/"
