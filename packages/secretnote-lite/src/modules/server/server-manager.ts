@@ -47,14 +47,17 @@ export class SecretNoteServerManager {
     this.defaultServerManager = defaultServerManager;
     this.updateServerConnectionSettings();
     this.getResourcesAndVersions();
-    this.getServerList().then((servers) => {
-      // The default ServerManager must be launched to get LSP to work.
-      // If there exists servers at the beginning, just launch directly.
-      // Otherwise postpone the launch until a server is added.
-      servers?.length &&
-        !this.defaultServerManager.loaded &&
-        this.defaultServerManager.launch();
-    });
+    this.getServerList()
+      .then((servers) => {
+        // The default ServerManager must be launched to get LSP to work.
+        // If there exists servers at the beginning, just launch directly.
+        // Otherwise postpone the launch until a server is added.
+        servers?.length &&
+          !this.defaultServerManager.loaded &&
+          this.defaultServerManager.launch();
+        return;
+      })
+      .catch((e) => genericErrorHandler(e, { silent: true }));
   }
 
   /**
@@ -228,6 +231,7 @@ export class SecretNoteServerManager {
     try {
       const data = await Promise.race([
         request('api/kernelspecs', {}, server.id),
+        /* eslint-disable-next-line promise/param-names */
         new Promise((_, reject) => {
           setTimeout(() => reject(new Error('timeout')), 5000);
         }),

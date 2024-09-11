@@ -44,6 +44,7 @@ export class FilePreviewView extends BaseView {
 
   constructor(
     @inject(FileService) fileService: FileService,
+    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     // @ts-ignore
     @contrib(FilePreviewContribution)
     providers: Contribution.Provider<FilePreviewContribution>,
