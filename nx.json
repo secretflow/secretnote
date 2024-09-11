@@ -28,10 +28,6 @@
       ],
       "cache": true
     },
-    "lint:ruff": {
-      "inputs": [":default", ":python"],
-      "cache": true
-    },
     "format:prettier": {
       "inputs": ["{workspaceRoot}/**/*"],
       "cache": false

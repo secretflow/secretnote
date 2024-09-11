@@ -27,6 +27,7 @@ const MetricsComponent = () => {
     return () => {
       service.disable();
     };
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
   const formatMetric = (v: (typeof metrics)[1]) =>

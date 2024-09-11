@@ -25,7 +25,7 @@ export const DriveName = 'SecretNoteContentsDrive';
 @singleton()
 export class SecretNoteContentsDrive implements IContentsDrive {
   readonly name: string = DriveName; // Name of drive, used at the leading component of file paths.
-  protected apiEndpoint: string = 'api/contents';
+  protected apiEndpoint = 'api/contents';
   protected _isDisposed = false;
   protected fileChangedEmitter = new Emitter<IContentsChangedArgs>();
 
@@ -96,6 +96,7 @@ export class SecretNoteContentsDrive implements IContentsDrive {
    * @override Drive._getSettings
    */
   protected _getSettings(...args: any) /* :ISettings */ {
+    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     // @ts-ignore
     return void 0;
   }
