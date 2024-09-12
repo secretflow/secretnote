@@ -1,0 +1,49 @@
+# https://github.com/sveltejs/kit/blob/32afba695088b946aefe96da75b36de9b0667fbe/.github/workflows/release.yml
+name: 'Release'
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  changesets:
+    # prevents this action from running on forks
+    if: github.repository == 'secretflow/secretnote'
+
+    name: Changesets
+    uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main
+
+    permissions:
+      pull-requests: write
+      contents: write
+
+  ci:
+    needs: [changesets]
+    if: |
+      needs.changesets.outputs.should-release == 'true'
+
+    name: Prerelease CI
+    uses: ./.github/workflows/ci.yml
+
+    permissions:
+      contents: read
+      actions: read
+
+  publish:
+    needs: [ci]
+    if: |
+      needs.ci.result == 'success'
+
+    name: Publish
+    uses: secretflow/web-ci/.github/workflows/release-publish.yml@main
+
+    with:
+      node-version: '18'
+      python-version: '3.10'
+
+    permissions:
+      contents: write
+
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

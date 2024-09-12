@@ -10,7 +10,7 @@ _需要注意的是，SecretNote 的设计是为了学习和原型实验，请�
 
 ### 隐语实训平台云 SecretNote (推荐)
 
-🕹 SecretNote SF 现在隐语实训平台提供云上版本，开箱即用，无需环境配置直接拉起计算节点，欢迎 [立即体验](https://www.secret-flow.com/secretnote)。
+SecretNote SF 现在隐语实训平台提供云上版本，开箱即用，无需环境配置直接拉起计算节点，欢迎 [立即体验](https://www.secret-flow.com/secretnote)。
 
 ### 在本地启动 SecretNote SF
 

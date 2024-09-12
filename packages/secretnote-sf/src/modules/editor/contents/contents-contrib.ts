@@ -28,6 +28,7 @@ export class SecretNoteContentContribution implements ContentContribution {
       secretNoteModel.currentFileContents = currentFileContents;
       secretNoteModel.filePath = currentFileContents.path;
 
+      /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
       // @ts-ignore
       if (!secretNoteModel.quickEditMode && !secretNoteModel.readOnly) {
         secretNoteModel.startKernelConnection();

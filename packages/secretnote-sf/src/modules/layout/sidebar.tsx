@@ -114,6 +114,7 @@ export class SideBarView extends DefaultSlotView {
   readonly providers: Contribution.Provider<SideBarContribution>;
 
   constructor(
+    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     // @ts-ignore
     @contrib(SideBarContribution)
     providers: Contribution.Provider<SideBarContribution>,

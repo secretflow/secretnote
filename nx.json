@@ -19,6 +19,15 @@
       ],
       "cache": true
     },
+    "lint:stylelint": {
+      "inputs": [
+        ":default",
+        ":javascript",
+        "{workspaceRoot}/.stylelintrc.*",
+        "{workspaceRoot}/.stylelintignore"
+      ],
+      "cache": true
+    },
     "format:prettier": {
       "inputs": ["{workspaceRoot}/**/*"],
       "cache": false

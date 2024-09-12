@@ -11,10 +11,11 @@
     "clean": "git clean -fX .",
     "format:black": "python -m black pyprojects/**/*.py",
     "format:prettier": "prettier --write --ignore-unknown packages/**/*.{ts,tsx}",
-    "ci:check:js": "nx format:prettier && nx run-many -t lint:eslint -t typecheck:tsc",
-    "ci:check:py": "nx format:black",
-    "ci:build": "nx run-many -t build:component -t build:site && nx run-many -t build:py",
-    "docker:build": "docker build -t secretflow/secretnote:1.6.1-amd64 -f ./docker/app/Dockerfile .",
+    "ci:setup": ":",
+    "ci:check:js": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
+    "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
+    "ci:build": "nx run-many -t build:component -t build:site && nx run-many -t build:py:ci",
+    "docker:build": "docker build -t secretflow/secretnote:1.9.0b0 -f ./docker/app/Dockerfile .",
     "docker:up": "docker-compose -f ./docker/sim/docker-compose.yml up"
   },
   "devDependencies": {
@@ -54,5 +55,16 @@
   "engines": {
     "node": ">=18.18.0"
   },
-  "packageManager": "pnpm@9.7.0"
+  "packageManager": "pnpm@9.4.0",
+  "pnpm": {
+    "overrides": {
+      "@difizen/mana-app": "0.1.23",
+      "@difizen/mana-core": "0.1.23",
+      "@difizen/mana-common": "0.1.23",
+      "@difizen/mana-l10n": "0.1.23",
+      "@difizen/mana-observable": "0.1.23",
+      "@difizen/mana-react": "0.1.23",
+      "@difizen/mana-syringe": "0.1.23"
+    }
+  }
 }
