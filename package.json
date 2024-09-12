@@ -11,6 +11,7 @@
     "clean": "git clean -fX .",
     "format:black": "python -m black pyprojects/**/*.py",
     "format:prettier": "prettier --write --ignore-unknown packages/**/*.{ts,tsx}",
+    "build": "nx run-many -t build:component -t build:site && nx run-many -t build:py",
     "ci:setup": ":",
     "ci:check:js": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
     "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
@@ -19,7 +20,6 @@
     "docker:up": "docker-compose -f ./docker/sim/docker-compose.yml up"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.27.1",
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^17.8.1",
     "@types/node": "^18.16.19",

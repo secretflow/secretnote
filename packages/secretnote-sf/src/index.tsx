@@ -21,6 +21,7 @@ import { localStorageService } from './modules/storage/local-storage-service';
 export interface ISecretNoteAppProps {
   backendURL?: string; // backend URL before `/secretnote/*`
   tokenKey?: string; // token key in local storage
+  selfDeploy?: boolean; // whether to deploy the app by oneself
 }
 
 const App = (props: ISecretNoteAppProps): JSX.Element => {
@@ -41,6 +42,7 @@ const App = (props: ISecretNoteAppProps): JSX.Element => {
         MarkdownCellModule,
         ToolbarModule,
         WelcomeModule,
+        // TODO these two modules requires some updates
         // ComponentCellModule,
         // SnippetModule,
       ]}

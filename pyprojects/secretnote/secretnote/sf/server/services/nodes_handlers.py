@@ -1,11 +1,13 @@
 # Handlers for the nodes management API.
 
 import json
-from typing import List, Tuple, Type
+from typing import Dict, List, Tuple, Type
 from jupyter_client.jsonutil import json_default
 from jupyter_server.base.handlers import APIHandler, JupyterHandler
 from tornado import web
 
+from jupyter_server.utils import ensure_async
+from jupyter_server_proxy.handlers import ProxyHandler as _ProxyHandler
 from .nodes_manager import nodes_manager
 
 
@@ -62,10 +64,87 @@ class NodeHandler(APIHandler):
         self.finish()
 
 
-# _node_id_regex = r"(?P<node_id>.+)"
-nodes_handlers: List[Tuple[str, Type[JupyterHandler]]] = [
-    ("/secretnote/api/nodes", NodeRootHandler),  # GET POST
-    # ("/secretnote/api/nodes/(.*)", NodeWithIdHandler),
-    # ("/secretnote/api/nodes/start/(.*)", NotImplementedHandler),
-    # ("/secretnote/api/nodes/stop/(.*)", NotImplementedHandler)
+class NodeWithIdHandler(APIHandler):
+    @web.authenticated
+    async def http_get(self, node_id: str):
+        node = nodes_manager.get_node(id=node_id)
+        self.finish(json.dumps(node, default=json_default))
+
+    @web.authenticated
+    async def delete(self, node_id: str):
+        nodes_manager.remove_node(node_id)
+        self.finish()
+
+
+class NotImplementedHandler(APIHandler):
+    @web.authenticated
+    async def http_get(self, *_):
+        raise web.HTTPError(501, "This API is not implemented in self-deployment mode.")
+
+    @web.authenticated
+    async def post(self, *_):
+        raise web.HTTPError(501, "This API is not implemented in self-deployment mode.")
+
+    @web.authenticated
+    async def patch(self, *_):
+        raise web.HTTPError(501, "This API is not implemented in self-deployment mode.")
+
+    @web.authenticated
+    async def delete(self, *_):
+        """[DELETE] Delete a node by ID."""
+        raise web.HTTPError(501, "This API is not implemented in self-deployment mode.")
+
+
+class ToKernelProxyHandler(_ProxyHandler):
+    """Should not only handle HTTP but also WebSocket."""
+
+    def rewrite(self, path: str):
+        return path  # no rewrite by default
+
+    async def open(self, node_id, proxied_path):
+        host, port = nodes_manager.get_node(id=node_id)["podIp"].split(":")
+
+        return await self.proxy_open(host, port, proxied_path)
+
+    def proxy(self, node_id: str, proxied_path: str):
+        print("got node >>> ", nodes_manager.get_node(id=node_id))
+        host, port = nodes_manager.get_node(id=node_id)["podIp"].split(":")
+
+        return super().proxy(host, port, self.rewrite(proxied_path))
+
+    async def http_get(self, *args):
+        print("args of get >>>", args)
+        return await ensure_async(self.proxy(*args))
+
+    def post(self, *args):
+        return self.proxy(*args)
+
+    def put(self, *args):
+        return self.proxy(*args)
+
+    def delete(self, *args):
+        return self.proxy(*args)
+
+    def head(self, *args):
+        return self.proxy(*args)
+
+    def patch(self, *args):
+        return self.proxy(*args)
+
+    def options(self, *args):
+        return self.proxy(*args)
+
+
+nodes_handlers = [
+    ("/secretnote/api/nodes", NodeRootHandler),
+    ("/secretnote/api/nodes/(.*)", NodeWithIdHandler),
+    ("/secretnote/api/nodes/start/(.*)", NotImplementedHandler),
+    ("/secretnote/api/nodes/stop/(.*)", NotImplementedHandler),
+    (
+        "/secretnote/(.*?)/(.*)",
+        ToKernelProxyHandler,
+        {
+            "host_allowlist": lambda *_: True,
+        },
+    ),
 ]

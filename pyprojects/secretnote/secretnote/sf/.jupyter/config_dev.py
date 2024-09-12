@@ -5,6 +5,10 @@ if TYPE_CHECKING:
 
 c = get_config()
 
+
+c.NotebookApp.token = ""
+c.NotebookApp.password = ""
+
 c.Application.log_level = 0
 
 c.ServerApp.allow_origin = "*"

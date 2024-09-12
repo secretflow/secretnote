@@ -10,17 +10,17 @@
 - docs # 文档
 - examples # 示例
   - psi # SecretFlow 隐私求交示例
-  - telemetry # 可观测示例
+  - telemetry # 可观测示例 [暂不维护]
 - packages # 前端 Monorepo
   - secretnote-scql # SecretNote SCQL 主组件
   - secretnote-scql-site # SecretNote SCQL Playground (Demo Site)
   - secretnote-sf # SecretNote SF 主组件
   - secretnote-sf-site # SecretNote SF Playground (Demo Site)
-  - secretnote-ui # 可观测前端支持
+  - secretnote-ui # 可观测前端支持 [暂不维护]
 - pyprojects # 后端 Monorepo
   - secretnote-scql # SecretNote SCQL 后端服务
   - secretnote-sf # SecretNote SF 后端服务
-  - telemetry # 可观测后端服务
+  - telemetry # 可观测后端服务 [暂不维护]
 ```
 
 ## 调试方法

@@ -51,8 +51,8 @@ export class NodeService {
   /**
    * Add a remote node serving as Jupyter Server to under management.
    */
-  async addNode({ name }: { name: string; address: string }) {
-    return await this.serverManager.addServer(name);
+  async addNode({ name, podIp }: { name: string; podIp?: string }) {
+    return await this.serverManager.addServer(name, podIp);
   }
 
   /**

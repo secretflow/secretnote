@@ -101,13 +101,15 @@ export class SecretNoteServerManager {
 
   /*
    * Add a new remote server.
+   * For self-deployed usage, podIp is required.
    */
-  async addServer(name: string) {
+  async addServer(name: string, podIp?: string) {
     // request to create a new server
     const data: SecretNoteNode = await request('api/nodes', {
       method: 'POST',
       body: JSON.stringify({
         name,
+        ...(podIp ? { pod_ip: podIp } : {}),
       }),
     });
     // check if it's created successfully according to the kernelspecs response

@@ -6,12 +6,11 @@
   "scripts": {
     "dev:sf": "NODE_ENV=development python -m secretnote sf --config=./secretnote/sf/.jupyter/config_dev.py",
     "dev:scql": "NODE_ENV=development python -m secretnote scql --config=./secretnote/scql/.jupyter/config_dev.py",
-    "build": "nx build:py",
     "format:black": "python -m black --check src tests",
     "test:pytest": "python -m pytest",
     "typecheck:pyright": "pyright --project ../.. src/secretnote/server tests",
-    "build:py:ci": "python -m build --out ./dist",
     "build:py": "rye build --out ./dist",
+    "build:py:ci": "python -m build --out ./dist",
     "publish:py": "python -m hatch publish ./dist"
   },
   "dependencies": {

@@ -1,18 +1,10 @@
 # Manage nodes using a database.
 
+import json
 from typing import Dict, Optional
 from dataset import Table, connect
 
 from ..utils import get_db_path
-
-
-class SecretNoteNode:
-    def __init__(self, id: str, name: str, status: str, service: str, podIp: str):
-        self.id = id
-        self.name = name
-        self.status = status  # Pending, Running, Succeeded, Failed, Unknown, Terminated
-        self.service = service
-        self.podIp = podIp
 
 
 class NodesManager(object):
@@ -38,15 +30,21 @@ class NodesManager(object):
         else:
             raise Exception("node podIp is required.")
 
-    def add_node(self, node: Dict[str, str]):
-        """Add a new node. `node` is like `{name, podIp}`. Returns the node id."""
-        name = node.get("name", None)
-        pod_ip = node.get("pod_ip", None)
-
+    def add_node(self, form: Dict[str, str]):
+        """Add a new node. Returns the node id."""
+        name = form.get("name", None)
+        pod_ip = form.get("pod_ip", None)
         self.ensure_name(name)
         self.ensure_pod_ip(pod_ip)
 
-        return self.table.insert(node)
+        return self.table.insert(
+            {
+                "name": name,
+                "status": "Pending",
+                "service": "self-deployment",
+                "podIp": pod_ip,
+            }
+        )
 
     def remove_node(self, node_id: str) -> None:
         """Remove a node from the database."""

@@ -6,6 +6,7 @@ const dtsIndex = `
 declare const App: (props: {
   backendURL?: string;
   tokenKey?: string;
+  selfDeploy?: boolean;
 }) => JSX.Element;
 export { App as default };`.trim();
 

@@ -24,12 +24,12 @@ export default defineConfig({
       : false,
   // proxy for development
   proxy: {
-    // '/secretnote': {
-    //   target: 'http://localhost:8888/',
-    //   changeOrigin: true,
-    //   secure: false,
-    //   ws: true,
-    // },
+    '/secretnote': {
+      target: 'http://localhost:8888/',
+      changeOrigin: true,
+      secure: false,
+      ws: true,
+    },
   },
   extraBabelPlugins: [],
   mfsu: false,
