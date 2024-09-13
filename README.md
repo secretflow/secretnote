@@ -68,7 +68,33 @@ SecretNote SCQL 对 P2P SCQL 进行产品化封装，降低了开发者编写 SC
 
 ## 开发与贡献
 
-SecretNote 前端基于 [Mana](https://github.com/difizen/mana) 模块化框架和 [Libro](https://github.com/difizen/libro) Notebook 解决方案定制开发，开源的后端服务基于 [Jupyter Server](https://github.com/jupyter-server/jupyter_server) 定制开发。如需进一步了解项目结构和 API 约定，请查看 [CONTRIBUTING](CONTRIBUTING.md) 。
+SecretNote 前端基于 [Mana](https://github.com/difizen/mana) 模块化框架和 [Libro](https://github.com/difizen/libro) Notebook 解决方案定制开发，开源的后端服务基于 [Jupyter Server](https://github.com/jupyter-server/jupyter_server) 定制开发。
+
+### 初始化
+
+项目前端使用 [pnpm](https://pnpm.io/)、服务端使用 [Rye](https://rye.astral.sh/) 管理 Monorepo。初始化请执行
+
+```sh
+pnpm run bootstrap # 安装依赖
+pnpm run build # 首次构建
+```
+
+### 开发
+
+以进行 SecretNote SF 的开发为例，需要同时启动组件监视编译、Playground DevServer、本地 Jupyter Server
+
+```sh
+pnpm run dev # 在 secretnote/packages/secretnote-sf 下监视组件修改
+pnpm run dev # 在 secretnote/packages/secretnote-sf-site 下启动 DevServer
+NODE_ENV=development python -m secretnote sf ./.secretnote --config=./secretnote/sf/.jupyter/config_dev.py --no-browser
+# 在 secretnote/pyprojects 下启动 Jupyter Server
+```
+
+如果还需要无刷新热重载，请查看 [如何通过 Playground 调试前端组件](./CONTRIBUTING.md) ；如果还需要本地运算节点，请参考前文使用 Docker 启动。
+
+### 更多
+
+如需进一步了解项目结构和 API 约定，请查看 [CONTRIBUTING](CONTRIBUTING.md) 。
 
 ## 问题反馈
 
