@@ -1,6 +1,8 @@
 # Manage nodes using a database.
 
 import json
+import random
+import string
 from typing import Dict, Optional
 from dataset import Table, connect
 
@@ -10,7 +12,7 @@ from ..utils import get_db_path
 class NodesManager(object):
     def __init__(self):
         db = connect(get_db_path())
-        self.table: Table = db.get_table("node")  # type: ignore
+        self.table: Table = db.get_table("node", primary_id="id", primary_type=db.types.text)  # type: ignore
 
     def ensure_name(self, name: Optional[str]) -> None:
         """Ensure that the node name is unused."""
@@ -39,6 +41,7 @@ class NodesManager(object):
 
         return self.table.insert(
             {
+                "id": "".join(random.choices(string.ascii_lowercase, k=8)),
                 "name": name,
                 "status": "Pending",
                 "service": "self-deployment",

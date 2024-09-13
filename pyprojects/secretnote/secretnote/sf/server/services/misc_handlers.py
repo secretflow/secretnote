@@ -14,7 +14,7 @@ class KernelSpecsHandler(APIHandler):
 
 class EmptyJSONHandler(APIHandler):
     @web.authenticated
-    def get(self):
+    def get(self, *_):
         self.finish(r"{}")
 
 
@@ -25,5 +25,5 @@ misc_handlers: List[Tuple[str, Type[JupyterHandler]]] = [
     ("/secretnote/api/resources-versions", EmptyJSONHandler),
     ("/secretnote/libro/api/workspace", EmptyJSONHandler),
     ("/secretnote/lsp/status", EmptyJSONHandler),
-    ("/secretnote/(.*?)/api/workspace", EmptyJSONHandler),
+    ("/secretnote/(.*?)/libro/api/workspace", EmptyJSONHandler),
 ]

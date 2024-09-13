@@ -146,7 +146,7 @@ export class SecretNoteServerManager {
     const server = this.servers[index];
     this.servers.splice(index, 1);
     this.updateServerConnectionSettings();
-    this.onServerAddedEmitter.fire(server);
+    this.onServerDeletedEmitter.fire(server);
   }
 
   /**

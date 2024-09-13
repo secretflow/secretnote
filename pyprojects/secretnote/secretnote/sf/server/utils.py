@@ -5,7 +5,7 @@ def get_db_path():
     """Get the URI of the SQLite database file for the SecretNote application."""
     from jupyter_core import paths
 
-    jupyter_config_dir = paths.jupyter_config_dir()
+    jupyter_config_dir = paths.jupyter_config_dir()  # ~/.jupyter by default
     if not path.exists(jupyter_config_dir):
         makedirs(jupyter_config_dir)
 

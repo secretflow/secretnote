@@ -90,7 +90,7 @@
 
 ```ts
 type SecretNoteNode = {
-  id: string; // 节点 ID
+  id: string; // 节点 ID，不能为纯数字
   name: string; // 节点名
   status: ServerStatus; // Pending, Running, Succeeded, Failed, Unknown, Terminated
   service: string; // 该节点的 K8s Service 名

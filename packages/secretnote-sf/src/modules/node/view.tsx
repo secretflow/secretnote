@@ -68,6 +68,7 @@ const NodeDetails = (props: { node: SecretNoteNode }) => {
   const instance = useInject<NodeView>(ViewInstance);
   const service = instance.service;
   const { node } = props;
+  const { resourcesAndVersions: nodeRV } = node;
   const { status, text } = formatNodeStatus(node);
   const [loading, setLoading] = useState(false);
 
@@ -90,6 +91,10 @@ const NodeDetails = (props: { node: SecretNoteNode }) => {
     }
   };
 
+  const getOrDefault = (v: any, default_ = l10n.t('暂无数据')) => {
+    return v || default_;
+  };
+
   return (
     <div className="secretnote-node-description">
       <Spin spinning={loading}>
@@ -99,20 +104,16 @@ const NodeDetails = (props: { node: SecretNoteNode }) => {
             <Badge status={status} text={text} />
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('IP')}>
-            <Paragraph copyable={!!node.podIp}>
-              {node.podIp || l10n.t('暂无数据')}
-            </Paragraph>
+            <Paragraph copyable={!!node.podIp}>{getOrDefault(node.podIp)}</Paragraph>
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('CPU 和内存配额')}>
-            {`${node.resourcesAndVersions?.cpu}C` || l10n.t('暂无数据')} /{' '}
-            {node.resourcesAndVersions?.memory || l10n.t('暂无数据')}
+            {`${getOrDefault(nodeRV?.cpu)}C`} / {getOrDefault(nodeRV?.memory)}
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('镜像')}>
-            {node.resourcesAndVersions?.image || l10n.t('暂无数据')}
+            {getOrDefault(nodeRV?.image)}
           </Descriptions.Item>
           <Descriptions.Item label={l10n.t('Python 和 SecretFlow 版本')}>
-            {node.resourcesAndVersions?.python || l10n.t('暂无数据')} /{' '}
-            {node.resourcesAndVersions?.secretflow || l10n.t('暂无数据')}
+            {getOrDefault(nodeRV?.python)} / {getOrDefault(nodeRV?.secretflow)}
           </Descriptions.Item>
         </Descriptions>
         <Divider style={{ marginTop: '0', marginBottom: '1em' }} />
