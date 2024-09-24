@@ -36,17 +36,17 @@ export const TopToolbarRunItem = () => {
         autoAdjustOverflow={false}
       >
         <DropdownMenu
-          icon={<PlayCircle className="libro-top-toolbar-run-icon" size={18} />}
+          icon={<PlayCircle className="libro-top-toolbar-custom-icon" size={18} />}
           trigger={['hover']}
           items={[
             {
-              key: 'RunAllCells',
-              label: l10n.t('执行所有 Cell'),
+              key: 'RunCell',
+              label: l10n.t('执行当前 Cell'),
               icon: <Play size={14} />,
             },
             {
-              key: 'RunCell',
-              label: l10n.t('执行当前 Cell'),
+              key: 'RunAllCells',
+              label: l10n.t('执行所有 Cell'),
               icon: <FastForward size={14} />,
             },
             {
@@ -72,7 +72,11 @@ export const TopToolbarRunItem = () => {
         trigger="hover"
         overlayClassName="libro-tooltip-placement-right"
       >
-        <PlayCircle size={18} color="#bfbfbf" className="libro-top-toolbar-run-icon" />
+        <PlayCircle
+          size={18}
+          color="#bfbfbf"
+          className="libro-top-toolbar-custom-icon"
+        />
       </Tooltip>
     );
   }

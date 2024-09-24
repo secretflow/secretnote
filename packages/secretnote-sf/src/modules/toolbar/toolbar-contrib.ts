@@ -5,6 +5,7 @@ import { singleton, ToolbarContribution } from '@difizen/mana-app';
 import './index.less';
 import { SideToolbarRunItem } from './side-toolbar-run-item';
 import { TopToolbarRunItem } from './top-toolbar-run-item';
+import { KeybindInstruction } from './keybind-instruction';
 
 @singleton({ contrib: ToolbarContribution })
 export class SecretNoteToolbarContribution implements ToolbarContribution {
@@ -34,6 +35,13 @@ export class SecretNoteToolbarContribution implements ToolbarContribution {
       icon: TopToolbarRunItem,
       group: ['group2'],
       order: 'a',
+    });
+    // Replace with our own keybind instructions
+    registry.unregisterItem('notebook:keybind-instructions');
+    registry.registerItem({
+      id: 'notebook:keybind-instructions',
+      command: 'notebook:keybind-instructions',
+      icon: KeybindInstruction,
     });
   }
 }

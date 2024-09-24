@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { l10n } from '@difizen/mana-l10n';
 import type { Editor, Range } from '@tiptap/core';
 import { Extension } from '@tiptap/core';
 import { ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
 import classnames from 'classnames';
 import {
-  CheckSquare,
   Code,
   Heading1,
   Heading2,
@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import React from 'react';
 import tippy from 'tippy.js';
 
 interface CommandItemProps {
@@ -64,8 +63,7 @@ const Command = Extension.create({
 const getSuggestionItems = ({ query }: { query: string }) => {
   return [
     {
-      title: 'Text',
-      description: 'Just start typing with plain text.',
+      title: l10n.t('文本'),
       searchTerms: ['p', 'paragraph'],
       icon: <Text size={18} />,
       command: ({ editor, range }: CommandProps) => {
@@ -78,17 +76,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: 'To-do List',
-      description: 'Track tasks with a to-do list.',
-      searchTerms: ['todo', 'task', 'list', 'check', 'checkbox'],
-      icon: <CheckSquare size={18} />,
-      command: ({ editor, range }: CommandProps) => {
-        editor.chain().focus().deleteRange(range).toggleTaskList().run();
-      },
-    },
-    {
-      title: 'Heading 1',
-      description: 'Big section heading.',
+      title: l10n.t('标题 1'),
       searchTerms: ['title', 'big', 'large'],
       icon: <Heading1 size={18} />,
       command: ({ editor, range }: CommandProps) => {
@@ -101,8 +89,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: 'Heading 2',
-      description: 'Medium section heading.',
+      title: l10n.t('标题 2'),
       searchTerms: ['subtitle', 'medium'],
       icon: <Heading2 size={18} />,
       command: ({ editor, range }: CommandProps) => {
@@ -115,8 +102,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: 'Heading 3',
-      description: 'Small section heading.',
+      title: l10n.t('标题 3'),
       searchTerms: ['subtitle', 'small'],
       icon: <Heading3 size={18} />,
       command: ({ editor, range }: CommandProps) => {
@@ -129,8 +115,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: 'Bullet List',
-      description: 'Create a simple bullet list.',
+      title: l10n.t('无序列表'),
       searchTerms: ['unordered', 'point'],
       icon: <List size={18} />,
       command: ({ editor, range }: CommandProps) => {
@@ -138,8 +123,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: 'Numbered List',
-      description: 'Create a list with numbering.',
+      title: l10n.t('有序列表'),
       searchTerms: ['ordered'],
       icon: <ListOrdered size={18} />,
       command: ({ editor, range }: CommandProps) => {
@@ -147,8 +131,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       },
     },
     {
-      title: 'Quote',
-      description: 'Capture a quote.',
+      title: l10n.t('引用块'),
       searchTerms: ['blockquote'],
       icon: <TextQuote size={18} />,
       command: ({ editor, range }: CommandProps) =>
@@ -161,8 +144,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
           .run(),
     },
     {
-      title: 'Code',
-      description: 'Capture a code snippet.',
+      title: l10n.t('代码块'),
       searchTerms: ['codeblock'],
       icon: <Code size={18} />,
       command: ({ editor, range }: CommandProps) =>
@@ -173,7 +155,6 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       const search = query.toLowerCase();
       return (
         item.title.toLowerCase().includes(search) ||
-        item.description.toLowerCase().includes(search) ||
         (item.searchTerms &&
           item.searchTerms.some((term: string) => term.includes(search)))
       );

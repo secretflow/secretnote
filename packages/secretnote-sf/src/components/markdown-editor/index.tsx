@@ -1,23 +1,22 @@
+// A WYSIWYG markdown editor component used as the Markdown Cell in SecretNote.
+// The default markdown cell shipped with @difizen/libro-markdown-cell is not WYSIWYG,
+// so we don't use it.
+
 import type { Editor as EditorClass } from '@tiptap/core';
 import type { Extension } from '@tiptap/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { useDebounceFn } from 'ahooks';
 import { useEffect, useState } from 'react';
-import React from 'react';
 
 import { EditorBubbleMenu } from './bubble-menu';
 import { defaultExtensions } from './extensions';
 import './index.less';
 
-function Editor({
+export function Editor({
   defaultValue = '',
   extensions = [],
-  onUpdate = () => {
-    //
-  },
-  onDebouncedUpdate = () => {
-    //
-  },
+  onUpdate = () => {},
+  onDebouncedUpdate = () => {},
 }: {
   defaultValue: string;
   extensions?: Extension[];
@@ -78,5 +77,3 @@ function Editor({
     </div>
   );
 }
-
-export { Editor };

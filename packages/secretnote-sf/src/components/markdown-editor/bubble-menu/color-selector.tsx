@@ -4,7 +4,6 @@ import { Popover } from 'antd';
 import { Check, ChevronDown } from 'lucide-react';
 import type { Dispatch, FC, SetStateAction } from 'react';
 import './color-selector.less';
-import React from 'react';
 
 export interface BubbleColorMenuItem {
   name: string;

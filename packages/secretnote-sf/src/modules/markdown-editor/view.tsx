@@ -40,11 +40,8 @@ MarkdownCell.displayName = 'MarkdownCell';
 export class MarkdownCellView extends LibroEditorCellView implements CellCollapsible {
   view = MarkdownCell;
 
-  @prop()
-  headingCollapsed = false;
-
-  @prop()
-  collapsibleChildNumber = 0;
+  @prop() headingCollapsed = false;
+  @prop() collapsibleChildNumber = 0;
 
   get cellModel() {
     return this.model as MarkdownCellModel;

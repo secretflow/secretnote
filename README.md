@@ -90,11 +90,11 @@ NODE_ENV=development python -m secretnote sf ./.secretnote --config=./secretnote
 # 在 secretnote/pyprojects 下启动 Jupyter Server
 ```
 
-如果还需要无刷新热重载，请查看 [如何通过 Playground 调试前端组件](./CONTRIBUTING.md) ；如果还需要本地运算节点，请参考前文使用 Docker 启动。
+如果还需要无刷新热重载，请查看 [如何通过 Playground 调试前端组件](CONTRIBUTING.md) ；如果还需要本地运算节点，请参考前文使用 Docker 启动。
 
 ### 更多
 
-如需进一步了解项目结构和 API 约定，请查看 [CONTRIBUTING](CONTRIBUTING.md) 。
+请查看 [CONTRIBUTING](CONTRIBUTING.md) 进一步了解项目结构和 API 约定
 
 ## 问题反馈
 

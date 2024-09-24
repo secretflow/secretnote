@@ -14,7 +14,6 @@ import {
   TextQuote,
 } from 'lucide-react';
 import type { Dispatch, FC, SetStateAction } from 'react';
-import React from 'react';
 
 import type { BubbleMenuItem } from '.';
 import './node-selector.less';
@@ -58,13 +57,6 @@ export const NodeSelector: FC<NodeSelectorProps> = ({ editor, isOpen, setIsOpen 
       icon: Heading3,
       command: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       isActive: () => editor.isActive('heading', { level: 3 }),
-    },
-    {
-      name: 'To-do List',
-      label: l10n.t('任务列表'),
-      icon: CheckSquare,
-      command: () => editor.chain().focus().toggleTaskList().run(),
-      isActive: () => editor.isActive('taskItem'),
     },
     {
       name: 'Bullet List',

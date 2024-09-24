@@ -1,11 +1,10 @@
 import '@/lang';
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 import { message } from 'antd';
-
+import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { EditorModule } from '@/modules/editor';
 import { FileModule } from '@/modules/file';
 import { LayoutModule } from '@/modules/layout';
-import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { NodeModule } from '@/modules/node';
 import { NotebookModule } from '@/modules/notebook';
 import { StorageModule } from '@/modules/storage';
@@ -14,9 +13,9 @@ import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
 import { MetricsModule } from '@/modules/metrics';
 // import { ComponentCellModule } from '@/modules/component-cell'
-// import { SnippetModule } from '@/modules/snippet';
-import './override.less';
+import { SnippetModule } from '@/modules/toolbar/snippet';
 import { localStorageService } from './modules/storage/local-storage-service';
+import './override.less';
 
 export interface ISecretNoteAppProps {
   backendURL?: string; // backend URL before `/secretnote/*`
@@ -44,7 +43,7 @@ const App = (props: ISecretNoteAppProps): JSX.Element => {
         WelcomeModule,
         // TODO these two modules requires some updates
         // ComponentCellModule,
-        // SnippetModule,
+        SnippetModule,
       ]}
       onReady={() => {
         // do some initialization

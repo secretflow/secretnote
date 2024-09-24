@@ -10,9 +10,9 @@ export function genericErrorHandler(
     reThrow?: boolean;
   } = {},
 ) {
+  console.error(e);
   if (!options?.silent) {
     message.error(e?.message || e.toString());
-    console.error(e);
   }
   // eslint-disable-next-line no-console
   if (options?.reThrow) {

@@ -36,7 +36,7 @@ class SinglePageApplicationHandler(
 
 pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
     (
-        r"/secretnote/(.*)",
+        "/secretnote/(.*)",
         SinglePageApplicationHandler,
         {"path": single_page_static_path},
     ),

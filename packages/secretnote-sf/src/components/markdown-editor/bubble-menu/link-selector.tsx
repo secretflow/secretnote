@@ -4,10 +4,7 @@ import classnames from 'classnames';
 import { Check, Trash } from 'lucide-react';
 import type { Dispatch, FC, SetStateAction } from 'react';
 import { useEffect, useRef } from 'react';
-import React from 'react';
-
 import { getUrlFromString } from '../util';
-
 import './link-selector.less';
 
 interface LinkSelectorProps {

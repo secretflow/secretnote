@@ -13,13 +13,13 @@ from .nodes_manager import nodes_manager
 class NodeRootHandler(APIHandler):
     @web.authenticated
     def get(self):
-        """[GET] Get all nodes."""
+        """Get all nodes."""
         nodes = nodes_manager.get_nodes()
         self.finish(json.dumps(nodes, default=json_default))
 
     @web.authenticated
     async def post(self):
-        """[POST] Add a new node. Returns the node and its ID."""
+        """Add a new node. Returns the node and its ID."""
         model = self.get_json_body()
         if model is None:
             raise web.HTTPError(400, "no request body provided.")
@@ -63,13 +63,16 @@ class NotImplementedHandler(APIHandler):
 
 
 class ToRemoteJupyterServerProxyHandler(_ProxyHandler):
-    """Proxy all requests to remote jupyter server running inside container.
-    Not only handle HTTP but also WebSocket."""
+    """Proxy all requests to remote jupyter server running inside a container.
+    Not only handles HTTP but also WebSocket."""
+
+    def check_origin(self, *_):
+        return True
 
     def rewrite(self, path: str):
         return path
 
-    async def open(self, node_id, proxied_path):
+    async def open(self, node_id: str, proxied_path: str):
         """Handle WebSocket connection."""
         host, port = nodes_manager.get_node(id=node_id)["podIp"].split(":")
 
@@ -108,10 +111,11 @@ class ToRemoteJupyterServerProxyHandler(_ProxyHandler):
 nodes_handlers = [
     ("/secretnote/api/nodes", NodeRootHandler),
     ("/secretnote/api/nodes/(.*)", NodeWithIdHandler),
+    # we can't start/stop nodes in self-deployment mode
     ("/secretnote/api/nodes/start/(.*)", NotImplementedHandler),
     ("/secretnote/api/nodes/stop/(.*)", NotImplementedHandler),
     (
-        "/secretnote/(.*?)/(.*)",
+        "/secretnote/(?!static)(.*?)/(.*)",
         ToRemoteJupyterServerProxyHandler,
         {
             "host_allowlist": lambda *_: True,
