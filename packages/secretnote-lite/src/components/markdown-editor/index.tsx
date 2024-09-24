@@ -8,6 +8,7 @@ import React from 'react';
 import { EditorBubbleMenu } from './bubble-menu';
 import { defaultExtensions } from './extensions';
 import './index.less';
+import 'katex/dist/katex.min.css';
 
 function Editor({
   defaultValue = '',
