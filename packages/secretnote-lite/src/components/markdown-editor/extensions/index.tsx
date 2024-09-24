@@ -12,6 +12,7 @@ import TiptapUnderline from '@tiptap/extension-underline';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
 import SlashCommand from './slash-command';
+import { MathExtension } from '@aarkue/tiptap-math-extension';
 
 export const defaultExtensions = [
   StarterKit.configure({
@@ -115,4 +116,5 @@ export const defaultExtensions = [
     html: true,
     transformCopiedText: true,
   }),
+  MathExtension,
 ];
