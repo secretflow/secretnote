@@ -1,6 +1,6 @@
 # Serves the static files of the SecretNote frontend as a single-page application.
 
-import os
+from os import path
 from tornado import web
 from typing import Dict, List, Tuple, Type
 from jupyter_server.base.handlers import JupyterHandler, FileFindHandler
@@ -9,9 +9,7 @@ from jupyter_server.extension.handler import (
     ExtensionHandlerJinjaMixin,
 )
 
-single_page_static_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../../www")
-)
+single_page_static_path = path.abspath(path.join(path.dirname(__file__), "../../www"))
 
 
 class SinglePageApplicationHandler(

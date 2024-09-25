@@ -1,14 +1,17 @@
 import { KernelCommands, NotebookCommands } from '@difizen/libro-jupyter';
-import type { ToolbarRegistry } from '@difizen/mana-app';
+import { ModalContribution, ModalItem, ToolbarRegistry } from '@difizen/mana-app';
 import { singleton, ToolbarContribution } from '@difizen/mana-app';
 
 import './index.less';
 import { SideToolbarRunItem } from './side-toolbar-run-item';
 import { TopToolbarRunItem } from './top-toolbar-run-item';
 import { KeybindInstruction } from './keybind-instruction';
+import { RestartClearOutputModal } from './restart-clear-outputs-modal';
 
-@singleton({ contrib: ToolbarContribution })
-export class SecretNoteToolbarContribution implements ToolbarContribution {
+@singleton({ contrib: [ToolbarContribution, ModalContribution] })
+export class SecretNoteToolbarContribution
+  implements ToolbarContribution, ModalContribution
+{
   registerToolbarItems(registry: ToolbarRegistry) {
     // don't allow manually kernel switch
     registry.unregisterItem(KernelCommands.ShowKernelStatusAndSelector.id);
@@ -43,5 +46,12 @@ export class SecretNoteToolbarContribution implements ToolbarContribution {
       command: 'notebook:keybind-instructions',
       icon: KeybindInstruction,
     });
+  }
+
+  registerModals() {
+    return [
+      // override the original RestartClearOutput modal which has no i18n supports
+      RestartClearOutputModal,
+    ];
   }
 }

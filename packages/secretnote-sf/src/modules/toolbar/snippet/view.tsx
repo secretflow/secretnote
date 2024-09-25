@@ -1,14 +1,16 @@
 // Snippet component.
 
 import { l10n } from '@difizen/mana-l10n';
-import { Collapse, Drawer, Flex, Table, Tooltip } from 'antd';
+import { Collapse, Drawer, Flex, message, Table, Tooltip } from 'antd';
 import { ArrowUpSquareIcon, CodeIcon } from 'lucide-react';
 import { useState } from 'react';
 import endent from 'endent';
 
 import './index.less';
+import { SnippetService } from './service';
+import { useInject } from '@difizen/mana-app';
 
-interface ISnippet {
+export interface ISnippet {
   key: string;
   label: string;
   code: string;
@@ -104,6 +106,7 @@ export const snippets: ISnippet[] = [
 ] as const;
 
 export const SnippetView = () => {
+  const service = useInject(SnippetService);
   const [open, setOpen] = useState(false);
 
   return (
@@ -129,14 +132,14 @@ export const SnippetView = () => {
             label: (
               <Flex justify="space-between" align="center">
                 {v.label}
-                <Tooltip title={l10n.t('应用到 Notebook')}>
+                <Tooltip title={l10n.t('添加到 Notebook')}>
                   <ArrowUpSquareIcon
                     size={14}
                     onClick={(e) => {
-                      // navigator.clipboard.writeText(v.code);
                       e.preventDefault();
                       e.stopPropagation();
-                      // TODO
+                      service.addSnippet(v);
+                      message.success(l10n.t('已添加到选中的 Cell 后方'));
                     }}
                   />
                 </Tooltip>

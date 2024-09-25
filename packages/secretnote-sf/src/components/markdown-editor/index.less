@@ -1,5 +1,6 @@
-.ProseMirror {
-  font-size: 14px;
+// Refer to https://github.com/sindresorhus/github-markdown-css/blob/main/github-markdown-light.css
+.tiptap.ProseMirror {
+  font-size: 16px;
 
   p {
     margin-bottom: 0.8em;
@@ -30,8 +31,16 @@
   }
 
   .blockquote {
-    padding-left: 1em;
-    border-left: 2px solid #44403c;
+    margin: 16px 0;
+    padding: 0 1em;
+    color: #636c76;
+    border-left: 0.25em solid #d0d7de;
+    & > :first-child {
+      margin-top: 0;
+    }
+    & > :last-child {
+      margin-bottom: 0;
+    }
   }
 
   .code-block {
@@ -60,24 +69,11 @@
     text-underline-offset: 3px;
   }
 
-  .task-list {
-    padding-left: 0.5rem;
-    margin-bottom: 0;
-    list-style: none;
-  }
-
-  .task-list-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 0.6rem;
-
-    label {
-      margin-right: 0.3rem;
-    }
-
-    p {
-      margin-bottom: 0;
-    }
+  img {
+    border-style: none;
+    max-width: 100%;
+    box-sizing: content-box;
+    background-color: #ffffff;
   }
 }
 

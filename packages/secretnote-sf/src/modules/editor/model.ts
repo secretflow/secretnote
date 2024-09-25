@@ -1,7 +1,6 @@
 import type { IContentsModel, IKernelConnection } from '@difizen/libro-jupyter';
 import {
   DocumentCommands,
-  ExecutedWithKernelCellModel,
   LibroModel,
   SaveFileErrorModal,
 } from '@difizen/libro-jupyter';
@@ -162,6 +161,9 @@ export class SecretNoteModel extends LibroModel {
     return true;
   }
 
+  /**
+   * Interrupt all kernels.
+   */
   async interrupt() {
     await Promise.all(
       this.kernelConnections.map(async (item) => {
@@ -170,6 +172,9 @@ export class SecretNoteModel extends LibroModel {
     );
   }
 
+  /**
+   * Shutdown all kernels for the current opened notebook.
+   */
   async shutdown() {
     if (this.currentFileContents) {
       await this.kernelManager.shutdownKernelConnections(this.currentFileContents);
@@ -192,24 +197,14 @@ export class SecretNoteModel extends LibroModel {
     }
   }
 
+  /**
+   * Reconnect all kernels.
+   */
   async reconnect() {
     await Promise.all(
       this.kernelConnections.map(async (item) => {
         await item.reconnect();
       }),
     );
-  }
-
-  findRunningCell() {
-    const runningCellIndex = this.cells.findIndex((item) => {
-      if (ExecutedWithKernelCellModel.is(item.model)) {
-        return item.model.kernelExecuting === true;
-      }
-      return false;
-    });
-    if (runningCellIndex > -1) {
-      this.selectCell(this.cells[runningCellIndex]);
-      this.scrollToView(this.cells[runningCellIndex]);
-    }
   }
 }

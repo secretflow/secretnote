@@ -6,6 +6,7 @@ import type { Dispatch, FC, SetStateAction } from 'react';
 import { useEffect, useRef } from 'react';
 import { getUrlFromString } from '../util';
 import './link-selector.less';
+import { message } from 'antd';
 
 interface LinkSelectorProps {
   editor: Editor;
@@ -45,7 +46,11 @@ export const LinkSelector: FC<LinkSelectorProps> = ({ editor, isOpen, setIsOpen 
             e.preventDefault();
             const input = e.currentTarget[0] as HTMLInputElement;
             const url = getUrlFromString(input.value);
-            url && editor.chain().focus().setLink({ href: url }).run();
+            if (!url) {
+              message.error(l10n.t('请输入正确的链接'));
+            } else {
+              editor.chain().focus().setLink({ href: url }).run();
+            }
             setIsOpen(false);
           }}
           className="link-selector-form"

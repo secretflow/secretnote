@@ -8,7 +8,6 @@ import { ManaModule } from '@difizen/mana-app';
 
 import { SecretNoteKernelModule } from '@/modules/kernel';
 import { SecretNoteServerModule } from '@/modules/server';
-
 import { SecretNoteCodeCellModel, SecretNoteCodeCellView } from './cell';
 import { SecretNoteContentContribution } from './contents';
 import { SecretNoteModel } from './model';

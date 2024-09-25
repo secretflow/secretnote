@@ -4,6 +4,7 @@ import { Modal, Form, Input, message } from 'antd';
 import { useEffect } from 'react';
 
 import { type Project, ProjectService } from './service';
+import { l10n } from '@difizen/mana-l10n';
 
 const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
   const { visible, close, data } = props;
@@ -28,7 +29,7 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
         };
         try {
           await service.addProject(params);
-          message.success('添加成功');
+          message.success(l10n.t('添加成功'));
           close();
         } catch (e) {
           if (e instanceof Error) {
@@ -46,12 +47,11 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
     <Modal
       open={visible}
       destroyOnClose={true}
-      title="New Project"
-      okText="Create Project"
+      title={l10n.t('创建新项目')}
+      okText={l10n.t('确认')}
+      cancelText={l10n.t('取消')}
       onOk={() => add()}
-      onCancel={() => {
-        close();
-      }}
+      onCancel={() => close()}
     >
       <Form
         form={form}
@@ -62,21 +62,21 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
         style={{ marginTop: 24 }}
       >
         <Form.Item
-          label="Name"
+          label={l10n.t('项目名称')}
           name="name"
           rules={[{ required: true, message: '请输入项目名称' }]}
         >
           <Input
             maxLength={16}
             disabled={editMode}
-            placeholder="请输入英文、数字或者下划线"
+            placeholder={l10n.t('请输入英文、数字或者下划线')}
             allowClear
           />
         </Form.Item>
-        <Form.Item label="Description" name="description" required={false}>
+        <Form.Item label={l10n.t('项目描述')} name="description" required={false}>
           <Input.TextArea
             rows={3}
-            placeholder="请输入英文、数字或者下划线"
+            placeholder={l10n.t('请输入英文、数字或者下划线')}
             allowClear
           />
         </Form.Item>

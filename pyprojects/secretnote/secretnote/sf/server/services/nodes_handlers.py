@@ -66,6 +66,11 @@ class ToRemoteJupyterServerProxyHandler(_ProxyHandler):
     """Proxy all requests to remote jupyter server running inside a container.
     Not only handles HTTP but also WebSocket."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.host_allowlist = lambda *_: True
+
     def check_origin(self, *_):
         return True
 
@@ -80,8 +85,6 @@ class ToRemoteJupyterServerProxyHandler(_ProxyHandler):
 
     def proxy(self, node_id: str, proxied_path: str):
         """Handle HTTP requests."""
-        print("all nodes", nodes_manager.get_nodes())
-        print("id", node_id)
         host, port = nodes_manager.get_node(id=node_id)["podIp"].split(":")
 
         return super().proxy(host, port, self.rewrite(proxied_path))

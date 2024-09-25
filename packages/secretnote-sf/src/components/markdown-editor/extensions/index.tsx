@@ -12,39 +12,38 @@ import TiptapUnderline from '@tiptap/extension-underline';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
 import SlashCommand from './slash-command';
-import { Image } from '@tiptap/extension-image';
 import { MathExtension } from '@aarkue/tiptap-math-extension';
 
 export const defaultExtensions = [
   StarterKit.configure({
     bulletList: {
       HTMLAttributes: {
-        class: 'mdcell-bullet-list',
+        class: 'bullet-list',
       },
     },
     orderedList: {
       HTMLAttributes: {
-        class: 'mdcell-order-list',
+        class: 'order-list',
       },
     },
     listItem: {
       HTMLAttributes: {
-        class: 'mdcell-list-item',
+        class: 'list-item',
       },
     },
     blockquote: {
       HTMLAttributes: {
-        class: 'mdcell-blockquote',
+        class: 'blockquote',
       },
     },
     codeBlock: {
       HTMLAttributes: {
-        class: 'mdcell-code-block',
+        class: 'code-block',
       },
     },
     code: {
       HTMLAttributes: {
-        class: 'mdcell-code',
+        class: 'code',
         spellcheck: 'false',
       },
     },
@@ -78,12 +77,12 @@ export const defaultExtensions = [
     },
   }).configure({
     HTMLAttributes: {
-      class: 'mdcell-horizontal',
+      class: 'horizontal',
     },
   }),
   TiptapLink.configure({
     HTMLAttributes: {
-      class: 'mdcell-link-text',
+      class: 'link-text',
     },
   }),
   Placeholder.configure({
@@ -91,9 +90,13 @@ export const defaultExtensions = [
       if (node.type.name === 'heading') {
         return `标题 ${node.attrs.level}`;
       }
+      if (node.content.childCount > 0) {
+        return '';
+      }
       return l10n.t('键入 / 查看更多命令');
     },
-    includeChildren: true,
+    showOnlyWhenEditable: true,
+    includeChildren: false,
   }),
   SlashCommand,
   TiptapUnderline,
@@ -106,13 +109,12 @@ export const defaultExtensions = [
     html: true,
     transformCopiedText: true,
   }),
-  // TODO dangerous for CSRF
-  Image.configure({
-    HTMLAttributes: {
-      class: 'mdcell-image',
-    },
-    inline: true,
-    // allowBase64: false,
-  }),
+  // Images from external urls might cause security issues like CSRF, we disable this feature for now.
+  // Image.configure({
+  //   HTMLAttributes: {
+  //     class: 'image',
+  //   },
+  //   inline: true,
+  // }),
   MathExtension,
 ];

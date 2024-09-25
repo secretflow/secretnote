@@ -8,7 +8,7 @@ import {
   ModalService,
   ModalContribution,
 } from '@difizen/mana-app';
-import { Table, Input, Button } from 'antd';
+import { Table, Input, Button, Flex, Typography } from 'antd';
 import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
@@ -16,6 +16,7 @@ import './index.less';
 import { ProjectConfigModal } from './add-modal';
 import { ProjectService, type Project } from './service';
 import { history } from '@/utils';
+import { l10n } from '@difizen/mana-l10n';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
@@ -32,7 +33,7 @@ export const ProjectComponent = () => {
     <div className="project-container">
       <div className="toolbar">
         <Input
-          placeholder="Filter name"
+          placeholder={l10n.t('用名称搜索')}
           prefix={<Search color="#5b768f" size={16} />}
           style={{ width: 280 }}
           value={searchWords}
@@ -40,7 +41,7 @@ export const ProjectComponent = () => {
           allowClear
         />
         <Button type="primary" onClick={() => instance.openAddProjectModal()}>
-          Add New Project
+          {l10n.t('新建项目')}
         </Button>
       </div>
       <div className="content">
@@ -52,7 +53,7 @@ export const ProjectComponent = () => {
           }
           columns={[
             {
-              title: 'Name',
+              title: l10n.t('项目名'),
               dataIndex: 'name',
               key: 'name',
               render: (name: string) => (
@@ -63,24 +64,24 @@ export const ProjectComponent = () => {
               ),
             },
             {
-              title: 'Host',
+              title: l10n.t('主机 (Host)'),
               dataIndex: 'creator',
               key: 'creator',
             },
             {
-              title: 'Member',
+              title: l10n.t('成员 (Members)'),
               dataIndex: 'members',
               key: 'members',
               render: (members: string[]) => members.join(', '),
             },
             {
-              title: 'Description',
+              title: l10n.t('项目描述'),
               dataIndex: 'description',
               key: 'description',
               render: (description: string) => description || '-',
             },
             {
-              title: 'Action',
+              title: l10n.t('操作'),
               dataIndex: 'action',
               key: 'action',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,6 +96,17 @@ export const ProjectComponent = () => {
           ]}
         />
       </div>
+      <Flex justify="center" gap={'1em'} style={{ paddingTop: '8px' }}>
+        <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
+          SecretFlow
+        </Typography.Link>
+        <Typography.Link
+          href="https://github.com/secretflow/secretnote"
+          target="_blank"
+        >
+          SecretNote
+        </Typography.Link>
+      </Flex>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
 import classnames from 'classnames';
 import {
+  CalculatorIcon,
   Code,
   Heading1,
   Heading2,
@@ -21,7 +22,7 @@ import tippy from 'tippy.js';
 
 interface CommandItemProps {
   title: string;
-  description: string;
+  description?: string;
   icon: ReactNode;
 }
 
@@ -60,7 +61,7 @@ const Command = Extension.create({
   },
 });
 
-const getSuggestionItems = ({ query }: { query: string }) => {
+const getSuggestionItems = ({ query }: { query: string }): CommandItemProps[] => {
   return [
     {
       title: l10n.t('文本'),
@@ -149,6 +150,14 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       icon: <Code size={18} />,
       command: ({ editor, range }: CommandProps) =>
         editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
+    },
+    {
+      title: l10n.t('数学公式'),
+      description: l10n.t('使用 $ 结束'),
+      searchTerms: ['equation', 'math'],
+      icon: <CalculatorIcon size={18} />,
+      command: ({ editor, range }: CommandProps) =>
+        editor.chain().focus().deleteRange(range).insertContent('$').run(),
     },
   ].filter((item) => {
     if (typeof query === 'string' && query.length > 0) {
@@ -252,7 +261,7 @@ const CommandList = ({
             <div className="icon">{item.icon}</div>
             <div className="content">
               <p className="title">{item.title}</p>
-              <p className="description">{item.description}</p>
+              <p className="description">{item.description || ''}</p>
             </div>
           </button>
         );

@@ -6,6 +6,7 @@ import { CommandRegistry, useInject, ViewInstance } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Tooltip } from 'antd';
 import { PlayCircle } from 'lucide-react';
+import { CmdOrCtrl } from './keybind-instruction';
 
 export const SideToolbarRunItem = () => {
   const libroView = useInject<LibroView>(ViewInstance);
@@ -22,10 +23,10 @@ export const SideToolbarRunItem = () => {
         autoAdjustOverflow={false}
         overlayClassName="libro-tooltip-placement-right"
         title={
-          <span>
-            <div>{l10n.t('运行')}</div>
-            <div>Cmd+Enter / Ctrl+Enter</div>
-          </span>
+          <div className="libro-side-tooltip">
+            <div className="libro-tooltip-text">{l10n.t('运行')}</div>
+            <div className="libro-tooltip-keybind">{`${CmdOrCtrl}+Enter`}</div>
+          </div>
         }
       >
         <PlayCircle

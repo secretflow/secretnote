@@ -13,8 +13,8 @@ interface Keybind {
   combo: string[];
   description: string;
 }
-const CmdOrCtrl = isMacintosh ? 'Cmd' : 'Ctrl';
-const OptionOrAlt = isMacintosh ? 'Option' : 'Alt';
+export const CmdOrCtrl = isMacintosh ? 'Cmd' : 'Ctrl';
+export const OptionOrAlt = isMacintosh ? 'Option' : 'Alt';
 export const Keybinds = withId<Keybind>([
   { combo: [CmdOrCtrl, 'S'], description: l10n.t('保存 Notebook') },
   { combo: [CmdOrCtrl, 'Enter'], description: l10n.t('运行 Cell') },
