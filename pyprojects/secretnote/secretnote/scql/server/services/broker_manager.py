@@ -1,294 +1,235 @@
-# This is the manager for SCQL's broker.
-# SCQL exposes a set of APIs to manage projects, tables, and column control lists (CCLs).
+# This is the manager that interacts with SCQL's broker, just like "broker API's broker".
+# SCQL itself exposes a set of APIs to manage projects, tables, and column control lists (CCLs).
+# @see https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.0b1/reference/broker-api
+# APIs here are consistent with those of SCQL's broker.
 
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+from ..utils import request
 
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 
-# Collections of paths for the broker service actions.
-BROKER_SERVICE_PATH = {
-    "query": "/intra/query",
-    "submit_query": "/intra/query/submit",
-    "fetch_result": "/intra/query/fetch",
-    "create_project": "/intra/project/create",
-    "list_projects": "/intra/project/list",
-    "invite_member": "/intra/member/invite",
-    "list_invitations": "/intra/invitation/list",
-    "process_invitation": "/intra/invitation/process",
-    "create_table": "/intra/table/create",
-    "list_tables": "/intra/table/list",
-    "drop_table": "/intra/table/drop",
-    "grant_ccl": "/intra/ccl/grant",
-    "revoke_ccl": "/intra/ccl/revoke",
-    "show_ccl": "/intra/ccl/show",
-}
+"""Examples
+Project{"conf":{"spu_runtime_cfg":{"field":"FM64","protocol":"SEMI2K"}},
+        "creator":"alice","members":["alice"],"project_id":"proj_id"}
+Invitation{"invitation_id":1,"invitee":"bob","inviter":"alice",
+           "project":{"conf":{"spu_runtime_cfg":{"field":"FM64","protocol":"SEMI2K"}},
+           "project_id":"proj_id"},"status":0}
+Table{"columns":[{"dtype":"string","name":"ID"},{"dtype":"int","name":"age"}],
+      "db_type":"mysql","ref_table":"bob.user_stats","table_name":"tb","table_owner":"bob"}
+ColumnControlList{"col":{"column_name":"ID","table_name":"ta"},"constraint":"PLAINTEXT",
+                  "party_code":"alice"}
+OutColumns{"elem_type":"STRING","name":"ID","option":"VALUE","shape":{"dim":[{"dim_value":"2"},
+           {"dim_value":"1"}]},"string_data":["alice","bob"]}
+"""
+Project = Dict[str, Any]
+Invitation = Dict[str, Any]
+Table = Dict[str, Any]
+ColumnControlList = Dict[str, Any]
+OutColumns = Dict[str, Any]
 
 
 class BrokerManager:
-    def __init__(self):
-        pass
+    def __init__(self, party, broker):
+        """Initialize the broker manager as `party` to interact with endpoint `broker`."""
+        assert party is not None, Exception(
+            "Failed to initialize BrokerManager: party is not given."
+        )
+        assert broker is not None, Exception(
+            "Failed to initialize BrokerManager: broker is not given."
+        )
+        self.party = party
+        self.broker = broker
 
-    async def request(self, url: str, method="GET", body=None):
-        """Send a async JSON request to a given url. The response is also parsed as JSON."""
-        if body is None:
-            body = {}
-        http_client = AsyncHTTPClient()
-        http_request_body = json.dumps(body)
-
-        try:
-            http_request = HTTPRequest(
-                url,
-                method,
-                body=http_request_body,
-                headers={"Content-Type": "application/json"},
-            )
-            response = await http_client.fetch(http_request)
-            return json.loads(response.body)
-        except Exception as e:
-            print("Error: " + str(e))
-
-    def get_request_status(self, response):
-        """Normalize the status code and message from a response. 0 means success."""
+    def validate_response(self, response) -> Any:
+        """Check if the response is valid. Returns the response."""
+        # Normalize the status code and message of a SCQL broker response
         if response is None:
-            return 500, "no response found."
-
-        code = 0
-        message = ""
+            code, message = 500, "No response received from broker."
         status = response.get("status", None)
         if status is not None:
-            code = status.get("code", 0)
-            message = status.get("message", "")
+            code, message = status.get("code", 0), status.get("message", "")
         else:
-            message = "no status found."
-            code = 500
-
-        return code, message
-
-    def _check(self, response: Any):
-        """Check if the response is valid. Returns the response."""
-        code, message = self.get_request_status(response)
-        if response is None or code != 0:
-            raise Exception(message)
+            code, message = 500, "No status found in response."
+        # Intercept those unsuccessful responses
+        assert code != 0, Exception(message)
 
         return response
 
-    async def create_project(self, project: Dict[str, Any], address: str) -> str:
-        """Create a project. Returns the `project_id`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['create_project']}",
+    async def create_project(self, project: Project) -> str | None:
+        """Create a new Project and automatically become the Project member and creator.
+        Returns the project_id.
+        """
+        response = await request(
+            f"{self.broker}/intra/project/create", "POST", body=project
+        )
+
+        return self.validate_response(response).get("project_id", None)
+
+    async def list_projects(self, ids: List[str] | None) -> List[Project]:
+        """List All Projects that have created and joined."""
+        response = await request(
+            f"{self.broker}/intra/project/list",
             "POST",
-            body={
-                **project,
-                "conf": {
-                    "spu_runtime_cfg": {"protocol": "SEMI2K", "field": "FM64"}
-                },  # TODO
-            },
+            body={"ids": [] if ids is None else ids},
         )
 
-        return self._check(response).get("project_id", "")
+        return self.validate_response(response).get("projects", [])
 
-    async def get_project_list(self, address: str) -> List[Dict[str, Any]]:
-        """Get the list of projects."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['list_projects']}",
-            "POST",
-            body={"ids": []},
+    async def list_invitations(self, roles: List[str]) -> List[Invitation]:
+        """List all invitations sent and received. Filtered according to `party`
+        by `roles` in ["inviter", "invitee"]."""
+        response = await request(
+            f"{self.broker}/intra/invitation/list", "POST", body={}
         )
 
-        return self._check(response).get("projects", [])
+        invitations = self.validate_response(response).get("invitations", [])
+        filtered_invitations = []
+        for role in roles:
+            assert role in ["inviter", "invitee"], ValueError(f"Invalid role: {role}")
+            filtered_invitations.extend(
+                [x for x in invitations if x[role] == self.party]
+            )
 
-    async def get_project_info(
-        self, project_id: str, address: str
-    ) -> Optional[Dict[str, Any]]:
-        """Get the project information by `project_id`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['list_projects']}" "POST",
-            body={"ids": [project_id]},
+        return filtered_invitations
+
+    async def process_invitation(self, invitation_id: str, respond: str) -> str | None:
+        """Process the received invitation, specify it by invitation_id,
+        choose to join the corresponding project or reject it.
+        Returns the invitation_id.
+        """
+        assert respond in ["ACCEPT", "DECLINE"], ValueError(
+            f"Invalid respond: {respond}"
         )
 
-        projects = self._check(response).get("projects", [])
-        return projects[0] if len(projects) > 0 else None
-
-    async def get_invitation_list(
-        self, party: str, address: str
-    ) -> List[Dict[str, Any]]:
-        """Get the list of invitations for a party."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['list_invitations']}",
-            "POST",
-            body={},
-        )
-
-        invite_list = self._check(response).get("invitations", [])
-        return [invite for invite in invite_list if invite["inviter"] != party]
-
-    async def process_invitation(
-        self, invitation_id: str, respond: str, address: str
-    ) -> None:
-        """Process an invitation by `invitation_id`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['process_invitation']}",
+        response = await request(
+            f"{self.broker}/intra/invitation/process",
             "POST",
             body={
                 "invitation_id": invitation_id,
                 "respond": respond,
-                "respond_comment": "",
             },
         )
 
-        return self._check(response)
+        return self.validate_response(response).get("invitation_id", None)
 
-    async def invite_member(self, project_id: str, invitee: str, address: str) -> None:
-        """Invite a member to a project."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['invite_member']}",
+    async def invite_member(self, project_id: str, invitee: str) -> None:
+        """Invite another member to join the Project you created"""
+        response = await request(
+            f"{self.broker}/intra/member/invite",
             "POST",
             body={
                 "project_id": project_id,
                 "invitee": invitee,
-                "postscript": "",
-                "method": "PUSH",
+                "method": "PUSH",  # PULL is not implemented by SCQL yet
             },
         )
 
-        self._check(response)
+        self.validate_response(response)
+        return None
 
-    async def get_table_list(
-        self, project_id: str, address: str
-    ) -> List[Dict[str, Any]]:
-        """Get the list of tables for a project."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['list_tables']}",
+    async def list_tables(
+        self, project_id: str, names: List[str] | None
+    ) -> List[Table]:
+        """List all Tables in specified Project."""
+        response = await request(
+            f"{self.broker}/intra/table/list",
             method="POST",
-            body={"project_id": project_id, "names": []},
+            body={"project_id": project_id, "names": [] if names is None else names},
         )
 
-        return self._check(response).get("tables", [])
+        return self.validate_response(response).get("tables", [])
 
-    async def create_table(
-        self,
-        project_id: str,
-        table: Dict[str, Any],
-        address: str,
-    ) -> None:
-        """Create a table."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['create_table']}",
+    async def create_table(self, project_id: str, table: Table) -> None:
+        """Create a Table you owned in specified Project."""
+        response = await request(
+            f"{self.broker}/intra/table/create",
             "POST",
             body={
                 "project_id": project_id,
-                **table,
+                **table,  # table_name, ref_table, db_type?, columns
             },
         )
 
-        self._check(response)
+        self.validate_response(response)
+        return None
 
-    async def delete_table(
-        self, project_id: str, table_name: str, address: str
-    ) -> None:
-        """Delete a table by `table_name`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['drop_table']}",
+    async def drop_table(self, project_id: str, table_name: str) -> None:
+        """Drop a Table you owned in specified Project, the relevant CCLs will be automatically cleared."""
+        response = await request(
+            f"{self.broker}/intra/table/drop",
             "POST",
             body={"project_id": project_id, "table_name": table_name},
         )
 
-        self._check(response)
+        self.validate_response(response)
+        return None
 
-    async def get_table_info(
-        self, project_id: str, table_name: str, address: str
-    ) -> Any:
-        """Get the table information by `table_name`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['list_tables']}",
-            "POST",
-            body={"project_id": project_id, "names": [table_name]},
-        )
-
-        tables = self._check(response).get("tables", [])
-        return tables[0] if len(tables) > 0 else None
-
-    async def get_ccl_list(
+    async def show_ccl(
         self,
         project_id: str,
         table_name: str,
-        address: str,
-    ) -> List[Dict[str, Any]]:
-        """Get the column control list for a table."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['show_ccl']}",
+    ) -> List[ColumnControlList]:
+        """Show CCLs in specified Project, supports specifying Tables, members."""
+        response = await request(
+            f"{self.broker}/intra/ccl/show",
             "POST",
             body={"project_id": project_id, "tables": [table_name], "dest_parties": []},
         )
 
-        return self._check(response).get("column_control_list", [])
+        return self.validate_response(response).get("column_control_list", [])
 
     async def grant_ccl(
-        self, project_id: str, ccl_list: List[Any], address: str
+        self, project_id: str, column_control_list: List[ColumnControlList]
     ) -> None:
         """Grant a list of column control lists to a project."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['grant_ccl']}",
+        response = await request(
+            f"{self.broker}/intra/ccl/grant",
             "POST",
             body={
                 "project_id": project_id,
-                "column_control_list": ccl_list,
+                "column_control_list": column_control_list,
             },
         )
 
-        self._check(response)
+        self.validate_response(response)
+        return None
 
-    async def revoke_ccl(
-        self, project_id: str, ccl_list: List[Any], address: str
-    ) -> None:
-        """Revoke a list of column control lists from a project."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['revoke_ccl']}",
+    async def revoke_ccl(self, project_id: str, column_control_list: List[Any]) -> None:
+        """Revoke the CCLs you have granted to the specified member."""
+        response = await request(
+            f"{self.broker}/intra/ccl/revoke",
             "POST",
-            body={
-                "project_id": project_id,
-                "column_control_list": ccl_list,
-            },
+            body={"project_id": project_id, "column_control_list": column_control_list},
         )
 
-        self._check(response)
+        self.validate_response(response)
+        return None
 
-    async def query(self, project_id: str, query: str, address: str) -> List[Any]:
-        """Do a query and return the result."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['query']}",
+    async def do_query(self, project_id: str, query: str) -> List[OutColumns]:
+        """Do a query and return the result. Returns the out_columns."""
+        response = await request(
+            f"{self.broker}/intra/query",
             "POST",
-            body={
-                "project_id": project_id,
-                "query": query,
-            },
+            body={"project_id": project_id, "query": query},
         )
 
-        return self._check(response).get("result").get("out_columns", [])
+        return self.validate_response(response).get("result").get("out_columns", [])
 
-    async def create_query_job(self, project_id: str, address: str, query: str) -> str:
-        """Create a query job and return the `job_id`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['submit_query']}",
+    async def submit_query(self, project_id: str, query: str) -> str:
+        """Run Query asynchronously. Returns the job_id."""
+        response = await request(
+            f"{self.broker}/intra/query/submit",
             "POST",
-            body={
-                "project_id": project_id,
-                "query": query,
-            },
+            body={"project_id": project_id, "query": query},
         )
 
-        return self._check(response).get("job_id", "")
+        return self.validate_response(response).get("job_id", "")
 
-    async def get_job_result(self, job_id: str, address: str) -> List[Any]:
-        """Get the result of a job by `job_id`."""
-        response = await self.request(
-            f"{address}{BROKER_SERVICE_PATH['fetch_result']}",
+    async def fetch_result(self, job_id: str) -> List[OutColumns]:
+        """Fetch query result of asynchronous query. Returns the out_columns."""
+        response = await request(
+            f"{self.broker}/intra/query/fetch",
             method="POST",
             body={"job_id": job_id},
         )
 
-        return self._check(response).get("out_columns", [])
-
-
-broker_manager = BrokerManager()
+        return self.validate_response(response).get("out_columns", [])

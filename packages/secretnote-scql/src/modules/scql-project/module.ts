@@ -3,7 +3,6 @@
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
 import { PreviewLayoutArea, HeaderArea } from '@/modules/layout';
-
 import { InvitationNotificationView } from './notification-view';
 import { ProjectService } from './service';
 import { ProjectView } from './view';

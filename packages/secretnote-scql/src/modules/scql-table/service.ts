@@ -1,9 +1,7 @@
 import { prop, singleton } from '@difizen/mana-app';
 import { Modal } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import { history } from '@/utils';
-
-import { request } from '@/utils';
+import { history, request } from '@/utils';
 
 export interface DataTableColumn {
   name: string;

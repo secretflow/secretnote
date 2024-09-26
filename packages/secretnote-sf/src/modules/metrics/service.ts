@@ -9,7 +9,7 @@ import { SecretNoteServerManager } from '@/modules/server';
 import { genericErrorHandler, request } from '@/utils';
 
 import { IKernelConnection } from '@difizen/libro-jupyter';
-import { NotebookFileService } from '../notebook';
+import { NotebookFileService } from '@/modules/notebook';
 
 // The metrics information of one single server.
 interface ServerMetric {

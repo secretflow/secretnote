@@ -1,3 +1,5 @@
+// The view component of SCQL project page.
+
 import {
   BaseView,
   inject,
@@ -8,15 +10,15 @@ import {
   ModalService,
   ModalContribution,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
+import { useState } from 'react';
 import { Table, Input, Button, Flex, Typography } from 'antd';
 import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
 
 import './index.less';
 import { ProjectConfigModal } from './add-modal';
 import { ProjectService, type Project } from './service';
-import { history } from '@/utils';
-import { l10n } from '@difizen/mana-l10n';
+import { genericErrorHandler, history } from '@/utils';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
@@ -25,9 +27,11 @@ export const ProjectComponent = () => {
     (project) => project.name.includes(searchWords) || searchWords === '',
   );
 
-  const enterProject = (projectId: string) => {
-    history.push('/scql/project/' + projectId);
-  };
+  /**
+   * Go into the detail page of a project.
+   */
+  const handleEnterProject = (projectId: string) =>
+    history.push(`/secretnote/project/${projectId}`);
 
   return (
     <div className="project-container">
@@ -85,11 +89,11 @@ export const ProjectComponent = () => {
               dataIndex: 'action',
               key: 'action',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              render: (_: any, record: Project) => (
+              render: (_, record) => (
                 <ArrowRight
                   size={16}
                   cursor="pointer"
-                  onClick={() => enterProject(record.id)}
+                  onClick={() => handleEnterProject(record.id)}
                 />
               ),
             },
@@ -128,6 +132,17 @@ export class ProjectView extends BaseView implements ModalContribution {
   }
 
   async onViewMount() {
+    // validate the runtime arguments
+    try {
+      const platformInfo = await this.service.getPlatformInfo();
+      (['party', 'broker'] as const).forEach((v) => {
+        if (!platformInfo[v]) {
+          throw new Error(l10n.t(`运行时参数 {0} 未指定，应用可能无法完整运行`, v));
+        }
+      });
+    } catch (e) {
+      genericErrorHandler(e);
+    }
     this.service.getProjectList();
   }
 

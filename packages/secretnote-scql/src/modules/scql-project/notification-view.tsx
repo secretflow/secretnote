@@ -22,6 +22,7 @@ import { Bell, User } from 'lucide-react';
 
 import './index.less';
 import { ProjectService, Respond } from './service';
+import { l10n } from '@difizen/mana-l10n';
 
 export const InvitationNotificationComponent = () => {
   const instance = useInject<InvitationNotificationView>(ViewInstance);
@@ -46,7 +47,7 @@ export const InvitationNotificationComponent = () => {
   const items: TabsProps['items'] = [
     {
       key: '1',
-      label: 'Pending',
+      label: l10n.t('待处理'),
       children: (
         <div className="secretnote-notification-box">
           {pending.length > 0 ? (
@@ -75,17 +76,14 @@ export const InvitationNotificationComponent = () => {
               ))}
             </ul>
           ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No new notifications."
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={l10n.t('暂无')} />
           )}
         </div>
       ),
     },
     {
       key: '2',
-      label: 'Archived',
+      label: l10n.t('已完成'),
       children: (
         <div className="secretnote-notification-box">
           {archived.length > 0 ? (
@@ -111,10 +109,7 @@ export const InvitationNotificationComponent = () => {
               ))}
             </ul>
           ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="Nothing in Archived."
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={l10n.t('暂无')} />
           )}
         </div>
       ),
