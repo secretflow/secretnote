@@ -1,7 +1,7 @@
 import { prop, singleton } from '@difizen/mana-app';
 import { Modal } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import { history, request } from '@/utils';
+import { request } from '@/utils';
 
 export interface DataTableColumn {
   name: string;
@@ -252,9 +252,10 @@ export class DataTableService {
         title: 'Info',
         content: 'You were not involved in the project.',
         okText: 'Back to project list',
-        onOk: () => {
-          history.push('/scql/project');
-        },
+        // TODO
+        // onOk: () => {
+        //   history.push('/scql/project');
+        // },
       });
       return;
     }

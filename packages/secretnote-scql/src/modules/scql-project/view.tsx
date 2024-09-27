@@ -17,22 +17,24 @@ import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 
 import './index.less';
 import { ProjectConfigModal } from './add-modal';
-import { genericErrorHandler, history } from '@/utils';
-import { SCQLBrokerService } from '../scql-broker';
+import { genericErrorHandler } from '@/utils';
+import { SCQLBrokerService } from '@/modules/scql-broker';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
+  const service = instance.service;
 
+  // search by project name
   const [searchWords, setSearchWords] = useState<string>('');
-  // const filteredProjects = instance.service.projects.filter(
-  //   (project) => project.name.includes(searchWords) || searchWords === '',
-  // );
+  const filteredProjects = service.projects.filter(
+    (project) => project.name.includes(searchWords) || searchWords === '',
+  );
 
   /**
    * Go into the detail page of a project.
    */
   const handleEnterProject = (projectId: string) =>
-    history.push(`/secretnote/project/${projectId}`);
+    (location.href = location.origin + `/secretnote/workspace/${projectId}`);
 
   return (
     <div className="project-container">
@@ -91,11 +93,14 @@ export const ProjectComponent = () => {
               key: 'action',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               render: (_, record) => (
-                <ArrowRight
-                  size={16}
-                  cursor="pointer"
-                  onClick={() => handleEnterProject(record)}
-                />
+                <Button
+                  icon={<ArrowRight size={16} />}
+                  onClick={() => handleEnterProject(record.project_id)}
+                  type="link"
+                  size="small"
+                >
+                  {l10n.t('进入')}
+                </Button>
               ),
             },
           ]}

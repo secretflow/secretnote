@@ -8,7 +8,7 @@ import { l10n } from '@difizen/mana-l10n';
 import { pick } from 'lodash-es';
 
 import { genericErrorHandler } from '@/utils';
-import { SCQLBrokerService } from '@/modules/scql-broker';
+import { _SPURuntimeConfig, SCQLBrokerService } from '@/modules/scql-broker';
 
 const SPUProtocolOptions = ['SEMI2K', 'REF2K', 'CHEETAH'].map((v) => ({
   value: v,
@@ -24,8 +24,8 @@ const ConfigModalComponent = (props: ModalItemProps<any>) => {
   const [form] = Form.useForm<{
     name: string;
     description: string;
-    spu_protocol: SCQL._SPURuntimeConfig['protocol'];
-    spu_field: SCQL._SPURuntimeConfig['field'];
+    spu_protocol: _SPURuntimeConfig['protocol'];
+    spu_field: _SPURuntimeConfig['field'];
   }>();
   const service = useInject<SCQLBrokerService>(SCQLBrokerService);
   const editMode = !!(data && data.name);
@@ -55,6 +55,7 @@ const ConfigModalComponent = (props: ModalItemProps<any>) => {
       });
       message.success(l10n.t('添加成功'));
       close();
+      service.listProjects();
     } catch (e) {
       genericErrorHandler(e);
     }

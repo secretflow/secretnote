@@ -54,7 +54,7 @@ class BrokerManager:
             else:
                 code, message = 500, "No status found in response."
         # Intercept those unsuccessful responses
-        assert code != 0, Exception(message)
+        assert code == 0, Exception(f'[{code}] {message}')
 
         return response
 

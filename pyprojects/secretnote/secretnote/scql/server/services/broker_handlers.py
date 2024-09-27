@@ -41,7 +41,7 @@ class BrokerHandler(APIHandler):
                 "broker": self.broker_manager.broker,
             },
             "listProjects": lambda: self.broker_manager.list_projects(
-                [model.get("project_id", None)]
+                model.get("ids", None)
             ),
             "createProject": lambda: self.broker_manager.create_project(
                 ipick(model, ["action"])

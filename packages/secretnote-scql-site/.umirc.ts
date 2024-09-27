@@ -10,7 +10,7 @@ export default defineConfig({
   routes: [
     { path: '/', redirect: '/project' },
     { path: '/project', component: 'project' },
-    { path: '/workspace', component: 'workspace' },
+    { path: '/workspace/:id', component: 'workspace' },
   ],
   writeToDisk: true,
   headScripts:

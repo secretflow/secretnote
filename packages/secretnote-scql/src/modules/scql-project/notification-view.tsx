@@ -1,3 +1,5 @@
+// The notifications panel after clicking the bell icon on the top right.
+
 import {
   BaseView,
   inject,
@@ -21,26 +23,43 @@ import {
 import { Bell, User } from 'lucide-react';
 
 import './index.less';
-import { ProjectService, Respond } from './service';
 import { l10n } from '@difizen/mana-l10n';
+import {
+  _ProjectInvitationRespond,
+  _ProjectInvitationStatus,
+  SCQLBrokerService,
+} from '@/modules/scql-broker';
+import { genericErrorHandler } from '@/utils';
 
 export const InvitationNotificationComponent = () => {
   const instance = useInject<InvitationNotificationView>(ViewInstance);
-  const pending = instance.service.invitationList.filter(
-    (item) => item.status === Respond.UNDECIDED,
+  const service = instance.service;
+
+  // filter out pending and archived invitations
+  const pending = service.invitations.filter(
+    (v) => v.status === _ProjectInvitationStatus.UNDECIDED,
   );
-  const archived = instance.service.invitationList.filter(
-    (item) => item.status !== Respond.UNDECIDED,
+  const archived = service.invitations.filter(
+    (v) => v.status !== _ProjectInvitationStatus.UNDECIDED,
   );
 
-  const handleInvitation = async (id: string, accepted: boolean) => {
+  /**
+   * Alter invitation status.
+   */
+  const handleInvitation = async (id: string, to: _ProjectInvitationRespond) => {
     try {
-      await instance.service.processInvitation(id, accepted);
-      message.success(`${accepted ? 'Accept' : 'Decline'} successfully.`);
-    } catch (err) {
-      if (err instanceof Error) {
-        message.error(err.message);
-      }
+      await service.processInvitation(id, to);
+      message.success(
+        l10n.t(
+          '成功{0}邀请',
+          {
+            ACCEPT: '接受',
+            DECLINE: '拒绝',
+          }[to],
+        ),
+      );
+    } catch (e) {
+      genericErrorHandler(e);
     }
   };
 
@@ -53,23 +72,24 @@ export const InvitationNotificationComponent = () => {
           {pending.length > 0 ? (
             <ul>
               {pending.map((item) => (
-                <li key={item.id}>
-                  <span>
-                    {`${item.inviter} invites you to participate in the project ${item.project}.`}
-                  </span>
+                <li key={item.invitation_id}>
+                  <span>{`${item.inviter} 邀请你加入项目 ${item.project}`}</span>
                   <Divider
                     type="vertical"
                     style={{ height: '1em', borderInlineStart: '1px solid #d6dee6' }}
                   />
                   <span className="action">
-                    <Button onClick={() => handleInvitation(item.id, true)} type="link">
-                      Accept
-                    </Button>
                     <Button
-                      onClick={() => handleInvitation(item.id, false)}
+                      onClick={() => handleInvitation(item.invitation_id, 'ACCEPT')}
                       type="link"
                     >
-                      Decline
+                      {l10n.t('接受')}
+                    </Button>
+                    <Button
+                      onClick={() => handleInvitation(item.invitation_id, 'DECLINE')}
+                      type="link"
+                    >
+                      {l10n.t('拒绝')}
                     </Button>
                   </span>
                 </li>
@@ -89,7 +109,7 @@ export const InvitationNotificationComponent = () => {
           {archived.length > 0 ? (
             <ul>
               {archived.map((item) => (
-                <li key={item.id}>
+                <li key={item.invitation_id}>
                   <span>
                     {`${item.inviter} invites you to participate in the project ${item.project}.`}
                   </span>
@@ -100,10 +120,19 @@ export const InvitationNotificationComponent = () => {
                   <span
                     className="action"
                     style={{
-                      color: item.status === Respond.ACCEPTED ? 'green' : 'orange',
+                      color:
+                        item.status === _ProjectInvitationStatus.ACCEPTED
+                          ? 'green'
+                          : 'orange',
                     }}
                   >
-                    {Respond[item.status]}
+                    {
+                      {
+                        UNDECIDED: '未确定',
+                        ACCEPTED: '已接受',
+                        REJECTED: '已拒绝',
+                      }[item.status]
+                    }
                   </span>
                 </li>
               ))}
@@ -131,7 +160,7 @@ export const InvitationNotificationComponent = () => {
           <Bell color="#40566c" size={18} cursor="pointer" />
         </Badge>
       </Popover>
-      <Tooltip title={instance.service.platformInfo.party}>
+      <Tooltip title={service.platformInfo.party}>
         <Avatar
           style={{
             backgroundColor: '#87d068',
@@ -151,15 +180,10 @@ export const InvitationNotificationComponent = () => {
 @view('secretnote-invitation-notification-view')
 export class InvitationNotificationView extends BaseView {
   view = InvitationNotificationComponent;
-  readonly service: ProjectService;
+  readonly service: SCQLBrokerService;
 
-  constructor(@inject(ProjectService) service: ProjectService) {
+  constructor(@inject(SCQLBrokerService) service: SCQLBrokerService) {
     super();
     this.service = service;
-  }
-
-  onViewMount(): void {
-    this.service.getPlatformInfo();
-    this.service.getInvitationList();
   }
 }

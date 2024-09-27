@@ -1,6 +1,10 @@
-import React from 'react';
 import { SCQLWorkspace } from '@alipay/secretnote-scql';
+import './index.less';
 
 export default function () {
-  return <SCQLWorkspace />;
+  return (
+    <div className="secretnote-scql-container">
+      <SCQLWorkspace />
+    </div>
+  );
 }
