@@ -1,4 +1,4 @@
-# This is the manager that interacts with SCQL's broker, just like "broker API's broker".
+# This is the manager that interacts with SCQL's broker, just like "broker's broker".
 # SCQL itself exposes a set of APIs to manage projects, tables, and column control lists (CCLs).
 # @see https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.0b1/reference/broker-api
 # APIs here are consistent with those of SCQL's broker.
@@ -31,10 +31,13 @@ class BrokerManager:
     def __init__(self, party, broker):
         """Initialize the broker manager as `party` to interact with endpoint `broker`."""
         assert party is not None, Exception(
-            "Failed to initialize BrokerManager: party is not given."
+            "Failed to init BrokerManager: party is not given."
         )
         assert broker is not None, Exception(
-            "Failed to initialize BrokerManager: broker is not given."
+            "Failed to init BrokerManager: broker is not given."
+        )
+        assert broker.startswith("http"), Exception(
+            "Failed to init BrokerManager: broker must start with 'http' or 'https'."
         )
         self.party = party
         self.broker = broker
@@ -44,11 +47,12 @@ class BrokerManager:
         # Normalize the status code and message of a SCQL broker response
         if response is None:
             code, message = 500, "No response received from broker."
-        status = response.get("status", None)
-        if status is not None:
-            code, message = status.get("code", 0), status.get("message", "")
         else:
-            code, message = 500, "No status found in response."
+            status = response.get("status", None)
+            if status is not None:
+                code, message = status.get("code", 0), status.get("message", "")
+            else:
+                code, message = 500, "No status found in response."
         # Intercept those unsuccessful responses
         assert code != 0, Exception(message)
 

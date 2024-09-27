@@ -2,7 +2,6 @@
 # running on the host to manage notebook files locally.
 
 from tornado.httputil import HTTPServerRequest
-from jupyter_server.utils import ensure_async
 from ._proxy_handler import ProxyHandler
 
 

@@ -17,15 +17,16 @@ import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 
 import './index.less';
 import { ProjectConfigModal } from './add-modal';
-import { ProjectService, type Project } from './service';
 import { genericErrorHandler, history } from '@/utils';
+import { SCQLBrokerService } from '../scql-broker';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
+
   const [searchWords, setSearchWords] = useState<string>('');
-  const filteredProjects = instance.service.projects.filter(
-    (project) => project.name.includes(searchWords) || searchWords === '',
-  );
+  // const filteredProjects = instance.service.projects.filter(
+  //   (project) => project.name.includes(searchWords) || searchWords === '',
+  // );
 
   /**
    * Go into the detail page of a project.
@@ -93,7 +94,7 @@ export const ProjectComponent = () => {
                 <ArrowRight
                   size={16}
                   cursor="pointer"
-                  onClick={() => handleEnterProject(record.id)}
+                  onClick={() => handleEnterProject(record)}
                 />
               ),
             },
@@ -119,11 +120,11 @@ export const ProjectComponent = () => {
 @view('scql-project-view')
 export class ProjectView extends BaseView implements ModalContribution {
   view = ProjectComponent;
-  readonly service: ProjectService;
+  readonly service: SCQLBrokerService;
   readonly modalService: ModalService;
 
   constructor(
-    @inject(ProjectService) service: ProjectService,
+    @inject(SCQLBrokerService) service: SCQLBrokerService,
     @inject(ModalService) modalService: ModalService,
   ) {
     super();
@@ -143,7 +144,7 @@ export class ProjectView extends BaseView implements ModalContribution {
     } catch (e) {
       genericErrorHandler(e);
     }
-    this.service.getProjectList();
+    this.service.listProjects();
   }
 
   openAddProjectModal() {

@@ -12,6 +12,7 @@ import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
+import { SCQLBrokerModule } from '@/modules/scql-broker';
 
 const App = (): JSX.Element => {
   return (
@@ -31,6 +32,7 @@ const App = (): JSX.Element => {
         MarkdownCellModule,
         WelcomeModule,
         SCQLToolbarModule,
+        SCQLBrokerModule,
       ]}
     />
   );

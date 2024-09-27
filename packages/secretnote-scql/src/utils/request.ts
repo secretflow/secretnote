@@ -142,7 +142,11 @@ const getCookie = (name: string): string | undefined => {
 };
 
 // serverId: 请求会被代理到的目标服务，serverId 为 0 时代表请求本地服务
-export const request = async (url: string, init: RequestInit, serverId = '0') => {
+export const request = async <T>(
+  url: string,
+  init: RequestInit,
+  serverId = '0',
+): Promise<T> => {
   let requestUrl = normalizeUrl(url, serverId);
 
   const cache = init.cache ?? 'no-store';
@@ -177,7 +181,7 @@ export const request = async (url: string, init: RequestInit, serverId = '0') =>
   const response = await window.fetch(req);
 
   if (response.status === 204) {
-    return;
+    return {} as T;
   }
 
   if (response.status === 200) {

@@ -1,22 +1,33 @@
 // The "New Project" modal.
 
-import { Modal, Form, Input, message, Dropdown, Select } from 'antd';
+import { Modal, Form, Input, message, Select } from 'antd';
 import { useEffect } from 'react';
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
+import { pick } from 'lodash-es';
 
-import { type Project, ProjectService } from './service';
 import { genericErrorHandler } from '@/utils';
+import { SCQLBrokerService } from '@/modules/scql-broker';
 
-const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
+const SPUProtocolOptions = ['SEMI2K', 'REF2K', 'CHEETAH'].map((v) => ({
+  value: v,
+  label: v,
+}));
+const SPUFieldOptions = ['FM32', 'FM64', 'FM128'].map((v) => ({
+  value: v,
+  label: v,
+}));
+
+const ConfigModalComponent = (props: ModalItemProps<any>) => {
   const { visible, close, data } = props;
   const [form] = Form.useForm<{
     name: string;
-    description?: string;
-    spu_config: string;
+    description: string;
+    spu_protocol: SCQL._SPURuntimeConfig['protocol'];
+    spu_field: SCQL._SPURuntimeConfig['field'];
   }>();
-  const service = useInject<ProjectService>(ProjectService);
+  const service = useInject<SCQLBrokerService>(SCQLBrokerService);
   const editMode = !!(data && data.name);
 
   useEffect(() => {
@@ -32,7 +43,16 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
   const handleAdd = async () => {
     const values = await form.validateFields();
     try {
-      await service.addProject({ ...values, id: values.name });
+      await service.createProject({
+        ...pick(values, ['name', 'description']),
+        project_id: values.name,
+        conf: {
+          spu_runtime_cfg: {
+            field: values.spu_field,
+            protocol: values.spu_protocol,
+          },
+        },
+      });
       message.success(l10n.t('添加成功'));
       close();
     } catch (e) {
@@ -43,7 +63,7 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
   return (
     <Modal
       open={visible}
-      destroyOnClose={true}
+      destroyOnClose
       title={l10n.t('创建新项目')}
       okText={l10n.t('确认')}
       cancelText={l10n.t('取消')}
@@ -53,12 +73,13 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
       <Form
         form={form}
         autoComplete="off"
-        requiredMark={true}
+        requiredMark
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         style={{ marginTop: 24 }}
         initialValues={{
-          spu_config: 'SEMI2K / FM64',
+          spu_protocol: 'SEMI2K',
+          spu_field: 'FM64',
         }}
       >
         <Form.Item
@@ -80,42 +101,18 @@ const ConfigPanel = (props: ModalItemProps<Partial<Project>>) => {
             allowClear
           />
         </Form.Item>
-        <Form.Item label={l10n.t('SPU 配置')} name="spu_config" required>
-          <Select
-            options={[
-              {
-                value: 'SEMI2K / FM64',
-                label: 'SEMI2K / FM64',
-              },
-              {
-                value: 'SEMI2K / FM128',
-                label: 'SEMI2K / FM128',
-              },
-              {
-                value: 'REF2K / FM64',
-                label: 'REF2K / FM64',
-              },
-              {
-                value: 'REF2K / FM128',
-                label: 'REF2K / FM128',
-              },
-              {
-                value: 'CHEETAH / FM64',
-                label: 'CHEETAH / FM64',
-              },
-              {
-                value: 'CHEETAH / FM128',
-                label: 'CHEETAH / FM128',
-              },
-            ]}
-          ></Select>
+        <Form.Item label={l10n.t('SPU 协议')} name="spu_protocol" required>
+          <Select options={SPUProtocolOptions}></Select>
+        </Form.Item>
+        <Form.Item label={l10n.t('SPU 环')} name="spu_field" required>
+          <Select options={SPUFieldOptions}></Select>
         </Form.Item>
       </Form>
     </Modal>
   );
 };
 
-export const ProjectConfigModal: ModalItem<Partial<Project>> = {
+export const ProjectConfigModal: ModalItem = {
   id: 'project-config-modal',
-  component: ConfigPanel,
+  component: ConfigModalComponent,
 };
