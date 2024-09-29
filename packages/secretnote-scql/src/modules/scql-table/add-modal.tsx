@@ -1,15 +1,19 @@
+// The modal used for creating a new table in SCQL.
+
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
 import { Modal, Form, Input, message, Space, Button, Select } from 'antd';
 import { Plus, MinusSquare } from 'lucide-react';
 import { useEffect } from 'react';
+import { l10n } from '@difizen/mana-l10n';
 
-import { type DataTable, DataTableService } from './service';
+import { _Table, BrokerService } from '@/modules/scql-broker';
+import { genericErrorHandler } from '@/utils';
 
-const ConfigPanel = (props: ModalItemProps<DataTable>) => {
+const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const { visible, close, data } = props;
   const [form] = Form.useForm();
-  const service = useInject<DataTableService>(DataTableService);
+  const brokerService = useInject<BrokerService>(BrokerService);
   const editMode = !!(data && data.tableName);
 
   useEffect(() => {
@@ -18,67 +22,69 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
     }
   }, [data, form]);
 
-  const addDataTable = () => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        try {
-          await service.addDataTable(values);
-          message.success('Add table successfully.');
-          close();
-        } catch (e) {
-          if (e instanceof Error) {
-            message.error(e.message);
-          }
-        }
-        return;
-      })
-      .catch(() => {
-        // pass
-      });
+  /**
+   * Handle create a new table to the project.
+   */
+  const handleCreateTable = async () => {
+    const values = await form.validateFields();
+    try {
+      await brokerService.createTable(values);
+      message.success(l10n.t('新建数据表成功'));
+      close();
+    } catch (e) {
+      genericErrorHandler(e);
+    }
   };
 
   return (
     <Modal
       open={visible}
-      destroyOnClose={true}
-      title="New Table"
-      onOk={() => addDataTable()}
-      onCancel={() => {
-        close();
-      }}
+      destroyOnClose
+      title={l10n.t('新建数据表')}
+      onOk={() => handleCreateTable()}
+      onCancel={close}
     >
       <Form
         form={form}
         autoComplete="off"
-        requiredMark={true}
+        requiredMark
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         style={{ marginTop: 24, maxHeight: 500, overflowY: 'auto' }}
-        initialValues={{ dbType: 'mysql' }}
+        initialValues={{ dbType: 'MySQL' }}
       >
         <Form.Item
-          label="数据库类型"
+          label={l10n.t('数据库类型')}
           name="dbType"
           rules={[{ required: true, message: '请输入数据库类型' }]}
         >
-          <Input maxLength={16} disabled={editMode} placeholder="mysql" />
+          <Select
+            options={[
+              { label: 'MySQL', value: 'MySQL' },
+              { label: 'Postgres', value: 'Postgres', disabled: true },
+              { label: 'csvdb', value: 'csvdb', disabled: true },
+            ]}
+          ></Select>
         </Form.Item>
         <Form.Item
-          label="表名称"
+          label={l10n.t('表名称')}
           name="tableName"
           rules={[{ required: true, message: '请输入表名称' }]}
         >
           <Input maxLength={16} disabled={editMode} />
         </Form.Item>
         <Form.Item
-          label="关联表"
+          label={l10n.t('关联的物理表')}
           name="refTable"
           rules={[{ required: true, message: '请输入关联表' }]}
         >
           <Input maxLength={32} disabled={editMode} />
         </Form.Item>
-        <Form.Item label="数据列" className="secretnote-table-columns" required>
+        <Form.Item
+          label={l10n.t('数据列')}
+          className="secretnote-table-columns"
+          required
+        >
           <Form.List name="columns">
             {(fields, { add, remove }) => (
               <>
@@ -102,7 +108,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
                     >
                       <Select
                         style={{ width: 140 }}
-                        placeholder="Data Type"
+                        placeholder={l10n.t('数据类型')}
                         options={[
                           { label: 'int', value: 'int' },
                           { label: 'string', value: 'string' },
@@ -125,7 +131,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
                     block
                     icon={<Plus size={16} color="#182431" />}
                   >
-                    Add Columns
+                    {l10n.t('添加列')}
                   </Button>
                 </Form.Item>
               </>
@@ -137,7 +143,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
   );
 };
 
-export const DataTableConfigModal: ModalItem<DataTable> = {
-  id: 'data-table-config-modal',
+export const TableConfigModal: ModalItem<_Table> = {
+  id: 'scql-table-config-modal',
   component: ConfigPanel,
 };

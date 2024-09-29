@@ -21,20 +21,11 @@ export class SQLCellModel
   hasOutputHidden = false;
   hasOutputsScrolled = false;
 
-  @prop()
-  metadata: Partial<SqlCellMetadata>;
-
-  @prop()
-  executing = false;
-
-  @prop()
-  kernelExecuting = false;
-
-  @prop()
-  executeCount: ExecutionCount = null;
-
-  @prop()
-  isEdit = false;
+  @prop() metadata: Partial<SqlCellMetadata>;
+  @prop() executing = false;
+  @prop() kernelExecuting = false;
+  @prop() executeCount: ExecutionCount = null;
+  @prop() isEdit = false;
 
   msgChangeEmitter = new Emitter<KernelMessage.IIOPubMessage>();
 

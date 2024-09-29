@@ -8,8 +8,9 @@ import { l10n } from '@difizen/mana-l10n';
 import { pick } from 'lodash-es';
 
 import { genericErrorHandler } from '@/utils';
-import { _SPURuntimeConfig, SCQLBrokerService } from '@/modules/scql-broker';
+import { _SPURuntimeConfig, BrokerService } from '@/modules/scql-broker';
 
+// SPU configuration options.
 const SPUProtocolOptions = ['SEMI2K', 'REF2K', 'CHEETAH'].map((v) => ({
   value: v,
   label: v,
@@ -27,7 +28,7 @@ const ConfigModalComponent = (props: ModalItemProps<any>) => {
     spu_protocol: _SPURuntimeConfig['protocol'];
     spu_field: _SPURuntimeConfig['field'];
   }>();
-  const service = useInject<SCQLBrokerService>(SCQLBrokerService);
+  const service = useInject<BrokerService>(BrokerService);
   const editMode = !!(data && data.name);
 
   useEffect(() => {

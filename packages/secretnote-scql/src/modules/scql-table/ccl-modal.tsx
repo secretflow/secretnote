@@ -1,24 +1,32 @@
+// The modal used for managing the CCL of a table.
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
 import { Modal, message, Select, Table } from 'antd';
 import { useState } from 'react';
 
-import { type DataTable, DataTableService, type TableCCL, CONSTRAINT } from './service';
+import { TableService } from './service';
+import { _Table, BrokerService, ColumnControl } from '../scql-broker';
+import { l10n } from '@difizen/mana-l10n';
 
-const ConfigPanel = (props: ModalItemProps<DataTable>) => {
+const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const { visible, close, data } = props;
-  const [tableCCL, setTableCCL] = useState<TableCCL[]>([]);
+  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
   const [loading, setLoading] = useState(false);
-  const service = useInject<DataTableService>(DataTableService);
+  const brokerService = useInject<BrokerService>(BrokerService);
+  const service = useInject<TableService>(TableService);
   const [tableOwner, setTableOwner] = useState('');
 
-  const getTableCCL = async () => {
+  /**
+   * Get CCL of current table.
+   */
+  const handleRefreshCCL = async () => {
     try {
       setLoading(true);
-      const { ccl, owner } = await service.getTableCCL(data!.tableName);
-      setTableOwner(owner);
-      setTableCCL(ccl);
+      // const { ccl, owner } = await brokerService.showCCL(data!.tableName);
+      // setTableOwner(owner);
+      // setTableCCL(ccl);
     } catch (e) {
       if (e instanceof Error) {
         message.error(e.message);
@@ -30,8 +38,8 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
 
   const changeCCL = async () => {
     try {
-      await service.grantTableCCL(data!.tableName, tableCCL);
-      message.success('Ccl config successfully.');
+      // await service.grantTableCCL(data!.tableName, tableCCL);
+      message.success(l10n.t('成功更新 CCL'));
       close();
     } catch (e) {
       if (e instanceof Error) {
@@ -45,7 +53,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
       ? Object.keys(tableCCL[0]).map((item) => {
           if (item === 'column') {
             return {
-              title: 'Column',
+              title: l10n.t('列'),
               dataIndex: 'column',
               key: 'column',
             };
@@ -54,21 +62,21 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
             title: `Grant to ${item === tableOwner ? item + '(you)' : item}`,
             dataIndex: item,
             key: item,
-            render: (text: string, record: TableCCL) => (
+            render: (text: string, record: any) => (
               <Select
-                options={CONSTRAINT.map((c) => ({ label: c, value: c }))}
+                // options={CONSTRAINT.map((c: any) => ({ label: c, value: c }))}
                 value={text}
                 size="small"
                 style={{ width: 260 }}
                 popupClassName="secret-note-ccl-select"
                 onChange={(value) => {
                   const newTableCCL = tableCCL.map((c) => {
-                    if (c.column === record.column) {
-                      return {
-                        ...c,
-                        [item]: value,
-                      };
-                    }
+                    // if (c.column === record.column) {
+                    //   return {
+                    //     ...c,
+                    //     [item]: value,
+                    //   };
+                    // }
                     return c;
                   });
                   setTableCCL(newTableCCL);
@@ -86,14 +94,8 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
       destroyOnClose={true}
       title="CCL Config"
       onOk={() => changeCCL()}
-      onCancel={() => {
-        close();
-      }}
-      afterOpenChange={(open) => {
-        if (open) {
-          getTableCCL();
-        }
-      }}
+      onCancel={close}
+      afterOpenChange={(open) => open && handleRefreshCCL()}
     >
       <a
         className="secretnote-ccl-doc-link"
@@ -101,7 +103,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
         target="_blank"
         rel="noreferrer"
       >
-        CCL configuration Guide
+        {l10n.t('CCL 配置说明')}
       </a>
       <Table
         className="secretnote-ccl-table"
@@ -116,7 +118,7 @@ const ConfigPanel = (props: ModalItemProps<DataTable>) => {
   );
 };
 
-export const CCLConfigModal: ModalItem<DataTable> = {
+export const CCLConfigModal: ModalItem<_Table> = {
   id: 'data-table-ccl-modal',
   component: ConfigPanel,
 };

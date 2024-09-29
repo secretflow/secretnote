@@ -1,3 +1,5 @@
+// The view and components for SCQL table management.
+
 import {
   BaseView,
   inject,
@@ -24,36 +26,29 @@ import type { Menu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
 
 import './index.less';
-import { DataTableConfigModal } from './add-modal';
+import { TableConfigModal } from './add-modal';
 import { CCLConfigModal } from './ccl-modal';
-import {
-  DataTableService,
-  type DataTableNode,
-  type DataTable,
-  type TableCCL,
-} from './service';
+import { TableService } from './service';
+import { noop } from 'lodash-es';
+import { ColumnControl } from '../scql-broker';
 
 const { DirectoryTree } = Tree;
 
-const DataTableDetails = (props: { data?: DataTable }) => {
+const TableDetails = (props: { data?: any }) => {
   const { data } = props;
-  const [tableCCL, setTableCCL] = useState<TableCCL[]>([]);
-  const instance = useInject<DataTableView>(ViewInstance);
+  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
+  const instance = useInject<TableView>(ViewInstance);
 
   const getTableCCL = async (tableName: string) => {
-    const { ccl } = await instance.service.getTableCCL(tableName);
+    const { ccl } = await instance.tableService.getTableCCL(tableName);
     setTableCCL(ccl);
   };
 
-  useEffect(
-    () => {
-      if (data) {
-        getTableCCL(data.tableName);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data],
-  );
+  useEffect(() => {
+    if (data) {
+      getTableCCL(data.tableName);
+    }
+  }, [data]);
 
   if (!data) {
     return null;
@@ -85,7 +80,7 @@ const DataTableDetails = (props: { data?: DataTable }) => {
         <Descriptions.Item label="表名称">{data.tableName}</Descriptions.Item>
         <Descriptions.Item label="关联表">{data.refTable}</Descriptions.Item>
         <Descriptions.Item label="数据列">
-          {data.columns.map((c) => c.name).join(', ')}
+          {data.columns.map((c: any) => c.name).join(', ')}
         </Descriptions.Item>
         <Descriptions.Item label="CCL">
           <Table
@@ -102,14 +97,14 @@ const DataTableDetails = (props: { data?: DataTable }) => {
   );
 };
 
-export const DataTableComponent = () => {
-  const instance = useInject<DataTableView>(ViewInstance);
-  const service = instance.service;
+export const TableComponent = () => {
+  const instance = useInject<TableView>(ViewInstance);
+  const service = instance.tableService;
 
-  const onMenuClick = (key: string, node: DataTableNode) => {
+  const onMenuClick = (key: string, node: any) => {
     switch (key) {
       case 'add':
-        instance.modalService.openModal(DataTableConfigModal);
+        instance.modalService.openModal(TableConfigModal);
         break;
       case 'configCCL':
         instance.modalService.openModal(CCLConfigModal, node.data);
@@ -123,7 +118,7 @@ export const DataTableComponent = () => {
           cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
-            await service.deleteDataTable(node);
+            // await instance.tableService.drop(node);
             message.success('数据表已删除');
             return close(Promise.resolve);
           },
@@ -134,12 +129,12 @@ export const DataTableComponent = () => {
     }
   };
 
-  const titleRender = (nodeData: DataTableNode) => {
+  const titleRender = (nodeData: any) => {
     const { isLeaf, belongToMe } = nodeData;
 
     const folderMenuItems: Menu[] = belongToMe
       ? [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }]
-      : [];
+      : [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }];
 
     const dataMenuItems: Menu[] = belongToMe
       ? [
@@ -152,7 +147,7 @@ export const DataTableComponent = () => {
             danger: true,
           },
         ]
-      : [];
+      : [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }];
 
     const title = (
       <div className="ant-tree-title-content">
@@ -181,7 +176,7 @@ export const DataTableComponent = () => {
         align={{ offset: [10, 0] }}
         arrow={false}
         overlayStyle={{ maxWidth: 520 }}
-        content={<DataTableDetails data={nodeData.data} />}
+        content={<TableDetails data={nodeData.data} />}
         trigger="hover"
         destroyTooltipOnHide
       >
@@ -193,10 +188,8 @@ export const DataTableComponent = () => {
   return (
     <DirectoryTree
       blockNode
-      onSelect={() => {
-        // do nothing
-      }}
-      treeData={service.dataTables}
+      onSelect={noop}
+      treeData={service.tables}
       className="secretnote-data-table-tree"
       switcherIcon={<ChevronDown size={12} />}
       icon={null}
@@ -205,36 +198,36 @@ export const DataTableComponent = () => {
   );
 };
 
-export const dataTableViewKey = 'data-table';
+export const tableViewKey = 'scql-table';
 @singleton({ contrib: [SideBarContribution, ModalContribution] })
 @view('secretnote-data-table-view')
-export class DataTableView
+export class TableView
   extends BaseView
   implements SideBarContribution, ModalContribution
 {
-  readonly service: DataTableService;
+  readonly tableService: TableService;
   readonly modalService: ModalService;
 
-  key = dataTableViewKey;
-  label = '数据表';
+  key = tableViewKey;
+  label = l10n.t('数据表');
   order = 2;
   defaultOpen = true;
-  view = DataTableComponent;
+  view = TableComponent;
 
   constructor(
-    @inject(DataTableService) service: DataTableService,
+    @inject(TableService) tableService: TableService,
     @inject(ModalService) modalService: ModalService,
   ) {
     super();
-    this.service = service;
+    this.tableService = tableService;
     this.modalService = modalService;
   }
 
-  onViewMount(): void {
-    this.service.getDataTables();
+  onViewMount() {
+    this.tableService.refreshTables();
   }
 
   registerModals() {
-    return [DataTableConfigModal, CCLConfigModal];
+    return [TableConfigModal, CCLConfigModal];
   }
 }

@@ -1,20 +1,20 @@
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
 import { ExtraView } from './extra-view';
-import { DataTableService } from './service';
-import { DataTableView, dataTableViewKey } from './view';
+import { TableService } from './service';
+import { TableView, tableViewKey } from './view';
 
 export const SCQLDataTableModule = ManaModule.create().register(
-  DataTableService,
-  DataTableView,
+  TableService,
+  TableView,
   ExtraView,
   createViewPreference({
-    slot: dataTableViewKey,
-    view: DataTableView,
+    slot: tableViewKey,
+    view: TableView,
     autoCreate: true,
   }),
   createViewPreference({
-    slot: `${dataTableViewKey}Extra`,
+    slot: `${tableViewKey}Extra`,
     view: ExtraView,
     autoCreate: true,
   }),

@@ -1,9 +1,12 @@
-// Service for interacting with backend's broker APIs.
+// Service for interacting with backend's broker APIs only without states.
 // @see https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.0b1/reference/broker-api
+// @see pyprojects/secretnote/secretnote/scql/server/services/broker_manager.py
 // The schema follows the document, best effort.
 
 import { request } from '@/utils';
+import { toSnakeCaseObject as snake } from '@/utils/object';
 import { prop, singleton } from '@difizen/mana-app';
+import { pick } from 'lodash-es';
 
 // APIs of SCQL Broker.
 export enum BrokerActions {
@@ -62,17 +65,86 @@ export type ProjectInvitation = {
   status: _ProjectInvitationStatus;
 };
 
-// defined by ourself
+// scql.pb.CreateTableRequest.ColumnDesc
+export type TableColumnDesc = {
+  name: string;
+  // github.com/secretflow/scql/blob/main/proto-gen/api/v1/column.pb.go
+  dtype:
+    | 'INT'
+    | 'INTEGER'
+    | 'INT32'
+    | 'INT64'
+    | 'FLOAT32'
+    | 'FLOAT64'
+    | 'FLOAT'
+    | 'DOUBLE'
+    | 'STRING'
+    | 'STR'
+    | 'DATETIME'
+    | 'TIMESTAMP';
+};
+
+// scql.pb.ColumnDef
+export type ColumnDef = {
+  column_name: string;
+  table_name: string;
+};
+
+export enum _ColumnControlConstraint {
+  UNKNOWN = 'UNKNOWN',
+  PLAINTEXT = 'PLAINTEXT',
+  ENCRYPTED_ONLY = 'ENCRYPTED_ONLY',
+  PLAINTEXT_AFTER_JOIN = 'PLAINTEXT_AFTER_JOIN',
+  PLAINTEXT_AFTER_GROUP_BY = 'PLAINTEXT_AFTER_GROUP_BY',
+  PLAINTEXT_AFTER_COMPARE = 'PLAINTEXT_AFTER_COMPARE',
+  PLAINTEXT_AFTER_AGGREGATE = 'PLAINTEXT_AFTER_AGGREGATE',
+}
+
+// scql.pb.ColumnControl
+export type ColumnControl = {
+  col: ColumnDef;
+  party_code: string; // the code of party that the constraint applies to.
+  constraint: _ColumnControlConstraint;
+};
+
+export interface TableCCL {
+  column: string;
+  [party: string]: string;
+}
+
+// the following types are defined by ourself without corresponding protobuf
 export type _PlatformInfo = {
   party: string; // self party
   broker: string; // address of broker API
 };
 
+export type _ProjectMember = {
+  party: string; // name of the party
+  isCreator: boolean;
+};
+
+export type _Table = {
+  projectId: string;
+  tableName: string;
+  tableOwner: string;
+  refTable: string; // The refered physical table, e.g. `db.table`
+  dbType: 'MySQL' | 'Postgres' | 'csvdb';
+  columns: TableColumnDesc[];
+};
+
+async function requestBroker<T>(action: BrokerActions, body?: Record<string, any>) {
+  return request<T>('api/broker', {
+    method: 'POST',
+    body: JSON.stringify({
+      action,
+      ...snake(body ?? {}),
+    }),
+  });
+}
+
 @singleton()
-export class SCQLBrokerService {
+export class BrokerService {
   @prop() platformInfo: _PlatformInfo = { party: '', broker: '' };
-  @prop() projects: ProjectDesc[] = [];
-  @prop() invitations: ProjectInvitation[] = [];
 
   constructor() {
     this.getPlatformInfo();
@@ -85,27 +157,18 @@ export class SCQLBrokerService {
    * Update in place and return.
    */
   async getPlatformInfo() {
-    return (this.platformInfo = await request<_PlatformInfo>('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: BrokerActions.getPlatformInfo,
-      }),
-    }));
+    return (this.platformInfo = await requestBroker<_PlatformInfo>(
+      BrokerActions.getPlatformInfo,
+    ));
   }
 
   /**
    * List All Projects that have created and joined.
-   * If `projectId` is not given, return all projects.
-   * Update in place and return.
    */
   async listProjects(projectId?: string) {
-    return (this.projects = await request<ProjectDesc[]>('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: BrokerActions.listProjects,
-        ids: projectId ? [projectId] : [],
-      }),
-    }));
+    return await requestBroker<ProjectDesc[]>(BrokerActions.listProjects, {
+      ids: projectId ? [projectId] : [],
+    });
   }
 
   /**
@@ -114,41 +177,98 @@ export class SCQLBrokerService {
   async createProject(
     project: Pick<ProjectDesc, 'project_id' | 'name' | 'description' | 'conf'>,
   ) {
-    await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: BrokerActions.createProject,
-        ...project,
-      }),
-    });
+    return await requestBroker<{}>(BrokerActions.createProject, project);
   }
 
   /**
    * List all invitations sent and received.
-   * Update in place and return.
    */
   async listInvitations(status?: _ProjectInvitationStatus, inviter?: string) {
-    return (this.invitations = await request<ProjectInvitation[]>('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: BrokerActions.listInvitations,
-        status,
-        inviter,
-      }),
-    }));
+    return await requestBroker<ProjectInvitation[]>(BrokerActions.listInvitations, {
+      status,
+      inviter,
+    });
   }
 
   /**
    * Process the received invitation, specify it by invitation_id, choose to join the corresponding project or reject it
    */
   async processInvitation(invitationId: string, respond: _ProjectInvitationRespond) {
-    return await request<{}>('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: BrokerActions.processInvitation,
-        invitation_id: invitationId,
+    return await requestBroker<{}>(
+      BrokerActions.processInvitation,
+      snake({
+        invitationId,
         respond,
       }),
+    );
+  }
+
+  /**
+   * Invite another member to join the Project you created.
+   */
+  async inviteMember(invitee: string, projectId: string) {
+    return await requestBroker<{}>(
+      BrokerActions.inviteMember,
+      snake({
+        invitee,
+        projectId,
+        method: 'PUSH',
+      }),
+    );
+  }
+
+  /**
+   * Create a Table you owned in specified Project.
+   */
+  async createTable(table: _Table) {
+    return await requestBroker<{}>(
+      BrokerActions.createTable,
+      pick(table, ['projectId', 'tableName', 'refTable', 'dbType', 'columns']),
+    );
+  }
+
+  /**
+   * Drop a Table you owned in specified Project, the relevant CCLs will be automatically cleared.
+   */
+  async dropTable(projectId: string, tableName: string) {
+    return await requestBroker<{}>(BrokerActions.dropTable, {
+      projectId,
+      tableName,
+    });
+  }
+
+  /**
+   * Show CCLs in specified Project, supports specifying Tables, members.
+   */
+  async showCCL(
+    projectId: string,
+    tables?: string[],
+    destParties?: 'self' | 'others' | string,
+  ) {
+    return await requestBroker<TableCCL[]>(BrokerActions.showCCL, {
+      projectId,
+      tables,
+      destParties,
+    });
+  }
+
+  /**
+   * List all Tables in specified Project.
+   */
+  async listTables(projectId: string, names?: string[]) {
+    return await requestBroker<_Table[]>(BrokerActions.listTables, {
+      projectId,
+      names,
+    });
+  }
+
+  /**
+   * Grant CCLs of your Table to a specific member.
+   */
+  async grantCCL(projectId: string, columnControlList: ColumnControl[]) {
+    return await requestBroker<{}>(BrokerActions.grantCCL, {
+      projectId,
+      columnControlList,
     });
   }
 }

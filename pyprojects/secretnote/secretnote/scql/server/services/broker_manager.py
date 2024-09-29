@@ -115,15 +115,17 @@ class BrokerManager:
 
         return self.validate_response(response).get("invitation_id", None)
 
-    async def invite_member(self, project_id: str, invitee: str) -> None:
+    async def invite_member(self, project_id: str, invitee: str, method: str) -> None:
         """Invite another member to join the Project you created"""
+        assert method == 'PUSH', ValueError(f"Method except PUSH is not implemented yet.")
+        
         response = await request(
             f"{self.broker}/intra/member/invite",
             "POST",
             body={
                 "project_id": project_id,
                 "invitee": invitee,
-                "method": "PUSH",  # PULL is not implemented by SCQL yet
+                "method": method, 
             },
         )
 

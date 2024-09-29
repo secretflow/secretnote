@@ -6,6 +6,7 @@ from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinja
 from .services.agent_handlers import agent_handlers
 from .services.pages_handlers import pages_handlers
 from .services.broker_handlers import broker_handlers
+from .services.contents_handlers import contents_handlers
 
 __dirname__ = os.path.dirname(__file__)
 
@@ -36,6 +37,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         """Register the handlers of the SecretNote application."""
         routes = [
             *agent_handlers,
+            *contents_handlers,
             *pages_handlers,
             *broker_handlers,
         ]

@@ -18,7 +18,7 @@ import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 import './index.less';
 import { ProjectConfigModal } from './add-modal';
 import { genericErrorHandler } from '@/utils';
-import { SCQLBrokerService } from '@/modules/scql-broker';
+import { BrokerService } from '@/modules/scql-broker';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
@@ -125,11 +125,11 @@ export const ProjectComponent = () => {
 @view('scql-project-view')
 export class ProjectView extends BaseView implements ModalContribution {
   view = ProjectComponent;
-  readonly service: SCQLBrokerService;
+  readonly service: BrokerService;
   readonly modalService: ModalService;
 
   constructor(
-    @inject(SCQLBrokerService) service: SCQLBrokerService,
+    @inject(BrokerService) service: BrokerService,
     @inject(ModalService) modalService: ModalService,
   ) {
     super();

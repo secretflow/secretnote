@@ -65,11 +65,8 @@ export class SQLCellView extends LibroExecutableCellView {
   readonly viewManager: ViewManager;
   readonly commandRegistry: CommandRegistry;
 
-  @prop()
-  outputs: IOutput[] = [];
-
-  @prop()
-  editorView?: CodeEditorView;
+  @prop() outputs: IOutput[] = [];
+  @prop() editorView?: CodeEditorView;
 
   get cellModel() {
     return this.model as SQLCellModel;

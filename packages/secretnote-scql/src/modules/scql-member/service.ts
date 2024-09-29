@@ -1,60 +1,33 @@
-import { singleton, prop } from '@difizen/mana-app';
+// Service about project members management.
 
-import { randomColorByName, request } from '@/utils';
+import { singleton, prop, inject } from '@difizen/mana-app';
 
-export interface Member {
-  name: string;
-  creator: boolean;
-  color: string;
-}
+import { _ProjectMember, BrokerService } from '@/modules/scql-broker';
 
 @singleton()
-export class MemberService {
-  @prop()
-  members: Member[] = [];
+export class ProjectMemberService {
+  protected readonly service: BrokerService;
+  @prop() members: _ProjectMember[] = [];
 
-  async getMemberList() {
-    const { party } = await this.getPlatformInfo();
-    const project = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getProjectInfo',
-        project_id: this.getProjectId(),
-      }),
-    });
+  constructor(@inject(BrokerService) service: BrokerService) {
+    this.service = service;
+  }
+
+  /**
+   * Get members of project. Update `members` in place and return it.
+   */
+  async getProjectMembers(projectId: string) {
+    const project = (await this.service.listProjects(projectId))[0];
+
     if (project) {
-      this.members = project.members.map((item: string) => ({
-        name: item === party ? `${item} (you)` : item,
-        creator: item === project.creator,
-        color: randomColorByName(item),
+      this.members = project.members.map((v) => ({
+        party: v,
+        isCreator: v === project.creator,
       }));
+    } else {
+      this.members = [];
     }
+
     return this.members;
-  }
-
-  async inviteMember(name: string) {
-    await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'inviteMember',
-        project_id: this.getProjectId(),
-        invitee: name,
-      }),
-    });
-  }
-
-  async getPlatformInfo() {
-    const platformInfo = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getPlatformInfo',
-      }),
-    });
-    return platformInfo;
-  }
-
-  getProjectId() {
-    const list = window.location.pathname.split('/');
-    return list[list.length - 1];
   }
 }

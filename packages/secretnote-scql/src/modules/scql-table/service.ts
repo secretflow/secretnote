@@ -1,147 +1,40 @@
-import { prop, singleton } from '@difizen/mana-app';
+// Service for SCQL table and CCL management.
+
+import { inject, prop, singleton } from '@difizen/mana-app';
 import { Modal } from 'antd';
-import type { DataNode } from 'antd/es/tree';
-import { request } from '@/utils';
-
-export interface DataTableColumn {
-  name: string;
-  dtype: 'string' | 'double' | 'int';
-}
-
-export interface DataTable {
-  tableName: string;
-  refTable: string;
-  dbType: string;
-  tableOwner: string;
-  columns: DataTableColumn[];
-}
-
-export type DataTableNode = DataNode & {
-  children: DataTableNode[];
-  belongToMe: boolean;
-  data?: DataTable;
-};
-
-export enum Constraint {
-  UNDEFINED = '',
-  UNKNOWN = 'UNKNOWN',
-  PLAINTEXT = 'PLAINTEXT',
-  ENCRYPTED_ONLY = 'ENCRYPTED_ONLY',
-  PLAINTEXT_AFTER_JOIN = 'PLAINTEXT_AFTER_JOIN',
-  PLAINTEXT_AFTER_GROUP_BY = 'PLAINTEXT_AFTER_GROUP_BY',
-  PLAINTEXT_AFTER_COMPARE = 'PLAINTEXT_AFTER_COMPARE',
-  PLAINTEXT_AFTER_AGGREGATE = 'PLAINTEXT_AFTER_AGGREGATE',
-}
-
-export const CONSTRAINT = [
-  Constraint.UNKNOWN,
-  Constraint.PLAINTEXT,
-  Constraint.ENCRYPTED_ONLY,
-  Constraint.PLAINTEXT_AFTER_JOIN,
-  Constraint.PLAINTEXT_AFTER_GROUP_BY,
-  Constraint.PLAINTEXT_AFTER_COMPARE,
-  Constraint.PLAINTEXT_AFTER_AGGREGATE,
-];
-
-export interface TableCCL {
-  column: string;
-  [party: string]: string;
-}
+import { genericErrorHandler, request } from '@/utils';
+import { _Table, BrokerService } from '../scql-broker';
+import { getProjectId } from '@/utils/scql';
+import { ProjectService } from '../scql-project/service';
+import { l10n } from '@difizen/mana-l10n';
 
 @singleton()
-export class DataTableService {
-  @prop()
-  dataTables: DataTableNode[] = [];
+export class TableService {
+  protected readonly brokerService: BrokerService;
+  protected readonly projectService: ProjectService;
+  @prop() tables: _Table[] = [];
 
-  async getDataTables() {
-    const treeNodes: DataTableNode[] = [];
+  constructor(
+    @inject(BrokerService) brokerService: BrokerService,
+    @inject(ProjectService) projectService: ProjectService,
+  ) {
+    this.brokerService = brokerService;
+    this.projectService = projectService;
+  }
 
-    const project = await this.getProjectInfo();
+  /**
+   * Get all tables associtated with current project.
+   */
+  async refreshTables() {
+    // Get current project.
+    const project = await this.projectService.getProjectInfo(getProjectId());
     if (!project) {
+      genericErrorHandler(l10n.t('当前项目无效'));
       return;
     }
-
-    const platformInfo = await this.getPlatformInfo();
-    if (!platformInfo) {
-      return;
-    }
-
-    const tables = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getDataTables',
-        project_id: this.getProjectId(),
-      }),
-    });
-
-    const { members } = project;
-    const { party } = platformInfo;
-
-    if (tables) {
-      members.forEach((member: string) => {
-        const belongToMe = party === member;
-        const node: DataTableNode = {
-          key: member,
-          title: member,
-          isLeaf: false,
-          belongToMe,
-          children: [],
-        };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        tables.forEach((item: any) => {
-          if (item.table_owner === member) {
-            node.children.push({
-              key: item.table_name,
-              title: item.table_name,
-              isLeaf: true,
-              data: {
-                tableName: item.table_name,
-                refTable: item.ref_table,
-                dbType: item.db_type,
-                tableOwner: item.table_owner,
-                columns: item.columns,
-              },
-              children: [],
-              belongToMe,
-            });
-          }
-        });
-
-        treeNodes.push(node);
-      });
-    }
-
-    this.dataTables = treeNodes;
-  }
-
-  async addDataTable(table: DataTable) {
-    await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'createTable',
-        project_id: this.getProjectId(),
-        table_name: table.tableName,
-        ref_table: table.refTable,
-        db_type: table.dbType,
-        columns: table.columns,
-      }),
-    });
-    this.getDataTables();
-  }
-
-  async deleteDataTable(nodeData: DataNode) {
-    if (!nodeData.isLeaf) {
-      return;
-    }
-    await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'deleteTable',
-        project_id: this.getProjectId(),
-        table_name: nodeData.title,
-      }),
-    });
-    this.getDataTables();
+    const { members } = project; // members of project
+    const tables = await this.brokerService.listTables(getProjectId()); // all tables
+    this.tables = tables.filter(({ tableOwner }) => members.includes(tableOwner));
   }
 
   async getTableCCL(tableName: string) {
@@ -194,7 +87,7 @@ export class DataTableService {
     return result;
   }
 
-  async grantTableCCL(tableName: string, ccl: TableCCL[]) {
+  async grantCCL(tableName: string, ccl: TableCCL[]) {
     const cclList: {
       col: {
         column_name: string;
@@ -223,61 +116,16 @@ export class DataTableService {
       method: 'POST',
       body: JSON.stringify({
         action: 'grantCCL',
-        project_id: this.getProjectId(),
+        project_id: getProjectId(),
         ccl_list: cclList,
       }),
     });
   }
 
-  async getPlatformInfo() {
-    const platformInfo = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getPlatformInfo',
-      }),
-    });
-    return platformInfo;
-  }
-
-  async getProjectInfo() {
-    const project = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getProjectInfo',
-        project_id: this.getProjectId(),
-      }),
-    });
-    if (!project) {
-      Modal.info({
-        title: 'Info',
-        content: 'You were not involved in the project.',
-        okText: 'Back to project list',
-        // TODO
-        // onOk: () => {
-        //   history.push('/scql/project');
-        // },
-      });
-      return;
-    }
-
-    return project;
-  }
-
+  /**
+   * Get table info by name.
+   */
   async getTableInfo(tableName: string) {
-    const table = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getTableInfo',
-        project_id: this.getProjectId(),
-        table_name: tableName,
-      }),
-    });
-
-    return table;
-  }
-
-  getProjectId() {
-    const list = history.location.pathname.split('/');
-    return list[list.length - 1];
+    return await this.brokerService.listTables(getProjectId(), [tableName]);
   }
 }

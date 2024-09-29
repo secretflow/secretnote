@@ -1,3 +1,5 @@
+// The refresh button of the table tree sidebar.
+
 import {
   BaseView,
   inject,
@@ -9,11 +11,10 @@ import {
 import { l10n } from '@difizen/mana-l10n';
 import { message, Tooltip } from 'antd';
 import { RefreshCw } from 'lucide-react';
-
-import { DataTableService } from './service';
+import { TableService } from './service';
 
 export const ExtraComponent = () => {
-  const instance = useInject<ExtraView>(ViewInstance);
+  const { service } = useInject<ExtraView>(ViewInstance);
 
   return (
     <Tooltip title={l10n.t('刷新')}>
@@ -21,7 +22,7 @@ export const ExtraComponent = () => {
         size={14}
         onClick={(e) => {
           e.stopPropagation();
-          instance.service.getDataTables();
+          service.refreshTables();
           message.success(l10n.t('数据表已刷新'));
         }}
       />
@@ -32,11 +33,10 @@ export const ExtraComponent = () => {
 @singleton()
 @view('data-table-extra-view')
 export class ExtraView extends BaseView {
-  readonly service: DataTableService;
-
+  readonly service: TableService;
   view = ExtraComponent;
 
-  constructor(@inject(DataTableService) service: DataTableService) {
+  constructor(@inject(TableService) service: TableService) {
     super();
     this.service = service;
   }

@@ -19,6 +19,8 @@ import {
   Divider,
   Tooltip,
   Avatar,
+  Flex,
+  Space,
 } from 'antd';
 import { Bell, User } from 'lucide-react';
 
@@ -27,7 +29,7 @@ import { l10n } from '@difizen/mana-l10n';
 import {
   _ProjectInvitationRespond,
   _ProjectInvitationStatus,
-  SCQLBrokerService,
+  BrokerService,
 } from '@/modules/scql-broker';
 import { genericErrorHandler } from '@/utils';
 
@@ -73,25 +75,37 @@ export const InvitationNotificationComponent = () => {
             <ul>
               {pending.map((item) => (
                 <li key={item.invitation_id}>
-                  <span>{`${item.inviter} 邀请你加入项目 ${item.project}`}</span>
-                  <Divider
-                    type="vertical"
-                    style={{ height: '1em', borderInlineStart: '1px solid #d6dee6' }}
-                  />
-                  <span className="action">
-                    <Button
-                      onClick={() => handleInvitation(item.invitation_id, 'ACCEPT')}
-                      type="link"
-                    >
-                      {l10n.t('接受')}
-                    </Button>
-                    <Button
-                      onClick={() => handleInvitation(item.invitation_id, 'DECLINE')}
-                      type="link"
-                    >
-                      {l10n.t('拒绝')}
-                    </Button>
-                  </span>
+                  <Flex style={{ width: '100%' }} align="center">
+                    <Space direction="vertical" style={{ flex: '1 1 0%' }}>
+                      <span>
+                        {l10n.t(
+                          '{0} 邀请你加入项目 {1}',
+                          item.inviter,
+                          item.project.name,
+                        )}
+                      </span>
+                      <span>
+                        {l10n.t(
+                          '项目描述: {0}',
+                          item.project.description || l10n.t('无'),
+                        )}
+                      </span>
+                    </Space>
+                    <span className="action">
+                      <Button
+                        onClick={() => handleInvitation(item.invitation_id, 'ACCEPT')}
+                        type="link"
+                      >
+                        {l10n.t('接受')}
+                      </Button>
+                      <Button
+                        onClick={() => handleInvitation(item.invitation_id, 'DECLINE')}
+                        type="link"
+                      >
+                        {l10n.t('拒绝')}
+                      </Button>
+                    </span>
+                  </Flex>
                 </li>
               ))}
             </ul>
@@ -146,7 +160,7 @@ export const InvitationNotificationComponent = () => {
   ];
 
   return (
-    <div className="secretnote-invitation-notification">
+    <Space className="secretnote-invitation-notification">
       <Popover
         content={<Tabs defaultActiveKey="1" items={items} size="small" />}
         title=""
@@ -172,7 +186,7 @@ export const InvitationNotificationComponent = () => {
           size="small"
         />
       </Tooltip>
-    </div>
+    </Space>
   );
 };
 
@@ -180,9 +194,9 @@ export const InvitationNotificationComponent = () => {
 @view('secretnote-invitation-notification-view')
 export class InvitationNotificationView extends BaseView {
   view = InvitationNotificationComponent;
-  readonly service: SCQLBrokerService;
+  readonly service: BrokerService;
 
-  constructor(@inject(SCQLBrokerService) service: SCQLBrokerService) {
+  constructor(@inject(BrokerService) service: BrokerService) {
     super();
     this.service = service;
   }

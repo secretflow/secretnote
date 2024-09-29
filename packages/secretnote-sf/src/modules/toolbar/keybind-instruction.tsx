@@ -2,7 +2,7 @@
 
 import { l10n } from '@difizen/mana-l10n';
 import { isMacintosh } from '@difizen/mana-common';
-import { Divider, Drawer, Table, Tag, Tooltip } from 'antd';
+import { Divider, Drawer, Table, Tag, Tooltip, Typography } from 'antd';
 import { KeyboardIcon } from 'lucide-react';
 import { useState } from 'react';
 

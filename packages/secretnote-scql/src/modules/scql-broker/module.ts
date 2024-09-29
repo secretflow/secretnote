@@ -1,4 +1,4 @@
 import { ManaModule } from '@difizen/mana-app';
-import { SCQLBrokerService } from './service';
+import { BrokerService } from './service';
 
-export const SCQLBrokerModule = ManaModule.create().register(SCQLBrokerService);
+export const SCQLBrokerModule = ManaModule.create().register(BrokerService);
