@@ -7,7 +7,7 @@ import {
   DocumentCommands,
 } from '@difizen/libro-jupyter';
 import { CommandRegistry, inject, ModalService, transient } from '@difizen/mana-app';
-import { debounce } from 'lodash-es';
+import { debounce, noop } from 'lodash-es';
 
 import { getLocalBaseUrl } from '@/utils';
 
@@ -39,7 +39,10 @@ export class SecretNoteModel extends LibroModel {
     this.onChanged(this.autoSave.bind(this));
   }
 
-  async saveNotebookContent(): Promise<void> {
+  /**
+   * Serialize current notebook content to JSON and save.
+   */
+  async saveNotebookContent() {
     const notebookContent = this.toJSON();
 
     if (!this.currentFileContents) {
@@ -76,78 +79,18 @@ export class SecretNoteModel extends LibroModel {
       this.modalService.openModal(SaveFileErrorModal);
       throw new Error('File Save Error');
     }
-
-    await this.createCheckpoint();
   }
 
-  canRun() {
-    return true;
-  }
-
-  async interrupt() {
-    // pass
-  }
-
-  async shutdown() {
-    // pass
-  }
-
-  async restart() {
-    // pass
-  }
-
-  async reconnect() {
-    // pass
-  }
-
-  findRunningCell() {
-    const runningCellIndex = this.cells.findIndex((item) => {
-      if (ExecutedWithKernelCellModel.is(item.model)) {
-        return item.model.kernelExecuting === true;
-      }
-      return false;
-    });
-    if (runningCellIndex > -1) {
-      this.selectCell(this.cells[runningCellIndex]);
-      this.scrollToView(this.cells[runningCellIndex]);
-    }
-  }
-
-  async createCheckpoint() {
-    if (this.currentFileContents) {
-      await this.contentsManager.createCheckpoint(this.currentFileContents.path, {
-        baseUrl: getLocalBaseUrl(),
-      });
-    }
-  }
-
-  async listCheckpoints() {
-    if (this.currentFileContents) {
-      await this.contentsManager.listCheckpoints(this.currentFileContents.path, {
-        baseUrl: getLocalBaseUrl(),
-      });
-    }
-  }
-
-  async restoreCheckpoint(checkpointID: string) {
-    if (this.currentFileContents) {
-      await this.contentsManager.restoreCheckpoint(
-        this.currentFileContents.path,
-        checkpointID,
-        { baseUrl: getLocalBaseUrl() },
-      );
-    }
-  }
-
-  async deleteCheckpoint(checkpointID: string) {
-    if (this.currentFileContents) {
-      await this.contentsManager.deleteCheckpoint(
-        this.currentFileContents.path,
-        checkpointID,
-        { baseUrl: getLocalBaseUrl() },
-      );
-    }
-  }
+  canRun = (..._: any) => true;
+  interrupt = noop;
+  shutdown = noop;
+  restart = noop;
+  reconnect = noop;
+  findRunningCell = noop;
+  createCheckpoint = noop;
+  listCheckpoints = noop;
+  restoreCheckpoint = noop;
+  deleteCheckpoint = noop;
 
   autoSave = debounce(() => {
     this.commandRegistry.executeCommand(DocumentCommands.Save.id);

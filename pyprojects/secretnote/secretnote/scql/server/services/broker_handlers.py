@@ -56,10 +56,10 @@ class BrokerHandler(APIHandler):
                 model.get("project_id", None), model.get("invitee", None), model.get('method', None)
             ),
             "listTables": lambda: self.broker_manager.list_tables(
-                model.get("project_id", None), [model.get("table_name", None)]
+                model.get("project_id", None), model.get("names", None)
             ),
             "createTable": lambda: self.broker_manager.create_table(
-                model.get("project_id", None), ipick(model, ["project_id", "action"])
+                model.get("project_id", None), ipick(model, ["action", "project_id"])
             ),
             "dropTable": lambda: self.broker_manager.drop_table(
                 model.get("project_id", None), model.get("table_name", None)

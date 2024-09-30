@@ -9,6 +9,7 @@ import { l10n } from '@difizen/mana-l10n';
 
 import { _Table, BrokerService } from '@/modules/scql-broker';
 import { genericErrorHandler } from '@/utils';
+import { getProjectId } from '@/utils/scql';
 
 const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const { visible, close, data } = props;
@@ -28,7 +29,7 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const handleCreateTable = async () => {
     const values = await form.validateFields();
     try {
-      await brokerService.createTable(values);
+      await brokerService.createTable(getProjectId(), values);
       message.success(l10n.t('新建数据表成功'));
       close();
     } catch (e) {
@@ -51,7 +52,7 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         style={{ marginTop: 24, maxHeight: 500, overflowY: 'auto' }}
-        initialValues={{ dbType: 'MySQL' }}
+        initialValues={{ dbType: 'mysql' }}
       >
         <Form.Item
           label={l10n.t('数据库类型')}
@@ -60,7 +61,7 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
         >
           <Select
             options={[
-              { label: 'MySQL', value: 'MySQL' },
+              { label: 'MySQL', value: 'mysql' },
               { label: 'Postgres', value: 'Postgres', disabled: true },
               { label: 'csvdb', value: 'csvdb', disabled: true },
             ]}

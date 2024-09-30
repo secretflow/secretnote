@@ -16,6 +16,6 @@ export class SecretNoteLocalStorageService
   }
 }
 
-// manually create an instance of the service and inject it using `useValue`
+// manually create an instance of the service and register it using `useValue`
 // so that it can be used in somewhere without injection.
 export const localStorageService = new SecretNoteLocalStorageService();

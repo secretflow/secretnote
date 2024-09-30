@@ -19,8 +19,8 @@ const App = (): JSX.Element => {
         StorageModule,
         ThemeModule,
         PreviewLayoutModule,
-        SCQLProjectModule,
         SCQLBrokerModule,
+        SCQLProjectModule,
       ]}
     />
   );

@@ -21,11 +21,11 @@ const FILE_EXT = '.ipynb'; // the default extname of notebook files
  * Add the customized drive name to the path so that
  * ContentsManager will call that drive to fire requests.
  */
-const drived = (path: string, driveName = DriveName) => `${driveName}:${path}`;
+export const drived = (path: string, driveName = DriveName) => `${driveName}:${path}`;
 /**
  * Remove the drive name and leading slash from the path if any.
  */
-const undrived = (path: string, driveName = DriveName) =>
+export const undrived = (path: string, driveName = DriveName) =>
   path.replace(new RegExp(`^${driveName}:/?`), '');
 
 @singleton()
@@ -69,6 +69,7 @@ export class NotebookFileService {
    * @see `loadContent` in `/editor/contents/contents-contrib.ts`
    */
   openFile(file: IContentsModel) {
+    console.log('openFile', file);
     if (this.currentNotebookFile !== file) {
       const previous = this.currentNotebookFile;
       this.currentNotebookFile = file;

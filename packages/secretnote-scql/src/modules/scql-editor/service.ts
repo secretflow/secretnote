@@ -1,61 +1,54 @@
-import { singleton } from '@difizen/mana-app';
+import { inject, singleton } from '@difizen/mana-app';
 
-import { transpose, request } from '@/utils';
+import { transpose } from '@/utils';
+import { BrokerService, Tensor } from '../scql-broker';
+import { getProjectId } from '@/utils/scql';
 
 @singleton()
-export class SCQLQueryService {
-  async query(query: string) {
-    const data = await request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'query',
-        project_id: this.getProjectId(),
-        query,
-      }),
-    });
+export class QueryService {
+  protected readonly brokerService: BrokerService;
 
+  constructor(@inject(BrokerService) brokerService: BrokerService) {
+    this.brokerService = brokerService;
+  }
+
+  /**
+   * Do a synchronous query and get its result immediately.
+   */
+  async doQuery(query: string) {
+    const result = await this.brokerService.doQuery(getProjectId(), query);
     const columns: string[] = [];
     const rows: string[][] = [];
 
-    if (data) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data.forEach((item: any) => {
-        columns.push(item.name);
-        rows.push(this.getRowValue(item));
+    if (result.out_columns) {
+      result.out_columns.forEach((tensor) => {
+        columns.push(tensor.name);
+        rows.push(this.getRow(tensor).map(String));
       });
-
-      return {
-        columns,
-        rows: transpose(rows),
-      };
     }
 
     return {
       columns,
-      rows,
+      rows: transpose(rows),
     };
   }
 
-  getRowValue(row: Record<string, string[]>) {
-    const keys = [
-      'int32_data',
-      'int64_data',
-      'float_data',
-      'double_data',
-      'bool_data',
-      'string_data',
-    ];
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (row[key] && row[key].length > 0) {
-        return row[key];
+  getRow(row: Tensor) {
+    let res;
+    (
+      [
+        'int32_data',
+        'int64_data',
+        'float_data',
+        'double_data',
+        'bool_data',
+        'string_data',
+      ] as const
+    ).forEach((k) => {
+      if (row[k] && row[k].length) {
+        res = row[k];
       }
-    }
-    return [];
-  }
-
-  getProjectId() {
-    const list = window.location.pathname.split('/');
-    return list[list.length - 1];
+    });
+    return (res || []) as number[] | string[] | boolean[];
   }
 }

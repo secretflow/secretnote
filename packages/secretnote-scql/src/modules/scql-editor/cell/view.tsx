@@ -30,7 +30,7 @@ import { forwardRef } from 'react';
 
 import { SQLEditor } from '../editor';
 import { SqlOutputArea } from '../output';
-import { SCQLQueryService } from '../service';
+import { QueryService } from '../service';
 
 import type { SQLCellModel } from './model';
 
@@ -61,7 +61,7 @@ SqlCellComponent.displayName = 'SqlCellComponent';
 @view('sql-cell-view')
 export class SQLCellView extends LibroExecutableCellView {
   override view = SqlCellComponent;
-  readonly queryService: SCQLQueryService;
+  readonly queryService: QueryService;
   readonly viewManager: ViewManager;
   readonly commandRegistry: CommandRegistry;
 
@@ -76,7 +76,7 @@ export class SQLCellView extends LibroExecutableCellView {
     @inject(ViewOption) options: CellViewOptions,
     @inject(CellService) cellService: CellService,
     @inject(ViewManager) viewManager: ViewManager,
-    @inject(SCQLQueryService) queryService: SCQLQueryService,
+    @inject(QueryService) queryService: QueryService,
     @inject(CommandRegistry) commandRegistry: CommandRegistry,
   ) {
     super(options, cellService);
@@ -204,7 +204,7 @@ export class SQLCellView extends LibroExecutableCellView {
     this.cellModel.executeCount = 1;
 
     try {
-      const data = await this.queryService.query(this.cellModel.value);
+      const data = await this.queryService.doQuery(this.cellModel.value);
       const msg: KernelMessage.IExecuteResultMsg = {
         header: {
           msg_type: 'execute_result',

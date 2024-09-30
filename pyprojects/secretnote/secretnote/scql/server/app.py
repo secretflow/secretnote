@@ -36,8 +36,8 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
     def initialize_handlers(self):
         """Register the handlers of the SecretNote application."""
         routes = [
-            *agent_handlers,
             *contents_handlers,
+            *agent_handlers,
             *pages_handlers,
             *broker_handlers,
         ]

@@ -12,6 +12,7 @@ import {
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';
+import type { TreeDataNode } from 'antd';
 import {
   ChevronDown,
   Trash,
@@ -24,13 +25,14 @@ import { useEffect, useState } from 'react';
 import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-
 import './index.less';
 import { TableConfigModal } from './add-modal';
 import { CCLConfigModal } from './ccl-modal';
 import { TableService } from './service';
 import { noop } from 'lodash-es';
-import { ColumnControl } from '../scql-broker';
+import { BrokerService, ColumnControl } from '@/modules/scql-broker';
+import { getProjectId } from '@/utils/scql';
+import { ProjectService } from '../scql-project/service';
 
 const { DirectoryTree } = Tree;
 
@@ -40,8 +42,8 @@ const TableDetails = (props: { data?: any }) => {
   const instance = useInject<TableView>(ViewInstance);
 
   const getTableCCL = async (tableName: string) => {
-    const { ccl } = await instance.tableService.getTableCCL(tableName);
-    setTableCCL(ccl);
+    await instance.tableService.getTableCCL(tableName);
+    // setTableCCL(ccl);
   };
 
   useEffect(() => {
@@ -75,11 +77,13 @@ const TableDetails = (props: { data?: any }) => {
 
   return (
     <div className="secretnote-node-description">
-      <Descriptions title="表信息" column={1}>
-        <Descriptions.Item label="数据库类型">{data.dbType}</Descriptions.Item>
-        <Descriptions.Item label="表名称">{data.tableName}</Descriptions.Item>
-        <Descriptions.Item label="关联表">{data.refTable}</Descriptions.Item>
-        <Descriptions.Item label="数据列">
+      <Descriptions title={l10n.t('表信息')} column={1}>
+        <Descriptions.Item label={l10n.t('数据库类型')}>
+          {data.dbType}
+        </Descriptions.Item>
+        <Descriptions.Item label={l10n.t('表名称')}>{data.tableName}</Descriptions.Item>
+        <Descriptions.Item label={l10n.t('关联表')}>{data.refTable}</Descriptions.Item>
+        <Descriptions.Item label={l10n.t('数据列')}>
           {data.columns.map((c: any) => c.name).join(', ')}
         </Descriptions.Item>
         <Descriptions.Item label="CCL">
@@ -98,38 +102,65 @@ const TableDetails = (props: { data?: any }) => {
 };
 
 export const TableComponent = () => {
+  const [nodes, setNodes] = useState<TreeDataNode[]>([]);
   const instance = useInject<TableView>(ViewInstance);
-  const service = instance.tableService;
+  const { tableService, brokerService, projectService, modalService } = instance;
+
+  async function transformTablesToTreeNodes() {
+    console.log('transformTablesToTreeNodes');
+
+    const { members } = (await projectService.getProjectInfo(getProjectId()))!;
+    const { tables } = tableService;
+    const { party: selfParty } = brokerService.platformInfo;
+
+    const _nodes: TreeDataNode[] = [];
+    members.forEach((member) => {
+      _nodes.push({
+        key: member,
+        title: member,
+        children: tables.map((v) => ({
+          key: `${v.tableName}-${member}`,
+          title: v.tableName,
+        })),
+      });
+    });
+
+    return _nodes;
+  }
+
+  useEffect(() => {
+    (async () => setNodes(await transformTablesToTreeNodes()))();
+  }, [tableService.tables]);
 
   const onMenuClick = (key: string, node: any) => {
     switch (key) {
       case 'add':
-        instance.modalService.openModal(TableConfigModal);
+        modalService.openModal(TableConfigModal);
         break;
       case 'configCCL':
-        instance.modalService.openModal(CCLConfigModal, node.data);
+        modalService.openModal(CCLConfigModal, node.data);
         break;
       case 'delete':
         Modal.confirm({
-          title: '删除数据表',
+          title: l10n.t('删除数据表'),
           centered: true,
-          content: `数据表 ${node.title} 将被删除`,
-          okText: '删除数据表',
+          content: l10n.t('数据表 {0} 将被删除', node.title),
+          okText: l10n.t('确认'),
           cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
-            // await instance.tableService.drop(node);
-            message.success('数据表已删除');
+            await brokerService.dropTable(getProjectId(), node.tableName);
+            message.success(l10n.t('数据表已删除'));
             return close(Promise.resolve);
           },
         });
-        break;
-      default:
         break;
     }
   };
 
   const titleRender = (nodeData: any) => {
+    console.log('rendering...', nodeData);
+
     const { isLeaf, belongToMe } = nodeData;
 
     const folderMenuItems: Menu[] = belongToMe
@@ -159,9 +190,7 @@ export const TableComponent = () => {
         </span>
         <DropdownMenu
           items={isLeaf ? dataMenuItems : folderMenuItems}
-          onClick={(key) => {
-            onMenuClick(key, nodeData);
-          }}
+          onClick={(key) => onMenuClick(key, nodeData)}
         />
       </div>
     );
@@ -189,7 +218,7 @@ export const TableComponent = () => {
     <DirectoryTree
       blockNode
       onSelect={noop}
-      treeData={service.tables}
+      treeData={nodes}
       className="secretnote-data-table-tree"
       switcherIcon={<ChevronDown size={12} />}
       icon={null}
@@ -205,8 +234,10 @@ export class TableView
   extends BaseView
   implements SideBarContribution, ModalContribution
 {
+  readonly brokerService: BrokerService;
   readonly tableService: TableService;
   readonly modalService: ModalService;
+  readonly projectService: ProjectService;
 
   key = tableViewKey;
   label = l10n.t('数据表');
@@ -215,12 +246,16 @@ export class TableView
   view = TableComponent;
 
   constructor(
+    @inject(BrokerService) brokerService: BrokerService,
     @inject(TableService) tableService: TableService,
     @inject(ModalService) modalService: ModalService,
+    @inject(ProjectService) projectService: ProjectService,
   ) {
     super();
+    this.brokerService = brokerService;
     this.tableService = tableService;
     this.modalService = modalService;
+    this.projectService = projectService;
   }
 
   onViewMount() {

@@ -10,7 +10,7 @@ import {
 import { SQLContentContribution } from './contents';
 import { SecretNoteModel } from './model';
 import { SqlOutputArea, SQLOutputMimeTypeContribution } from './output';
-import { SCQLQueryService } from './service';
+import { QueryService } from './service';
 
 export const SCQLEditorModule = ManaModule.create()
   .register(
@@ -19,7 +19,7 @@ export const SCQLEditorModule = ManaModule.create()
     SQLCellView,
     SQLCellModel,
     SqlOutputArea,
-    SCQLQueryService,
+    QueryService,
     SQLOutputMimeTypeContribution,
     { token: LibroModel, useClass: SecretNoteModel },
     {

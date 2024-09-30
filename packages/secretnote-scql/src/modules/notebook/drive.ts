@@ -6,6 +6,7 @@
 import {
   createNotImplemented,
   getDefaultServerConnectionSettings,
+  getLocalBaseUrl,
   getRemoteBaseUrl,
   requestNoUnpack,
 } from '@/utils';
@@ -46,6 +47,8 @@ export class SecretNoteContentsDrive implements IContentsDrive {
       if (settings) {
         throw new Error('`settings` is not allowed to be overriden.');
       }
+      console.log('SecretNoteContentsDrive.makeRequest', url, init, settings);
+
       return requestNoUnpack(url, init, /*targetId*/ '');
     },
     settings: {
@@ -73,7 +76,7 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   copy = DefaultDrive.prototype.copy.bind(this);
   // this one is special because its internal doesn't use `makeRequest` directly
   getDownloadUrl = async (localPath: string, ...args: any) => {
-    const baseUrl = getRemoteBaseUrl();
+    const baseUrl = getLocalBaseUrl();
     // so we need to override its baseUrl temporarily to let it work
     const fullURL = await DefaultDrive.prototype.getDownloadUrl.call(this, localPath, {
       baseUrl,

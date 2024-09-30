@@ -1,4 +1,4 @@
-// The view component of SCQL project page.
+// The view component of SCQL project list page.
 
 import {
   BaseView,
@@ -19,19 +19,20 @@ import './index.less';
 import { ProjectConfigModal } from './add-modal';
 import { genericErrorHandler } from '@/utils';
 import { BrokerService } from '@/modules/scql-broker';
+import { ProjectService } from './service';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
-  const service = instance.service;
+  const { projectService } = instance;
 
   // search by project name
   const [searchWords, setSearchWords] = useState<string>('');
-  const filteredProjects = service.projects.filter(
+  const filteredProjects = projectService.projects.filter(
     (project) => project.name.includes(searchWords) || searchWords === '',
   );
 
   /**
-   * Go into the detail page of a project.
+   * Go into the workspace of a project.
    */
   const handleEnterProject = (projectId: string) =>
     (location.href = location.origin + `/secretnote/workspace/${projectId}`);
@@ -47,7 +48,7 @@ export const ProjectComponent = () => {
           onChange={(e) => setSearchWords(e.target.value)}
           allowClear
         />
-        <Button type="primary" onClick={() => instance.openAddProjectModal()}>
+        <Button type="primary" onClick={() => instance.openCreateProjectModal()}>
           {l10n.t('新建项目')}
         </Button>
       </div>
@@ -125,38 +126,42 @@ export const ProjectComponent = () => {
 @view('scql-project-view')
 export class ProjectView extends BaseView implements ModalContribution {
   view = ProjectComponent;
-  readonly service: BrokerService;
+  readonly brokerService: BrokerService;
+  readonly projectService: ProjectService;
   readonly modalService: ModalService;
 
   constructor(
-    @inject(BrokerService) service: BrokerService,
+    @inject(BrokerService) brokerService: BrokerService,
+    @inject(ProjectService) projectService: ProjectService,
     @inject(ModalService) modalService: ModalService,
   ) {
     super();
-    this.service = service;
+    this.brokerService = brokerService;
+    this.projectService = projectService;
     this.modalService = modalService;
   }
 
   async onViewMount() {
     // validate the runtime arguments
     try {
-      const platformInfo = await this.service.getPlatformInfo();
+      await this.brokerService.refreshPlatformInfo();
       (['party', 'broker'] as const).forEach((v) => {
-        if (!platformInfo[v]) {
+        if (!this.brokerService.platformInfo[v]) {
           throw new Error(l10n.t(`运行时参数 {0} 未指定，应用可能无法完整运行`, v));
         }
       });
     } catch (e) {
       genericErrorHandler(e);
     }
-    this.service.listProjects();
+    this.projectService.refreshProjects();
   }
 
-  openAddProjectModal() {
+  openCreateProjectModal() {
     this.modalService.openModal(ProjectConfigModal);
   }
 
   registerModal() {
+    // register the modal to the registry shipped by Mana
     return ProjectConfigModal;
   }
 }

@@ -6,19 +6,22 @@ import { PreviewLayoutArea, HeaderArea } from '@/modules/layout';
 import { InvitationNotificationView } from './notification-view';
 import { ProjectView } from './view';
 import { ProjectService } from './service';
+import { SCQLBrokerModule } from '@/modules/scql-broker';
 
-export const SCQLProjectModule = ManaModule.create().register(
-  ProjectView,
-  ProjectService,
-  InvitationNotificationView,
-  createViewPreference({
-    slot: PreviewLayoutArea.main,
-    view: ProjectView,
-    autoCreate: true,
-  }),
-  createViewPreference({
-    slot: HeaderArea.right,
-    view: InvitationNotificationView,
-    autoCreate: true,
-  }),
-);
+export const SCQLProjectModule = ManaModule.create()
+  .register(
+    ProjectView,
+    ProjectService,
+    InvitationNotificationView,
+    createViewPreference({
+      slot: PreviewLayoutArea.main,
+      view: ProjectView,
+      autoCreate: true,
+    }),
+    createViewPreference({
+      slot: HeaderArea.right,
+      view: InvitationNotificationView,
+      autoCreate: true,
+    }),
+  )
+  .dependOn(SCQLBrokerModule);

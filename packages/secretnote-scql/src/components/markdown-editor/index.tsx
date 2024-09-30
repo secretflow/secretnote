@@ -3,12 +3,10 @@ import type { Extension } from '@tiptap/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { useDebounceFn } from 'ahooks';
 import { useEffect, useState } from 'react';
-import React from 'react';
 
 import { EditorBubbleMenu } from './bubble-menu';
 import { defaultExtensions } from './extensions';
 import './index.less';
-import 'katex/dist/katex.min.css';
 
 function Editor({
   defaultValue = '',

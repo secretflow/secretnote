@@ -6,13 +6,13 @@ import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { NotebookModule } from '@/modules/notebook';
 import { SCQLEditorModule } from '@/modules/scql-editor';
 import { SCQLMemberModule } from '@/modules/scql-member';
-import { SCQLDataTableModule } from '@/modules/scql-table';
+import { SCQLTableModule } from '@/modules/scql-table';
 import { SCQLToolbarModule } from '@/modules/scql-toolbar';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
-import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
 import { SCQLBrokerModule } from '@/modules/scql-broker';
+import { SCQLProjectModule } from '@/modules/scql-project';
 
 const App = (): JSX.Element => {
   return (
@@ -25,14 +25,14 @@ const App = (): JSX.Element => {
         ThemeModule,
         StorageModule,
         NotebookModule,
+        SCQLBrokerModule,
+        SCQLProjectModule,
         SCQLMemberModule,
-        SCQLDataTableModule,
+        SCQLTableModule,
         SCQLEditorModule,
-        ToolbarModule,
+        SCQLToolbarModule,
         MarkdownCellModule,
         WelcomeModule,
-        SCQLToolbarModule,
-        SCQLBrokerModule,
       ]}
     />
   );

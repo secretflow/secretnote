@@ -4,7 +4,7 @@ import { ExtraView } from './extra-view';
 import { TableService } from './service';
 import { TableView, tableViewKey } from './view';
 
-export const SCQLDataTableModule = ManaModule.create().register(
+export const SCQLTableModule = ManaModule.create().register(
   TableService,
   TableView,
   ExtraView,

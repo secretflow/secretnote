@@ -3,7 +3,7 @@
 // @see pyprojects/secretnote/secretnote/scql/server/services/broker_manager.py
 // The schema follows the document, best effort.
 
-import { request } from '@/utils';
+import { genericErrorHandler, request } from '@/utils';
 import { toSnakeCaseObject as snake } from '@/utils/object';
 import { prop, singleton } from '@difizen/mana-app';
 import { pick } from 'lodash-es';
@@ -107,6 +107,46 @@ export type ColumnControl = {
   constraint: _ColumnControlConstraint;
 };
 
+// scql.pb.SQLWarning
+export type SQLWarning = {
+  reason: string;
+};
+
+export type TensorShape = {
+  dim: {
+    dim_value?: number;
+    dim_param?: string;
+  }[];
+};
+
+// scql.pb.Tensor
+export type Tensor = {
+  name: string;
+  shape: TensorShape;
+  elem_type: 'PrimitiveDataType_UNDEFINED' | TableColumnDesc['dtype'];
+  option: 'VALUE' | 'REFERENCE' | 'VARIABLE';
+  status:
+    | 'TENSORSTATUS_UNKNOWN'
+    | 'TENSORSTATUS_PRIVATE'
+    | 'TENSORSTATUS_SECRET'
+    | 'TENSORSTATUS_CIPHER'
+    | 'TENSORSTATUS_PUBLIC';
+  int32_data?: number[];
+  int64_data?: number[];
+  float_data?: number[];
+  double_data?: number[];
+  string_data?: string[];
+  bool_data?: boolean[];
+};
+
+// scql.pb.QueryResult
+export type QueryResult = {
+  affected_rows?: number;
+  warnings?: SQLWarning[];
+  cost_time_s: number;
+  out_columns?: Tensor[];
+};
+
 export interface TableCCL {
   column: string;
   [party: string]: string;
@@ -124,7 +164,6 @@ export type _ProjectMember = {
 };
 
 export type _Table = {
-  projectId: string;
   tableName: string;
   tableOwner: string;
   refTable: string; // The refered physical table, e.g. `db.table`
@@ -132,6 +171,9 @@ export type _Table = {
   columns: TableColumnDesc[];
 };
 
+/**
+ * Reqeust the broker with the given action and body.
+ */
 async function requestBroker<T>(action: BrokerActions, body?: Record<string, any>) {
   return request<T>('api/broker', {
     method: 'POST',
@@ -139,7 +181,7 @@ async function requestBroker<T>(action: BrokerActions, body?: Record<string, any
       action,
       ...snake(body ?? {}),
     }),
-  });
+  }).catch(genericErrorHandler) as T;
 }
 
 @singleton()
@@ -147,16 +189,14 @@ export class BrokerService {
   @prop() platformInfo: _PlatformInfo = { party: '', broker: '' };
 
   constructor() {
-    this.getPlatformInfo();
-    this.listProjects();
-    this.listInvitations();
+    this.refreshPlatformInfo();
   }
 
   /**
    * Get the platform info.
    * Update in place and return.
    */
-  async getPlatformInfo() {
+  async refreshPlatformInfo() {
     return (this.platformInfo = await requestBroker<_PlatformInfo>(
       BrokerActions.getPlatformInfo,
     ));
@@ -220,11 +260,11 @@ export class BrokerService {
   /**
    * Create a Table you owned in specified Project.
    */
-  async createTable(table: _Table) {
-    return await requestBroker<{}>(
-      BrokerActions.createTable,
-      pick(table, ['projectId', 'tableName', 'refTable', 'dbType', 'columns']),
-    );
+  async createTable(projectId: string, table: _Table) {
+    return await requestBroker<{}>(BrokerActions.createTable, {
+      projectId,
+      ...pick(table, ['tableName', 'refTable', 'dbType', 'columns']),
+    });
   }
 
   /**
@@ -269,6 +309,16 @@ export class BrokerService {
     return await requestBroker<{}>(BrokerActions.grantCCL, {
       projectId,
       columnControlList,
+    });
+  }
+
+  /**
+   * Run Query synchronously and return query result if the query completes within a specified timeout.
+   */
+  async doQuery(projectId: string, query: string) {
+    return await requestBroker<QueryResult>(BrokerActions.doQuery, {
+      projectId,
+      query,
     });
   }
 }

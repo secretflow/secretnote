@@ -32,32 +32,33 @@ import {
   BrokerService,
 } from '@/modules/scql-broker';
 import { genericErrorHandler } from '@/utils';
+import { ProjectService } from './service';
 
 export const InvitationNotificationComponent = () => {
   const instance = useInject<InvitationNotificationView>(ViewInstance);
-  const service = instance.service;
+  const { brokerService, projectService } = instance;
 
   // filter out pending and archived invitations
-  const pending = service.invitations.filter(
+  const pending = projectService.invitations.filter(
     (v) => v.status === _ProjectInvitationStatus.UNDECIDED,
   );
-  const archived = service.invitations.filter(
+  const archived = projectService.invitations.filter(
     (v) => v.status !== _ProjectInvitationStatus.UNDECIDED,
   );
 
   /**
    * Alter invitation status.
    */
-  const handleInvitation = async (id: string, to: _ProjectInvitationRespond) => {
+  const handleInvitation = async (id: string, respond: _ProjectInvitationRespond) => {
     try {
-      await service.processInvitation(id, to);
+      await brokerService.processInvitation(id, respond);
       message.success(
         l10n.t(
           '成功{0}邀请',
           {
             ACCEPT: '接受',
             DECLINE: '拒绝',
-          }[to],
+          }[respond],
         ),
       );
     } catch (e) {
@@ -174,7 +175,7 @@ export const InvitationNotificationComponent = () => {
           <Bell color="#40566c" size={18} cursor="pointer" />
         </Badge>
       </Popover>
-      <Tooltip title={service.platformInfo.party}>
+      <Tooltip title={brokerService.platformInfo.party}>
         <Avatar
           style={{
             backgroundColor: '#87d068',
@@ -194,10 +195,15 @@ export const InvitationNotificationComponent = () => {
 @view('secretnote-invitation-notification-view')
 export class InvitationNotificationView extends BaseView {
   view = InvitationNotificationComponent;
-  readonly service: BrokerService;
+  readonly brokerService: BrokerService;
+  readonly projectService: ProjectService;
 
-  constructor(@inject(BrokerService) service: BrokerService) {
+  constructor(
+    @inject(BrokerService) brokerService: BrokerService,
+    @inject(ProjectService) projectService: ProjectService,
+  ) {
     super();
-    this.service = service;
+    this.brokerService = brokerService;
+    this.projectService = projectService;
   }
 }
