@@ -95,11 +95,11 @@ export const requestNoUnpack = async (
 };
 
 export const getLocalBaseUrl = () => {
-  return getRemoteBaseUrl('0'); // 0 代表请求本地服务
+  return getRemoteBaseUrl(''); // 0 代表请求本地服务
 };
 
 export const getLocalWsUrl = () => {
-  return getRemoteWsUrl('0'); // 0 代表请求本地服务
+  return getRemoteWsUrl(''); // 0 代表请求本地服务
 };
 
 export class ResponseError extends Error {

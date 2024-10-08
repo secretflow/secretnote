@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { Contribution } from '@difizen/mana-app';
+import { BaseView, Contribution } from '@difizen/mana-app';
 import {
   contrib,
   DefaultSlotView,
@@ -11,7 +11,7 @@ import {
   ViewManager,
   inject,
 } from '@difizen/mana-app';
-import { Collapse } from 'antd';
+import { Collapse, Space, Typography } from 'antd';
 
 import { SideBarContribution } from './protocol';
 
@@ -22,6 +22,26 @@ export enum SideBarArea {
   FileExtra = 'dataExtra',
   integration = 'integration',
   integrationExtra = 'integrationExtra',
+}
+
+// About bar on the bottom of the sidebar
+const AboutBarComponent = () => (
+  <Space direction="horizontal" align="center" size="large" className="about-bar">
+    <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
+      SecretFlow
+    </Typography.Link>
+    <Typography.Link href="https://github.com/secretflow/secretnote" target="_blank">
+      SecretNote
+    </Typography.Link>
+  </Space>
+);
+
+export const aboutBarViewKey = 'aboutBar';
+@singleton()
+@view('secretnote-scql-aboutBar-view')
+export class AboutBarView extends BaseView {
+  key = aboutBarViewKey;
+  view = AboutBarComponent;
 }
 
 export const SideBar: React.FC = () => {
@@ -46,6 +66,9 @@ export const SideBar: React.FC = () => {
   return (
     <div className="secretnote-sidebar">
       <Collapse defaultActiveKey={defaultActiveKey} ghost items={items} />
+      <Space className="bottom-bar" direction="vertical" size="middle">
+        <Slot name={aboutBarViewKey} />
+      </Space>
     </div>
   );
 };
@@ -57,6 +80,8 @@ export class SideBarView extends DefaultSlotView {
   readonly providers: Contribution.Provider<SideBarContribution>;
 
   constructor(
+    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+    // @ts-ignore
     @contrib(SideBarContribution) providers: Contribution.Provider<SideBarContribution>,
     @inject(ViewManager) viewManager: ViewManager,
   ) {

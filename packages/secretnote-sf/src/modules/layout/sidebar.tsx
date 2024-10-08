@@ -116,8 +116,7 @@ export class SideBarView extends DefaultSlotView {
   constructor(
     /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     // @ts-ignore
-    @contrib(SideBarContribution)
-    providers: Contribution.Provider<SideBarContribution>,
+    @contrib(SideBarContribution) providers: Contribution.Provider<SideBarContribution>,
     @inject(ViewManager) viewManager: ViewManager,
   ) {
     super(undefined, viewManager);

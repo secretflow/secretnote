@@ -1,99 +1,96 @@
-// The modal used for managing the CCL of a table.
+// The modal used for configuring the CCL of a table.
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
-import { Modal, message, Select, Table } from 'antd';
+import { Modal, message, Select, Table, TableColumnsType } from 'antd';
 import { useState } from 'react';
 
 import { TableService } from './service';
-import { _Table, BrokerService, ColumnControl } from '../scql-broker';
+import { _ColumnControlConstraint, _Table, ColumnControl } from '@/modules/scql-broker';
 import { l10n } from '@difizen/mana-l10n';
+import { genericErrorHandler } from '@/utils';
+import { ProjectMemberService } from '../scql-member/service';
+import { getProjectId } from '@/utils/scql';
 
 const ConfigPanel = (props: ModalItemProps<_Table>) => {
-  const { visible, close, data } = props;
-  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
+  const { visible, close, data: table } = props;
   const [loading, setLoading] = useState(false);
-  const brokerService = useInject<BrokerService>(BrokerService);
-  const service = useInject<TableService>(TableService);
-  const [tableOwner, setTableOwner] = useState('');
+  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
+  const [tableData, setTableData] = useState<TableData[]>([]);
+  const memberService = useInject<ProjectMemberService>(ProjectMemberService);
+  const tableService = useInject<TableService>(TableService);
 
   /**
-   * Get CCL of current table.
+   * Refresh CCL of current table.
    */
   const handleRefreshCCL = async () => {
     try {
       setLoading(true);
-      // const { ccl, owner } = await brokerService.showCCL(data!.tableName);
-      // setTableOwner(owner);
-      // setTableCCL(ccl);
+      setTableCCL((await tableService.getTableCCL(table!.tableName)) || []);
+      setTableData(await transformCCLToTableData());
     } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
+      genericErrorHandler(e);
     } finally {
       setLoading(false);
     }
   };
 
-  const changeCCL = async () => {
+  /**
+   * Update CCL of current table.
+   */
+  const handleChangeCCL = async () => {
     try {
       // await service.grantTableCCL(data!.tableName, tableCCL);
       message.success(l10n.t('成功更新 CCL'));
       close();
     } catch (e) {
-      if (e instanceof Error) {
-        message.error(e.message);
-      }
+      genericErrorHandler(e);
     }
   };
 
-  const columns =
-    tableCCL.length > 0
-      ? Object.keys(tableCCL[0]).map((item) => {
-          if (item === 'column') {
-            return {
-              title: l10n.t('列'),
-              dataIndex: 'column',
-              key: 'column',
-            };
-          }
-          return {
-            title: `Grant to ${item === tableOwner ? item + '(you)' : item}`,
-            dataIndex: item,
-            key: item,
-            render: (text: string, record: any) => (
-              <Select
-                // options={CONSTRAINT.map((c: any) => ({ label: c, value: c }))}
-                value={text}
-                size="small"
-                style={{ width: 260 }}
-                popupClassName="secret-note-ccl-select"
-                onChange={(value) => {
-                  const newTableCCL = tableCCL.map((c) => {
-                    // if (c.column === record.column) {
-                    //   return {
-                    //     ...c,
-                    //     [item]: value,
-                    //   };
-                    // }
-                    return c;
-                  });
-                  setTableCCL(newTableCCL);
-                }}
-              />
-            ),
-          };
-        })
-      : [];
+  type TableData = {
+    __column: string; // name of column
+    [party: string]: string; // constraint of each party
+  };
+  const antdTableColumns: TableColumnsType = [
+    {
+      title: '列名',
+      dataIndex: '__column',
+      render(_, record) {
+        return <>123</>;
+      },
+    },
+  ];
+  async function transformCCLToTableData() {
+    const tableData: TableData[] = [];
+    const columns = table!.columns;
+    await memberService.getProjectMembers(getProjectId());
+    columns.forEach((column) => {
+      const item: TableData = {
+        __column: column.name,
+      };
+      memberService.members.forEach((member) => {
+        item[member.party] = _ColumnControlConstraint.UNKNOWN;
+      });
+      tableCCL.forEach((cc) => {
+        const { column_name, table_name } = cc.col;
+        if (table_name === table!.tableName && column_name === column.name) {
+          item[cc.party_code] = cc.constraint;
+        }
+      });
+      tableData.push(item);
+    });
+    return tableData;
+  }
 
   return (
     <Modal
       width={720}
       open={visible}
       destroyOnClose={true}
-      title="CCL Config"
-      onOk={() => changeCCL()}
+      title={l10n.t('CCL 配置')}
+      onOk={() => handleChangeCCL()}
       onCancel={close}
       afterOpenChange={(open) => open && handleRefreshCCL()}
     >
@@ -103,14 +100,14 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
         target="_blank"
         rel="noreferrer"
       >
-        {l10n.t('CCL 配置说明')}
+        {l10n.t('CCL 配置指南')}
       </a>
       <Table
         className="secretnote-ccl-table"
         dataSource={tableCCL}
         rowKey="column"
         pagination={false}
-        columns={columns}
+        columns={antdTableColumns}
         size="small"
         loading={loading}
       />
@@ -119,6 +116,6 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
 };
 
 export const CCLConfigModal: ModalItem<_Table> = {
-  id: 'data-table-ccl-modal',
+  id: 'scql-table-ccl-config-modal',
   component: ConfigPanel,
 };

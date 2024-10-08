@@ -172,13 +172,13 @@ class BrokerManager:
     async def show_ccl(
         self,
         project_id: str,
-        table_name: str,
+        tables: List[str],
     ) -> List[ColumnControlList]:
         """Show CCLs in specified Project, supports specifying Tables, members."""
         response = await request(
             f"{self.broker}/intra/ccl/show",
             "POST",
-            body={"project_id": project_id, "tables": [table_name], "dest_parties": []},
+            body={"project_id": project_id, "tables": tables, "dest_parties": []},
         )
 
         return self.validate_response(response).get("column_control_list", [])

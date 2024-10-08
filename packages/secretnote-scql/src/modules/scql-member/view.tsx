@@ -104,6 +104,7 @@ export const ProjectMemberComponent = () => {
 
   return (
     <div className="secretnote-scql-member">
+      <div>{l10n.t('项目成员')}:&nbsp;</div>
       <Avatar.Group>
         {memberService.members.map((v) => {
           const color = randomColorByName(v.party);

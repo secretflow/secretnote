@@ -100,7 +100,7 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
                       name={[name, 'name']}
                       rules={[{ required: true, message: '' }]}
                     >
-                      <Input placeholder="Column Name" />
+                      <Input placeholder={l10n.t('列名')} />
                     </Form.Item>
                     <Form.Item
                       {...restField}

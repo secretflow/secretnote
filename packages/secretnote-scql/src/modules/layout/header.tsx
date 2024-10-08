@@ -13,12 +13,12 @@ export enum HeaderArea {
 
 export const Header: React.FC = () => {
   const reload = () => {
-    const pathname = history.location.pathname;
+    const pathname = window.location.pathname;
     if (pathname.startsWith('/secretnote')) {
       window.location.href = '/secretnote/project';
-      return;
+    } else {
+      window.location.reload();
     }
-    window.location.reload();
   };
 
   return (

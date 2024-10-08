@@ -7,7 +7,6 @@ import {
   createNotImplemented,
   getDefaultServerConnectionSettings,
   getLocalBaseUrl,
-  getRemoteBaseUrl,
   requestNoUnpack,
 } from '@/utils';
 import type {

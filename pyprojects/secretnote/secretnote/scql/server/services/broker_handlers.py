@@ -65,7 +65,7 @@ class BrokerHandler(APIHandler):
                 model.get("project_id", None), model.get("table_name", None)
             ),
             "showCCL": lambda: self.broker_manager.show_ccl(
-                model.get("project_id", None), model.get("table_name", None)
+                model.get("project_id", None), model.get("tables", [])
             ),
             "grantCCL": lambda: self.broker_manager.grant_ccl(
                 model.get("project_id", None), model.get("ccl_list", None)

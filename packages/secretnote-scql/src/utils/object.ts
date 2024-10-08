@@ -3,37 +3,29 @@
 /**
  * Convert snake_case to camelCase.
  */
-type ToCamelCase<S extends string> = S extends `${infer P1}_${infer P2}${infer R}`
-  ? `${Lowercase<P1>}${Uppercase<P2>}${ToCamelCase<R>}`
-  : Lowercase<S>;
+export type ToCamelCase<S extends string> =
+  S extends `${infer P1}_${infer P2}${infer R}`
+    ? `${Lowercase<P1>}${Uppercase<P2>}${ToCamelCase<R>}`
+    : Lowercase<S>;
 
 /**
  * Convert camelCase to snake_case.
  */
-type ToSnakeCase<S extends string> = S extends `${infer T}${infer U}`
+export type ToSnakeCase<S extends string> = S extends `${infer T}${infer U}`
   ? `${T extends Capitalize<T> ? '_' : ''}${Lowercase<T>}${ToSnakeCase<U>}`
   : S;
 
 /**
  * Convert snake_case object keys to camelCase.
  */
-type ToCamelCaseObject<T extends Record<string, any>> = {
+export type ToCamelCaseObject<T extends Record<string, any>> = {
   [K in keyof T as ToCamelCase<string & K>]: T[K];
 };
-
-interface Snake {
-  a: number;
-  b_c: number;
-  d_e_f: number;
-  g_h_i_j_k: number;
-}
-
-type w = ToCamelCaseObject<Snake>;
 
 /**
  * Convert camelCase object keys to snake_case.
  */
-type ToSnakeCaseObject<T extends Record<string, any>> = {
+export type ToSnakeCaseObject<T extends Record<string, any>> = {
   [K in keyof T as ToSnakeCase<string & K>]: T[K];
 };
 

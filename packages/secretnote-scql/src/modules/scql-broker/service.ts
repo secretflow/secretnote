@@ -4,7 +4,11 @@
 // The schema follows the document, best effort.
 
 import { genericErrorHandler, request } from '@/utils';
-import { toSnakeCaseObject as snake } from '@/utils/object';
+import {
+  toSnakeCaseObject as snake,
+  toCamelCaseObject as camel,
+  ToSnakeCaseObject,
+} from '@/utils/object';
 import { prop, singleton } from '@difizen/mana-app';
 import { pick } from 'lodash-es';
 
@@ -147,11 +151,6 @@ export type QueryResult = {
   out_columns?: Tensor[];
 };
 
-export interface TableCCL {
-  column: string;
-  [party: string]: string;
-}
-
 // the following types are defined by ourself without corresponding protobuf
 export type _PlatformInfo = {
   party: string; // self party
@@ -285,7 +284,7 @@ export class BrokerService {
     tables?: string[],
     destParties?: 'self' | 'others' | string,
   ) {
-    return await requestBroker<TableCCL[]>(BrokerActions.showCCL, {
+    return await requestBroker<ColumnControl[]>(BrokerActions.showCCL, {
       projectId,
       tables,
       destParties,
@@ -296,10 +295,12 @@ export class BrokerService {
    * List all Tables in specified Project.
    */
   async listTables(projectId: string, names?: string[]) {
-    return await requestBroker<_Table[]>(BrokerActions.listTables, {
-      projectId,
-      names,
-    });
+    return (
+      await requestBroker<ToSnakeCaseObject<_Table>[]>(BrokerActions.listTables, {
+        projectId,
+        names,
+      })
+    ).map(camel);
   }
 
   /**

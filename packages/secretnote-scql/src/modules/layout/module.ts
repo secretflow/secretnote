@@ -6,7 +6,7 @@ import { HeaderView } from './header';
 import { LayoutArea, LayoutView } from './layout';
 import { PreviewLayoutArea, PreviewLayoutView } from './preview';
 import { SideBarContribution } from './protocol';
-import { SideBarView } from './sidebar';
+import { AboutBarView, aboutBarViewKey, SideBarView } from './sidebar';
 
 /**
  * The common layout module with header, sidebar and content.
@@ -28,6 +28,10 @@ export const LayoutModule = ManaModule.create()
     createSlotPreference({
       slot: LayoutArea.sidebar,
       view: SideBarView,
+    }),
+    createSlotPreference({
+      slot: aboutBarViewKey,
+      view: AboutBarView,
     }),
   );
 

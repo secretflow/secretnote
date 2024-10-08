@@ -12,7 +12,7 @@ import {
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';
-import type { TreeDataNode } from 'antd';
+import type { TreeDataNode as _TreeDataNode, TableColumnsType } from 'antd';
 import {
   ChevronDown,
   Trash,
@@ -30,69 +30,79 @@ import { TableConfigModal } from './add-modal';
 import { CCLConfigModal } from './ccl-modal';
 import { TableService } from './service';
 import { noop } from 'lodash-es';
-import { BrokerService, ColumnControl } from '@/modules/scql-broker';
+import { _Table, BrokerService, ColumnControl } from '@/modules/scql-broker';
 import { getProjectId } from '@/utils/scql';
-import { ProjectService } from '../scql-project/service';
+import { ProjectService } from '@/modules/scql-project/service';
 
 const { DirectoryTree } = Tree;
 
-const TableDetails = (props: { data?: any }) => {
-  const { data } = props;
-  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
-  const instance = useInject<TableView>(ViewInstance);
+type TreeDataNode = _TreeDataNode & {
+  belongToMe: boolean;
+  isLeaf: boolean;
+  table?: _Table; // table payload for current node
+  children?: TreeDataNode[];
+};
 
-  const getTableCCL = async (tableName: string) => {
-    await instance.tableService.getTableCCL(tableName);
-    // setTableCCL(ccl);
-  };
-
-  useEffect(() => {
-    if (data) {
-      getTableCCL(data.tableName);
-    }
-  }, [data]);
-
-  if (!data) {
+/**
+ * Table details to display when hovering a table node.
+ */
+const TableDetails = ({ table }: { table: _Table }) => {
+  if (!table) {
     return null;
   }
 
-  const columns =
-    tableCCL.length > 0
-      ? Object.keys(tableCCL[0]).map((item) => {
-          if (item === 'column') {
-            return {
-              title: 'Column',
-              dataIndex: 'column',
-              key: 'column',
-            };
-          }
-          return {
-            title: `Grant to ${item}`,
-            dataIndex: item,
-            key: item,
-            render: (text: string) => text || '-',
-          };
-        })
-      : [];
+  // Get the CCL of a specified table.
+  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
+  const tableService = useInject<TableService>(TableService);
+  useEffect(() => {
+    (async () => {
+      table && setTableCCL((await tableService.getTableCCL(table.tableName)) || []);
+    })();
+  }, [table]);
+
+  // tableCCL.length > 0
+  //   ? Object.keys(tableCCL[0]).map((item) => {
+  //       if (item === 'column') {
+  //         return {
+  //           title: 'Column',
+  //           dataIndex: 'column',
+  //           key: 'column',
+  //         };
+  //       }
+  //       return {
+  //         title: `Grant to ${item}`,
+  //         dataIndex: item,
+  //         key: item,
+  //         render: (text: string) => text || '-',
+  //       };
+  //     })
+  //   : [];
 
   return (
     <div className="secretnote-node-description">
-      <Descriptions title={l10n.t('表信息')} column={1}>
+      <Descriptions title={l10n.t('表信息')} column={2}>
+        <Descriptions.Item label={l10n.t('表名称')}>
+          {table.tableName}
+        </Descriptions.Item>
+        <Descriptions.Item label={l10n.t('所有方')}>
+          {table.tableOwner}
+        </Descriptions.Item>
         <Descriptions.Item label={l10n.t('数据库类型')}>
-          {data.dbType}
+          {table.dbType}
         </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('表名称')}>{data.tableName}</Descriptions.Item>
-        <Descriptions.Item label={l10n.t('关联表')}>{data.refTable}</Descriptions.Item>
-        <Descriptions.Item label={l10n.t('数据列')}>
-          {data.columns.map((c: any) => c.name).join(', ')}
+        <Descriptions.Item label={l10n.t('关联物理表')}>
+          {table.refTable}
         </Descriptions.Item>
-        <Descriptions.Item label="CCL">
+        <Descriptions.Item label={l10n.t('数据列')} span={2}>
+          {table.columns.map((c) => `${c.name} (${c.dtype})`).join(', ')}
+        </Descriptions.Item>
+        <Descriptions.Item label="CCL" span={2}>
           <Table
             className="secretnote-ccl-view-table"
             dataSource={tableCCL}
             rowKey="column"
             pagination={false}
-            columns={columns}
+            columns={[]}
             size="small"
           />
         </Descriptions.Item>
@@ -106,21 +116,29 @@ export const TableComponent = () => {
   const instance = useInject<TableView>(ViewInstance);
   const { tableService, brokerService, projectService, modalService } = instance;
 
+  /**
+   * Transform the results of `listTables` action into AntD tree nodes.
+   */
   async function transformTablesToTreeNodes() {
-    console.log('transformTablesToTreeNodes');
-
     const { members } = (await projectService.getProjectInfo(getProjectId()))!;
+    await tableService.refreshTables();
     const { tables } = tableService;
     const { party: selfParty } = brokerService.platformInfo;
 
     const _nodes: TreeDataNode[] = [];
     members.forEach((member) => {
+      const belongToMe = selfParty === member;
       _nodes.push({
         key: member,
         title: member,
-        children: tables.map((v) => ({
-          key: `${v.tableName}-${member}`,
-          title: v.tableName,
+        belongToMe,
+        isLeaf: false,
+        children: tables.map((table) => ({
+          key: `${table.tableName}-${member}`,
+          title: table.tableName,
+          belongToMe,
+          isLeaf: true,
+          table,
         })),
       });
     });
@@ -130,15 +148,15 @@ export const TableComponent = () => {
 
   useEffect(() => {
     (async () => setNodes(await transformTablesToTreeNodes()))();
-  }, [tableService.tables]);
+  }, []);
 
-  const onMenuClick = (key: string, node: any) => {
+  const onMenuClick = (key: string, node: TreeDataNode) => {
     switch (key) {
       case 'add':
         modalService.openModal(TableConfigModal);
         break;
       case 'configCCL':
-        modalService.openModal(CCLConfigModal, node.data);
+        modalService.openModal(CCLConfigModal, node.table);
         break;
       case 'delete':
         Modal.confirm({
@@ -149,7 +167,7 @@ export const TableComponent = () => {
           cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
-            await brokerService.dropTable(getProjectId(), node.tableName);
+            await brokerService.dropTable(getProjectId(), node.table!.tableName);
             message.success(l10n.t('数据表已删除'));
             return close(Promise.resolve);
           },
@@ -158,27 +176,28 @@ export const TableComponent = () => {
     }
   };
 
-  const titleRender = (nodeData: any) => {
-    console.log('rendering...', nodeData);
-
+  /**
+   * Render the title of a tree node.
+   */
+  const titleRender = (nodeData: TreeDataNode) => {
     const { isLeaf, belongToMe } = nodeData;
-
-    const folderMenuItems: Menu[] = belongToMe
-      ? [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }]
-      : [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }];
-
-    const dataMenuItems: Menu[] = belongToMe
+    // menu items for a party node
+    const partyMenuItems: Menu[] = belongToMe
+      ? [{ key: 'add', label: l10n.t('添加数据表'), icon: <PlusSquare size={12} /> }]
+      : [];
+    // menu items for a table node
+    const leafMenuItems: Menu[] = belongToMe
       ? [
-          { key: 'configCCL', label: '配置 CCL', icon: <Settings size={12} /> },
+          { key: 'configCCL', label: l10n.t('配置 CCL'), icon: <Settings size={12} /> },
           { type: 'divider' },
           {
             key: 'delete',
-            label: l10n.t('删除'),
+            label: l10n.t('删除数据表'),
             icon: <Trash size={12} />,
             danger: true,
           },
         ]
-      : [{ key: 'add', label: '添加数据表', icon: <PlusSquare size={12} /> }];
+      : [];
 
     const title = (
       <div className="ant-tree-title-content">
@@ -189,7 +208,7 @@ export const TableComponent = () => {
           </Space>
         </span>
         <DropdownMenu
-          items={isLeaf ? dataMenuItems : folderMenuItems}
+          items={isLeaf ? leafMenuItems : partyMenuItems}
           onClick={(key) => onMenuClick(key, nodeData)}
         />
       </div>
@@ -198,14 +217,14 @@ export const TableComponent = () => {
     if (!isLeaf) {
       return title;
     }
-
+    // include a popover to display details when hovering over a table
     return (
       <Popover
         placement="rightTop"
         align={{ offset: [10, 0] }}
         arrow={false}
         overlayStyle={{ maxWidth: 520 }}
-        content={<TableDetails data={nodeData.data} />}
+        content={<TableDetails table={nodeData.table!} />}
         trigger="hover"
         destroyTooltipOnHide
       >
@@ -223,6 +242,7 @@ export const TableComponent = () => {
       switcherIcon={<ChevronDown size={12} />}
       icon={null}
       titleRender={titleRender}
+      defaultExpandAll
     />
   );
 };

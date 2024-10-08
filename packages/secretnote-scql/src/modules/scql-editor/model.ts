@@ -9,8 +9,6 @@ import {
 import { CommandRegistry, inject, ModalService, transient } from '@difizen/mana-app';
 import { debounce, noop } from 'lodash-es';
 
-import { getLocalBaseUrl } from '@/utils';
-
 @transient()
 export class SecretNoteModel extends LibroModel {
   private readonly modalService: ModalService;
@@ -56,7 +54,6 @@ export class SecretNoteModel extends LibroModel {
         type: this.currentFileContents.type,
         content: notebookContent,
         format: this.currentFileContents.format,
-        baseUrl: getLocalBaseUrl(),
       });
 
       if (!res) {

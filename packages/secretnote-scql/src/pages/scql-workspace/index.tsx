@@ -13,6 +13,7 @@ import { ThemeModule } from '@/modules/theme';
 import { WelcomeModule } from '@/modules/welcome';
 import { SCQLBrokerModule } from '@/modules/scql-broker';
 import { SCQLProjectModule } from '@/modules/scql-project';
+import '../../override.less';
 
 const App = (): JSX.Element => {
   return (

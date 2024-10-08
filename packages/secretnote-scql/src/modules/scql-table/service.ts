@@ -1,8 +1,8 @@
 // Service for SCQL table and CCL management.
 
 import { inject, prop, singleton } from '@difizen/mana-app';
-import { genericErrorHandler, request } from '@/utils';
-import { _Table, BrokerService, ColumnControl } from '../scql-broker';
+import { genericErrorHandler } from '@/utils';
+import { _Table, BrokerService } from '../scql-broker';
 import { getProjectId } from '@/utils/scql';
 import { ProjectService } from '../scql-project/service';
 import { l10n } from '@difizen/mana-l10n';
@@ -33,6 +33,7 @@ export class TableService {
     }
     const { members } = project; // members of project
     const tables = await this.brokerService.listTables(getProjectId()); // all tables
+    console.log('alltables', tables);
     this.tables = tables.filter(({ tableOwner }) => members.includes(tableOwner));
   }
 
@@ -40,12 +41,12 @@ export class TableService {
    * Get CCL of a table.
    */
   async getTableCCL(tableName: string) {
-    const table = (await this.brokerService.listTables(getProjectId(), [tableName]))[0];
-    if (!table) {
+    const project = await this.projectService.getProjectInfo(getProjectId());
+    if (!project) {
       return void 0;
     }
-    const project = await this.projectService.getProjectInfo(tableName);
-    if (!project) {
+    const table = (await this.brokerService.listTables(getProjectId(), [tableName]))[0];
+    if (!table) {
       return void 0;
     }
     const ccl = await this.brokerService.showCCL(getProjectId(), [tableName]);

@@ -12,7 +12,7 @@ import {
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
 export const BASE_PATH = '/';
-export const FILE_EXTS = ['.csv', '.log', '.txt', '.jsonl'];
+export const FILE_EXTS = ['.csv', '.log', '.txt', '.jsonl']; // TODO support more file types
 @singleton()
 export class FileService {
   protected readonly contentsManager: ContentsManager;
