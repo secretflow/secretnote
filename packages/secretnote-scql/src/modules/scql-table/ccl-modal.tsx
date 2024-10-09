@@ -13,11 +13,11 @@ import { genericErrorHandler } from '@/utils';
 import { ProjectMemberService } from '../scql-member/service';
 import { getProjectId } from '@/utils/scql';
 
-const ConfigPanel = (props: ModalItemProps<_Table>) => {
+const CCLModalComponent = (props: ModalItemProps<_Table>) => {
   const { visible, close, data: table } = props;
   const [loading, setLoading] = useState(false);
-  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
-  const [tableData, setTableData] = useState<TableData[]>([]);
+  const [ccl, setCCL] = useState<ColumnControl[]>([]); // native CCL of SCQL
+  const [tableData, setTableData] = useState<TableItem[]>([]); // transformed CCL for Antd Table to display
   const memberService = useInject<ProjectMemberService>(ProjectMemberService);
   const tableService = useInject<TableService>(TableService);
 
@@ -27,7 +27,7 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const handleRefreshCCL = async () => {
     try {
       setLoading(true);
-      setTableCCL((await tableService.getTableCCL(table!.tableName)) || []);
+      setCCL((await tableService.getTableCCL(table!.tableName)) || []);
       setTableData(await transformCCLToTableData());
     } catch (e) {
       genericErrorHandler(e);
@@ -49,32 +49,27 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
     }
   };
 
-  type TableData = {
+  type TableItem = {
     __column: string; // name of column
     [party: string]: string; // constraint of each party
   };
-  const antdTableColumns: TableColumnsType = [
-    {
-      title: '列名',
-      dataIndex: '__column',
-      render(_, record) {
-        return <>123</>;
-      },
-    },
-  ];
+  /**
+   * Transform SCQL CCL to TableItem for Antd Table to display.
+   */
   async function transformCCLToTableData() {
-    const tableData: TableData[] = [];
+    const tableData: TableItem[] = [];
     const columns = table!.columns;
-    await memberService.getProjectMembers(getProjectId());
+    const members = await memberService.getProjectMembers(getProjectId());
     columns.forEach((column) => {
-      const item: TableData = {
+      const item: TableItem = {
         __column: column.name,
       };
-      memberService.members.forEach((member) => {
+      members.forEach((member) => {
         item[member.party] = _ColumnControlConstraint.UNKNOWN;
       });
-      tableCCL.forEach((cc) => {
+      ccl.forEach((cc) => {
         const { column_name, table_name } = cc.col;
+        // assign constraint to each party
         if (table_name === table!.tableName && column_name === column.name) {
           item[cc.party_code] = cc.constraint;
         }
@@ -83,6 +78,16 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
     });
     return tableData;
   }
+
+  const antDTableColumns: TableColumnsType = [
+    {
+      title: '列名',
+      dataIndex: '__column',
+      render(_, record) {
+        return record.__column;
+      },
+    },
+  ];
 
   return (
     <Modal
@@ -104,7 +109,7 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
       </a>
       <Table
         className="secretnote-ccl-table"
-        dataSource={tableCCL}
+        dataSource={tableData}
         rowKey="column"
         pagination={false}
         columns={antdTableColumns}
@@ -117,5 +122,5 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
 
 export const CCLConfigModal: ModalItem<_Table> = {
   id: 'scql-table-ccl-config-modal',
-  component: ConfigPanel,
+  component: CCLModalComponent,
 };

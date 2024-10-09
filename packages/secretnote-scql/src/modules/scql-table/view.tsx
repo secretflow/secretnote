@@ -12,7 +12,7 @@ import {
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';
-import type { TreeDataNode as _TreeDataNode, TableColumnsType } from 'antd';
+import type { TreeDataNode as _TreeDataNode } from 'antd';
 import {
   ChevronDown,
   Trash,

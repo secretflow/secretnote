@@ -12,7 +12,6 @@ import {
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
 export const BASE_PATH = '/';
-export const FILE_EXTS = ['.csv', '.log', '.txt', '.jsonl']; // TODO support more file types
 @singleton()
 export class FileService {
   protected readonly contentsManager: ContentsManager;
@@ -94,7 +93,12 @@ export class FileService {
     return list.content.some((file: any) => file.name === name);
   }
 
-  async uploadFile(nodeData: DataNode, name: string, content: string) {
+  async uploadFile(
+    nodeData: DataNode,
+    name: string,
+    content: string,
+    format: 'text' | 'base64' = 'text',
+  ) {
     const serverId = nodeData.key as string;
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
@@ -106,7 +110,8 @@ export class FileService {
         name,
         path,
         type: 'file',
-        format: 'text',
+        format,
+        mimetype: 'application/octet-stream',
       });
     }
   }
@@ -183,8 +188,7 @@ export class FileService {
   }
 
   private isFileVisible(path: string) {
-    const ext = this.getFileExtByPath(path);
-    return FILE_EXTS.includes(`.${ext}`);
+    return true;
   }
 
   private onServerChanged() {

@@ -29,9 +29,8 @@ import type { Menu } from '@/components/dropdown-menu';
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
 import { genericErrorHandler, readFile } from '@/utils';
-
 import './index.less';
-import { FILE_EXTS, FileService } from './service';
+import { FileService } from './service';
 
 const { DirectoryTree } = Tree;
 
@@ -83,9 +82,9 @@ export const FileComponent = () => {
 
   const uploadFile = async (nodeData: DataNode, file: File) => {
     setIsUploading(true);
-    const content = await readFile(file);
+    const content = await readFile(file, 'base64');
     try {
-      await fileService.uploadFile(nodeData, file.name, content);
+      await fileService.uploadFile(nodeData, file.name, content, 'base64');
       await fileService.getFileTree();
       message.success(l10n.t('文件上传成功'));
     } catch (e) {
@@ -97,7 +96,6 @@ export const FileComponent = () => {
 
   const uploadRender = (nodeData: DataNode) => {
     const props: UploadProps = {
-      accept: FILE_EXTS.join(','),
       beforeUpload: async (file) => {
         const isExisted = await fileService.isFileExist(nodeData, file.name);
         if (isExisted) {

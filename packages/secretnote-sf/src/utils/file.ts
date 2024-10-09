@@ -39,14 +39,28 @@ const saveAs = (blob: Blob, filename: string) => {
   }
 };
 
-export async function readFile(file: File): Promise<string> {
+export async function readFile(
+  file: File,
+  format: 'text' | 'base64' = 'text',
+): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
+    console.log('inside readFile util');
     try {
       const reader = new FileReader();
-      reader.addEventListener('loadend', () => {
-        resolve(reader.result?.toString() || '');
-      });
-      reader.readAsText(file);
+      if (format === 'text') {
+        reader.addEventListener('loadend', () => {
+          resolve(reader.result?.toString() || '');
+        });
+        reader.readAsText(file);
+      } else if (format === 'base64') {
+        reader.addEventListener('loadend', () => {
+          const regex = /data:.*base64,/;
+          const base64 = (reader.result as string).replace(regex, '');
+          console.log('>>>', base64);
+          resolve((base64 as string) || '');
+        });
+        reader.readAsDataURL(file);
+      }
     } catch (e) {
       reject(e);
     }
