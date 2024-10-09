@@ -93,6 +93,9 @@ export class FileService {
     return list.content.some((file: any) => file.name === name);
   }
 
+  /**
+   * Upload file via Jupyter Server. For binary files, use `format='base64'` and base64-encoded `content`.
+   */
   async uploadFile(
     nodeData: DataNode,
     name: string,
@@ -111,7 +114,7 @@ export class FileService {
         path,
         type: 'file',
         format,
-        mimetype: 'application/octet-stream',
+        ...(format === 'base64' ? { mimetype: 'application/octet-stream' } : {}),
       });
     }
   }
@@ -188,7 +191,7 @@ export class FileService {
   }
 
   private isFileVisible(path: string) {
-    return true;
+    return true; // let all files be visible
   }
 
   private onServerChanged() {

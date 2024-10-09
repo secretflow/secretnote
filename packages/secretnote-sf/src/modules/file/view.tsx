@@ -80,11 +80,18 @@ export const FileComponent = () => {
     }
   };
 
-  const uploadFile = async (nodeData: DataNode, file: File) => {
+  /**
+   * Handle the upload file action.
+   */
+  const uploadFile = async (
+    nodeData: DataNode,
+    file: File,
+    format: 'text' | 'base64' = 'text',
+  ) => {
     setIsUploading(true);
-    const content = await readFile(file, 'base64');
+    const content = await readFile(file, format);
     try {
-      await fileService.uploadFile(nodeData, file.name, content, 'base64');
+      await fileService.uploadFile(nodeData, file.name, content, format);
       await fileService.getFileTree();
       message.success(l10n.t('文件上传成功'));
     } catch (e) {
@@ -94,7 +101,7 @@ export const FileComponent = () => {
     }
   };
 
-  const uploadRender = (nodeData: DataNode) => {
+  const uploadRender = (nodeData: DataNode, format: 'text' | 'base64' = 'text') => {
     const props: UploadProps = {
       beforeUpload: async (file) => {
         const isExisted = await fileService.isFileExist(nodeData, file.name);
@@ -109,19 +116,25 @@ export const FileComponent = () => {
             cancelText: l10n.t('取消'),
             okType: 'danger',
             async onOk(close) {
-              await uploadFile(nodeData, file);
+              await uploadFile(nodeData, file, format);
               return close(Promise.resolve);
             },
           });
         } else {
-          uploadFile(nodeData, file);
+          uploadFile(nodeData, file, format);
         }
 
         return false;
       },
       fileList: [],
     };
-    return <Upload {...props}>{l10n.t('上传到文件夹')}</Upload>;
+    return (
+      <Upload {...props}>
+        {l10n.t(
+          format === 'text' ? '上传到文件夹 (文本文件)' : '上传到文件夹 (二进制文件)',
+        )}
+      </Upload>
+    );
   };
 
   const getFileIcon = (nodeData: DataNode) => {
@@ -141,8 +154,13 @@ export const FileComponent = () => {
 
     const folderMenuItems: Menu[] = [
       {
-        key: 'upload',
-        label: uploadRender(nodeData),
+        key: 'uploadText',
+        label: uploadRender(nodeData, 'text'),
+        icon: <UploadIcon size={12} />,
+      },
+      {
+        key: 'uploadBinary',
+        label: uploadRender(nodeData, 'base64'),
         icon: <UploadIcon size={12} />,
       },
     ];
