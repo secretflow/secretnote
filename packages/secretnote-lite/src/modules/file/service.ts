@@ -12,7 +12,6 @@ import {
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
 export const BASE_PATH = '/';
-export const FILE_EXTS = ['.csv', '.log', '.txt', '.jsonl'];
 @singleton()
 export class FileService {
   protected readonly contentsManager: ContentsManager;
@@ -183,8 +182,7 @@ export class FileService {
   }
 
   private isFileVisible(path: string) {
-    const ext = this.getFileExtByPath(path);
-    return FILE_EXTS.includes(`.${ext}`);
+    return true; // let all files be visible
   }
 
   private onServerChanged() {

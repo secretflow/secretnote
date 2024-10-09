@@ -31,7 +31,7 @@ import { SideBarContribution } from '@/modules/layout';
 import { genericErrorHandler, readFile } from '@/utils';
 
 import './index.less';
-import { FILE_EXTS, FileService } from './service';
+import { FileService } from './service';
 
 const { DirectoryTree } = Tree;
 
@@ -97,7 +97,6 @@ export const FileComponent = () => {
 
   const uploadRender = (nodeData: DataNode) => {
     const props: UploadProps = {
-      accept: FILE_EXTS.join(','),
       beforeUpload: async (file) => {
         const isExisted = await fileService.isFileExist(nodeData, file.name);
         if (isExisted) {
