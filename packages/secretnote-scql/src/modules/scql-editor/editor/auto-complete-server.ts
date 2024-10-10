@@ -2,16 +2,13 @@
 import * as _ from 'lodash-es';
 import * as monaco from 'monaco-editor';
 
-import { genericErrorHandler, request } from '@/utils';
-
 import type {
   ITableInfo,
   IStatement,
   ICompletionItem,
   ICursorInfo,
 } from './sql-parser';
-import { Container, inject, useInject } from '@difizen/mana-app';
-import { BrokerService, ColumnControl } from '@/modules/scql-broker';
+import { BrokerService } from '@/modules/scql-broker';
 import { l10n } from '@difizen/mana-l10n';
 
 type Column = {
@@ -42,7 +39,7 @@ const getTables = async () => {
   }
 
   getTablesPromise = new Promise((resolve, reject) => {
-    BrokerService.ListTables(getProjectId())
+    BrokerService.ListTables(getProjectId(), void 0, true)
       .then((results) => {
         const tables = results.map((table) => ({
           name: table.tableName,
@@ -70,10 +67,10 @@ const getTableCCL = async (tableName: string) => {
       // avoid e.g. SELECT * crashes the application
       return resolve([]);
     }
-    BrokerService.ShowCCL(getProjectId(), [tableName])
+    BrokerService.ShowCCL(getProjectId(), [tableName], void 0, true)
       .then((results) => {
         const ccl: TableCCL[] = [];
-        results.forEach((item) => {
+        results?.forEach((item) => {
           const column = item.col.column_name;
           const party = item.party_code;
           const constraint = item.constraint;

@@ -34,6 +34,7 @@ import { _Table, BrokerService, ColumnControl } from '@/modules/scql-broker';
 import { getProjectId } from '@/utils/scql';
 import { ProjectService } from '@/modules/scql-project/service';
 import './index.less';
+import { MemberService } from '../scql-member/service';
 
 const { DirectoryTree } = Tree;
 
@@ -51,33 +52,6 @@ const TableDetails = ({ table }: { table: _Table }) => {
   if (!table) {
     return null;
   }
-
-  // Get the CCL of a specified table.
-  const [tableCCL, setTableCCL] = useState<ColumnControl[]>([]);
-  const tableService = useInject<TableService>(TableService);
-  useEffect(() => {
-    (async () => {
-      table && setTableCCL((await tableService.getTableCCL(table.tableName)) || []);
-    })();
-  }, [table]);
-
-  // tableCCL.length > 0
-  //   ? Object.keys(tableCCL[0]).map((item) => {
-  //       if (item === 'column') {
-  //         return {
-  //           title: 'Column',
-  //           dataIndex: 'column',
-  //           key: 'column',
-  //         };
-  //       }
-  //       return {
-  //         title: `Grant to ${item}`,
-  //         dataIndex: item,
-  //         key: item,
-  //         render: (text: string) => text || '-',
-  //       };
-  //     })
-  //   : [];
 
   return (
     <Descriptions
@@ -102,27 +76,26 @@ const TableDetails = ({ table }: { table: _Table }) => {
 export const TableComponent = () => {
   const [nodes, setNodes] = useState<TreeDataNode[]>([]);
   const instance = useInject<TableView>(ViewInstance);
-  const { tableService, brokerService, projectService, modalService } = instance;
+  const { tableService, brokerService, memberService, modalService } = instance;
 
   /**
    * Transform the results of `listTables` action into AntD tree nodes.
    */
-  async function transformTablesToTreeNodes() {
-    const { members } = (await projectService.getProjectInfo(getProjectId()))!;
-    await tableService.refreshTables();
+  function transformTablesToTreeNodes() {
+    const { members } = memberService;
     const { tables } = tableService;
     const { party: selfParty } = brokerService.platformInfo;
 
     const _nodes: TreeDataNode[] = [];
     members.forEach((member) => {
-      const belongToMe = selfParty === member;
+      const belongToMe = selfParty === member.party;
       _nodes.push({
-        key: member,
-        title: member,
+        key: member.party,
+        title: member.party,
         belongToMe,
         isLeaf: false,
         children: tables.map((table) => ({
-          key: `${table.tableName}-${member}`,
+          key: `${table.tableName}-${member.party}`,
           title: table.tableName,
           belongToMe,
           isLeaf: true,
@@ -135,8 +108,8 @@ export const TableComponent = () => {
   }
 
   useEffect(() => {
-    (async () => setNodes(await transformTablesToTreeNodes()))();
-  }, []);
+    setNodes(transformTablesToTreeNodes());
+  }, [memberService.members, tableService.tables]);
 
   const onMenuClick = (key: string, node: TreeDataNode) => {
     switch (key) {
@@ -160,6 +133,7 @@ export const TableComponent = () => {
           okType: 'danger',
           async onOk(close) {
             await brokerService.dropTable(getProjectId(), node.table!.tableName);
+            await tableService.refreshTables();
             message.success(l10n.t('数据表已删除'));
             return close(Promise.resolve);
           },
@@ -175,7 +149,7 @@ export const TableComponent = () => {
     const { isLeaf, belongToMe } = nodeData;
     // menu items for a party node
     const partyMenuItems: Menu[] = belongToMe
-      ? [{ key: 'add', label: l10n.t('添加数据表'), icon: <PlusSquare size={12} /> }]
+      ? [{ key: 'add', label: l10n.t('新建数据表'), icon: <PlusSquare size={12} /> }]
       : [];
     // menu items for a table node
     const leafMenuItems: Menu[] = belongToMe
@@ -249,7 +223,7 @@ export class TableView
   readonly brokerService: BrokerService;
   readonly tableService: TableService;
   readonly modalService: ModalService;
-  readonly projectService: ProjectService;
+  readonly memberService: MemberService;
 
   key = tableViewKey;
   label = l10n.t('数据表');
@@ -261,13 +235,13 @@ export class TableView
     @inject(BrokerService) brokerService: BrokerService,
     @inject(TableService) tableService: TableService,
     @inject(ModalService) modalService: ModalService,
-    @inject(ProjectService) projectService: ProjectService,
+    @inject(MemberService) memberService: MemberService,
   ) {
     super();
     this.brokerService = brokerService;
     this.tableService = tableService;
     this.modalService = modalService;
-    this.projectService = projectService;
+    this.memberService = memberService;
   }
 
   onViewMount() {

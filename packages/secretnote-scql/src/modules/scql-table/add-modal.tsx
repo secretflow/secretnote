@@ -10,11 +10,13 @@ import { l10n } from '@difizen/mana-l10n';
 import { _Table, BrokerService } from '@/modules/scql-broker';
 import { genericErrorHandler } from '@/utils';
 import { getProjectId } from '@/utils/scql';
+import { TableService } from './service';
 
 const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const { visible, close, data } = props;
   const [form] = Form.useForm();
   const brokerService = useInject<BrokerService>(BrokerService);
+  const tableService = useInject<TableService>(TableService);
   const editMode = !!(data && data.tableName);
 
   useEffect(() => {
@@ -29,7 +31,10 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const handleCreateTable = async () => {
     const values = await form.validateFields();
     try {
-      await brokerService.createTable(getProjectId(), values);
+      await brokerService.createTable(getProjectId(), values, {
+        passthrough: true,
+      });
+      await tableService.refreshTables();
       message.success(l10n.t('新建数据表成功'));
       close();
     } catch (e) {
@@ -44,6 +49,8 @@ const ConfigPanel = (props: ModalItemProps<_Table>) => {
       title={l10n.t('新建数据表')}
       onOk={() => handleCreateTable()}
       onCancel={close}
+      okText={l10n.t('确定')}
+      cancelText={l10n.t('取消')}
     >
       <Form
         form={form}

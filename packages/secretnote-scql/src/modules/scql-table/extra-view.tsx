@@ -14,7 +14,7 @@ import { RefreshCw } from 'lucide-react';
 import { TableService } from './service';
 
 export const ExtraComponent = () => {
-  const { service } = useInject<ExtraView>(ViewInstance);
+  const { tableService } = useInject<ExtraView>(ViewInstance);
 
   return (
     <Tooltip title={l10n.t('刷新')}>
@@ -22,8 +22,9 @@ export const ExtraComponent = () => {
         size={14}
         onClick={(e) => {
           e.stopPropagation();
-          service.refreshTables();
-          message.success(l10n.t('数据表已刷新'));
+          tableService
+            .refreshTables()
+            .then(() => message.success(l10n.t('数据表已刷新')));
         }}
       />
     </Tooltip>
@@ -33,11 +34,11 @@ export const ExtraComponent = () => {
 @singleton()
 @view('data-table-extra-view')
 export class ExtraView extends BaseView {
-  readonly service: TableService;
+  readonly tableService: TableService;
   view = ExtraComponent;
 
-  constructor(@inject(TableService) service: TableService) {
+  constructor(@inject(TableService) tableService: TableService) {
     super();
-    this.service = service;
+    this.tableService = tableService;
   }
 }

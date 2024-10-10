@@ -46,7 +46,6 @@ export class SecretNoteContentsDrive implements IContentsDrive {
       if (settings) {
         throw new Error('`settings` is not allowed to be overriden.');
       }
-      console.log('SecretNoteContentsDrive.makeRequest', url, init, settings);
 
       return requestNoUnpack(url, init, /*targetId*/ '');
     },

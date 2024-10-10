@@ -211,14 +211,14 @@ class BrokerManager:
         return None
 
     async def do_query(self, project_id: str, query: str) -> List[OutColumns]:
-        """Do a query and return the result. Returns the out_columns."""
+        """Do a query and return the result."""
         response = await request(
             f"{self.broker}/intra/query",
             "POST",
             body={"project_id": project_id, "query": query},
         )
 
-        return self.validate_response(response).get("result").get("out_columns", [])
+        return self.validate_response(response).get("result")
 
     async def submit_query(self, project_id: str, query: str) -> str:
         """Run Query asynchronously. Returns the job_id."""

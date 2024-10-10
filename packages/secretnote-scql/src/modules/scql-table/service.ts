@@ -22,7 +22,7 @@ export class TableService {
   }
 
   /**
-   * Get all tables associtated with current project.
+   * Get all tables associtated with current project. Update `tables` prop in-place.
    */
   async refreshTables() {
     // Get current project.
@@ -32,7 +32,8 @@ export class TableService {
       return;
     }
     const { members } = project; // members of project
-    const tables = await this.brokerService.listTables(getProjectId()); // all tables
+    // Get all tables of current project.
+    const tables = await this.brokerService.listTables(getProjectId());
     this.tables = tables.filter(({ tableOwner }) => members.includes(tableOwner));
   }
 

@@ -4,7 +4,7 @@ import {
   BrokerService,
   ProjectDesc,
   ProjectInvitation,
-} from '../scql-broker';
+} from '@/modules/scql-broker';
 
 @singleton()
 export class ProjectService {

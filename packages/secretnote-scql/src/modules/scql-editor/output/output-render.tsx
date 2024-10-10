@@ -1,4 +1,6 @@
 import type { BaseOutputView } from '@difizen/libro-jupyter';
+import { l10n } from '@difizen/mana-l10n';
+
 import './index.less';
 
 export const SQLOutputRender: React.FC<{ model: BaseOutputView }> = (props: {
@@ -37,7 +39,7 @@ export const SQLOutputRender: React.FC<{ model: BaseOutputView }> = (props: {
         </tbody>
       </table>
       <p>
-        {data.rows.length} rows × {data.columns.length} columns
+        {data.rows.length} {l10n.t('行')} × {data.columns.length} {l10n.t('列')}
       </p>
     </div>
   );

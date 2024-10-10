@@ -14,13 +14,16 @@ export class QueryService {
 
   /**
    * Do a synchronous query and get its result immediately.
+   * @throws
    */
   async doQuery(query: string) {
-    const result = await this.brokerService.doQuery(getProjectId(), query);
+    const result = await this.brokerService.doQuery(getProjectId(), query, {
+      passthrough: true,
+    });
     const columns: string[] = [];
     const rows: string[][] = [];
 
-    if (result.out_columns) {
+    if (result && result.out_columns) {
       result.out_columns.forEach((tensor) => {
         columns.push(tensor.name);
         rows.push(this.getRow(tensor).map(String));
@@ -29,7 +32,7 @@ export class QueryService {
 
     return {
       columns,
-      rows: transpose(rows),
+      rows: rows.length ? transpose(rows) : [],
     };
   }
 

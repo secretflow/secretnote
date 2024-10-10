@@ -69,7 +69,6 @@ export class NotebookFileService {
    * @see `loadContent` in `/editor/contents/contents-contrib.ts`
    */
   openFile(file: IContentsModel) {
-    console.log('openFile', file);
     if (this.currentNotebookFile !== file) {
       const previous = this.currentNotebookFile;
       this.currentNotebookFile = file;

@@ -116,6 +116,7 @@ export class SQLCellView extends LibroExecutableCellView {
     const meta = super.toJSON();
     return {
       ...meta,
+      execution_count: 1, // make .ipynb file valid
       outputs: this.outputArea?.toJSON() ?? this.outputs,
     };
   }
@@ -126,7 +127,9 @@ export class SQLCellView extends LibroExecutableCellView {
       factory: (editorOption) => new SQLEditor(editorOption),
       model: this.cellModel,
       config: {
+        // @ts-ignore
         readOnly: this.parent.model.readOnly,
+        // @ts-ignore
         editable: !this.parent.model.readOnly,
       },
     };
@@ -245,7 +248,7 @@ export class SQLCellView extends LibroExecutableCellView {
             content: {
               traceback: messageLines.slice(1),
               ename: 'ExecuteQueryException',
-              evalue: messageLines[0],
+              evalue: message,
             },
             buffers: [],
             channel: 'iopub',

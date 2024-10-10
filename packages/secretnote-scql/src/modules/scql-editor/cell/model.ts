@@ -8,6 +8,8 @@ import type {
 import { CellOptions, LibroCellModel } from '@difizen/libro-jupyter';
 import { inject, prop, transient, Emitter } from '@difizen/mana-app';
 
+import './index.less';
+
 export interface SqlCellMetadata extends CodeCellMetadata {
   execution: ExecutionMeta;
 }

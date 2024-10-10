@@ -34,7 +34,7 @@
 + import SecretNoteSF from '../../../secretnote-sf';
 ```
 
-随后在 secretnote-sf-site 和 secretnote-sf 分别 `pnpm run dev` 即可。如果需要无刷 Reload，需将 secretnote-sf 的 package.json 复制到 dist 下后，改从 `secretnote-sf/dist` 导入。
+随后在 secretnote-sf-site 和 secretnote-sf 分别 `pnpm run dev` 即可获得 HMR 能力。
 
 ## 后端 API 列表
 

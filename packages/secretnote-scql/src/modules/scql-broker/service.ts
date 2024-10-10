@@ -3,14 +3,15 @@
 // @see pyprojects/secretnote/secretnote/scql/server/services/broker_manager.py
 // The schema follows the document, best effort.
 
+import { prop, singleton } from '@difizen/mana-app';
+import { pick } from 'lodash-es';
+
 import { genericErrorHandler, request } from '@/utils';
 import {
   toSnakeCaseObject as snake,
   toCamelCaseObject as camel,
   ToSnakeCaseObject,
 } from '@/utils/object';
-import { prop, singleton } from '@difizen/mana-app';
-import { pick } from 'lodash-es';
 
 // APIs of SCQL Broker.
 export enum BrokerActions {
@@ -116,6 +117,7 @@ export type SQLWarning = {
   reason: string;
 };
 
+// scql.pb.TensorShape
 export type TensorShape = {
   dim: {
     dim_value?: number;
@@ -172,18 +174,24 @@ export type _Table = {
   columns: TableColumnDesc[];
 };
 
+type ErrorHandlerOptions = Parameters<typeof genericErrorHandler>['1'];
+
 /**
  * Reqeust the broker with the given action and body.
  * CamelCase body keys will be transformed into snake-case automatically.
  */
-async function requestBroker<T>(action: BrokerActions, body?: Record<string, any>) {
+async function requestBroker<T>(
+  action: BrokerActions,
+  body?: Record<string, any>,
+  errorHandlerOptions?: ErrorHandlerOptions,
+) {
   return request<T>('api/broker', {
     method: 'POST',
     body: JSON.stringify({
       action,
       ...snake(body ?? {}),
     }),
-  }).catch(genericErrorHandler) as T;
+  }).catch((e) => genericErrorHandler(e, errorHandlerOptions)) as T;
 }
 
 @singleton()
@@ -262,11 +270,15 @@ export class BrokerService {
   /**
    * Create a Table you owned in specified Project.
    */
-  async createTable(projectId: string, table: _Table) {
-    return await requestBroker<{}>(BrokerActions.createTable, {
-      projectId,
-      ...pick(table, ['tableName', 'refTable', 'dbType', 'columns']),
-    });
+  async createTable(projectId: string, table: _Table, _options?: ErrorHandlerOptions) {
+    return await requestBroker<{}>(
+      BrokerActions.createTable,
+      {
+        projectId,
+        ...pick(table, ['tableName', 'refTable', 'dbType', 'columns']),
+      },
+      _options,
+    );
   }
 
   /**
@@ -298,12 +310,17 @@ export class BrokerService {
     projectId: string,
     tables?: string[],
     destParties?: 'self' | 'others' | string,
+    _options?: ErrorHandlerOptions,
   ) {
-    return await requestBroker<ColumnControl[]>(BrokerActions.showCCL, {
-      projectId,
-      tables,
-      destParties,
-    });
+    return await requestBroker<ColumnControl[]>(
+      BrokerActions.showCCL,
+      {
+        projectId,
+        tables,
+        destParties,
+      },
+      _options,
+    );
   }
 
   /**
@@ -316,12 +333,20 @@ export class BrokerService {
   /**
    * [static] (For SQL auto-complete) List all Tables in specified Project.
    */
-  static async ListTables(projectId: string, names?: string[]) {
+  static async ListTables(
+    projectId: string,
+    names?: string[],
+    _options?: ErrorHandlerOptions,
+  ) {
     return (
-      await requestBroker<ToSnakeCaseObject<_Table>[]>(BrokerActions.listTables, {
-        projectId,
-        names,
-      })
+      await requestBroker<ToSnakeCaseObject<_Table>[]>(
+        BrokerActions.listTables,
+        {
+          projectId,
+          names,
+        },
+        _options,
+      )
     ).map(camel);
   }
 
@@ -338,10 +363,14 @@ export class BrokerService {
   /**
    * Run Query synchronously and return query result if the query completes within a specified timeout.
    */
-  async doQuery(projectId: string, query: string) {
-    return await requestBroker<QueryResult>(BrokerActions.doQuery, {
-      projectId,
-      query,
-    });
+  async doQuery(projectId: string, query: string, _options: ErrorHandlerOptions) {
+    return await requestBroker<QueryResult>(
+      BrokerActions.doQuery,
+      {
+        projectId,
+        query,
+      },
+      _options,
+    );
   }
 }

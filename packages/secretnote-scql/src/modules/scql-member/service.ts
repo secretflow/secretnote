@@ -3,6 +3,7 @@
 import { singleton, prop, inject } from '@difizen/mana-app';
 
 import { _Member, BrokerService } from '@/modules/scql-broker';
+import { getProjectId } from '@/utils/scql';
 
 @singleton()
 export class MemberService {
@@ -11,6 +12,8 @@ export class MemberService {
 
   constructor(@inject(BrokerService) service: BrokerService) {
     this.service = service;
+
+    this.getProjectMembers(getProjectId());
   }
 
   /**
