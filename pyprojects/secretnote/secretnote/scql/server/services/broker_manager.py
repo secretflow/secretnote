@@ -3,7 +3,7 @@
 # @see https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.0b1/reference/broker-api
 # APIs here are consistent with those of SCQL's broker.
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 from ..utils import request
 
 
@@ -58,7 +58,7 @@ class BrokerManager:
 
         return response
 
-    async def create_project(self, project: Project) -> str | None:
+    async def create_project(self, project: Project) -> Union[str, None]:
         """Create a new Project and automatically become the Project member and creator.
         Returns the project_id.
         """
@@ -68,7 +68,7 @@ class BrokerManager:
 
         return self.validate_response(response).get("project_id", None)
 
-    async def list_projects(self, ids: List[str] | None) -> List[Project]:
+    async def list_projects(self, ids: Union[List[str], None]) -> List[Project]:
         """List All Projects that have created and joined."""
         response = await request(
             f"{self.broker}/intra/project/list",
@@ -95,7 +95,7 @@ class BrokerManager:
 
         return filtered_invitations
 
-    async def process_invitation(self, invitation_id: str, respond: str) -> str | None:
+    async def process_invitation(self, invitation_id: str, respond: str) -> Union[str, None]:
         """Process the received invitation, specify it by invitation_id,
         choose to join the corresponding project or reject it.
         Returns the invitation_id.
@@ -133,7 +133,7 @@ class BrokerManager:
         return None
 
     async def list_tables(
-        self, project_id: str, names: List[str] | None
+        self, project_id: str, names: Union[List[str], None]
     ) -> List[Table]:
         """List all Tables in specified Project."""
         response = await request(

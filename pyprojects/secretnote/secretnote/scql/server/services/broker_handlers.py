@@ -1,7 +1,7 @@
 # Handlers for the broker service for SCQL.
 
 import json
-from typing import List, Tuple, Type
+from typing import List, Tuple, Type, Union
 from jupyter_client.jsonutil import json_default
 from jupyter_server.base.handlers import APIHandler, JupyterHandler
 from tornado import web
@@ -16,7 +16,7 @@ def ipick(obj, keys):
 
 
 class BrokerHandler(APIHandler):
-    broker_manager: BrokerManager | None = None
+    broker_manager: Union[BrokerManager, None] = None
 
     def ensure_broker_manager(self):
         if self.broker_manager is None:
@@ -68,7 +68,7 @@ class BrokerHandler(APIHandler):
                 model.get("project_id", None), model.get("tables", [])
             ),
             "grantCCL": lambda: self.broker_manager.grant_ccl(
-                model.get("project_id", None), model.get("ccl_list", None)
+                model.get("project_id", None), model.get("column_control_list", None)
             ),
             "doQuery": lambda: self.broker_manager.do_query(
                 model.get("project_id", None), model.get("query", None)

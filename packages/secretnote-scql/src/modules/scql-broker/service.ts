@@ -157,11 +157,13 @@ export type _PlatformInfo = {
   broker: string; // address of broker API
 };
 
-export type _ProjectMember = {
+// member of a project
+export type _Member = {
   party: string; // name of the party
   isCreator: boolean;
 };
 
+// table inside a project
 export type _Table = {
   tableName: string;
   tableOwner: string;
@@ -172,6 +174,7 @@ export type _Table = {
 
 /**
  * Reqeust the broker with the given action and body.
+ * CamelCase body keys will be transformed into snake-case automatically.
  */
 async function requestBroker<T>(action: BrokerActions, body?: Record<string, any>) {
   return request<T>('api/broker', {

@@ -5,15 +5,15 @@ import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
 import { HeaderArea } from '@/modules/layout';
 
-import { ProjectMemberService } from './service';
-import { ProjectMemberView } from './view';
+import { MemberService } from './service';
+import { MemberView } from './view';
 
 export const SCQLMemberModule = ManaModule.create().register(
-  ProjectMemberView,
-  ProjectMemberService,
+  MemberView,
+  MemberService,
   createViewPreference({
     slot: HeaderArea.right,
-    view: ProjectMemberView,
+    view: MemberView,
     autoCreate: true,
   }),
 );

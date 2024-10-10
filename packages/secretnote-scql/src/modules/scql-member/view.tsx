@@ -26,7 +26,7 @@ import { useState } from 'react';
 import './index.less';
 import { genericErrorHandler, invert, randomColorByName } from '@/utils';
 
-import { ProjectMemberService } from './service';
+import { MemberService } from './service';
 import { BrokerService } from '../scql-broker';
 
 /**
@@ -37,11 +37,11 @@ function getProjectId() {
   return window.location.pathname.split('/').pop()!;
 }
 
-export const ProjectMemberComponent = () => {
+export const MemberComponent = () => {
   const [form] = Form.useForm();
   const [addFormVisible, setAddFormVisible] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
-  const instance = useInject<ProjectMemberView>(ViewInstance);
+  const instance = useInject<MemberView>(ViewInstance);
   const { brokerService, memberService } = instance;
   const formValues = Form.useWatch([], form);
 
@@ -148,14 +148,14 @@ export const ProjectMemberComponent = () => {
 
 @singleton()
 @view('secretnote-scql-member-view')
-export class ProjectMemberView extends BaseView {
-  view = ProjectMemberComponent;
+export class MemberView extends BaseView {
+  view = MemberComponent;
   readonly brokerService: BrokerService;
-  readonly memberService: ProjectMemberService;
+  readonly memberService: MemberService;
 
   constructor(
     @inject(BrokerService) brokerService: BrokerService,
-    @inject(ProjectMemberService) memberService: ProjectMemberService,
+    @inject(MemberService) memberService: MemberService,
   ) {
     super();
     this.brokerService = brokerService;

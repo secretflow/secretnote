@@ -9,6 +9,7 @@ import {
   ViewInstance,
   ModalContribution,
   ModalService,
+  ModalItem,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';
@@ -19,13 +20,13 @@ import {
   TableProperties,
   Settings,
   PlusSquare,
+  Monitor,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-import './index.less';
 import { TableConfigModal } from './add-modal';
 import { CCLConfigModal } from './ccl-modal';
 import { TableService } from './service';
@@ -33,6 +34,7 @@ import { noop } from 'lodash-es';
 import { _Table, BrokerService, ColumnControl } from '@/modules/scql-broker';
 import { getProjectId } from '@/utils/scql';
 import { ProjectService } from '@/modules/scql-project/service';
+import './index.less';
 
 const { DirectoryTree } = Tree;
 
@@ -79,35 +81,22 @@ const TableDetails = ({ table }: { table: _Table }) => {
   //   : [];
 
   return (
-    <div className="secretnote-node-description">
-      <Descriptions title={l10n.t('表信息')} column={2}>
-        <Descriptions.Item label={l10n.t('表名称')}>
-          {table.tableName}
-        </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('所有方')}>
-          {table.tableOwner}
-        </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('数据库类型')}>
-          {table.dbType}
-        </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('关联物理表')}>
-          {table.refTable}
-        </Descriptions.Item>
-        <Descriptions.Item label={l10n.t('数据列')} span={2}>
-          {table.columns.map((c) => `${c.name} (${c.dtype})`).join(', ')}
-        </Descriptions.Item>
-        <Descriptions.Item label="CCL" span={2}>
-          <Table
-            className="secretnote-ccl-view-table"
-            dataSource={tableCCL}
-            rowKey="column"
-            pagination={false}
-            columns={[]}
-            size="small"
-          />
-        </Descriptions.Item>
-      </Descriptions>
-    </div>
+    <Descriptions
+      title={l10n.t('表信息')}
+      column={2}
+      size="small"
+      className="secretnote-hover-table-info"
+    >
+      <Descriptions.Item label={l10n.t('表名称')}>{table.tableName}</Descriptions.Item>
+      <Descriptions.Item label={l10n.t('所有方')}>{table.tableOwner}</Descriptions.Item>
+      <Descriptions.Item label={l10n.t('数据库类型')}>{table.dbType}</Descriptions.Item>
+      <Descriptions.Item label={l10n.t('关联物理表')}>
+        {table.refTable}
+      </Descriptions.Item>
+      <Descriptions.Item label={l10n.t('数据列')} span={2}>
+        {table.columns.map((c) => `${c.name} (${c.dtype})`).join(', ')}
+      </Descriptions.Item>
+    </Descriptions>
   );
 };
 
@@ -156,13 +145,17 @@ export const TableComponent = () => {
         modalService.openModal(TableConfigModal);
         break;
       case 'configCCL':
-        modalService.openModal(CCLConfigModal, node.table);
+        // @see props of CCLModalComponent
+        modalService.openModal(CCLConfigModal, { table: node.table, mode: 'config' });
+        break;
+      case 'viewCCL':
+        modalService.openModal(CCLConfigModal, { table: node.table, mode: 'view' });
         break;
       case 'delete':
         Modal.confirm({
           title: l10n.t('删除数据表'),
           centered: true,
-          content: l10n.t('数据表 {0} 将被删除', node.title),
+          content: l10n.t('数据表 {0} 将被删除', node.table?.tableName || '??'),
           okText: l10n.t('确认'),
           cancelText: l10n.t('取消'),
           okType: 'danger',
@@ -197,7 +190,7 @@ export const TableComponent = () => {
             danger: true,
           },
         ]
-      : [];
+      : [{ key: 'viewCCL', label: l10n.t('查看 CCL'), icon: <Monitor size={12} /> }];
 
     const title = (
       <div className="ant-tree-title-content">

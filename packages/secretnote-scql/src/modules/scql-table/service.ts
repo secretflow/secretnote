@@ -2,7 +2,7 @@
 
 import { inject, prop, singleton } from '@difizen/mana-app';
 import { genericErrorHandler } from '@/utils';
-import { _Table, BrokerService } from '../scql-broker';
+import { _Table, BrokerService, ColumnControl } from '../scql-broker';
 import { getProjectId } from '@/utils/scql';
 import { ProjectService } from '../scql-project/service';
 import { l10n } from '@difizen/mana-l10n';
@@ -56,38 +56,10 @@ export class TableService {
     return ccl;
   }
 
-  // async grantCCL(tableName: string, ccl: TableCCL[]) {
-  //   const cclList: {
-  //     col: {
-  //       column_name: string;
-  //       table_name: string;
-  //     };
-  //     party_code: string;
-  //     constraint: string;
-  //   }[] = [];
-
-  //   ccl.forEach((item) => {
-  //     Object.keys(item).forEach((column) => {
-  //       if (column !== 'column' && item[column] !== Constraint.UNDEFINED) {
-  //         cclList.push({
-  //           col: {
-  //             column_name: item.column,
-  //             table_name: tableName,
-  //           },
-  //           party_code: column,
-  //           constraint: item[column],
-  //         });
-  //       }
-  //     });
-  //   });
-
-  //   await request('api/broker', {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       action: 'grantCCL',
-  //       project_id: getProjectId(),
-  //       ccl_list: cclList,
-  //     }),
-  //   });
-  // }
+  /**
+   * Grant CCL to tables of current project.
+   */
+  async grantCCL(ccl: ColumnControl[]) {
+    await this.brokerService.grantCCL(getProjectId(), ccl);
+  }
 }

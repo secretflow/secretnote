@@ -2,12 +2,12 @@
 
 import { singleton, prop, inject } from '@difizen/mana-app';
 
-import { _ProjectMember, BrokerService } from '@/modules/scql-broker';
+import { _Member, BrokerService } from '@/modules/scql-broker';
 
 @singleton()
-export class ProjectMemberService {
+export class MemberService {
   protected readonly service: BrokerService;
-  @prop() members: _ProjectMember[] = [];
+  @prop() members: _Member[] = [];
 
   constructor(@inject(BrokerService) service: BrokerService) {
     this.service = service;
