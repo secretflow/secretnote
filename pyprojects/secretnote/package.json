@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev:sf": "cd .. && NODE_ENV=development python -m secretnote sf --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-browser",
-    "dev:scql": "cd .. && NODE_ENV=development python -m secretnote scql --config=./secretnote/secretnote/scql/.jupyter/config_dev.py --no-browser",
+    "dev:scql": "cd .. && NODE_ENV=development python -m secretnote scql --config=./secretnote/secretnote/scql/.jupyter/config_dev.py --no-browser --party=alice --broker=http://127.0.0.1:8181",
     "format:black": "python -m black --check src tests",
     "test:pytest": "python -m pytest",
     "typecheck:pyright": "pyright --project ../.. src/secretnote/server tests",
