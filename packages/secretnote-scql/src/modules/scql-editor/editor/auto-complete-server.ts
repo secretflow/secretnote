@@ -2,7 +2,7 @@
 import * as _ from 'lodash-es';
 import * as monaco from 'monaco-editor';
 
-import { request } from '@/utils';
+import { genericErrorHandler, request } from '@/utils';
 
 import type {
   ITableInfo,
@@ -10,6 +10,9 @@ import type {
   ICompletionItem,
   ICursorInfo,
 } from './sql-parser';
+import { Container, inject, useInject } from '@difizen/mana-app';
+import { BrokerService, ColumnControl } from '@/modules/scql-broker';
+import { l10n } from '@difizen/mana-l10n';
 
 type Column = {
   name: string;
@@ -39,17 +42,11 @@ const getTables = async () => {
   }
 
   getTablesPromise = new Promise((resolve, reject) => {
-    request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getDataTables',
-        project_id: getProjectId(),
-      }),
-    })
+    BrokerService.ListTables(getProjectId())
       .then((results) => {
-        const tables = results.map((table: any) => ({
-          name: table.table_name,
-          owner: table.table_owner,
+        const tables = results.map((table) => ({
+          name: table.tableName,
+          owner: table.tableOwner,
           columns: table.columns,
         }));
         resolve(tables);
@@ -69,18 +66,14 @@ const getTableCCL = async (tableName: string) => {
   }
 
   getTableCCLPromiseMap[tableName] = new Promise((resolve, reject) => {
-    request('api/broker', {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'getTableCCL',
-        project_id: getProjectId(),
-        table_name: tableName,
-      }),
-    })
+    if (!tableName.match(/^[a-zA-Z0-9_]+$/)) {
+      // avoid e.g. SELECT * crashes the application
+      return resolve([]);
+    }
+    BrokerService.ShowCCL(getProjectId(), [tableName])
       .then((results) => {
         const ccl: TableCCL[] = [];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        results.forEach((item: any) => {
+        results.forEach((item) => {
           const column = item.col.column_name;
           const party = item.party_code;
           const constraint = item.constraint;
@@ -107,33 +100,36 @@ const getTableCCL = async (tableName: string) => {
   return await getTableCCLPromiseMap[tableName];
 };
 
-const createCCLTableHtml = (ccl: TableCCL[]) => {
+const createCCLTableHtml = (ccl: TableCCL[], title: string) => {
   if (ccl.length < 1) {
     return '';
   }
 
   return `
-  <table border="1" class="dataframe">
-    <thead>
-      <tr>
-        ${Object.keys(ccl[0])
-          .map((item) => `<th>${item}</th>`)
+  <div>
+    <span>${title}</span>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr>
+          ${Object.keys(ccl[0])
+            .map((item) => `<th>${item}</th>`)
+            .join('\n')}
+        </tr>
+      </thead>
+      <tbody>
+        ${ccl
+          .map(
+            (item) =>
+              `<tr>
+                ${Object.keys(item)
+                  .map((key) => `<td>${item[key]}</td>`)
+                  .join('\n')}
+              </tr>`,
+          )
           .join('\n')}
-      </tr>
-    </thead>
-    <tbody>
-      ${ccl
-        .map(
-          (item) =>
-            `<tr>
-              ${Object.keys(item)
-                .map((key) => `<td>${item[key]}</td>`)
-                .join('\n')}
-            </tr>`,
-        )
-        .join('\n')}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
   `;
 };
 
@@ -217,7 +213,7 @@ export const onHoverTableName: (
 
   return [
     {
-      value: createCCLTableHtml(ccl),
+      value: createCCLTableHtml(ccl, l10n.t('表 {0} 的 CCL', tableName)),
       supportHtml: true,
       isTrusted: true,
     },
@@ -240,7 +236,7 @@ export const onHoverTableField: (
         }
         return [
           {
-            value: createCCLTableHtml(ccl),
+            value: createCCLTableHtml(ccl, l10n.t('列 {0} 的 CCL', field)),
             supportHtml: true,
             isTrusted: true,
           },
@@ -259,7 +255,7 @@ export const onHoverTableField: (
         }
         return [
           {
-            value: createCCLTableHtml([c]),
+            value: createCCLTableHtml([c], l10n.t('列 {0} 的 CCL', field)),
             supportHtml: true,
             isTrusted: true,
           },

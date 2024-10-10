@@ -287,6 +287,18 @@ export class BrokerService {
     tables?: string[],
     destParties?: 'self' | 'others' | string,
   ) {
+    return BrokerService.ShowCCL(projectId, tables, destParties);
+  }
+
+  /**
+   * [static] (For SQL auto-complete) Show CCLs in specified Project,
+   * supports specifying Tables, members.
+   */
+  static async ShowCCL(
+    projectId: string,
+    tables?: string[],
+    destParties?: 'self' | 'others' | string,
+  ) {
     return await requestBroker<ColumnControl[]>(BrokerActions.showCCL, {
       projectId,
       tables,
@@ -298,6 +310,13 @@ export class BrokerService {
    * List all Tables in specified Project.
    */
   async listTables(projectId: string, names?: string[]) {
+    return BrokerService.ListTables(projectId, names);
+  }
+
+  /**
+   * [static] (For SQL auto-complete) List all Tables in specified Project.
+   */
+  static async ListTables(projectId: string, names?: string[]) {
     return (
       await requestBroker<ToSnakeCaseObject<_Table>[]>(BrokerActions.listTables, {
         projectId,

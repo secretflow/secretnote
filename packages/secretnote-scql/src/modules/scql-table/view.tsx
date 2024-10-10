@@ -9,7 +9,6 @@ import {
   ViewInstance,
   ModalContribution,
   ModalService,
-  ModalItem,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';

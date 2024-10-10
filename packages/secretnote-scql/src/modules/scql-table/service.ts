@@ -33,7 +33,6 @@ export class TableService {
     }
     const { members } = project; // members of project
     const tables = await this.brokerService.listTables(getProjectId()); // all tables
-    console.log('alltables', tables);
     this.tables = tables.filter(({ tableOwner }) => members.includes(tableOwner));
   }
 

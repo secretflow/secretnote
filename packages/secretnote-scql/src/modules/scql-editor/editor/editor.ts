@@ -42,6 +42,7 @@ export class SQLEditor implements IEditor {
   protected toDispose = new DisposableCollection();
   protected oldDeltaDecorations: string[] = [];
   protected modalChangeEmitter = new Emitter<boolean>();
+  format = () => {};
 
   monacoEditor?: MonacoEditorType;
   host: HTMLElement;
