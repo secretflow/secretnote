@@ -11,9 +11,11 @@ import {
   ViewManager,
   inject,
 } from '@difizen/mana-app';
-import { Collapse, Space, Typography } from 'antd';
+import { Collapse, Space, Tag, Typography } from 'antd';
 
 import { SideBarContribution } from './protocol';
+import { BrokerService } from '../scql-broker';
+import { l10n } from '@difizen/mana-l10n';
 
 export enum SideBarArea {
   notebook = 'notebook',
@@ -25,23 +27,47 @@ export enum SideBarArea {
 }
 
 // About bar on the bottom of the sidebar
-const AboutBarComponent = () => (
-  <Space direction="horizontal" align="center" size="large" className="about-bar">
-    <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
-      SecretFlow
-    </Typography.Link>
-    <Typography.Link href="https://github.com/secretflow/secretnote" target="_blank">
-      SecretNote
-    </Typography.Link>
-  </Space>
-);
+const AboutBarComponent = () => {
+  const brokerService = useInject<BrokerService>(BrokerService);
+  const { platformInfo } = brokerService;
 
-export const aboutBarViewKey = 'aboutBar';
+  return (
+    <Space direction="vertical" className="about-bar">
+      <Space direction="vertical">
+        <p className="title">{l10n.t('平台信息')}</p>
+        <Space direction="vertical">
+          <Tag>
+            {l10n.t('本方')}: {platformInfo.party}
+          </Tag>
+          <Tag>Broker: {platformInfo.broker}</Tag>
+        </Space>
+      </Space>
+      {/* Links to SecretFlow and SecretNote sites */}
+      <Space direction="horizontal" align="center" size="large">
+        <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
+          SecretFlow
+        </Typography.Link>
+        <Typography.Link
+          href="https://github.com/secretflow/secretnote"
+          target="_blank"
+        >
+          SecretNote
+        </Typography.Link>
+      </Space>
+    </Space>
+  );
+};
+
+export const aboutBarViewKey = 'scql-aboutBar';
 @singleton()
 @view('secretnote-scql-aboutBar-view')
 export class AboutBarView extends BaseView {
   key = aboutBarViewKey;
   view = AboutBarComponent;
+
+  constructor() {
+    super();
+  }
 }
 
 export const SideBar: React.FC = () => {
@@ -66,9 +92,9 @@ export const SideBar: React.FC = () => {
   return (
     <div className="secretnote-sidebar">
       <Collapse defaultActiveKey={defaultActiveKey} ghost items={items} />
-      <Space className="bottom-bar" direction="vertical" size="middle">
+      <div className="bottom-bar">
         <Slot name={aboutBarViewKey} />
-      </Space>
+      </div>
     </div>
   );
 };

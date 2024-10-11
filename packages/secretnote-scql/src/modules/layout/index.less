@@ -71,10 +71,28 @@
   border-right: 1px solid var(--mana-secretnote-divider-color);
   background-color: var(--mana-secretnote-sidebar-background);
 
-  .statusbar {
+  .bottom-bar {
     position: absolute;
-    bottom: 150px;
+    bottom: 0;
     width: 100%;
+    padding: 12px;
     border-top: 1px solid var(--mana-secretnote-divider-color);
+    text-align: center;
+  }
+
+  .about-bar {
+    .title {
+      color: var(--mana-secretnote-text-color);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    a.ant-typography {
+      color: var(--custom-blue-400) !important;
+    }
+
+    .icon-container {
+      line-height: 0;
+    }
   }
 }

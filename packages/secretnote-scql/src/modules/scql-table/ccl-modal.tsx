@@ -16,6 +16,7 @@ import {
 import { l10n } from '@difizen/mana-l10n';
 import { genericErrorHandler } from '@/utils';
 import { MemberService } from '@/modules/scql-member/service';
+import { getProjectId } from '@/utils/scql';
 
 type CCLModalData = {
   table: _Table;
@@ -53,8 +54,10 @@ const CCLModalComponent = (props: ModalItemProps<CCLModalData>) => {
   const handleChangeCCL = async () => {
     try {
       const ccl = await transformTableDataToCCL(tableData);
-      await tableService.grantCCL(ccl);
-      message.success(l10n.t('成功更新 CCL'));
+      await brokerService.grantCCL(getProjectId(), ccl, {
+        passthrough: true,
+      });
+      message.success(l10n.t('CCL 更新成功'));
       close();
     } catch (e) {
       genericErrorHandler(e);

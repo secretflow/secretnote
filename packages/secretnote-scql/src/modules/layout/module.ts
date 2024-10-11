@@ -17,6 +17,7 @@ export const LayoutModule = ManaModule.create()
     HeaderView,
     SideBarView,
     LayoutView,
+    AboutBarView,
     createSlotPreference({
       slot: RootSlotId,
       view: LayoutView,

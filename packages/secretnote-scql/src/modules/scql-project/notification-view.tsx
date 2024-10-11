@@ -51,16 +51,17 @@ export const InvitationNotificationComponent = () => {
    */
   const handleInvitation = async (id: string, respond: _ProjectInvitationRespond) => {
     try {
-      await brokerService.processInvitation(id, respond);
+      await brokerService.processInvitation(id, respond, { passthrough: true });
       message.success(
         l10n.t(
           '成功{0}邀请',
           {
-            ACCEPT: '接受',
-            DECLINE: '拒绝',
+            ACCEPT: l10n.t('接受'),
+            DECLINE: l10n.t('拒绝'),
           }[respond],
         ),
       );
+      projectService.refreshInvitations();
     } catch (e) {
       genericErrorHandler(e);
     }
@@ -125,13 +126,7 @@ export const InvitationNotificationComponent = () => {
             <ul>
               {archived.map((item) => (
                 <li key={item.invitation_id}>
-                  <span>
-                    {`${item.inviter} invites you to participate in the project ${item.project}.`}
-                  </span>
-                  <Divider
-                    type="vertical"
-                    style={{ height: '1em', borderInlineStart: '1px solid #d6dee6' }}
-                  />
+                  <span>{`${item.inviter} 邀请你加入项目 ${item.project.name}`}</span>
                   <span
                     className="action"
                     style={{
@@ -141,13 +136,11 @@ export const InvitationNotificationComponent = () => {
                           : 'orange',
                     }}
                   >
-                    {
-                      {
-                        UNDECIDED: '未确定',
-                        ACCEPTED: '已接受',
-                        REJECTED: '已拒绝',
-                      }[item.status]
-                    }
+                    {{
+                      UNDECIDED: l10n.t('未确定'),
+                      ACCEPTED: l10n.t('已接受'),
+                      REJECTED: l10n.t('已拒绝'),
+                    }[item.status] || l10n.t('未知')}
                   </span>
                 </li>
               ))}
@@ -163,7 +156,14 @@ export const InvitationNotificationComponent = () => {
   return (
     <Space className="secretnote-invitation-notification">
       <Popover
-        content={<Tabs defaultActiveKey="1" items={items} size="small" />}
+        content={
+          <Tabs
+            defaultActiveKey="1"
+            items={items}
+            size="small"
+            style={{ paddingInline: '8px', paddingBottom: '4px' }}
+          />
+        }
         title=""
         overlayStyle={{ width: 480 }}
         trigger="click"
@@ -205,5 +205,9 @@ export class InvitationNotificationView extends BaseView {
     super();
     this.brokerService = brokerService;
     this.projectService = projectService;
+  }
+
+  onViewMount() {
+    this.projectService.refreshInvitations();
   }
 }

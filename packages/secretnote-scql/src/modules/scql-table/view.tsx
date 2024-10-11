@@ -88,16 +88,15 @@ export const TableComponent = () => {
 
     const _nodes: TreeDataNode[] = [];
     members.forEach((member) => {
-      const belongToMe = selfParty === member.party;
       _nodes.push({
         key: member.party,
         title: member.party,
-        belongToMe,
+        belongToMe: selfParty === member.party,
         isLeaf: false,
         children: tables.map((table) => ({
           key: `${table.tableName}-${member.party}`,
           title: table.tableName,
-          belongToMe,
+          belongToMe: selfParty === table.tableOwner,
           isLeaf: true,
           table,
         })),

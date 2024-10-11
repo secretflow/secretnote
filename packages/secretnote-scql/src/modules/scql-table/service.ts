@@ -55,11 +55,4 @@ export class TableService {
     }
     return ccl;
   }
-
-  /**
-   * Grant CCL to tables of current project.
-   */
-  async grantCCL(ccl: ColumnControl[]) {
-    await this.brokerService.grantCCL(getProjectId(), ccl);
-  }
 }

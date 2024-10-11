@@ -1,3 +1,5 @@
+// Service related to projects and invitations.
+
 import { prop, singleton } from '@difizen/mana-app';
 import {
   _ProjectInvitationStatus,

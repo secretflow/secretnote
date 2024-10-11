@@ -243,13 +243,18 @@ export class BrokerService {
   /**
    * Process the received invitation, specify it by invitation_id, choose to join the corresponding project or reject it
    */
-  async processInvitation(invitationId: string, respond: _ProjectInvitationRespond) {
+  async processInvitation(
+    invitationId: string,
+    respond: _ProjectInvitationRespond,
+    _options?: ErrorHandlerOptions,
+  ) {
     return await requestBroker<{}>(
       BrokerActions.processInvitation,
       snake({
         invitationId,
         respond,
       }),
+      _options,
     );
   }
 
@@ -353,17 +358,25 @@ export class BrokerService {
   /**
    * Grant CCLs of your Table to a specific member.
    */
-  async grantCCL(projectId: string, columnControlList: ColumnControl[]) {
-    return await requestBroker<{}>(BrokerActions.grantCCL, {
-      projectId,
-      columnControlList,
-    });
+  async grantCCL(
+    projectId: string,
+    columnControlList: ColumnControl[],
+    _options?: ErrorHandlerOptions,
+  ) {
+    return await requestBroker<{}>(
+      BrokerActions.grantCCL,
+      {
+        projectId,
+        columnControlList,
+      },
+      _options,
+    );
   }
 
   /**
    * Run Query synchronously and return query result if the query completes within a specified timeout.
    */
-  async doQuery(projectId: string, query: string, _options: ErrorHandlerOptions) {
+  async doQuery(projectId: string, query: string, _options?: ErrorHandlerOptions) {
     return await requestBroker<QueryResult>(
       BrokerActions.doQuery,
       {
