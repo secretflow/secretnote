@@ -56,7 +56,9 @@ const ConfigModalComponent = (props: ModalItemProps<any>) => {
       });
       message.success(l10n.t('添加成功'));
       close();
-      service.listProjects();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (e) {
       genericErrorHandler(e);
     }

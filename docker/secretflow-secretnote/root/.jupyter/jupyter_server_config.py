@@ -18,9 +18,7 @@ c.ResourceUseDisplay.track_cpu_percent = True
 
 c.LanguageServerManager.autodetect = False
 c.LanguageServerManager.language_servers = {
-    # whole notebook LSP ability.
     "libro-analyzer": {
-        # if installed as a binary
         "argv": [
             "node",
             "node_modules/@difizen/libro-analyzer/index.js",

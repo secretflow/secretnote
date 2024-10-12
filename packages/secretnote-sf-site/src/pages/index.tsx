@@ -1,5 +1,4 @@
-// import SecretNoteSF from '@alipay/secretnote-sf';
-import SecretNoteSF from '../../../secretnote-sf';
+import SecretNoteSF from '@alipay/secretnote-sf';
 import './index.less';
 
 export default function () {

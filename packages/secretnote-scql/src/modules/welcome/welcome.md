@@ -1,8 +1,12 @@
 # 欢迎使用 SecretNote SCQL 在线实验环境
 
-推荐使用 docker 以 P2P 模式部署 SCQL 系统，可以参考[官网文档](https://www.secretflow.org.cn/zh-CN/docs/scql/0.5.0b2/topics/deployment/how-to-deploy-p2p-cluster)。简单起见，我们直接使用 [scql p2p examples](https://github.com/secretflow/scql/tree/main/examples/p2p-tutorial)。
+下面演示在一台机器上使用 SCQL + SecretNote 来模拟不同参与方完成一次 SCQL Query。
 
 ---
+
+## 准备环境
+
+使用 docker 以 P2P 模式部署 SCQL 系统，可以参考[官网文档](https://www.secretflow.org.cn/zh-CN/docs/scql/0.5.0b2/topics/deployment/how-to-deploy-p2p-cluster)。简单起见，我们直接使用 [scql p2p examples](https://github.com/secretflow/scql/tree/main/examples/p2p-tutorial)。
 
 ## 创建项目
 
@@ -16,12 +20,12 @@ alice 和 bob 分别在自己的项目中创建数据表。
 
 ---
 
-## 授权 CCL
+## 调整 CCL 授权
 
-alice 和 bob 分别在数据表中选择刚才创建的数据表，右键菜单中点击配置 CCL。
+alice 和 bob 分别在数据表中选择刚才创建的数据表，点击菜单中的配置 CCL 按钮调整 CCL。
 
 ---
 
 ## 执行 SCQL Query
 
-alice 新建 notebook，在代码区域输入 SQL 查询语句，输出区域会输出查询结果。
+alice 新建 Notebook，在代码区域输入 SQL 查询语句，执行后，输出区域会输出查询结果。

@@ -1,6 +1,6 @@
 {
   "name": "@alipay/secretnote-sf",
-  "version": "0.0.43",
+  "version": "0.0.46",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",

@@ -32,7 +32,7 @@ alice 和 bob 分别在自己的项目中创建数据表。
 
 ![table2.jpg](./images/scql-table2.png)
 
-### 授权 CCL
+### 调整 CCL 授权
 
 alice 和 bob 分别在数据表中选择刚才创建的数据表，右键菜单中点击配置 CCL。
 
@@ -47,5 +47,12 @@ bob:
 ### 执行 SCQL Query
 
 alice 新建 notebook，在代码区域输入 SQL 查询语句，输出区域会输出查询结果。
+
+```sql
+SELECT ta.credit_rank, COUNT(*) AS cnt, AVG(ta.income) AS avg_income, AVG(tb.order_amount) as avg_amount
+FROM ta INNER JOIN tb ON ta.ID = tb.ID
+WHERE ta.age >= 20 AND ta.age <= 30 AND tb.is_active = 1
+GROUP BY ta.credit_rank
+```
 
 ![sql.jpg](./images//scql-query.png)

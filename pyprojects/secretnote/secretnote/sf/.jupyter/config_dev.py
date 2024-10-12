@@ -12,7 +12,6 @@ dirname = path.dirname(__file__)
 
 c = get_config()
 
-
 c.Application.log_level = 0
 
 c.ServerApp.allow_origin = "*"
