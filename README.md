@@ -71,6 +71,32 @@ SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置
 
 - 如有需要，请查看更完整的具体[示例](docs/SCQL-INTRO.md)
 
+## 高级
+
+### 配置覆盖
+
+命令行下 SecretNote 可以接受可传递给 Jupyter Notebook 的参数，具体可参考 [开发配置文件](pyprojects/secretnote/secretnote/sf/.jupyter/config_dev.py)。
+
+```sh
+secretnote sf . --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-browser
+```
+
+### 清理残留的计算节点记录
+
+SecretNote 默认会在 `~/.jupyter` 下存储计算节点的相关信息。如果遇到计算节点状态识别异常，可尝试手工清理。
+
+```sh
+rm ~/.jupyter/secretnote*
+```
+
+### 本地构建 SecretFlow 计算节点镜像
+
+当前，[secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 维护 1.6.1b0 至 1.9.0b0 的镜像，同时支持 amd64 和 arm64 架构。如有定制化的需求，可自行构建计算节点镜像。例如构建 1.9.0b0 (linux/arm64) 镜像的命令如下。
+
+```sh
+docker buildx build --build-arg SECRETFLOW_VERSION=1.9.0b0 --platform linux/arm64 -t secretflow/secretnote:1.9.0b0 -f ./docker/secretflow-secretnote/Dockerfile .
+```
+
 ## 开发与贡献
 
 SecretNote 的前端基于 [Mana](https://github.com/difizen/mana) 和 [Libro](https://github.com/difizen/libro) 开发，开源后端基于 [Jupyter Server](https://github.com/jupyter-server/jupyter_server) 开发。
@@ -90,6 +116,6 @@ NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/sf
 
 请根据需要调整 Playground DevServer 的代理配置。如需 HMR 能力，请暂时从 `../../../secretnote-sf` 引入组件。进一步了解项目结构和 API 约定可查看 [CONTRIBUTING](CONTRIBUTING.md)。
 
-## 问题反馈
+## 问题与反馈
 
 请在 [issues](https://github.com/secretflow/secretnote/issues) 反馈，或点击 [隐语实训平台](https://www.secret-flow.com/welcome) 右上角 “反馈” 按钮加群咨询。

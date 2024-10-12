@@ -9,14 +9,11 @@ jobs:
     docker:
       - image: cimg/base:stable
     resource_class: xlarge
-
     parameters:
       platform:
         type: string
-        default: linux/amd64
       tag:
         type: string
-        default: latest
 
     steps:
       - checkout
@@ -28,8 +25,9 @@ jobs:
             export IMAGE_NAME=secretflow/secretnote:<< parameters.tag >>
 
             docker buildx build \
-              --platform=<< parameters.platform >> \
+              --platform << parameters.platform >> \
               -f docker/secretflow-secretnote/Dockerfile \
+              --build-arg SECRETFLOW_VERSION=<< parameters.tag >> \
               -t ${IMAGE_NAME} \
               --progress=plain \
               .
@@ -40,7 +38,7 @@ jobs:
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  devcontainer-publish-1.9.0b0:
+  devcontainer-publish-amd64:
     jobs:
       - devcontainer-publish:
           filters:
@@ -48,4 +46,18 @@ workflows:
               only:
                 - main
           platform: linux/amd64
-          tag: 1.9.0b0
+          matrix:
+            parameters:
+              tag: ["1.9.0b0", "1.8.0b0", "1.7.0b0", "1.6.1b0"]
+  
+  devcontainer-publish-arm64:
+    jobs:
+      - devcontainer-publish:
+          filters:
+            branches:
+              only:
+                - main
+          platform: linux/arm64
+          matrix:
+            parameters:
+              tag: ["1.9.0b0", "1.8.0b0", "1.7.0b0", "1.6.1b0"]
