@@ -23,19 +23,6 @@
   - telemetry # 可观测后端服务 [暂不维护]
 ```
 
-## 调试方法
-
-### 如何通过 Playground 调试前端组件？
-
-以 secretnote-sf 为例。将 secretnote-sf-site 中的导入替换为
-
-```diff
-- import SecretNoteSF from '@alipay/secretnote-sf';
-+ import SecretNoteSF from '../../../secretnote-sf';
-```
-
-随后在 secretnote-sf-site 和 secretnote-sf 分别 `pnpm run dev` 即可获得 HMR 能力。
-
 ## 后端 API 列表
 
 为了让 SecretNote SF 能够完整地正常工作，其后端需要实现以下 API。

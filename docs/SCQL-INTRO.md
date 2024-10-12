@@ -8,23 +8,6 @@
 
 ![p2p-tutorial.jpg](./images/p2p-tutorial.png)
 
-然后在本地安装 SecretNote。
-
-```shell
-pip install -U secretnote
-```
-
-**注意：当前 pip 包只支持 python>=3.8,<=3.10 版本**
-
-打开两个终端，分别执行下面的启动命令：
-
-```shell
-# 打开 alice web client
-secretnote --mode=scql --host=http://127.0.0.1:8991 --party=alice
-# 打开 bob web client
-secretnote --mode=scql --host=http://127.0.0.1:8992 --party=bob
-```
-
 ### 创建项目
 
 alice 新建项目。
@@ -35,7 +18,7 @@ alice 新建项目。
 
 ![invite.jpg](./images//scql-invite.png)
 
-此时，在 bob 主页会收到邀请信息。点击同意按钮。
+在 bob 主页刷新后会收到邀请信息。点击同意按钮。
 
 ![image.png](./images//scql-notification.png)
 

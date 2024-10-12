@@ -1,6 +1,6 @@
 services:
   alice:
-    image: secretflow/secretnote:1.6.1-amd64
+    image: secretflow/secretnote:1.9.0b0
     pull_policy: if_not_present
     platform: linux/amd64
     environment:
@@ -11,7 +11,7 @@ services:
       - ./alice:/root/workspace
 
   bob:
-    image: secretflow/secretnote:1.6.1-amd64
+    image: secretflow/secretnote:1.9.0b0
     pull_policy: if_not_present
     platform: linux/amd64
     environment:
