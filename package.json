@@ -13,7 +13,7 @@
     "format:prettier": "prettier --write --ignore-unknown packages/**/*.{ts,tsx}",
     "build": "nx run-many -t build:component -t build:site && nx run-many -t build:py",
     "ci:setup": ":",
-    "ci:check:js": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
+    "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
     "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
     "ci:build": "nx run-many -t build:component -t build:site && nx run-many -t build:py:ci",
     "docker:build": "docker buildx build --build-arg SECRETFLOW_VERSION=1.9.0b0 --platform linux/arm64 -t secretflow/secretnote:1.9.0b0 -f ./docker/secretflow-secretnote/Dockerfile .",

@@ -24,7 +24,7 @@
     "@alipay/secretnote-sf": "file:../secretnote-sf",
     "antd": "^5.10.1",
     "lucide-react": "^0.284.0",
-    "umi": "^4.0.86"
+    "umi": "^4.3.0"
   },
   "peerDependencies": {
     "react": "^18.3.1",
