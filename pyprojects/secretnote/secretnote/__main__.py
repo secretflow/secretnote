@@ -3,7 +3,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "mode", type=str, help="Mode of SecretNote to start, in [`sf`, `scql`]."
+        "mode", type=str, default='sf', help="Mode of SecretNote to start, in [`sf`, `scql`]. Default: `sf`."
     )
     args, rest_args = parser.parse_known_args()
 
