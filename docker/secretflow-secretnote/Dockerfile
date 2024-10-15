@@ -14,15 +14,15 @@ RUN git init \
 
 # Build the project
 FROM nikolaik/python-nodejs:python3.10-nodejs18 AS build
-ENV CI=true
 USER root
 WORKDIR /repo
 # Prepare building toolchain
+ENV CI=true
 RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g pnpm@9.4.0
 RUN pip install build --break-system-package
 COPY --from=source-tree /repo /repo
-RUN pnpm install --frozen-lockfile
+RUN CI=true pnpm install --frozen-lockfile
 RUN pnpm run ci:build
 RUN apt-get update && apt-get install -y rsync
 RUN rsync -avm --include='pyprojects/**/dist/*.whl' -f 'hide,! */' /repo/./ /dist

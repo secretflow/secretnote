@@ -1,20 +1,14 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
+# See https://circleci.com/docs/configuration-reference
+# See https://circleci.com/docs/using-docker
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
-jobs:
-  devcontainer-publish:
-    docker:
-      - image: cimg/base:stable
-    resource_class: xlarge
+commands:
+  dev-container-publish:
     parameters:
       platform:
         type: string
       tag:
         type: string
-
     steps:
       - checkout
       - setup_remote_docker:
@@ -35,12 +29,39 @@ jobs:
             docker login -u secretflow -p ${DOCKER_DEPLOY_TOKEN}
             docker push ${IMAGE_NAME}
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
+jobs:
+  devcontainer-publish-amd64:
+    docker:
+      - image: cimg/base:current
+    resource_class: xlarge
+    parameters:
+      platform:
+        type: string
+      tag:
+        type: string
+    steps:
+      - dev-container-publish:
+          platform: << parameters.platform >>
+          tag: << parameters.tag >>
+
+  devcontainer-publish-arm64:
+    docker:
+      - image: cimg/base:current
+    resource_class: arm.large
+    parameters:
+      platform:
+        type: string
+      tag:
+        type: string
+    steps:
+      - dev-container-publish:
+          platform: << parameters.platform >>
+          tag: << parameters.tag >>
+
 workflows:
   devcontainer-publish-amd64:
     jobs:
-      - devcontainer-publish:
+      - devcontainer-publish-amd64:
           filters:
             branches:
               only:
@@ -48,16 +69,18 @@ workflows:
           platform: linux/amd64
           matrix:
             parameters:
-              tag: ["1.9.0b0", "1.8.0b0", "1.7.0b0", "1.6.1b0"]
-  
+              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']
+
   devcontainer-publish-arm64:
     jobs:
-      - devcontainer-publish:
+      - devcontainer-publish-arm64:
           filters:
             branches:
               only:
                 - main
+                - update
           platform: linux/arm64
           matrix:
             parameters:
-              tag: ["1.9.0b0", "1.8.0b0", "1.7.0b0", "1.6.1b0"]
+              tag: ['1.9.0b0']
+              #, "1.8.0b0", "1.7.0b0", "1.6.1b0"]
