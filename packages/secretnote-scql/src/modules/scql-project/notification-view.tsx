@@ -62,6 +62,9 @@ export const InvitationNotificationComponent = () => {
         ),
       );
       projectService.refreshInvitations();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (e) {
       genericErrorHandler(e);
     }
