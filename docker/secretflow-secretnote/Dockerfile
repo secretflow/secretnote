@@ -13,7 +13,7 @@ RUN git init \
   && rm -r /repo/docker
 
 # Build the project
-FROM nikolaik/python-nodejs:python3.10-nodejs18 AS build
+FROM nikolaik/python-nodejs:python3.10-nodejs20 AS build
 USER root
 WORKDIR /repo
 # Prepare building toolchain

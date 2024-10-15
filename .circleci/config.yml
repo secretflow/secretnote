@@ -47,7 +47,7 @@ jobs:
   devcontainer-publish-arm64:
     docker:
       - image: cimg/base:current
-    resource_class: arm.large
+    resource_class: arm.xlarge
     parameters:
       platform:
         type: string
