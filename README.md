@@ -91,7 +91,7 @@ rm ~/.jupyter/secretnote*
 
 ### 本地构建 SecretFlow 计算节点镜像
 
-当前，[secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 维护 1.6.1b0 至 1.9.0b0 的镜像，同时支持 amd64 和 arm64 架构。如有定制化的需求，可自行构建计算节点镜像。例如构建 1.9.0b0 (linux/arm64) 镜像的命令如下。
+当前，[secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 维护 1.6.1b0 至 1.9.0b0 的镜像，同时支持 amd64 和 arm64 架构。如有定制化的需求，可自行构建计算节点镜像，例如构建 1.9.0b0 (linux/arm64) 镜像的命令如下。
 
 ```sh
 docker buildx build --build-arg SECRETFLOW_VERSION=1.9.0b0 --platform linux/arm64 -t secretflow/secretnote:1.9.0b0 -f ./docker/secretflow-secretnote/Dockerfile .
