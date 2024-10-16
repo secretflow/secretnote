@@ -53,7 +53,9 @@ class BrokerHandler(APIHandler):
                 model.get("invitation_id", None), model.get("respond", None)
             ),
             "inviteMember": lambda: self.broker_manager.invite_member(
-                model.get("project_id", None), model.get("invitee", None), model.get('method', None)
+                model.get("project_id", None),
+                model.get("invitee", None),
+                model.get("method", None),
             ),
             "listTables": lambda: self.broker_manager.list_tables(
                 model.get("project_id", None), model.get("names", None)

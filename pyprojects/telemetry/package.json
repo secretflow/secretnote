@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build:py": ":",
-    "build:py_": "rye build --out ./dist",
     "publish:py": "python -m hatch publish ./dist",
+    "typecheck:pyright": ":",
     "build": "nx build:py"
   }
 }

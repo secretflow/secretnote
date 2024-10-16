@@ -1,3 +1,4 @@
+/* eslint-disable react/no-is-mounted */
 import type * as G6 from '@antv/g6';
 import type * as graphlib from '@antv/graphlib';
 import Color from 'color';

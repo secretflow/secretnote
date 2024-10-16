@@ -54,7 +54,7 @@ class BrokerManager:
             else:
                 code, message = 500, "No status found in response."
         # Intercept those unsuccessful responses
-        assert code == 0, Exception(f'[{code}] {message}')
+        assert code == 0, Exception(f"[{code}] {message}")
 
         return response
 
@@ -95,7 +95,9 @@ class BrokerManager:
 
         return filtered_invitations
 
-    async def process_invitation(self, invitation_id: str, respond: str) -> Union[str, None]:
+    async def process_invitation(
+        self, invitation_id: str, respond: str
+    ) -> Union[str, None]:
         """Process the received invitation, specify it by invitation_id,
         choose to join the corresponding project or reject it.
         Returns the invitation_id.
@@ -117,15 +119,17 @@ class BrokerManager:
 
     async def invite_member(self, project_id: str, invitee: str, method: str) -> None:
         """Invite another member to join the Project you created"""
-        assert method == 'PUSH', ValueError(f"Method except PUSH is not implemented yet.")
-        
+        assert method == "PUSH", ValueError(
+            f"Method except PUSH is not implemented yet."
+        )
+
         response = await request(
             f"{self.broker}/intra/member/invite",
             "POST",
             body={
                 "project_id": project_id,
                 "invitee": invitee,
-                "method": method, 
+                "method": method,
             },
         )
 

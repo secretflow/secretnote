@@ -58,7 +58,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
         cls.launch_instance(
             [
                 "--ServerApp.ip=*",  # allow all IP addresses
-                "--ServerApp.token=", 
+                "--ServerApp.token=",
                 "--ServerApp.password=",
                 *args,
                 # view config_dev.py / jupyter_server_config.py for more

@@ -54,14 +54,18 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
             args = sys.argv[1:]  # slice out extension config
         else:
             args = argv
-        
-        assert any(list(map(lambda x: x.startswith("--party="), args))), "party is not specified"
-        assert any(list(map(lambda x: x.startswith("--broker="), args))), "broker is not specified"
+
+        assert any(
+            list(map(lambda x: x.startswith("--party="), args))
+        ), "party is not specified"
+        assert any(
+            list(map(lambda x: x.startswith("--broker="), args))
+        ), "broker is not specified"
 
         cls.launch_instance(
             [
                 "--ServerApp.ip=*",  # allow all IP addresses
-                "--ServerApp.token=", 
+                "--ServerApp.token=",
                 "--ServerApp.password=",
                 *args,
                 # view config_dev.py / jupyter_server_config.py for more
