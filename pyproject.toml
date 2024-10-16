@@ -2,9 +2,9 @@
 authors = [{ name = "Tony Wu", email = "tonywu6@protonmail.com" }]
 classifiers = ["Private :: Do Not Upload"]
 dependencies = []
-name = "monorepo"
+name = "secretnote-monorepo"
 readme = "README.md"
-requires-python = ">=3.8, <3.12"
+requires-python = ">=3.10, <3.12"
 version = "0.0.0"
 
 [project.scripts]
@@ -51,15 +51,7 @@ _pb2\\.pyi?
 | secretnote/proto
 """
 line-length = 88
-target-version = ["py38", "py39", "py310"]
-
-[tool.ruff]
-line-length = 88
-select = ["E", "F", "W", "B", "I"]
-src = ["pyprojects/*/src"]
-
-[tool.ruff.extend-per-file-ignores]
-"*.ipynb" = ["E402", "I001"]
+target-version = ["py310", "py311", "py312"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]

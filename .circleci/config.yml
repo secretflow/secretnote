@@ -1,23 +1,14 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
+# See https://circleci.com/docs/configuration-reference
+# See https://circleci.com/docs/using-docker
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
-jobs:
+commands:
   devcontainer-publish:
-    docker:
-      - image: cimg/base:stable
-    resource_class: xlarge
-
     parameters:
-      platform:
+      arch:
         type: string
-        default: linux/amd64
       tag:
         type: string
-        default: latest
-
     steps:
       - checkout
       - setup_remote_docker:
@@ -25,27 +16,111 @@ jobs:
       - run:
           name: Build and publish
           command: |
-            export IMAGE_NAME=secretflow/secretnote:<< parameters.tag >>
+            export IMAGE_NAME=secretflow/secretnote:<< parameters.tag >>-<< parameters.arch >>
 
             docker buildx build \
-              --platform=<< parameters.platform >> \
-              -f docker/app/Dockerfile \
+              --platform linux/<< parameters.arch >> \
+              -f docker/secretflow-secretnote/Dockerfile \
+              --build-arg SECRETFLOW_VERSION=<< parameters.tag >> \
               -t ${IMAGE_NAME} \
               --progress=plain \
               .
 
             docker login -u secretflow -p ${DOCKER_DEPLOY_TOKEN}
             docker push ${IMAGE_NAME}
+            docker logout
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
-workflows:
-  devcontainer-publish-1.9.0b0:
-    jobs:
+  devcontainer-manifest:
+    parameters:
+      tag:
+        type: string
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Create manifest and push to registry
+          command: |
+            export IMAGE_NAME=secretflow/secretnote:<< parameters.tag >>
+
+            docker login -u secretflow -p ${DOCKER_DEPLOY_TOKEN}
+            docker manifest create ${IMAGE_NAME} \
+              ${IMAGE_NAME}-amd64 \
+              ${IMAGE_NAME}-arm64
+            docker manifest push ${IMAGE_NAME}
+            docker logout
+
+jobs:
+  devcontainer-publish-amd64:
+    docker:
+      - image: cimg/base:current
+    resource_class: xlarge
+    parameters:
+      arch:
+        type: string
+      tag:
+        type: string
+    steps:
       - devcontainer-publish:
+          arch: << parameters.arch >>
+          tag: << parameters.tag >>
+
+  devcontainer-publish-arm64:
+    docker:
+      - image: cimg/base:current
+    resource_class: arm.large
+    parameters:
+      arch:
+        type: string
+      tag:
+        type: string
+    steps:
+      - devcontainer-publish:
+          arch: << parameters.arch >>
+          tag: << parameters.tag >>
+
+  devcontainer-manifest:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    parameters:
+      tag:
+        type: string
+    steps:
+      - devcontainer-manifest:
+          tag: << parameters.tag >>
+
+workflows:
+  devcontainer-publish-and-manifest:
+    jobs:
+      # Publish for linux/amd64
+      - devcontainer-publish-amd64:
           filters:
             branches:
               only:
                 - main
-          platform: linux/amd64
-          tag: 1.9.0b0
+          arch: amd64
+          matrix:
+            parameters:
+              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']
+      # Publish for linux/arm64
+      - devcontainer-publish-arm64:
+          filters:
+            branches:
+              only:
+                - main
+          arch: arm64
+          matrix:
+            parameters:
+              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']
+      # Manifest they two and push to registry
+      - devcontainer-manifest:
+          requires:
+            - devcontainer-publish-amd64
+            - devcontainer-publish-arm64
+          filters:
+            branches:
+              only:
+                - main
+          matrix:
+            parameters:
+              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']

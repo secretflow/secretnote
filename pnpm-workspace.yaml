@@ -1,6 +1,4 @@
+# used for pnpm to recognize monorepo packages
 packages:
-  - 'apps/*'
   - 'packages/*'
-  - 'docs'
   - 'pyprojects/*'
-  - 'pyprojects/*/src/*/assets'

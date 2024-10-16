@@ -40,37 +40,29 @@
       "inputs": ["^:default", ":default", ":javascript"],
       "cache": true
     },
-    "typecheck:pyright": {
-      "inputs": ["^:default", ":default", ":python"],
-      "cache": true
-    },
-    "test:vitest": {
-      "inputs": ["^:default", ":default", "{workspaceRoot}/vitest.config.*"],
-      "cache": false
-    },
-    "test:pytest": {
-      "inputs": ["^:default", ":default", ":python"],
-      "cache": false
-    },
     "setup:umi": {
       "inputs": [":default", ":javascript"],
       "outputs": ["{projectRoot}/src/.umi"],
       "cache": true
     },
-    "build:js": {
+    "build:component": {
+      "inputs": [":default", ":javascript"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "build:site": {
       "inputs": [":default", ":javascript"],
       "outputs": [
-        "{projectRoot}/build",
         "{projectRoot}/dist",
         "{projectRoot}/src/.umi",
         "{projectRoot}/src/.umi-production"
       ],
-      "dependsOn": ["^build:js", "^build:py"],
+      "dependsOn": ["build:component"],
       "cache": true
     },
     "build:py": {
       "inputs": [":default", ":python"],
-      "dependsOn": ["^build:js", "^build:py"],
+      "dependsOn": ["build:site"],
       "cache": false
     }
   },

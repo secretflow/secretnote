@@ -1,0 +1,12 @@
+{
+  "name": "telemetry",
+  "private": true,
+  "version": "0.0.8",
+  "type": "module",
+  "scripts": {
+    "build:py": ":",
+    "publish:py": "python -m hatch publish ./dist",
+    "typecheck:pyright": ":",
+    "build": "nx build:py"
+  }
+}
