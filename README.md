@@ -2,7 +2,9 @@
 
 SecretNote 是为 SecretFlow (隐语) 学习者和开发者定制的高级工具套件，可帮助您快速开展隐语实验。它包括 SecretNote SF 和 SecretNote SCQL，均以 Notebook 的形式呈现。前者用于 Python 下的 [SecretFlow](https://www.secretflow.org.cn/zh-CN/docs/secretflow) 运行，支持多节点代码执行和文件管理；后者用于进行 [SCQL](https://www.secretflow.org.cn/zh-CN/docs/scql) 相关实验。
 
-<img src="docs/images/first-view.jpg" alt="first-view" style="zoom:25%;" />
+<p align="center">
+  <img src="docs/images/first-view.jpg" alt="first-view" style="width: 500px;" />
+</p>
 
 \* _SecretNote 的设计是为了学习和原型实验，请勿在生产环境中直接使用。_
 
@@ -20,27 +22,21 @@ SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需
   pip install secretnote
   ```
 
-- 根据需要拉起一定数量的计算节点
+- 根据需要拉起若干个计算节点
 
-  [secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 提供了内置 SecretFlow 的计算节点镜像，且版本号相互对应。可根据需要自行调整监听端口、镜像版本等配置。
-
-  - 使用 Docker 拉起一个计算节点
-
-    ```sh
-    docker run --env=SELF_PARTY=alice --env=ALL_PARTIES=alice,bob -p 8090:8888 -d secretflow/secretnote:<version>
-    ```
-
-  - 使用 Docker Compose 拉起多个计算节点
-
-    ```sh
-    cd docker/secretnote-sf-sim && docker compose up -d
-    ```
-
-- 启动 SecretNote SF，在右上角连接计算节点，即可开始实验
+  [secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 提供了内置 SecretFlow 的、版本号相互对应的计算节点镜像。推荐使用 Docker Compose 拉起计算节点以便相互通信。SecretNote 提供了常用的拉起两个计算节点的 [docker-compose.yml](./docker/secretnote-sf-sim/docker-compose.yml)，可根据需要调整监听端口、镜像版本等配置
 
   ```sh
-  secretnote sf <work_dir>
+  cd docker/secretnote-sf-sim && docker compose up -d
   ```
+
+- 启动 SecretNote SF，在右上角添加计算节点，即可开始实验
+
+  ```sh
+  secretnote <work_dir> # 等价于 secretnote sf <work_dir>
+  ```
+
+  使用上述配置的节点地址为 `127.0.0.1:8090` 和 `127.0.0.1:8092`。在代码中，节点间可通过 service 名相互访问；镜像使用 8888 作为 Notebook 服务端口，6379 作为 Ray 端口，8000 作为 SecretFlow 集群网络端口，8001 作为 SPU 端口
 
 - 如有需要，请查看更完整的具体[示例](docs/SECRETFLOW-INTRO.md)
 
@@ -60,7 +56,7 @@ SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置
   bash setup.sh && docker compose up -d
   ```
 
-  可根据需要调整 SCQL Broker 服务的端口。
+  可根据需要调整 SCQL Broker 服务的端口
 
 - 分别作为 Alice 方和 Bob 方启动 SecretNote，即可开始实验
 
@@ -75,7 +71,7 @@ SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置
 
 ### 配置覆盖
 
-命令行下 SecretNote 可以接受可传递给 Jupyter Notebook 的参数，具体可参考 [开发配置文件](pyprojects/secretnote/secretnote/sf/.jupyter/config_dev.py)。
+命令行下 SecretNote 可以接受可传递给 Jupyter Notebook 的参数，具体可参考 [开发配置文件](pyprojects/secretnote/secretnote/sf/.jupyter/config_dev.py)：
 
 ```sh
 secretnote sf . --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-browser
@@ -83,7 +79,7 @@ secretnote sf . --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-
 
 ### 清理残留的计算节点记录
 
-SecretNote 默认会在 `~/.jupyter` 下存储计算节点的相关信息。如果遇到计算节点状态识别异常，可尝试手工清理。
+SecretNote 默认会在 `~/.jupyter` 下存储计算节点的相关信息。如果遇到计算节点状态识别异常，可尝试手工清理：
 
 ```sh
 rm ~/.jupyter/secretnote*
@@ -91,7 +87,7 @@ rm ~/.jupyter/secretnote*
 
 ### 本地构建 SecretFlow 计算节点镜像
 
-当前，[secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 维护 1.6.1b0 至 1.9.0b0 的镜像，同时支持 amd64 和 arm64 架构。如有定制化的需求，可自行构建计算节点镜像，例如构建 1.9.0b0 (linux/arm64) 镜像的命令如下。
+[secretflow/secretnote](https://hub.docker.com/r/secretflow/secretnote) 目前维护 1.6.1b0 至 1.9.0b0 的镜像，同时支持 amd64 和 arm64 架构。如有定制化的需求，可自行构建计算节点镜像，例如构建 1.9.0b0 (linux/arm64) 镜像的命令如下：
 
 ```sh
 docker buildx build --build-arg SECRETFLOW_VERSION=1.9.0b0 --platform linux/arm64 -t secretflow/secretnote:1.9.0b0 -f ./docker/secretflow-secretnote/Dockerfile .
@@ -118,4 +114,4 @@ NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/sf
 
 ## 问题与反馈
 
-请在 [issues](https://github.com/secretflow/secretnote/issues) 反馈，或点击 [隐语实训平台](https://www.secret-flow.com/welcome) 右上角 “反馈” 按钮加群咨询。
+请在 [Issues](https://github.com/secretflow/secretnote/issues) 反馈，或点击 [隐语实训平台](https://www.secret-flow.com/welcome) 右上角 “反馈” 按钮加群咨询。

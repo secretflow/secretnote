@@ -18,7 +18,7 @@
 
 ## 准备数据
 
-我们需要一个数据集来构建垂直分区的场景。可以点击 [iris_alice.csv](https://github.com/secretflow/secretnote/blob/main/docs/guide/data/iris_alice.csv) 和 [iris_bob.csv](https://github.com/secretflow/secretnote/blob/main/docs/guide/data/iris_bob.csv) 下载示例数据集。下载后分别上传到两个节点上。
+我们需要一个数据集来构建垂直分区的场景。可以点击 [iris_alice.csv](https://github.com/secretflow/secretnote/blob/main/examples/psi/iris_alice.csv) 和 [iris_bob.csv](https://github.com/secretflow/secretnote/blob/main/examples/psi/iris_bob.csv) 下载示例数据集。下载后分别上传到两个节点上。
 
 ![upload_data](https://mdn.alipayobjects.com/huamei_usjdcg/afts/img/A*GR6hSori6ekAAAAAAAAAAAAADo6HAQ/fmt.webp)
 
@@ -30,7 +30,7 @@
 
 ## 运行 Notebook
 
-我们继续点击 [psi.ipynb](https://github.com/secretflow/secretnote/blob/main/docs/guide/data/psi.ipynb) 下载一份示例代码，然后导入到 Notebook 列表中。
+我们继续点击 [psi.ipynb](https://github.com/secretflow/secretnote/blob/main/examples/psi/psi.ipynb) 下载一份示例代码，然后导入到 Notebook 列表中。
 
 SecretNote 的操作方式和 Jupyter Notebook 基本一致，并做了许多针对性的功能优化。比如 Python 单元格可选择多个节点同时执行，然后将执行结果汇总输出，这给隐语多控制器执行的开发模式带来了便利。
 
