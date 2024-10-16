@@ -44,7 +44,6 @@ export async function readFile(
   format: 'text' | 'base64' = 'text',
 ): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
-    console.log('inside readFile util');
     try {
       const reader = new FileReader();
       if (format === 'text') {

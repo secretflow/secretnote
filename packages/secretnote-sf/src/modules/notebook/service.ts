@@ -106,7 +106,7 @@ export class NotebookFileService {
       content: true,
       type: 'notebook',
     });
-    file.path = undrived(file.path); // do not
+    file.path = undrived(file.path); // do not let the downstream see the drive
 
     return file;
   }

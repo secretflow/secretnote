@@ -161,7 +161,7 @@ export class ProjectView extends BaseView implements ModalContribution {
   }
 
   registerModal() {
-    // register the modal to the registry shipped by Mana
+    // register the modal to the registry shipped with Mana
     return ProjectConfigModal;
   }
 }

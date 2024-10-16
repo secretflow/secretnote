@@ -12,7 +12,7 @@
 
 我们需要一个数据集来构建垂直分区的场景。可以点击下面的两个链接下载数据集。
 
-[iris_alice.csv](./data/iris_alice.csv) ； [iris_bob.csv](./data/iris_bob.csv)
+[iris_alice.csv](../examples/psi/iris_alice.csv) ； [iris_bob.csv](../examples/psi/iris_bob.csv)
 
 下载后分别上传到两个节点上。
 
@@ -22,7 +22,7 @@
 
 我们继续点击下面的链接下载一份示例代码，然后导入到 Notebook 列表中。
 
-[psi.ipynb](./data/psi.ipynb)
+[psi.ipynb](../examples/psi/psi.ipynb)
 
 Notebook 的操作方式和 Jupyter Notebook 一致，并且在此基础上做了许多针对性的功能优化，比如 Python 单元格可以选择多个节点同时去执行，然后将执行结果汇总起来输出。这给隐语多控制器执行的开发模式带来了较大的便利。
 

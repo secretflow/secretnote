@@ -4,7 +4,7 @@ SecretNote 是为 SecretFlow (隐语) 学习者和开发者定制的高级工具
 
 <img src="docs/images/first-view.jpg" alt="first-view" style="zoom:25%;" />
 
-\* *SecretNote 的设计是为了学习和原型实验，请勿在生产环境中直接使用。*
+\* _SecretNote 的设计是为了学习和原型实验，请勿在生产环境中直接使用。_
 
 ## 快速开始
 
@@ -59,9 +59,9 @@ SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置
   ```sh
   bash setup.sh && docker compose up -d
   ```
-  
+
   可根据需要调整 SCQL Broker 服务的端口。
-  
+
 - 分别作为 Alice 方和 Bob 方启动 SecretNote，即可开始实验
 
   ```sh
@@ -102,7 +102,7 @@ docker buildx build --build-arg SECRETFLOW_VERSION=1.9.0b0 --platform linux/arm6
 SecretNote 的前端基于 [Mana](https://github.com/difizen/mana) 和 [Libro](https://github.com/difizen/libro) 开发，开源后端基于 [Jupyter Server](https://github.com/jupyter-server/jupyter_server) 开发。
 
 ```sh
-pnpm run bootstrap && pnpm run build # 安装依赖并初次构建
+pnpm bootstrap && pnpm build # 安装依赖并初次构建
 ```
 
 以开发 SecretNote SF 为例，需同时启动组件编译、Playground DevServer、本地 Jupyter Server：

@@ -23,17 +23,6 @@ export const WelcomeComponent = () => {
   const titleMarkdown = _markdowns[0];
   const contentMarkdowns = _markdowns.slice(1);
 
-  // useConfetti({
-  //   zIndex: 2000,
-  //   spread: 500,
-  //   predicate: () => {
-  //     if (instance.currentStep > contentMarkdowns.length - 1 && !instance.finished) {
-  //       return new Promise((resolve) => setTimeout(() => resolve('confetti'), 100));
-  //     }
-  //     return Promise.resolve(undefined);
-  //   },
-  // });
-
   return (
     <div className="secretnote-welcome-page">
       <div
