@@ -226,8 +226,9 @@ export class BrokerService {
    */
   async createProject(
     project: Pick<ProjectDesc, 'project_id' | 'name' | 'description' | 'conf'>,
+    _options?: ErrorHandlerOptions,
   ) {
-    return await requestBroker<{}>(BrokerActions.createProject, project);
+    return await requestBroker<{}>(BrokerActions.createProject, project, _options);
   }
 
   /**

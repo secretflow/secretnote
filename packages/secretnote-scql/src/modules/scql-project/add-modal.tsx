@@ -44,16 +44,19 @@ const ConfigModalComponent = (props: ModalItemProps<any>) => {
   const handleAdd = async () => {
     const values = await form.validateFields();
     try {
-      await service.createProject({
-        ...pick(values, ['name', 'description']),
-        project_id: values.name,
-        conf: {
-          spu_runtime_cfg: {
-            field: values.spu_field,
-            protocol: values.spu_protocol,
+      await service.createProject(
+        {
+          ...pick(values, ['name', 'description']),
+          project_id: values.name,
+          conf: {
+            spu_runtime_cfg: {
+              field: values.spu_field,
+              protocol: values.spu_protocol,
+            },
           },
         },
-      });
+        { passthrough: true },
+      );
       message.success(l10n.t('添加成功'));
       close();
       setTimeout(() => {
