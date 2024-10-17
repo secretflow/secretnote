@@ -1,14 +1,11 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-  // This is not portable at all
   base: '/secretnote/',
   publicPath: '/secretnote/',
   favicons: ['/secretnote/favicon.svg'],
   title: 'SecretNote SF Playground',
-  exportStatic: {},
   routes: [{ path: '/', component: 'index' }],
-  // devtool: 'source-map',
   writeToDisk: true,
   headScripts:
     process.env.NODE_ENV !== 'development'
