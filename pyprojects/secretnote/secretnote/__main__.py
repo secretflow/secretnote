@@ -15,10 +15,12 @@ def main():
 
         SecretNoteApp().launch(rest_args)
     else:
-        # mode == "sf" or anyhow, defaults to sf mode.
+        # use sf mode by default
         from .sf.server.app import SecretNoteApp
 
-        SecretNoteApp().launch(rest_args)
+        SecretNoteApp().launch(
+            rest_args if args.mode == "sf" else [args.mode, *rest_args]
+        )
 
 
 if __name__ == "__main__":

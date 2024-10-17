@@ -1,12 +1,10 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-  // This is not portable at all
   base: '/secretnote/',
   publicPath: '/secretnote/',
   favicons: ['/secretnote/favicon.svg'],
   title: 'SecretNote SCQL Playground',
-  exportStatic: {},
   routes: [
     { path: '/', redirect: '/project' },
     { path: '/project', component: 'project' },

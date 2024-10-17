@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepare": "umi setup",
-    "build:site": "umi build && cp -R ./dist/. ../../pyprojects/secretnote/secretnote/scql/www",
+    "build:site": "umi build && node post-build.js",
     "dev": "umi dev"
   },
   "dependencies": {
