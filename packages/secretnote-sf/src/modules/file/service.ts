@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ContentsManager } from '@difizen/libro-jupyter';
+import { ContentsManager, type IContentsModel } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
@@ -7,10 +7,12 @@ import {
   downloadFileByURL as download,
   genericErrorHandler,
   getRemoteBaseUrl,
+  readFile,
 } from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
 
+export const CHUNK_SIZE = 1024 * 1024; // 1MB
 export const BASE_PATH = '/';
 @singleton()
 export class FileService {
@@ -94,28 +96,50 @@ export class FileService {
   }
 
   /**
-   * Upload file via Jupyter Server. For binary files, use `format='base64'` and base64-encoded `content`.
+   * Upload file via Jupyter Server. All files are treated as binary, upload with base64 format.
+   *
+   * @see https://github.com/jupyterlab/jupyterlab/blob/main/packages/filebrowser/src/model.ts
    */
-  async uploadFile(
-    nodeData: DataNode,
-    name: string,
-    content: string,
-    format: 'text' | 'base64' = 'text',
-  ) {
+  async uploadFile(nodeData: DataNode, name: string, file: File) {
     const serverId = nodeData.key as string;
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
-      const baseUrl = getRemoteBaseUrl(server.id);
-      const path = `${BASE_PATH}/${name}`;
-      await this.contentsManager.save(path, {
-        content,
-        baseUrl,
-        name,
-        path,
-        type: 'file',
-        format,
-        ...(format === 'base64' ? { mimetype: 'application/octet-stream' } : {}),
-      });
+      const baseUrl = getRemoteBaseUrl(server.id),
+        path = `${BASE_PATH}/${name}`,
+        baseOptions = {
+          baseUrl,
+          name,
+          path,
+          type: 'file',
+          format: 'base64',
+          mimetype: 'application/octet-stream',
+        } as const;
+
+      if (file.size < CHUNK_SIZE) {
+        // no need to chunk, just upload the whole file
+        return await this.contentsManager.save(path, {
+          content: await readFile(file, 'base64'),
+          ...baseOptions,
+        });
+      } else {
+        // perform chunked uploading
+        const _upload = async (blob: Blob, chunk: number) =>
+          await this.contentsManager.save(path, {
+            content: await readFile(blob, 'base64'),
+            chunk,
+            ...baseOptions,
+          });
+        let finalModal: IContentsModel | undefined = void 0,
+          currentModel: IContentsModel;
+        for (let start = 0; !finalModal; start += CHUNK_SIZE) {
+          const end = start + CHUNK_SIZE,
+            isLastChunk = end >= file.size,
+            chunk = isLastChunk ? -1 : end / CHUNK_SIZE;
+          currentModel = await _upload(file.slice(start, end), chunk);
+          isLastChunk && (finalModal = currentModel);
+        }
+        return finalModal;
+      }
     }
   }
 

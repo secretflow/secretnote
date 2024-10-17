@@ -39,8 +39,11 @@ const saveAs = (blob: Blob, filename: string) => {
   }
 };
 
+/**
+ * Read file content as text or base64 (without prelude) string.
+ */
 export async function readFile(
-  file: File,
+  file: File | Blob,
   format: 'text' | 'base64' = 'text',
 ): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
@@ -55,7 +58,6 @@ export async function readFile(
         reader.addEventListener('loadend', () => {
           const regex = /data:.*base64,/;
           const base64 = (reader.result as string).replace(regex, '');
-          console.log('>>>', base64);
           resolve((base64 as string) || '');
         });
         reader.readAsDataURL(file);
