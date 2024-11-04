@@ -4,10 +4,11 @@ import { inject, prop, singleton } from '@difizen/mana-app';
 import type { DataNode } from 'antd/es/tree';
 
 import {
-  downloadFileByURL as download,
+  downloadFileByURL,
   genericErrorHandler,
   getRemoteBaseUrl,
   readFile,
+  requestNoUnpack,
 } from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
@@ -143,14 +144,31 @@ export class FileService {
     }
   }
 
+  /**
+   * Download data file in computation node.
+   */
   async downloadFile(nodeData: DataNode) {
     const { serverId, path } = this.parseNodeKey(nodeData.key as string);
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
-      const data = await this.contentsManager.getDownloadUrl(path, {
-        baseUrl: getRemoteBaseUrl(server.id),
+      const baseUrl = getRemoteBaseUrl(server.id);
+      const downloadURL = await this.contentsManager.getDownloadUrl(path, {
+        baseUrl,
       });
-      download(data, nodeData.title as string);
+      // to make it consistent with other API, we manually remove the baseUrl from the result
+      const resp = await requestNoUnpack(
+        downloadURL.replace(new RegExp(`^${baseUrl}/?`), ''),
+        {
+          method: 'GET',
+        },
+        server.id,
+      );
+      if (resp.status === 200) {
+        downloadFileByURL(
+          window.URL.createObjectURL(await resp.blob()),
+          nodeData.title as string,
+        );
+      }
     }
   }
 
