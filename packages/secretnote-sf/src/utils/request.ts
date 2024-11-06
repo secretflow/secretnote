@@ -18,7 +18,13 @@ export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 
-  return origin + '/secretnote/' + targetId + `${endSlash ? '/' : ''}`;
+  return (
+    origin +
+    (origin.endsWith('/') ? '' : '/') +
+    'secretnote/' +
+    targetId +
+    `${endSlash ? '/' : ''}`
+  );
 };
 
 /**
