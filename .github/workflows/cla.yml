@@ -1,3 +1,4 @@
+# This Actions is used to hint users to sign the CLA if they have not done so yet.
 name: 'GitHub: CLA Assistant'
 
 on:

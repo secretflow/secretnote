@@ -1,3 +1,5 @@
+# This Action is used to run ci:check:javascript and ci:check:python to check
+# Python and JavaScript code.
 name: 'Code: CI'
 
 on:
