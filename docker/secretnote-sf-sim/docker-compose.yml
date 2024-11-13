@@ -1,22 +1,22 @@
 services:
   alice:
-    image: secretflow/secretnote:1.9.0b0
+    image: secretflow/secretnote:1.10.0b0
     pull_policy: if_not_present
-    platform: linux/amd64
+    platform: linux/arm64
     environment:
       - SELF_PARTY=alice
     ports:
-      - 8090:8888
+      - 55000:8888
     volumes:
       - ./alice:/home/secretnote/workspace
 
   bob:
-    image: secretflow/secretnote:1.9.0b0
+    image: secretflow/secretnote:1.10.0b0
     pull_policy: if_not_present
-    platform: linux/amd64
+    platform: linux/arm64
     environment:
       - SELF_PARTY=bob
     ports:
-      - 8092:8888
+      - 55111:8888
     volumes:
       - ./bob:/home/secretnote/workspace

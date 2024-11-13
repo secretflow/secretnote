@@ -43,7 +43,7 @@ COPY ./docker/secretflow-secretnote/root/ ./
 RUN curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
 RUN yum install -y nodejs
 RUN npm config set registry https://registry.npmmirror.com
-RUN npm install @difizen/libro-analyzer@0.1.2
+RUN npm install @difizen/pylez@0.1.2
 RUN mkdir workspace
 RUN chown -R secretnote:secretnote /home/secretnote
 USER secretnote

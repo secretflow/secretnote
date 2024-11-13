@@ -28,7 +28,7 @@ export const snippets: ISnippet[] = [
   },
   {
     key: 'cluster_2pc',
-    label: l10n.t('多机集群 3PC'),
+    label: l10n.t('多机集群 2PC'),
     code: endent`
     network_conf = {
       "parties": {

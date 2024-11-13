@@ -10,9 +10,9 @@ c = get_config()
 c.ServerApp.allow_origin = "*"
 c.ServerApp.allow_remote_access = True
 c.ServerApp.disable_check_xsrf = True
-c.ServerApp.token = ""
 c.ServerApp.ip = "*"
 c.ServerApp.root_dir = "/home/secretnote/workspace"
+c.IdentityProvider.token = ""
 
 c.ResourceUseDisplay.track_cpu_percent = True
 
@@ -21,7 +21,7 @@ c.LanguageServerManager.language_servers = {
     "libro-analyzer": {
         "argv": [
             "node",
-            "node_modules/@difizen/libro-analyzer/index.js",
+            "node_modules/@difizen/pylez/index.js",
             "--stdio",
         ],
         "languages": ["python"],

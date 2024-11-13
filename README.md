@@ -114,4 +114,4 @@ NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/sf
 
 ## 问题与反馈
 
-请在 [Issues](https://github.com/secretflow/secretnote/issues) 反馈，或点击 [隐语实训平台](https://www.secret-flow.com/welcome) 右上角 “反馈” 按钮加群咨询。
+请在 [Issues](https://github.com/secretflow/secretnote/issues) 反馈，或访问 [隐语实训平台](https://studio.secretflow.com/) 点击右上角 “反馈” 按钮加群咨询。

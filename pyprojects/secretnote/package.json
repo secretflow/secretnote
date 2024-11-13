@@ -14,6 +14,7 @@
     "publish:py": "python -m hatch publish ./dist"
   },
   "dependencies": {
-    "@difizen/libro-analyzer": "^0.1.0"
+    "@difizen/libro-analyzer": "latest",
+    "@difizen/pylez": "latest"
   }
 }
