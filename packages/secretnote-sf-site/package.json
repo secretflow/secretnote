@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepare": "umi setup",
-    "build:site": "umi build && node post-build.js",
+    "build:site": "umi build && node ../../scripts/post-build-site.js sf",
     "dev": "umi dev"
   },
   "dependencies": {

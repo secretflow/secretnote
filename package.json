@@ -8,7 +8,7 @@
   "scripts": {
     "bootstrap": "pnpm install --frozen-lockfile && rye sync --no-lock",
     "postinstall": "is-ci || husky install",
-    "clean": "git clean -fX .",
+    "clean": "node scripts/clean.js",
     "build": "nx run-many -t build:component -t build:site && nx run-many -t build:py",
     "format:black": "python -m black pyprojects/**/*.py",
     "format:prettier": "prettier --write --ignore-unknown packages/**/*.{ts,tsx}",
