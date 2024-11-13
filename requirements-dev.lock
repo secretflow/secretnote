@@ -11,7 +11,6 @@
 
 -e file:.
 -e file:pyprojects/secretnote
--e file:pyprojects/telemetry
 aiohttp==3.9.3
     # via jupyter-server-proxy
 aiosignal==1.3.1
@@ -35,8 +34,6 @@ arrow==1.3.0
     # via isoduration
 asttokens==2.4.1
     # via stack-data
-astunparse==1.6.3
-    # via secretnote-telemetry
 async-lru==2.0.4
     # via jupyterlab
 async-timeout==4.0.3
@@ -49,9 +46,6 @@ babel==2.14.0
     # via jupyterlab-server
 backcall==0.2.0
     # via ipython
-backoff==2.2.1
-    # via opentelemetry-exporter-otlp-proto-common
-    # via opentelemetry-exporter-otlp-proto-grpc
 banal==1.0.6
     # via dataset
 beautifulsoup4==4.12.3
@@ -76,25 +70,17 @@ click==8.1.7
 comm==0.2.1
     # via ipykernel
     # via ipywidgets
-contourpy==1.1.1
-    # via matplotlib
 coverage==7.4.1
     # via pytest-cov
-cycler==0.12.1
-    # via matplotlib
 datamodel-code-generator==0.25.3
 dataset==1.6.2
     # via secretnote
-    # via secretnote-telemetry
 debugpy==1.8.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
-deprecated==1.2.14
-    # via opentelemetry-api
-    # via opentelemetry-exporter-otlp-proto-grpc
 distlib==0.3.8
     # via virtualenv
 dnspython==2.5.0
@@ -114,26 +100,14 @@ fastapi==0.99.1
 fastjsonschema==2.19.1
     # via nbformat
 filelock==3.13.1
-    # via huggingface-hub
-    # via torch
-    # via transformers
     # via virtualenv
-fonttools==4.47.2
-    # via matplotlib
 fqdn==1.5.1
     # via jsonschema
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
-fsspec==2023.12.2
-    # via huggingface-hub
-    # via torch
 genson==1.2.2
     # via datamodel-code-generator
-googleapis-common-protos==1.62.0
-    # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.56.2
-    # via opentelemetry-exporter-otlp-proto-grpc
 h11==0.14.0
     # via httpcore
     # via uvicorn
@@ -144,9 +118,6 @@ httpcore==1.0.2
     # via httpx
 httpx==0.26.0
     # via hatch
-huggingface-hub==0.20.3
-    # via tokenizers
-    # via transformers
 hyperlink==21.0.0
     # via hatch
 idna==3.6
@@ -159,10 +130,6 @@ idna==3.6
     # via yarl
 importlib-metadata==6.11.0
     # via keyring
-    # via opentelemetry-api
-importlib-resources==6.1.1
-    # via secretnote
-    # via secretnote-telemetry
 inflect==5.6.2
     # via datamodel-code-generator
 iniconfig==2.0.0
@@ -170,14 +137,12 @@ iniconfig==2.0.0
 ipykernel==6.29.0
     # via jupyterlab
     # via secretnote
-    # via secretnote-telemetry
 ipython==8.12.3
     # via black
     # via ipykernel
     # via ipywidgets
 ipywidgets==8.1.1
     # via secretnote
-    # via secretnote-telemetry
 isoduration==20.11.0
     # via jsonschema
 isort==5.13.2
@@ -193,7 +158,6 @@ jinja2==3.1.3
     # via jupyterlab
     # via jupyterlab-server
     # via nbconvert
-    # via torch
 json5==0.9.14
     # via jupyterlab-server
 jsonpointer==2.4
@@ -221,10 +185,8 @@ jupyter-events==0.9.0
 jupyter-lsp==2.2.0
     # via jupyterlab
     # via secretnote
-    # via secretnote-telemetry
 jupyter-resource-usage==1.0.1
     # via secretnote
-    # via secretnote-telemetry
 jupyter-server==2.12.5
     # via jupyter-lsp
     # via jupyter-resource-usage
@@ -233,10 +195,8 @@ jupyter-server==2.12.5
     # via jupyterlab-server
     # via notebook-shim
     # via secretnote
-    # via secretnote-telemetry
 jupyter-server-proxy==4.1.0
     # via secretnote
-    # via secretnote-telemetry
 jupyter-server-terminals==0.5.2
     # via jupyter-server
 jupyterlab==4.0.12
@@ -248,13 +208,7 @@ jupyterlab-widgets==3.0.9
     # via ipywidgets
 keyring==24.3.0
     # via hatch
-kiwisolver==1.4.5
-    # via matplotlib
-lightning-utilities==0.10.1
-    # via torchmetrics
 logging-tree==1.9
-loguru==0.7.2
-    # via secretnote-telemetry
 mako==1.3.2
     # via alembic
 markdown-it-py==3.0.0
@@ -263,7 +217,6 @@ markupsafe==2.1.4
     # via jinja2
     # via mako
     # via nbconvert
-matplotlib==3.7.4
 matplotlib-inline==0.1.6
     # via ipykernel
     # via ipython
@@ -273,9 +226,6 @@ mistune==3.0.2
     # via nbconvert
 more-itertools==10.2.0
     # via jaraco-classes
-    # via secretnote-telemetry
-mpmath==1.3.0
-    # via sympy
 multidict==6.0.5
     # via aiohttp
     # via yarl
@@ -293,38 +243,8 @@ nbformat==5.9.2
     # via nbconvert
 nest-asyncio==1.6.0
     # via ipykernel
-networkx==3.1
-    # via secretnote-telemetry
-    # via torch
 notebook-shim==0.2.3
     # via jupyterlab
-numpy==1.23.5
-    # via contourpy
-    # via matplotlib
-    # via pandas
-    # via patsy
-    # via scipy
-    # via statsmodels
-    # via torchmetrics
-    # via torchvision
-    # via transformers
-opentelemetry-api==1.22.0
-    # via opentelemetry-exporter-otlp-proto-grpc
-    # via opentelemetry-sdk
-    # via secretnote-telemetry
-opentelemetry-exporter-otlp-proto-common==1.22.0
-    # via opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-exporter-otlp-proto-grpc==1.22.0
-opentelemetry-proto==1.22.0
-    # via opentelemetry-exporter-otlp-proto-common
-    # via opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-sdk==1.22.0
-    # via opentelemetry-exporter-otlp-proto-grpc
-    # via secretnote-telemetry
-opentelemetry-semantic-conventions==0.43b0
-    # via opentelemetry-sdk
-orjson==3.9.12
-    # via secretnote-telemetry
 overrides==7.7.0
     # via jupyter-server
 packaging==23.2
@@ -332,21 +252,12 @@ packaging==23.2
     # via datamodel-code-generator
     # via hatch
     # via hatchling
-    # via huggingface-hub
     # via ipykernel
     # via jupyter-server
     # via jupyterlab
     # via jupyterlab-server
-    # via lightning-utilities
-    # via matplotlib
     # via nbconvert
     # via pytest
-    # via secretnote-telemetry
-    # via statsmodels
-    # via torchmetrics
-    # via transformers
-pandas==1.5.3
-    # via statsmodels
 pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.3
@@ -354,16 +265,11 @@ parso==0.8.3
 pathspec==0.12.1
     # via black
     # via hatchling
-patsy==0.5.6
-    # via statsmodels
 pexpect==4.9.0
     # via hatch
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==10.2.0
-    # via matplotlib
-    # via torchvision
 pip==23.3.2
 platformdirs==3.11.0
     # via black
@@ -379,9 +285,6 @@ prometheus-client==0.19.0
     # via jupyter-server
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==3.19.6
-    # via googleapis-common-protos
-    # via opentelemetry-proto
 psutil==5.9.8
     # via ipykernel
     # via jupyter-resource-usage
@@ -395,35 +298,25 @@ pycparser==2.21
 pydantic==1.10.14
     # via datamodel-code-generator
     # via fastapi
-    # via secretnote-telemetry
 pygments==2.17.2
     # via ipython
     # via nbconvert
     # via rich
-pyparsing==3.1.1
-    # via matplotlib
 pytest==8.0.0
     # via pytest-cov
 pytest-cov==4.1.0
 python-dateutil==2.8.2
     # via arrow
     # via jupyter-client
-    # via matplotlib
-    # via pandas
 python-json-logger==2.0.7
     # via jupyter-events
 python-lsp-jsonrpc==1.1.2
     # via python-lsp-server
 python-lsp-server==1.8.2
     # via secretnote
-    # via secretnote-telemetry
-pytz==2024.1
-    # via pandas
 pyyaml==6.0.1
     # via datamodel-code-generator
-    # via huggingface-hub
     # via jupyter-events
-    # via transformers
 pyzmq==25.1.2
     # via ipykernel
     # via jupyter-client
@@ -433,13 +326,8 @@ referencing==0.33.0
     # via jsonschema
     # via jsonschema-specifications
     # via jupyter-events
-regex==2023.12.25
-    # via transformers
 requests==2.31.0
-    # via huggingface-hub
     # via jupyterlab-server
-    # via torchvision
-    # via transformers
 rfc3339-validator==0.1.4
     # via jsonschema
     # via jupyter-events
@@ -448,27 +336,19 @@ rfc3986-validator==0.1.1
     # via jupyter-events
 rich==13.7.0
     # via hatch
-    # via secretnote-telemetry
 rpds-py==0.17.1
     # via jsonschema
     # via referencing
-safetensors==0.4.2
-    # via transformers
-scipy==1.10.1
-    # via statsmodels
 send2trash==1.8.2
     # via jupyter-server
 setuptools==69.0.3
-    # via lightning-utilities
 shellingham==1.5.4
     # via hatch
 simpervisor==1.0.0
     # via jupyter-server-proxy
 six==1.16.0
     # via asttokens
-    # via astunparse
     # via bleach
-    # via patsy
     # via python-dateutil
     # via rfc3339-validator
 snakeviz==2.2.0
@@ -482,12 +362,8 @@ sqlalchemy==1.4.51
     # via dataset
 stack-data==0.6.3
     # via ipython
-    # via secretnote-telemetry
 starlette==0.27.0
     # via fastapi
-statsmodels==0.14.1
-sympy==1.12
-    # via torch
 terminado==0.18.0
     # via jupyter-server
     # via jupyter-server-terminals
@@ -495,8 +371,6 @@ tinycss2==1.2.1
     # via nbconvert
 tokenize-rt==5.2.0
     # via black
-tokenizers==0.15.1
-    # via transformers
 toml==0.10.2
     # via datamodel-code-generator
 tomli==2.0.1
@@ -510,11 +384,6 @@ tomli-w==1.0.0
     # via hatch
 tomlkit==0.12.3
     # via hatch
-torch==2.2.0
-    # via torchmetrics
-    # via torchvision
-torchmetrics==1.3.0.post0
-torchvision==0.17.0
 tornado==6.4
     # via ipykernel
     # via jupyter-client
@@ -522,10 +391,6 @@ tornado==6.4
     # via jupyterlab
     # via snakeviz
     # via terminado
-tqdm==4.66.1
-    # via huggingface-hub
-    # via secretnote-telemetry
-    # via transformers
 traitlets==5.14.1
     # via comm
     # via ipykernel
@@ -540,7 +405,6 @@ traitlets==5.14.1
     # via nbclient
     # via nbconvert
     # via nbformat
-transformers==4.37.2
 trove-classifiers==2024.1.31
     # via hatchling
 types-python-dateutil==2.8.19.20240106
@@ -551,13 +415,8 @@ typing-extensions==4.9.0
     # via async-lru
     # via black
     # via fastapi
-    # via huggingface-hub
-    # via lightning-utilities
     # via mypy
-    # via opentelemetry-sdk
     # via pydantic
-    # via secretnote-telemetry
-    # via torch
     # via uvicorn
 ujson==5.9.0
     # via python-lsp-jsonrpc
@@ -580,12 +439,8 @@ webencodings==0.5.1
     # via tinycss2
 websocket-client==1.7.0
     # via jupyter-server
-wheel==0.42.0
-    # via astunparse
 widgetsnbextension==4.0.9
     # via ipywidgets
-wrapt==1.16.0
-    # via deprecated
 yarl==1.9.4
     # via aiohttp
 zipp==3.17.0
