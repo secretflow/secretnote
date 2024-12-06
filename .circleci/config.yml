@@ -101,7 +101,7 @@ workflows:
           arch: amd64
           matrix:
             parameters:
-              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']
+              tag: ['1.10.0b0', '1.9.0b0', '1.8.0b0', '1.7.0b0']
       # Publish for linux/arm64
       - devcontainer-publish-arm64:
           filters:
@@ -111,7 +111,7 @@ workflows:
           arch: arm64
           matrix:
             parameters:
-              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']
+              tag: ['1.10.0b0', '1.9.0b0', '1.8.0b0', '1.7.0b0']
       # Manifest they two and push to registry
       - devcontainer-manifest:
           requires:
@@ -123,4 +123,4 @@ workflows:
                 - main
           matrix:
             parameters:
-              tag: ['1.9.0b0', '1.8.0b0', '1.7.0b0', '1.6.1b0']
+              tag: ['1.10.0b0', '1.9.0b0', '1.8.0b0', '1.7.0b0']
