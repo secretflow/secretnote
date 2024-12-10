@@ -27,7 +27,7 @@ c.ResourceUseDisplay.track_cpu_percent = True
 
 c.LanguageServerManager.autodetect = False
 pylez_entry = path.abspath(
-    path.join(dirname, "../../../node_modules/@difizen/libro-analyzer/index.js")
+    path.join(dirname, "../../../node_modules/@difizen/pylez/index.js")
 )
 if not path.exists(pylez_entry):
     logging.warning(

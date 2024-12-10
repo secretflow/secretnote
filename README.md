@@ -106,7 +106,7 @@ pnpm bootstrap && pnpm build # 安装依赖并初次构建
 ```sh
 pnpm run dev # 在 packages/secretnote-sf 下监视组件修改
 pnpm run dev # 在 packages/secretnote-sf-site 下启动 DevServer
-NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/sf/.jupyter/config_dev.py --no-browser
+NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-browser
 # 在 pyprojects 下启动 Jupyter Server
 ```
 

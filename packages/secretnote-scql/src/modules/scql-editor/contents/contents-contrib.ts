@@ -12,8 +12,8 @@ export class SQLContentContribution implements ContentContribution {
   };
   async loadContent(options: NotebookOption, model: NotebookModel) {
     const secretNoteModel = model as SecretNoteModel;
-    const fireUri = new URI(options.resource);
-    const filePath_ = fireUri.path.toString();
+    const fileUri = new URI(options.resource);
+    const filePath_ = fileUri.path.toString();
     const filePath = drived(filePath_);
 
     const currentFileContents = await secretNoteModel.contentsManager.get(filePath);
