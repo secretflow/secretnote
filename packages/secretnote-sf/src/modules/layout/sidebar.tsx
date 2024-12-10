@@ -15,7 +15,7 @@ import {
   ViewInstance,
   ViewManager,
 } from '@difizen/mana-app';
-import { Collapse, Space, Tooltip, Typography } from 'antd';
+import { Collapse, type CollapseProps, Space, Tooltip, Typography } from 'antd';
 import { InfoIcon } from 'lucide-react';
 import React from 'react';
 
@@ -83,7 +83,7 @@ export const SideBar: React.FC = () => {
   providers.sort((a, b) => a.order - b.order);
   const defaultActiveKey = providers.filter((p) => !!p.defaultOpen).map((p) => p.key);
 
-  const items = providers
+  const items: CollapseProps['items'] = providers
     .sort((a, b) => a.order - b.order)
     .map((item) => ({
       key: item.key,

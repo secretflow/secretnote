@@ -18,6 +18,7 @@ const SecreteNoteLayout: React.FC = () => {
       <SplitPanel id="split-panel" direction="left-to-right">
         <SplitPanel.Pane
           id="split-panel-left"
+          className="secretnote-split-panel-left"
           defaultSize={260}
           minSize={160}
           maxSize={400}
