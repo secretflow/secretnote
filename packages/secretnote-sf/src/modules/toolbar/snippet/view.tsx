@@ -17,6 +17,15 @@ export interface ISnippet {
 }
 export const snippets: ISnippet[] = [
   {
+    key: 'get_self_party',
+    label: l10n.t('获取本方节点名'),
+    code: endent`
+    import os
+    # 可根据此填写相关函数中的 party 参数，避免重复两个相似的 Cell
+    self_party = os.getenv("SELF_PARTY")
+    `,
+  },
+  {
     key: 'sim_2pc',
     label: l10n.t('单机仿真 2PC'),
     code: endent`sf.init(parties=["alice", "bob"], address="local")`,
