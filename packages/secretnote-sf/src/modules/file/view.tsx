@@ -4,6 +4,7 @@ import {
   BaseView,
   inject,
   singleton,
+  Slot,
   useInject,
   view,
   ViewInstance,
@@ -18,6 +19,7 @@ import {
   Download,
   File,
   FileText,
+  Fullscreen,
   Link,
   ScrollText,
   Table,
@@ -32,6 +34,7 @@ import { SideBarContribution } from '@/modules/layout';
 import { genericErrorHandler, readFile } from '@/utils';
 import './index.less';
 import { FileService } from './service';
+import { FilePreviewComponent, FilePreviewService } from './preview';
 
 const { DirectoryTree } = Tree;
 
@@ -44,7 +47,7 @@ const IconMap: Record<string, React.ReactElement> = {
 
 export const FileComponent = () => {
   const instance = useInject<FileView>(ViewInstance);
-  const fileService = instance.fileService;
+  const { fileService, filePreviewService } = instance;
   const [isUploading, setIsUploading] = useState(false);
 
   const onMenuClick = (key: string, node: DataNode) => {
@@ -76,7 +79,8 @@ export const FileComponent = () => {
         fileService.downloadFile(node);
         break;
       case 'preview':
-        fileService.viewFile(node);
+        const { serverId, path } = FileService.parseNodeKey(node.key as string);
+        filePreviewService.preview(serverId, path);
         break;
       default:
         break;
@@ -152,7 +156,7 @@ export const FileComponent = () => {
       },
     ];
     const dataMenuItems: Menu[] = [
-      { key: 'preview', label: l10n.t('预览'), icon: <Link size={12} /> },
+      { key: 'preview', label: l10n.t('预览'), icon: <Fullscreen size={12} /> },
       {
         key: 'copy',
         label: l10n.t('复制路径到剪切板'),
@@ -201,17 +205,20 @@ export const FileComponent = () => {
   };
 
   return (
-    <DirectoryTree
-      blockNode
-      onSelect={() => {
-        // do nothing
-      }}
-      treeData={fileService.fileTree}
-      className="secretnote-file-tree"
-      switcherIcon={<ChevronDown size={12} />}
-      icon={null}
-      titleRender={titleRender}
-    />
+    <>
+      <DirectoryTree
+        blockNode
+        onSelect={() => {
+          // do nothing
+        }}
+        treeData={fileService.fileTree}
+        className="secretnote-file-tree"
+        switcherIcon={<ChevronDown size={12} />}
+        icon={null}
+        titleRender={titleRender}
+      />
+      <FilePreviewComponent />
+    </>
   );
 };
 
@@ -220,6 +227,7 @@ export const fileViewKey = 'file';
 @view('secretnote-file-view')
 export class FileView extends BaseView implements SideBarContribution {
   readonly fileService: FileService;
+  readonly filePreviewService: FilePreviewService;
 
   key = fileViewKey;
   label = l10n.t('文件');
@@ -227,9 +235,13 @@ export class FileView extends BaseView implements SideBarContribution {
   defaultOpen = true;
   view = FileComponent;
 
-  constructor(@inject(FileService) fileService: FileService) {
+  constructor(
+    @inject(FileService) fileService: FileService,
+    @inject(FilePreviewService) filePreviewService: FilePreviewService,
+  ) {
     super();
     this.fileService = fileService;
+    this.filePreviewService = filePreviewService;
     this.fileService.getFileTree();
   }
 }

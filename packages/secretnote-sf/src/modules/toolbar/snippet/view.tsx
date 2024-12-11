@@ -1,7 +1,7 @@
 // Snippet component.
 
 import { l10n } from '@difizen/mana-l10n';
-import { Collapse, Drawer, Flex, message, Table, Tooltip } from 'antd';
+import { Collapse, Drawer, Flex, message, Tooltip } from 'antd';
 import { ArrowUpSquareIcon, CodeIcon } from 'lucide-react';
 import { useState } from 'react';
 import endent from 'endent';

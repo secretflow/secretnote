@@ -1,4 +1,8 @@
-import { ContentsManager, type IContentsModel } from '@difizen/libro-jupyter';
+import {
+  ContentsFileFormat,
+  ContentsManager,
+  type IContentsModel,
+} from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import type { TreeDataNode as DataNode } from 'antd';
 
@@ -12,6 +16,7 @@ import {
 } from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
+import { FilePreviewService } from './preview';
 
 export const CHUNK_SIZE = 1024 * 1024; // 1MB
 export const BASE_PATH = '/';
@@ -149,7 +154,7 @@ export class FileService {
    * Download data file in computation node.
    */
   async downloadFile(nodeData: DataNode) {
-    const { serverId, path } = this.parseNodeKey(nodeData.key as string);
+    const { serverId, path } = FileService.parseNodeKey(nodeData.key as string);
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const baseUrl = getRemoteBaseUrl(server.id);
@@ -177,7 +182,7 @@ export class FileService {
     if (!nodeData.isLeaf) {
       return;
     }
-    const { serverId, path } = this.parseNodeKey(nodeData.key as string);
+    const { serverId, path } = FileService.parseNodeKey(nodeData.key as string);
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       await this.contentsManager.delete(path, {
@@ -187,35 +192,32 @@ export class FileService {
     }
   }
 
-  async getFileContent(serverId: string, path: string) {
+  async getFileContent(serverId: string, path: string, format?: ContentsFileFormat) {
     const decodedPath = decodeURIComponent(path);
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.get(decodedPath, {
         baseUrl: getRemoteBaseUrl(server.id),
         content: true,
+        format,
       });
       return data;
     }
   }
 
-  viewFile(nodeData: DataNode) {
-    const { serverId, path } = this.parseNodeKey(nodeData.key as string);
-    const encodedPath = encodeURIComponent(path);
-    // TODO
-    window.open(
-      `/secretnote/preview?serverId=${serverId}&path=${encodedPath}`,
-      '_blank',
-    );
-  }
+  // viewFile(nodeData: DataNode) {
+  //   const { serverId, path } =FileService.parseNodeKey(nodeData.key as string);
+  //   this.filePreviewService.read(path, serverId);
+  //   this.filePreviewService.show();
+  // }
 
   async copyPath(nodeData: DataNode) {
-    const { path } = this.parseNodeKey(nodeData.key as string);
+    const { path } = FileService.parseNodeKey(nodeData.key as string);
     return await copyToClipboard(`/home/secretnote/workspace/${path}`);
   }
 
   getFileExt(nodeData: DataNode) {
-    const { path } = this.parseNodeKey(nodeData.key as string);
+    const { path } = FileService.parseNodeKey(nodeData.key as string);
     return this.getFileExtByPath(path);
   }
 
@@ -227,7 +229,7 @@ export class FileService {
     return `${serverId}|${path}`;
   }
 
-  private parseNodeKey(dataKey: string) {
+  static parseNodeKey(dataKey: string) {
     const [serverId, path] = dataKey.split('|');
     return { serverId, path };
   }

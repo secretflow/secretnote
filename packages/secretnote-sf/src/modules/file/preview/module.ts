@@ -1,5 +1,9 @@
 // File preview module for SecretNote.
-import { ManaModule } from '@difizen/mana-app';
+import {
+  createSlotPreference,
+  createViewPreference,
+  ManaModule,
+} from '@difizen/mana-app';
 
 import { FilePreviewService } from './service';
 

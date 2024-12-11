@@ -16,6 +16,7 @@ import { MetricsModule } from '@/modules/metrics';
 import { SnippetModule } from '@/modules/toolbar/snippet';
 import { localStorageService } from './modules/storage/local-storage-service';
 import './override.less';
+import { FilePreviewModule } from './modules/file/preview';
 
 export interface ISecretNoteAppProps {
   backendURL?: string; // backend URL before `/secretnote/*`
@@ -44,6 +45,7 @@ const App = (props: ISecretNoteAppProps): JSX.Element => {
         // TODO these two modules requires some updates
         // ComponentCellModule,
         SnippetModule,
+        FilePreviewModule,
       ]}
       onReady={() => {
         // do some initialization
