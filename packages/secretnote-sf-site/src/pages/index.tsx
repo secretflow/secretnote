@@ -1,4 +1,5 @@
-import SecretNoteSF from '@alipay/secretnote-sf';
+// import SecretNoteSF from '@alipay/secretnote-sf';
+import SecretNoteSF from '../../../secretnote-sf'; // use local version if you need HMR
 import './index.less';
 
 export default function () {

@@ -37,10 +37,11 @@ export function mdToHTML(
   if (options?.openInNewTab) {
     const defaultRender =
       md.renderer.rules.link_open ||
+      // @ts-ignore
       function (tokens, idx, options, env, self) {
         return self.renderToken(tokens, idx, options);
       };
-    // let the user open links in a new tab
+    // @ts-ignore
     md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
       tokens[idx].attrSet('target', '_blank');
       return defaultRender(tokens, idx, options, env, self);
@@ -51,10 +52,17 @@ export function mdToHTML(
 }
 
 /**
- * Convert a markdown string to HTML segments separated by '---'.
+ * Convert a markdown string to HTML segments.
  */
-export function mdToHTMLSegments(mdstr: string) {
-  const parts = mdstr.split('---');
+export function mdToHTMLSegments(mdstr: string, sep = '---') {
+  const parts = mdstr.split(sep);
 
   return parts.map((v) => mdToHTML(v, { openInNewTab: true }));
+}
+
+export async function copyToClipboard(text: string) {
+  if (!navigator.clipboard) {
+    return Promise.reject();
+  }
+  return await navigator.clipboard.writeText(text);
 }

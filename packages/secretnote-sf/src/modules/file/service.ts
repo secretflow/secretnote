@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentsManager, type IContentsModel } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
-import type { DataNode } from 'antd/es/tree';
+import type { TreeDataNode as DataNode } from 'antd';
 
 import {
+  copyToClipboard,
   downloadFileByURL,
   genericErrorHandler,
   getRemoteBaseUrl,
@@ -97,7 +97,8 @@ export class FileService {
   }
 
   /**
-   * Upload file via Jupyter Server. All files are treated as binary, upload with base64 format.
+   * Upload file via Jupyter Server. All files are treated as binary, uploaded with base64 format,
+   * and chunked if possible.
    *
    * @see https://github.com/jupyterlab/jupyterlab/blob/main/packages/filebrowser/src/model.ts
    */
@@ -201,26 +202,25 @@ export class FileService {
   viewFile(nodeData: DataNode) {
     const { serverId, path } = this.parseNodeKey(nodeData.key as string);
     const encodedPath = encodeURIComponent(path);
+    // TODO
     window.open(
       `/secretnote/preview?serverId=${serverId}&path=${encodedPath}`,
       '_blank',
     );
   }
 
-  copyPath(nodeData: DataNode) {
+  async copyPath(nodeData: DataNode) {
     const { path } = this.parseNodeKey(nodeData.key as string);
-    navigator.clipboard.writeText(`/home/secretnote/workspace/${path}`);
+    return await copyToClipboard(`/home/secretnote/workspace/${path}`);
   }
 
   getFileExt(nodeData: DataNode) {
     const { path } = this.parseNodeKey(nodeData.key as string);
-    const ext = this.getFileExtByPath(path);
-    return ext;
+    return this.getFileExtByPath(path);
   }
 
   getFileExtByPath(path: string) {
-    const ext = path.split('.').pop();
-    return ext;
+    return path.split('.').pop();
   }
 
   private formatNodeKey(serverId: string, path: string) {

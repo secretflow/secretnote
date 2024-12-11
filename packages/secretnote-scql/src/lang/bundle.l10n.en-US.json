@@ -267,7 +267,6 @@
   "文件 {name} 已经存在，是否覆盖？": "The file {name} is existed. Do you want to overwrite it?",
   "上传到文件夹": "Upload to folder",
   "查看": "View",
-  "复制路径到剪切板": "Copy path to clipboard",
   "下载": "Download",
   "下面是将要执行该代码的节点列表": "Here are the nodes who will execute the code",
   "没有可用的 Kernel 连接": "No available kernel connection.",

@@ -18,6 +18,7 @@ import {
   Download,
   File,
   FileText,
+  Link,
   ScrollText,
   Table,
   Trash,
@@ -49,8 +50,10 @@ export const FileComponent = () => {
   const onMenuClick = (key: string, node: DataNode) => {
     switch (key) {
       case 'copy':
-        fileService.copyPath(node);
-        message.success(l10n.t('路径已经复制到剪切板'));
+        fileService
+          .copyPath(node)
+          .then(() => message.success(l10n.t('路径已经复制到剪切板')))
+          .catch(() => message.error(l10n.t('复制失败')));
         break;
       case 'delete':
         Modal.confirm({
@@ -72,7 +75,7 @@ export const FileComponent = () => {
       case 'download':
         fileService.downloadFile(node);
         break;
-      case 'view':
+      case 'preview':
         fileService.viewFile(node);
         break;
       default:
@@ -149,7 +152,7 @@ export const FileComponent = () => {
       },
     ];
     const dataMenuItems: Menu[] = [
-      // { key: 'view', label: l10n.t('查看'), icon: <Link size={12} /> },
+      { key: 'preview', label: l10n.t('预览'), icon: <Link size={12} /> },
       {
         key: 'copy',
         label: l10n.t('复制路径到剪切板'),
@@ -177,7 +180,7 @@ export const FileComponent = () => {
               <>
                 <Space direction="horizontal" size="small">
                   <Spin size="small" />
-                  {l10n.t('正忙...')}
+                  {l10n.t('正忙…')}
                 </Space>
               </>
             ) : (

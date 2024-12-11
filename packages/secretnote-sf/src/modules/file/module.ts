@@ -8,10 +8,8 @@ import { PreviewLayoutArea } from '@/modules/layout';
 import { SecretNoteServerModule } from '@/modules/server';
 
 import { ExtraView } from './extra-view';
-import { FilePreviewView } from './preview-view';
+import { FilePreviewView } from './preview/view';
 import { CsvPreview } from './preview/csv-preview-contrib';
-import { JsonlPreview } from './preview/jsonl-preview-contrib';
-import { LogPreview } from './preview/log-preview-contrib';
 import { FilePreviewContribution } from './protocol';
 import { FileService } from './service';
 import { FileView, fileViewKey } from './view';
@@ -38,8 +36,6 @@ export const FilePreviewModule = ManaModule.create()
     FileService,
     FilePreviewView,
     CsvPreview,
-    LogPreview,
-    JsonlPreview,
     createViewPreference({
       slot: PreviewLayoutArea.main,
       view: FilePreviewView,

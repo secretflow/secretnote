@@ -20,7 +20,6 @@ import { InfoIcon } from 'lucide-react';
 import React from 'react';
 
 import LibroJupyterPkgJSON from '@difizen/libro-jupyter/package.json';
-import ManaAppPkgJSON from '@difizen/mana-app/package.json';
 import SecretNotePkgJSON from '../../../package.json';
 
 import { l10n } from '@difizen/mana-l10n';
@@ -34,16 +33,19 @@ const AboutBarComponent = () => {
   const fmtPackageVersions = instance.fmtPackageVersions;
 
   return (
-    <Space direction="horizontal" align="center" size="large" className="about-bar">
+    <Space direction="horizontal" align="center" className="about-bar">
       <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
         SecretFlow
       </Typography.Link>
       <Typography.Link href="https://github.com/secretflow/secretnote" target="_blank">
         SecretNote
       </Typography.Link>
+      <Typography.Link href="https://studio.secretflow.com" target="_blank">
+        隐语实训平台
+      </Typography.Link>
       <div className="icon-container">
         <Tooltip title={fmtPackageVersions}>
-          <InfoIcon size={16} />
+          <InfoIcon size={14} />
         </Tooltip>
       </div>
     </Space>
@@ -61,7 +63,6 @@ export class AboutBarView extends BaseView {
   packageVersions = {
     'secretnote-sf': SecretNotePkgJSON.version,
     'libro-jupyter': LibroJupyterPkgJSON.version,
-    'mana-app': ManaAppPkgJSON.version,
   } as const;
   fmtPackageVersions: string;
 
