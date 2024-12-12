@@ -24,7 +24,7 @@ export class FileService {
   protected readonly contentsManager: ContentsManager;
   protected readonly serverManager: SecretNoteServerManager;
 
-  @prop() fileTree: TreeDataNode[] = [];
+  @prop() fileTree: TreeDataNode[] | null = null;
 
   constructor(
     @inject(ContentsManager) contentsManager: ContentsManager,

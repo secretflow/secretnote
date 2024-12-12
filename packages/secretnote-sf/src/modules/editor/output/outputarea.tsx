@@ -138,12 +138,12 @@ export class SecretNoteOutputArea extends LibroOutputArea {
    * Flush all kernel outputs to the output area.
    */
   async flushOutputs() {
-    const kernelCount = Object.keys(this.kernelOutputs).length;
-    let outputs = Object.values(this.kernelOutputs).flat();
-    if (kernelCount < 2) {
-      // remove the leading output title if there is only one kernel
-      outputs = outputs.filter((output) => !output.isLeading);
-    }
+    const outputs = Object.values(this.kernelOutputs).flat();
+    // const kernelCount = Object.keys(this.kernelOutputs).length;
+    // if (kernelCount < 2) {
+    //   // remove the leading output title if there is only one kernel
+    //   outputs = outputs.filter((output) => !output.isLeading);
+    // }
     // dispose all previous outputs
     this.outputs.forEach((output) => output.dispose());
     // create new outputs

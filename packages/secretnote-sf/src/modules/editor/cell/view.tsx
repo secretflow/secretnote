@@ -32,7 +32,6 @@ import { Ribbon } from '@/components/ribbon';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import { compareDateString } from '@/utils';
-
 import type { SecretNoteModel } from '../model';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
@@ -82,7 +81,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     super(options, cellService, viewManager, codeEditorManager);
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
-    this.parties = this.getInitializedParties();
+    this.parties = this.getInitialParties();
   }
 
   /**
@@ -251,7 +250,13 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     lastParties = parties;
   }
 
-  getInitializedParties() {
+  /**
+   * Get the initialization value of parties for a cell.
+   * If the cell has been executed before, return those saved in the cell metadata.
+   * If can't, return the previous cell's parties.
+   * If still can't, all parties will be returned.
+   */
+  getInitialParties() {
     const execution = this.model.metadata.execution as ExecutionMeta;
     if (execution && execution.parties) {
       try {
@@ -261,8 +266,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
         return [];
       }
     } else if (lastParties.length > 0) {
-      // load parties from previous cell settings
-      return lastParties;
+      return lastParties; // load parties from previous cell settings
     }
     return this.partyList;
   }
@@ -270,7 +274,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   /**
    * Save the parties user selected to the cell model metadata.
    */
-  savePartiesToMeta(parties: string[] = this.parties) {
+  savePartiesToMeta(parties = this.parties) {
     const execution = this.model.metadata.execution as ExecutionMeta;
     if (execution) {
       execution.parties = JSON.stringify(parties);

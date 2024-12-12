@@ -44,7 +44,7 @@ export class NotebookFileService {
   }>();
   readonly onNotebookFileChanged = this.onNotebookFileChangedEmitter.event;
 
-  @prop() notebookFileList: IContentsModel[] = [];
+  @prop() notebookFileList: IContentsModel[] | null = null;
   @prop() currentNotebookFile: IContentsModel | null = null;
   @prop() currentLibroView: LibroView | null = null;
   @prop() pendingRename: { path: string; name: string } | null = null;
@@ -138,7 +138,7 @@ export class NotebookFileService {
       // and it's valid
       if (path && name) {
         // find the source file
-        const file = this.notebookFileList.find((file) => file.path === path);
+        const file = this.notebookFileList?.find((file) => file.path === path);
         // and the target name is different
         if (file && file.name !== name) {
           const newPath = path.replace(file.name, name);

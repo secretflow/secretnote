@@ -36,6 +36,7 @@ import './index.less';
 import { FileService } from './service';
 import { FilePreviewService } from './preview';
 import { noop } from 'lodash-es';
+import BusySpin from '@/components/busy-spin';
 
 const { DirectoryTree } = Tree;
 
@@ -182,18 +183,7 @@ export const FileComponent = () => {
           <span>{nodeData.title as string}</span>
         </Space>
         <DropdownMenu
-          icon={
-            isUploading ? (
-              <>
-                <Space direction="horizontal" size="small">
-                  <Spin size="small" />
-                  {l10n.t('正忙…')}
-                </Space>
-              </>
-            ) : (
-              void 0
-            )
-          } // undefined fallbacks to default "..." icon
+          icon={isUploading ? <BusySpin /> : void 0} // undefined fallbacks to default "..." icon
           items={isLeaf ? dataMenuItems : folderMenuItems}
           disabled={isUploading}
           onClick={(key) => {
@@ -209,15 +199,18 @@ export const FileComponent = () => {
 
   return (
     <>
-      <DirectoryTree
-        blockNode
-        onSelect={noop}
-        treeData={fileService.fileTree}
-        className="secretnote-file-tree"
-        switcherIcon={<ChevronDown size={12} />}
-        icon={null}
-        titleRender={titleRender}
-      />
+      {fileService.fileTree === null && <BusySpin />}
+      {fileService.fileTree && (
+        <DirectoryTree
+          blockNode
+          onSelect={noop}
+          treeData={fileService.fileTree}
+          className="secretnote-file-tree"
+          switcherIcon={<ChevronDown size={12} />}
+          icon={null}
+          titleRender={titleRender}
+        />
+      )}
       <Slot name="secretnote-file-preview-view" />
     </>
   );
