@@ -218,7 +218,7 @@ export class NotebookFileService {
   }
 
   /**
-   * Check if a file exists.
+   * Check if a notebook file exists.
    */
   async isFileExisted(name: string) {
     const { content } = (await this.contentsManager.get(drived(USER_ROOT_DIR), {

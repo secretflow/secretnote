@@ -34,7 +34,8 @@ import { SideBarContribution } from '@/modules/layout';
 import { genericErrorHandler } from '@/utils';
 import './index.less';
 import { FileService } from './service';
-import { FilePreviewComponent, FilePreviewService } from './preview';
+import { FilePreviewService } from './preview';
+import { noop } from 'lodash-es';
 
 const { DirectoryTree } = Tree;
 
@@ -79,8 +80,10 @@ export const FileComponent = () => {
         fileService.downloadFile(node);
         break;
       case 'preview':
-        const { serverId, path } = FileService.parseNodeKey(node.key as string);
-        filePreviewService.preview(serverId, path);
+        const { serverId, path, serverName } = FileService.parseNodeKey(
+          node.key as string,
+        );
+        filePreviewService.preview(serverId, path, serverName);
         break;
       default:
         break;
@@ -106,7 +109,7 @@ export const FileComponent = () => {
   const uploadRender = (nodeData: DataNode) => {
     const props: UploadProps = {
       beforeUpload: async (file) => {
-        const isExisted = await fileService.isFileExist(nodeData, file.name);
+        const isExisted = await fileService.isFileExisted(nodeData, file.name);
         if (isExisted) {
           Modal.confirm({
             title: l10n.t('上传文件'),
@@ -208,9 +211,7 @@ export const FileComponent = () => {
     <>
       <DirectoryTree
         blockNode
-        onSelect={() => {
-          // do nothing
-        }}
+        onSelect={noop}
         treeData={fileService.fileTree}
         className="secretnote-file-tree"
         switcherIcon={<ChevronDown size={12} />}

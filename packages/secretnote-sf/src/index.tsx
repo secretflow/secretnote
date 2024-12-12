@@ -13,7 +13,7 @@ import { ToolbarModule } from '@/modules/toolbar';
 import { WelcomeModule } from '@/modules/welcome';
 import { MetricsModule } from '@/modules/metrics';
 import { SnippetModule } from '@/modules/toolbar/snippet';
-import { localStorageService } from './modules/storage/local-storage-service';
+import { localStorageService } from '@/modules/storage/local-storage-service';
 // import { ComponentCellModule } from '@/modules/component-cell'
 
 import '@/lang';

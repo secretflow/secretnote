@@ -11,12 +11,13 @@ import { useEffect, useState } from 'react';
 import { EditorBubbleMenu } from './bubble-menu';
 import { defaultExtensions } from './extensions';
 import './index.less';
+import { noop } from 'lodash-es';
 
 export function Editor({
   defaultValue = '',
   extensions = [],
-  onUpdate = () => {},
-  onDebouncedUpdate = () => {},
+  onUpdate = noop,
+  onDebouncedUpdate = noop,
 }: {
   defaultValue: string;
   extensions?: Extension[];
