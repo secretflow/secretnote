@@ -1,22 +1,7 @@
 import Markdown from 'markdown-it';
-/**
- * Generate a random UUID.
- */
-export function uuid(): string {
-  let res = '';
-  const template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-
-  for (let i = 0, len = template.length; i < len; i += 1) {
-    const s = template[i];
-    const r = (Math.random() * 16) | 0;
-    const v = s === 'x' ? r : s === 'y' ? (r & 0x3) | 0x8 : s;
-    res += v.toString(16);
-  }
-  return res;
-}
 
 /**
- * Compare two date strings and return 1 if a > b, -1 if a < b, 0 elsewise.
+ * Compare two date strings and return 1 (a > b), -1 (a < b), 0 (elsewise).
  */
 export const compareDateString = (a: string, b: string) => {
   const aDate = new Date(a),
@@ -28,10 +13,7 @@ export const compareDateString = (a: string, b: string) => {
 /**
  * Convert a markdown string to HTML.
  */
-export function mdToHTML(
-  mdstr: string,
-  options?: { openInNewTab?: boolean; ignoreDivider?: boolean },
-) {
+export function mdToHTML(mdstr: string, options?: { openInNewTab?: boolean }) {
   const md = Markdown();
 
   if (options?.openInNewTab) {
@@ -60,6 +42,9 @@ export function mdToHTMLSegments(mdstr: string, sep = '---') {
   return parts.map((v) => mdToHTML(v, { openInNewTab: true }));
 }
 
+/**
+ * Try to copy text to clipboard.
+ */
 export async function copyToClipboard(text: string) {
   if (!navigator.clipboard) {
     return Promise.reject();

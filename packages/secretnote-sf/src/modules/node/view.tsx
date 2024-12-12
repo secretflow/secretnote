@@ -33,7 +33,7 @@ import { ServerStatus } from '../server';
 import './index.less';
 import type { NodeStatusTag, SecretNoteNode } from './service';
 import { NodeService } from './service';
-import { localStorageService } from '../storage/local-storage-service';
+import { getGlobalConfig } from '../storage/local-storage-service';
 
 const { Paragraph } = Typography;
 
@@ -223,7 +223,7 @@ export const NodeComponent = () => {
         >
           <Input placeholder="alice" />
         </Form.Item>
-        {(localStorageService.getData('globalConfig') as any)?.selfDeploy ? (
+        {getGlobalConfig()?.selfDeploy ? (
           <Form.Item
             label={l10n.t('地址')}
             name="podIp"

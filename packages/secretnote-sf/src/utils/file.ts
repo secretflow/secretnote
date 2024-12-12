@@ -1,7 +1,7 @@
 import { dsvFormat } from 'd3-dsv';
 
 /**
- * Read file content as text or base64 (without prelude) string.
+ * Read file content as text or base64 string without prelude.
  */
 export async function readFile(
   file: File | Blob,
@@ -17,6 +17,7 @@ export async function readFile(
         reader.readAsText(file);
       } else if (format === 'base64') {
         reader.addEventListener('loadend', () => {
+          // remove the prelude of the base64 string created by browser
           const regex = /data:.*base64,/;
           const base64 = (reader.result as string).replace(regex, '');
           resolve((base64 as string) || '');

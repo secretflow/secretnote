@@ -1,10 +1,9 @@
 // Customized request definitions and functions for SecretNote.
 
-import type { ISettings, JSONPrimitive } from '@difizen/libro-jupyter';
-import { URL as LibroURL } from '@difizen/libro-jupyter';
+import { URL as LibroURL, type ISettings } from '@difizen/libro-jupyter';
+
 import { genericErrorHandler } from './error';
-import { localStorageService } from '@/modules/storage/local-storage-service';
-import { ISecretNoteAppProps } from '..';
+import { getGlobalConfig } from '@/modules/storage/local-storage-service';
 
 /**
  * Get the base URL of a remote server for HTTP requests.
@@ -12,19 +11,13 @@ import { ISecretNoteAppProps } from '..';
  * Otherwise it goes to the default web server.
  */
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
-  const backendUrl =
-    (localStorageService.getData('globalConfig') as ISecretNoteAppProps)?.backendURL ||
-    '/';
+  // Try to get the backend URL from the global config (component props)
+  const backendUrl = getGlobalConfig()?.backendURL ?? '/';
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 
-  return (
-    origin +
-    (origin.endsWith('/') ? '' : '/') +
-    'secretnote/' +
-    targetId +
-    `${endSlash ? '/' : ''}`
-  );
+  // normalize the origin
+  return origin.replace(/\/$/, '') + `/secretnote/${targetId}${endSlash ? '/' : ''}`;
 };
 
 /**
@@ -33,6 +26,7 @@ export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
  * Otherwise it goes to the default web server.
  */
 export const getRemoteWsUrl = (targetId = '', endSlash = false) => {
+  // support ws and wss
   return getRemoteBaseUrl(targetId, endSlash).replace(/^http/, 'ws');
 };
 
@@ -86,9 +80,7 @@ const getCookie = (name: string) => {
  * Get the authentication token from the local storage.
  */
 export const getToken = (): string | null => {
-  const key =
-    (localStorageService.getData('globalConfig') as ISecretNoteAppProps)?.tokenKey ||
-    'pocketbase_auth';
+  const key = getGlobalConfig()?.tokenKey || 'pocketbase_auth';
   const auth = localStorage.getItem(key);
   if (auth) {
     try {
@@ -177,28 +169,4 @@ export const request = async <T = any>(
     return await response.json();
   }
   throw await createResponseError(response);
-};
-
-/**
- * node:querystring.stringify replacement for unnested values.
- */
-export function querystringStringify(
-  params: Record<string, JSONPrimitive | undefined>,
-) {
-  return Object.entries(params)
-    .filter(([_, v]) => v !== void 0)
-    .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
-    .join('&');
-}
-
-/**
- * Get search parameters of current location by keys.
- */
-export const getSearchParams = (...key: string[]) => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const res: string[] = [];
-  key.forEach((k) => {
-    res.push(searchParams.get(k) || '');
-  });
-  return res;
 };
