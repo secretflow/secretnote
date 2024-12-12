@@ -1,7 +1,7 @@
 /**
  * Hash an ascii string to a hex color.
  */
-export function randomColorByName(name: string) {
+export function hashStringToColor(name: string) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + hash * 7; // 7 is a prime number randomly picked

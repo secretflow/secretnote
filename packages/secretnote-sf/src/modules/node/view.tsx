@@ -15,6 +15,7 @@ import {
   Button,
   Descriptions,
   Divider,
+  Flex,
   Form,
   Input,
   message,
@@ -24,10 +25,10 @@ import {
   Spin,
   Typography,
 } from 'antd';
-import { Plus } from 'lucide-react';
+import { Plus, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import { genericErrorHandler, invert, randomColorByName, wait } from '@/utils';
+import { genericErrorHandler, invert, hashStringToColor, wait } from '@/utils';
 import { ServerStatus } from '../server';
 import './index.less';
 import type { NodeStatusTag, SecretNoteNode } from './service';
@@ -183,9 +184,21 @@ export const NodeComponent = () => {
     }
   };
 
-  const addNodeFormContent = (
+  const addNodeForm = (
     <div className="secretnote-add-node">
-      <div className="title">{l10n.t('添加节点')}</div>
+      <Flex justify="space-between" align="start">
+        <div className="title">{l10n.t('添加节点')}</div>
+        <Button
+          type="text"
+          shape="circle"
+          icon={<XIcon size={14} />}
+          disabled={addLoading}
+          onClick={() => {
+            form.resetFields();
+            setAddFormVisible(false);
+          }}
+        ></Button>
+      </Flex>
       <Form
         labelAlign="left"
         form={form}
@@ -252,7 +265,7 @@ export const NodeComponent = () => {
 
   return (
     <div className="secretnote-node">
-      <span className="title">节点列表:&nbsp;</span>
+      <span className="title">{l10n.t('节点列表')}:&nbsp;</span>
       <Avatar.Group>
         {service.nodes.map((node) => (
           <Popover
@@ -268,13 +281,13 @@ export const NodeComponent = () => {
               <Avatar
                 shape="square"
                 style={{
-                  backgroundColor: randomColorByName(node.name),
+                  backgroundColor: hashStringToColor(node.name),
                   cursor: 'pointer',
                 }}
               >
                 <span
                   style={{
-                    color: invert(randomColorByName(node.name)),
+                    color: invert(hashStringToColor(node.name)),
                     userSelect: 'none',
                   }}
                 >
@@ -286,19 +299,19 @@ export const NodeComponent = () => {
         ))}
       </Avatar.Group>
       <Popover
-        content={addNodeFormContent}
+        content={addNodeForm}
         overlayStyle={{ width: 360 }}
         trigger="click"
         placement="bottomLeft"
         open={addFormVisible}
-        onOpenChange={(visible) => {
-          form.resetFields();
-          setAddFormVisible(visible);
-        }}
+        onOpenChange={(visible) =>
+          // ignore visible == false to disallow click outside to close the popover
+          visible && setAddFormVisible(visible)
+        }
         arrow={false}
       >
         {/* Add two nodes at most */}
-        {instance.service.nodes.length < 2 && (
+        {service.nodes.length < 2 && (
           <Button
             icon={<Plus size={16} />}
             className="btn"
@@ -306,7 +319,7 @@ export const NodeComponent = () => {
           />
         )}
       </Popover>
-      {instance.service.loading && <Spin size="small" className="ml-2" />}
+      {service.loading && <Spin size="small" className="ml-2" />}
     </div>
   );
 };
