@@ -6,10 +6,13 @@ import { createViewPreference, ManaModule } from '@difizen/mana-app';
 import { ExtraView } from './extra-view';
 import { FileService } from './service';
 import { FileView, fileViewKey } from './view';
+import { FilePreviewService, FilePreviewView, filePreviewViewKey } from './preview';
 
 export const FileModule = ManaModule.create().register(
   FileService,
   FileView,
+  FilePreviewService,
+  FilePreviewView,
   ExtraView,
   createViewPreference({
     slot: fileViewKey,
@@ -19,6 +22,11 @@ export const FileModule = ManaModule.create().register(
   createViewPreference({
     slot: `${fileViewKey}Extra`,
     view: ExtraView,
+    autoCreate: true,
+  }),
+  createViewPreference({
+    slot: filePreviewViewKey,
+    view: FilePreviewView,
     autoCreate: true,
   }),
 );

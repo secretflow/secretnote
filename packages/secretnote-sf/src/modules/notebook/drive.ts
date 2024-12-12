@@ -3,12 +3,6 @@
 // but the request method are overriden instead of using the globally injected one.
 // To make it short, shared comments are removed. Please refer to the original source file if you need.
 
-import {
-  createNotImplemented,
-  getDefaultServerConnectionSettings,
-  getRemoteBaseUrl,
-  requestNoUnpack,
-} from '@/utils';
 import type {
   IContentsChangedArgs,
   IContentsDrive,
@@ -16,6 +10,13 @@ import type {
 } from '@difizen/libro-jupyter';
 import { Drive as DefaultDrive } from '@difizen/libro-jupyter';
 import { Emitter, singleton } from '@difizen/mana-app';
+
+import {
+  createNotImplemented,
+  getDefaultServerConnectionSettings,
+  getRemoteBaseUrl,
+  requestNoUnpack,
+} from '@/utils';
 
 /**
  * Name of the customized drive.

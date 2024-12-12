@@ -4,13 +4,12 @@ import { FileService } from '../service';
 
 @singleton()
 export class FilePreviewService {
-  // protected readonly fileService: FileService;
   protected readonly fileService: FileService;
-  @prop() previewOpen: boolean = false;
+  @prop() open: boolean = false;
   @prop() file: {
-    ext?: string;
+    path: string;
     content: string;
-  } = { content: '' };
+  } = { path: '', content: '' };
 
   constructor(@inject(FileService) fileService: FileService) {
     this.fileService = fileService;
@@ -22,14 +21,21 @@ export class FilePreviewService {
       return;
     }
     this.file = {
-      ext: this.fileService.getFileExtByPath(path)?.toLowerCase(),
+      path,
       content: maybeContent.content,
     };
-    this.previewOpen = true;
+    this.open = true;
+    console.log('after open', this);
+    // @ts-ignore
+    window.$temp1 = this;
   }
 
-  close() {
-    this.file = { content: '' };
-    this.previewOpen = false;
+  handleClose() {
+    console.log('when close, we get', this);
+    // @ts-ignore
+    window.$temp2 = this;
+
+    // this.file = { path: '', content: '' };
+    // this.open = false;
   }
 }

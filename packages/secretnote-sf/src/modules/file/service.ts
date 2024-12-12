@@ -16,7 +16,6 @@ import {
 } from '@/utils';
 
 import { SecretNoteServerManager, ServerStatus } from '../server';
-import { FilePreviewService } from './preview';
 
 export const CHUNK_SIZE = 1024 * 1024; // 1MB
 export const BASE_PATH = '/';
@@ -205,12 +204,6 @@ export class FileService {
     }
   }
 
-  // viewFile(nodeData: DataNode) {
-  //   const { serverId, path } =FileService.parseNodeKey(nodeData.key as string);
-  //   this.filePreviewService.read(path, serverId);
-  //   this.filePreviewService.show();
-  // }
-
   async copyPath(nodeData: DataNode) {
     const { path } = FileService.parseNodeKey(nodeData.key as string);
     return await copyToClipboard(`/home/secretnote/workspace/${path}`);
@@ -218,10 +211,10 @@ export class FileService {
 
   getFileExt(nodeData: DataNode) {
     const { path } = FileService.parseNodeKey(nodeData.key as string);
-    return this.getFileExtByPath(path);
+    return FileService.getFileExtByPath(path);
   }
 
-  getFileExtByPath(path: string) {
+  static getFileExtByPath(path: string) {
     return path.split('.').pop();
   }
 

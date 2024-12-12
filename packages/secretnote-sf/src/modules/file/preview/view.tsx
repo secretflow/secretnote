@@ -1,23 +1,34 @@
-import { useInject } from '@difizen/mana-app';
-import { FilePreviewService } from './service';
-import { Divider, Drawer } from 'antd';
+import {
+  BaseView,
+  DefaultSlotView,
+  singleton,
+  useInject,
+  view,
+} from '@difizen/mana-app';
+import { Drawer } from 'antd';
 import { l10n } from '@difizen/mana-l10n';
+
 import CSVPreviewer from './previewer-csv';
+import { FilePreviewService } from './service';
 
 export const FilePreviewComponent = () => {
-  const { previewOpen, close, file } = useInject(FilePreviewService);
+  const { open, handleClose, file } = useInject<FilePreviewService>(FilePreviewService);
 
   return (
     <Drawer
-      open={previewOpen}
-      onClose={() => close()}
-      title={l10n.t('文件预览')}
-      width={800}
-      forceRender
+      open={open}
+      onClose={() => handleClose()}
+      title={l10n.t('文件预览: {0}', file.path ?? '-')}
+      width={'80%'}
     >
-      {file.ext}
-      <Divider />
       <CSVPreviewer data={file.content} />
     </Drawer>
   );
 };
+
+export const filePreviewViewKey = 'secretnote-file-preview-view';
+@singleton()
+@view(filePreviewViewKey)
+export class FilePreviewView extends BaseView {
+  view = FilePreviewComponent;
+}

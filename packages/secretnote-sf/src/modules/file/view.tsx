@@ -31,7 +31,7 @@ import React, { useState } from 'react';
 import type { Menu } from '@/components/dropdown-menu';
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-import { genericErrorHandler, readFile } from '@/utils';
+import { genericErrorHandler } from '@/utils';
 import './index.less';
 import { FileService } from './service';
 import { FilePreviewComponent, FilePreviewService } from './preview';
@@ -217,7 +217,7 @@ export const FileComponent = () => {
         icon={null}
         titleRender={titleRender}
       />
-      <FilePreviewComponent />
+      <Slot name="secretnote-file-preview-view" />
     </>
   );
 };
