@@ -156,7 +156,9 @@ export class FileService {
    * Download data file in computation node.
    */
   async downloadFile(nodeData: TreeDataNode) {
-    const { serverId, path } = FileService.parseNodeKey(nodeData.key as string);
+    const { serverId = '', path = '' } = FileService.parseNodeKey(
+      nodeData.key as string,
+    );
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const baseUrl = getRemoteBaseUrl(server.id);
@@ -180,11 +182,16 @@ export class FileService {
     }
   }
 
+  /**
+   * Delete file from computation node.
+   */
   async deleteFile(nodeData: TreeDataNode) {
     if (!nodeData.isLeaf) {
       return;
     }
-    const { serverId, path } = FileService.parseNodeKey(nodeData.key as string);
+    const { serverId = '', path = '' } = FileService.parseNodeKey(
+      nodeData.key as string,
+    );
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       await this.contentsManager.delete(path, {
@@ -194,6 +201,9 @@ export class FileService {
     }
   }
 
+  /**
+   * Get file content from computation node.
+   */
   async getFileContent(serverId: string, path: string, format?: ContentsFileFormat) {
     const decodedPath = decodeURIComponent(path);
     const server = await this.serverManager.getServerDetail(serverId);
@@ -207,18 +217,29 @@ export class FileService {
     }
   }
 
+  /**
+   * Copy file path to clipboard.
+   */
   async copyPath(nodeData: TreeDataNode) {
     const { path } = FileService.parseNodeKey(nodeData.key as string);
+    // TODO Get the actual folder path from the server.
     return await copyToClipboard(`/home/secretnote/workspace/${path}`);
   }
 
-  getFileExt(nodeData: TreeDataNode) {
+  /**
+   * Get file extension from node data.
+   */
+  static getFileExt(nodeData: TreeDataNode, lowerCase = true) {
     const { path } = FileService.parseNodeKey(nodeData.key as string);
-    return FileService.getFileExtByPath(path);
+    return FileService.getFileExtByPath(path ?? '', lowerCase);
   }
 
-  static getFileExtByPath(path: string) {
-    return path.split('.').pop();
+  /**
+   * Get file extension from file path.
+   */
+  static getFileExtByPath(path: string, lowerCase = true) {
+    const ext = path?.split('.').pop();
+    return lowerCase ? ext?.toLowerCase() : ext;
   }
 
   /**
@@ -232,7 +253,9 @@ export class FileService {
    * Extrate the metadata of file from node key.
    */
   static parseNodeKey(dataKey: string) {
-    const [serverId, serverName, path] = dataKey.split('|');
+    type MaybeString = string | undefined;
+    const [serverId, serverName, path] = dataKey.split('|') as MaybeString[];
+
     return { serverId, serverName, path };
   }
 

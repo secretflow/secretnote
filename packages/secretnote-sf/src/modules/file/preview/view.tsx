@@ -6,15 +6,21 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
-import { Drawer } from 'antd';
+import { Alert, Drawer, Flex, Space } from 'antd';
 import { l10n } from '@difizen/mana-l10n';
 
-import CSVPreviewer from './previewer-csv';
 import { FilePreviewService } from './service';
+import CSVPreviewer from './previewer-csv';
+import { identity, noop } from 'lodash-es';
+
+const MAX_PREVIEW_LENGTH = 100000;
+
 export const FilePreviewComponent = () => {
   const instance = useInject<FilePreviewView>(ViewInstance);
   const service = instance.filePreviewService;
   const { file } = service;
+  const isTooLong = (file.content?.length ?? 0) > MAX_PREVIEW_LENGTH,
+    truncated = (file.content ?? '').substring(0, MAX_PREVIEW_LENGTH);
 
   return (
     <Drawer
@@ -22,17 +28,41 @@ export const FilePreviewComponent = () => {
       open={service.open}
       onClose={() => service.close()}
       title={
-        <>
-          {l10n.t(
-            '文件预览 (节点: {0}, 路径: {1})',
-            file.serverName ?? file.serverId ?? '-',
-            file.path ?? '-',
+        <Flex justify="space-between" align="center">
+          <div>
+            {l10n.t(
+              '预览 ({0} 的 {1})',
+              file.serverName ?? file.serverId ?? '-',
+              file.path ?? '-',
+            )}
+          </div>
+          {isTooLong && file.as_ === 'text' && (
+            <Alert
+              message={
+                <span style={{ fontWeight: 'normal' }}>
+                  {l10n.t('文件内容过长，仅展示前 {0} 个字符', MAX_PREVIEW_LENGTH)}
+                </span>
+              }
+              type="warning"
+              showIcon
+            />
           )}
-        </>
+        </Flex>
       }
-      width={'80%'}
+      width="80%"
     >
-      <CSVPreviewer dataSource={file.csv} />
+      {file.as_ === 'text' && (
+        <pre
+          style={{
+            fontFamily: 'monospace, monospace',
+            fontSize: '13px',
+            lineHeight: '1.5',
+          }}
+        >
+          {truncated}
+        </pre>
+      )}
+      {file.as_ === 'table' && <CSVPreviewer dataSource={file.csv} />}
     </Drawer>
   );
 };

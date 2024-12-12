@@ -1,5 +1,9 @@
 import { message } from 'antd';
 
+export function getErrorString(e: any) {
+  return e?.message ?? e.toString() ?? '';
+}
+
 /**
  * A generic error handler that shows a message and logs the error.
  */
@@ -11,7 +15,7 @@ export function genericErrorHandler(
   } = {},
 ) {
   if (!options?.silent) {
-    message.error(e?.message || e.toString());
+    message.error(getErrorString(e));
     console.error(e);
   }
   // eslint-disable-next-line no-console
