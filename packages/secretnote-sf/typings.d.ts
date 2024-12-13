@@ -5,4 +5,3 @@ declare module '*.svg' {
   export = Component;
 }
 declare module 'markdown-it';
-declare module 'canvas-confetti';

@@ -66,7 +66,7 @@ export class SQLCellView extends LibroExecutableCellView {
   readonly commandRegistry: CommandRegistry;
 
   @prop() outputs: IOutput[] = [];
-  @prop() editorView?: CodeEditorView;
+  @prop() editorView?: CodeEditorView = void 0;
 
   get cellModel() {
     return this.model as SQLCellModel;
@@ -296,15 +296,15 @@ export class SQLCellView extends LibroExecutableCellView {
       .catch(console.error);
   };
 
-  focus(toEdit: boolean) {
+  focus = (toEdit: boolean) => {
     if (toEdit) {
       this.cellModel.isEdit = true;
     }
-  }
+  };
 
-  blur() {
+  blur = () => {
     this.cellModel.isEdit = false;
-  }
+  };
 
   shouldEnterEditorMode() {
     return this.cellModel.isEdit;

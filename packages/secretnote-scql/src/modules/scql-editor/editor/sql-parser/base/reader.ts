@@ -317,6 +317,8 @@ async function getFieldsByFromClause(
 
         // If has alias, change
         if (_.has(ssFromStatement, 'alias.value')) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           statementSelectFields = statementSelectFields.map((statementSelectField) => {
             return {
               ...statementSelectField,

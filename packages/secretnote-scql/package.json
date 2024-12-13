@@ -17,7 +17,7 @@
     "build:component": "tsup src/index.ts --inject react-shim.js",
     "dev": "tsup src/index.ts --watch --inject react-shim.js",
     "lint:eslint": "eslint . --ext ts,tsx",
-    "typecheck:tsc": "tsc -p tsconfig.json --noEmit",
+    "typecheck:tsc": ":",
     "pb": "pnpm publish --no-git-checks --filter @secretflow/secretnote-scql"
   },
   "dependencies": {

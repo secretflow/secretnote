@@ -30,9 +30,7 @@ pylez_entry = path.abspath(
     path.join(dirname, "../../../node_modules/@difizen/pylez/index.js")
 )
 if not path.exists(pylez_entry):
-    logging.warning(
-        f"pylez not found at {pylez_entry}. LSP will be disabled."
-    )
+    logging.warning(f"pylez not found at {pylez_entry}. LSP will be disabled.")
 c.LanguageServerManager.language_servers = {
     # `pylez` is a derived version of pyright with virtual document enabled
     # whole notebook LSP ability. Note that when it runs with --stdio, the frontend

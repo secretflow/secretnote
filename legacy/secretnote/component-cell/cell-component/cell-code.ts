@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ComponentSpec,
-  Value,
   IOType,
   IOTypeKind,
+  Value,
 } from '@/components/component-form';
 
 const deviceConfig = {
