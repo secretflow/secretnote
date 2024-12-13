@@ -26,12 +26,14 @@ import { inject, transient, view, ViewOption } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
+import { entriesWithSortedKey } from '@/utils';
 
 @transient()
 @view('libro-output-area')
 export class SecretNoteOutputArea extends LibroOutputArea {
-  kernelManager: SecretNoteKernelManager;
-  kernelOutputs: Record<string, IOutput[]> = {}; // kernel id -> outputs from it
+  protected kernelManager: SecretNoteKernelManager;
+  protected kernelOutputs: Record<string, (IOutput | undefined)[]>; // kernel id -> outputs from it
+  protected kernelIdToServerName: Record<string, string>; // kernel id -> server name for better display
 
   constructor(
     @inject(ViewOption) option: IOutputAreaOption,
@@ -41,6 +43,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
     this.kernelManager = kernelManager;
     // manually control the outputs of each kernel and synchronize them with LibroOutputArea.outputs
     this.kernelOutputs = {};
+    this.kernelIdToServerName = {};
     this.startMsgHandler();
   }
 
@@ -114,7 +117,12 @@ export class SecretNoteOutputArea extends LibroOutputArea {
 
     const lastIndex = outputs.length - 1;
     const preOutput = outputs[lastIndex];
-    if (isStream(output) && isStream(preOutput) && output.name === preOutput.name) {
+    if (
+      isStream(output) &&
+      preOutput &&
+      isStream(preOutput) &&
+      output.name === preOutput.name
+    ) {
       // merge two continuous outputs to the same stream
       // handle backspace and carriage-return, concat the text
       output.text = removeOverwrittenChars(preOutput.text + normalize(output.text));
@@ -138,13 +146,17 @@ export class SecretNoteOutputArea extends LibroOutputArea {
    * Flush all kernel outputs to the output area.
    */
   async flushOutputs() {
-    const outputs = Object.values(this.kernelOutputs).flat();
+    // sort outputs by server name in alphabetical order
+    const outputs = entriesWithSortedKey(this.kernelOutputs, this.kernelIdToServerName)
+      .map(([_, v]) => v)
+      .flat()
+      .filter((v) => v !== void 0);
+    // Now we don't hide the leading output if there is only one kernel to make it clearer.
     // const kernelCount = Object.keys(this.kernelOutputs).length;
     // if (kernelCount < 2) {
-    //   // remove the leading output title if there is only one kernel
     //   outputs = outputs.filter((output) => !output.isLeading);
     // }
-    // dispose all previous outputs
+    // dispose all previous output views
     this.outputs.forEach((output) => output.dispose());
     // create new outputs
     this.outputs = await Promise.all(
@@ -159,6 +171,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   makeLeadingOutput(kernel: IKernelConnection) {
     const server = this.kernelManager.getServerByKernelConnection(kernel);
     const name = server?.name || kernel.clientId;
+    this.kernelIdToServerName[kernel.id] = name;
 
     const output: IDisplayData = {
       output_type: 'display_data',

@@ -37,12 +37,10 @@ export const EditorComponent = () => {
       instance.libroService
         .getOrCreateView(options)
         .then((v) => {
-          if (!v) {
-            return;
+          if (v) {
+            instance.notebookFileService.currentLibroView = v;
+            setLibroView(v);
           }
-          instance.notebookFileService.currentLibroView = v;
-          setLibroView(v);
-          return;
         })
         .catch(genericErrorHandler);
     }
@@ -66,9 +64,9 @@ export class EditorView extends DefaultSlotView {
   constructor(
     @inject(NotebookFileService) notebookFileService: NotebookFileService,
     @inject(LibroService) libroService: LibroService,
-    @inject(ViewManager) viewManger: ViewManager,
+    @inject(ViewManager) viewManager: ViewManager,
   ) {
-    super(undefined, viewManger);
+    super(undefined, viewManager);
     this.notebookFileService = notebookFileService;
     this.libroService = libroService;
   }

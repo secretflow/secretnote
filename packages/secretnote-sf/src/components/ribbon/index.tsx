@@ -27,7 +27,7 @@ function Ribbon(props: RibbonProps) {
     if (!filtered.length) {
       return l10n.t('选择执行节点…');
     }
-    return filtered.map((item) => item.label).join(',');
+    return filtered.map((item) => item.label).join(', ');
   };
 
   return (
