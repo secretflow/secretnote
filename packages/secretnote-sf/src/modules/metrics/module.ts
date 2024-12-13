@@ -2,9 +2,9 @@
 
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
-import { metricsMonitorKey } from '../layout';
-import { MetricsService } from './service';
-import { MetricsView } from './view';
+import { metricsMonitorKey } from '@/modules/layout';
+import { MetricsService } from '@/modules/metrics/service';
+import { MetricsView } from '@/modules/metrics/view';
 
 export const MetricsModule = ManaModule.create().register(
   MetricsView,

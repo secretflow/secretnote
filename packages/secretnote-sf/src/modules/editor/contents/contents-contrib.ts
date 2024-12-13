@@ -2,8 +2,8 @@ import type { NotebookModel, NotebookOption } from '@difizen/libro-jupyter';
 import { ContentContribution } from '@difizen/libro-jupyter';
 import { URI, inject, singleton } from '@difizen/mana-app';
 
+import type { SecretNoteModel } from '@/modules/editor';
 import { NotebookFileService } from '@/modules/notebook';
-import type { SecretNoteModel } from '../model';
 
 @singleton({ contrib: ContentContribution })
 export class SecretNoteContentContribution implements ContentContribution {

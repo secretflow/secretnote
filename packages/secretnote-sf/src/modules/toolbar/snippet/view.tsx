@@ -1,14 +1,14 @@
 // Snippet component.
 
+import { useInject } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Collapse, Drawer, Flex, message, Tooltip } from 'antd';
+import endent from 'endent';
 import { ArrowUpSquareIcon, CodeIcon } from 'lucide-react';
 import { useState } from 'react';
-import endent from 'endent';
 
 import './index.less';
 import { SnippetService } from './service';
-import { useInject } from '@difizen/mana-app';
 
 export interface ISnippet {
   key: string;

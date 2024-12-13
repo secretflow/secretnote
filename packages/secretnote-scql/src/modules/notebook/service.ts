@@ -8,11 +8,10 @@ import type {
 } from '@difizen/libro-jupyter';
 import { ContentsManager, ServerConnection } from '@difizen/libro-jupyter';
 import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
-
-import { downloadFileByURL, requestNoUnpack } from '@/utils';
 import { l10n } from '@difizen/mana-l10n';
 
-import { DriveName, SecretNoteContentsDrive } from './drive';
+import { DriveName, SecretNoteContentsDrive } from '@/modules/notebook/drive';
+import { downloadFileByURL, requestNoUnpack } from '@/utils';
 
 const USER_ROOT_DIR = '/'; // the root path for a user's notebook files with trailing slash
 const FILE_EXT = '.ipynb'; // the default extname of notebook files
@@ -137,7 +136,7 @@ export class NotebookFileService {
       // and it's valid
       if (path && name) {
         // find the source file
-        const file = this.notebookFileList.find((file) => file.path === path);
+        const file = this.notebookFileList.find((f) => f.path === path);
         // and the target name is different
         if (file && file.name !== name) {
           const newPath = path.replace(file.name, name);

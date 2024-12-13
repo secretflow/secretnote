@@ -1,12 +1,16 @@
 import { KernelCommands, NotebookCommands } from '@difizen/libro-jupyter';
-import { ModalContribution, ModalItem, ToolbarRegistry } from '@difizen/mana-app';
-import { singleton, ToolbarContribution } from '@difizen/mana-app';
+import {
+  ModalContribution,
+  singleton,
+  ToolbarContribution,
+  type ToolbarRegistry,
+} from '@difizen/mana-app';
 
 import './index.less';
-import { SideToolbarRunItem } from './side-toolbar-run-item';
-import { TopToolbarRunItem } from './top-toolbar-run-item';
 import { KeybindInstruction } from './keybind-instruction';
 import { RestartClearOutputModal } from './restart-clear-outputs-modal';
+import { SideToolbarRunItem } from './side-toolbar-run-item';
+import { TopToolbarRunItem } from './top-toolbar-run-item';
 
 @singleton({ contrib: [ToolbarContribution, ModalContribution] })
 export class SecretNoteToolbarContribution

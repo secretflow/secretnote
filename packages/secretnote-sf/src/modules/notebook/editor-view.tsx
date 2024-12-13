@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from 'react';
 
 import { genericErrorHandler } from '@/utils';
+
 import { NotebookFileService } from './service';
 
 export enum EditorArea {

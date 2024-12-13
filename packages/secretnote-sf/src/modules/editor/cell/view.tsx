@@ -29,10 +29,10 @@ import { isUndefined } from 'lodash-es';
 import { forwardRef } from 'react';
 
 import { Ribbon } from '@/components/ribbon';
+import type { SecretNoteModel } from '@/modules/editor/model';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import { compareDateString } from '@/utils';
-import type { SecretNoteModel } from '../model';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SecretNoteCodeCellView>(ViewInstance);

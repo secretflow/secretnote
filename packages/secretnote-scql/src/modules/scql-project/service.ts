@@ -1,9 +1,10 @@
 // Service related to projects and invitations.
 
 import { inject, prop, singleton } from '@difizen/mana-app';
-import {
+
+import { BrokerService } from '@/modules/scql-broker';
+import type {
   _ProjectInvitationStatus,
-  BrokerService,
   ProjectDesc,
   ProjectInvitation,
 } from '@/modules/scql-broker';

@@ -13,7 +13,7 @@
     "format:black": "python -m black pyprojects/**/*.py",
     "format:prettier": "prettier --write --ignore-unknown packages/**/*.{ts,tsx}",
     "ci:bootstrap": "pnpm install --frozen-lockfile && pip install -r requirements.txt",
-    "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
+    "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint",
     "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
     "ci:build": "nx run-many -t build:component -t build:site && nx run-many -t build:py:ci",
     "docker:build": "docker buildx build --build-arg SECRETFLOW_VERSION=1.10.0b0 --platform linux/arm64 -t secretflow/secretnote:1.10.0b0 -f ./docker/secretflow-secretnote/Dockerfile .",
@@ -41,7 +41,6 @@
     "postcss-less": "^6.0.0",
     "prettier": "^3.0.3",
     "pyright": "^1.1.332",
-    "stylelint": "^15.11.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },

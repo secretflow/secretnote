@@ -37,13 +37,17 @@ export function mdToHTML(
   if (options?.openInNewTab) {
     const defaultRender =
       md.renderer.rules.link_open ||
-      function (tokens, idx, options, env, self) {
-        return self.renderToken(tokens, idx, options);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      function (tokens, idx, options_, env, self) {
+        return self.renderToken(tokens, idx, options_);
       };
     // let the user open links in a new tab
-    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    md.renderer.rules.link_open = function (tokens, idx, options_, env, self) {
       tokens[idx].attrSet('target', '_blank');
-      return defaultRender(tokens, idx, options, env, self);
+      return defaultRender(tokens, idx, options_, env, self);
     };
   }
 

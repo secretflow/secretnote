@@ -4,7 +4,7 @@ import { SheetComponent } from '@antv/s2-react';
 import '@antv/s2-react/dist/s2-react.min.css';
 import { l10n } from '@difizen/mana-l10n';
 
-import { parseCSV } from '@/utils';
+import { type parseCSV } from '@/utils';
 import './index.less';
 
 export default function CSVPreviewer(props: {

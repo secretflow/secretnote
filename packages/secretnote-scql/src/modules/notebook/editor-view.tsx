@@ -15,8 +15,8 @@ import {
 } from '@difizen/mana-app';
 import { useEffect, useState } from 'react';
 
+import { NotebookFileService } from '@/modules/notebook/service';
 import { genericErrorHandler } from '@/utils';
-import { NotebookFileService } from './service';
 
 export enum EditorArea {
   welcome = 'welcome',

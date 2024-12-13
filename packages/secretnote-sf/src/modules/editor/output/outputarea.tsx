@@ -23,9 +23,9 @@ import {
   removeOverwrittenChars,
 } from '@difizen/libro-jupyter';
 import { inject, transient, view, ViewOption } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
-import { l10n } from '@difizen/mana-l10n';
 
 @transient()
 @view('libro-output-area')

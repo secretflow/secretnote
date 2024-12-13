@@ -651,6 +651,7 @@ const fieldItemDetail = () => {
         chain(
           '.',
           '*',
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         )((ast) => {
           return {
             type: 'identifier',

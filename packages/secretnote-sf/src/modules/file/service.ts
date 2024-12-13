@@ -1,12 +1,10 @@
-import {
-  ContentsFileFormat,
-  ContentsManager,
-  type IContentsModel,
-} from '@difizen/libro-jupyter';
+import type { ContentsFileFormat, IContentsModel } from '@difizen/libro-jupyter';
+import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
-import type { TreeDataNode } from 'antd';
 import { l10n } from '@difizen/mana-l10n';
+import type { TreeDataNode } from 'antd';
 
+import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import {
   copyToClipboard,
   downloadFileByURL,
@@ -15,7 +13,6 @@ import {
   readFile,
   requestNoUnpack,
 } from '@/utils';
-import { SecretNoteServerManager, ServerStatus } from '../server';
 
 export const CHUNK_SIZE = 1024 * 1024; // 1MB
 export const BASE_PATH = '/';
@@ -262,6 +259,7 @@ export class FileService {
   /**
    * Currently no files limitation. All files are visible.
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private isFileVisible(path: string) {
     return true;
   }

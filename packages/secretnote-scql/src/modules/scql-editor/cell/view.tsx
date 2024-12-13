@@ -1,30 +1,30 @@
 import type {
-  LibroOutputArea,
   CellViewOptions,
-  IOutputAreaOption,
-  IOutput,
-  ExecutionMeta,
   CodeEditorViewOptions,
+  ExecutionMeta,
+  IOutput,
+  IOutputAreaOption,
   KernelMessage,
+  LibroOutputArea,
 } from '@difizen/libro-jupyter';
 import {
-  CellService,
   CellEditorMemo,
-  isOutput,
+  CellService,
   CodeEditorView,
-  NotebookCommands,
+  isOutput,
   LibroExecutableCellView,
+  NotebookCommands,
 } from '@difizen/libro-jupyter';
 import {
+  CommandRegistry,
   inject,
+  prop,
   transient,
   useInject,
   view,
   ViewInstance,
   ViewManager,
   ViewOption,
-  CommandRegistry,
-  prop,
 } from '@difizen/mana-app';
 import { forwardRef } from 'react';
 
@@ -127,8 +127,10 @@ export class SQLCellView extends LibroExecutableCellView {
       factory: (editorOption) => new SQLEditor(editorOption),
       model: this.cellModel,
       config: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         readOnly: this.parent.model.readOnly,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         editable: !this.parent.model.readOnly,
       },

@@ -10,9 +10,9 @@ import {
   ViewInstance,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import type { UploadProps } from 'antd';
+import type { TreeDataNode as DataNode, UploadProps } from 'antd';
 import { message, Modal, Space, Tree, Upload } from 'antd';
-import type { DataNode } from 'antd/es/tree';
+import { noop } from 'lodash-es';
 import {
   ChevronDown,
   ClipboardCopy,
@@ -20,7 +20,6 @@ import {
   File,
   FileText,
   Fullscreen,
-  Link,
   ScanText,
   ScrollText,
   Table,
@@ -29,15 +28,14 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
+import BusySpin from '@/components/busy-spin';
 import type { Menu } from '@/components/dropdown-menu';
 import { DropdownMenu } from '@/components/dropdown-menu';
+import { FilePreviewService, LEGAL_TABLE_EXTS } from '@/modules/file/preview';
+import { FileService } from '@/modules/file/service';
 import { SideBarContribution } from '@/modules/layout';
 import { genericErrorHandler } from '@/utils';
 import './index.less';
-import { FileService } from './service';
-import { FilePreviewService, LEGAL_TABLE_EXTS } from './preview';
-import { noop } from 'lodash-es';
-import BusySpin from '@/components/busy-spin';
 
 const { DirectoryTree } = Tree;
 
@@ -82,7 +80,7 @@ export const FileComponent = () => {
         fileService.downloadFile(node);
         break;
       case 'previewAsText':
-      case 'previewAsTable':
+      case 'previewAsTable': {
         const {
           serverId = '',
           path = '',
@@ -91,6 +89,7 @@ export const FileComponent = () => {
         const as_ = ({ previewAsText: 'text', previewAsTable: 'table' } as const)[key];
         filePreviewService.preview(as_, serverId, path, serverName);
         break;
+      }
       default:
         break;
     }

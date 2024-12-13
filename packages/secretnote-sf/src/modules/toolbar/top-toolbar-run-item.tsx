@@ -1,6 +1,5 @@
 // The "Run" button in the top toolbar.
 
-import { DropdownMenu } from '@/components/dropdown-menu';
 import {
   NotebookCommands,
   type LibroJupyterModel,
@@ -16,6 +15,8 @@ import {
   Play,
   PlayCircle,
 } from 'lucide-react';
+
+import { DropdownMenu } from '@/components/dropdown-menu';
 import './index.less';
 
 export const TopToolbarRunItem = () => {

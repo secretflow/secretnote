@@ -11,17 +11,17 @@ import {
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import type { InputRef } from 'antd';
-import { Empty, Input, message, Modal, Popover, Space, Spin } from 'antd';
+import { Input, message, Modal, Popover } from 'antd';
 import classnames from 'classnames';
 import { ArrowRightFromLine, Copy, PenLine, Trash } from 'lucide-react';
 import React from 'react';
 
+import BusySpin from '@/components/busy-spin';
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
+import { NotebookFileService } from '@/modules/notebook/service';
 import { genericErrorHandler } from '@/utils';
 import './index.less';
-import { NotebookFileService } from './service';
-import BusySpin from '@/components/busy-spin';
 
 export const NotebookFileComponent = () => {
   const instance = useInject<NotebookFileView>(ViewInstance);

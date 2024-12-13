@@ -19,14 +19,16 @@ export function mdToHTML(mdstr: string, options?: { openInNewTab?: boolean }) {
   if (options?.openInNewTab) {
     const defaultRender =
       md.renderer.rules.link_open ||
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      function (tokens, idx, options, env, self) {
-        return self.renderToken(tokens, idx, options);
+      function (tokens, idx, options_, env, self) {
+        return self.renderToken(tokens, idx, options_);
       };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    md.renderer.rules.link_open = function (tokens, idx, options_, env, self) {
       tokens[idx].attrSet('target', '_blank');
-      return defaultRender(tokens, idx, options, env, self);
+      return defaultRender(tokens, idx, options_, env, self);
     };
   }
 
@@ -51,3 +53,6 @@ export async function copyToClipboard(text: string) {
   }
   return await navigator.clipboard.writeText(text);
 }
+
+// eslint-disable-next-line no-useless-escape
+export const IPRegex = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\:\d{1,5}$/;

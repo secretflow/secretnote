@@ -18,8 +18,8 @@ export function invert(hex: string): string {
   /**
    * Convert a hex color to rgb values.
    */
-  function hex2rgb(hex: string): [number, number, number] {
-    const color = hex.indexOf('#') === 0 ? hex : `#${hex}`;
+  function hex2rgb(hex_: string): [number, number, number] {
+    const color = hex_.indexOf('#') === 0 ? hex_ : `#${hex_}`;
     let val = Number(`0x${color.substr(1)}`);
     if (!(color.length === 4 || color.length === 7) || Number.isNaN(val)) {
       throw new Error('Invalid hex color.');

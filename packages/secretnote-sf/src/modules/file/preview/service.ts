@@ -1,12 +1,12 @@
 // Service for previewing files.
 
 import { inject, prop, singleton } from '@difizen/mana-app';
-import type { DSVRowArray } from 'd3-dsv';
 import { l10n } from '@difizen/mana-l10n';
-
-import { FileService } from '../service';
-import { genericErrorHandler, getErrorString, parseCSV } from '@/utils';
 import { message } from 'antd';
+import type { DSVRowArray } from 'd3-dsv';
+
+import { FileService } from '@/modules/file/service';
+import { genericErrorHandler, getErrorString, parseCSV } from '@/utils';
 
 export type FilePreviewAs = 'text' | 'table';
 export const LEGAL_TABLE_EXTS = ['csv']; // currently only support csv to be displayed as table
@@ -15,8 +15,8 @@ export const LEGAL_TABLE_EXTS = ['csv']; // currently only support csv to be dis
 export class FilePreviewService {
   protected readonly fileService: FileService;
 
-  @prop() open: boolean = false; // whether the preview drawer is open
-  @prop() loading: boolean = false; // whether the preview is loading
+  @prop() open = false; // whether the preview drawer is open
+  @prop() loading = false; // whether the preview is loading
   @prop() file: Partial<{
     serverId: string; // which server the file is on
     serverName: string; // name of the server the file is on

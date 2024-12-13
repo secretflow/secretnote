@@ -2,11 +2,11 @@
 
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
-import { PreviewLayoutArea, HeaderArea } from '@/modules/layout';
-import { InvitationNotificationView } from './notification-view';
-import { ProjectView } from './view';
-import { ProjectService } from './service';
+import { HeaderArea, PreviewLayoutArea } from '@/modules/layout';
 import { SCQLBrokerModule } from '@/modules/scql-broker';
+import { InvitationNotificationView } from '@/modules/scql-project/notification-view';
+import { ProjectService } from '@/modules/scql-project/service';
+import { ProjectView } from '@/modules/scql-project/view';
 
 export const SCQLProjectModule = ManaModule.create()
   .register(

@@ -3,23 +3,23 @@
 import {
   BaseView,
   inject,
+  ModalContribution,
+  ModalService,
   singleton,
   useInject,
   view,
   ViewInstance,
-  ModalService,
-  ModalContribution,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
+import { Button, Flex, Input, Table, Typography } from 'antd';
+import { ArrowRight, KanbanSquare, Search } from 'lucide-react';
 import { useState } from 'react';
-import { Table, Input, Button, Flex, Typography } from 'antd';
-import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 
-import './index.less';
-import { ProjectConfigModal } from './add-modal';
-import { genericErrorHandler } from '@/utils';
 import { BrokerService } from '@/modules/scql-broker';
-import { ProjectService } from './service';
+import { ProjectConfigModal } from '@/modules/scql-project/add-modal';
+import { ProjectService } from '@/modules/scql-project/service';
+import { genericErrorHandler } from '@/utils';
+import './index.less';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
@@ -92,7 +92,6 @@ export const ProjectComponent = () => {
               title: l10n.t('操作'),
               dataIndex: 'action',
               key: 'action',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               render: (_, record) => (
                 <Button
                   icon={<ArrowRight size={16} />}

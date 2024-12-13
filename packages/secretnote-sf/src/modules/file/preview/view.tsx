@@ -6,12 +6,11 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
-import { Alert, Drawer, Flex, Space } from 'antd';
 import { l10n } from '@difizen/mana-l10n';
+import { Alert, Drawer, Flex } from 'antd';
 
-import { FilePreviewService } from './service';
 import CSVPreviewer from './previewer-csv';
-import { identity, noop } from 'lodash-es';
+import { FilePreviewService } from './service';
 
 const MAX_PREVIEW_LENGTH = 100000;
 

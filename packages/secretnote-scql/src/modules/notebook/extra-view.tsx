@@ -11,10 +11,8 @@ import type { UploadProps } from 'antd';
 import { message, Modal, Space, Tooltip, Upload } from 'antd';
 import { Plus, Upload as UploadIcon } from 'lucide-react';
 
+import { NotebookFileService } from '@/modules/notebook';
 import { readFile } from '@/utils';
-
-import { NotebookFileService } from './service';
-import React from 'react';
 
 export const ExtraComponent = () => {
   const instance = useInject<ExtraView>(ViewInstance);

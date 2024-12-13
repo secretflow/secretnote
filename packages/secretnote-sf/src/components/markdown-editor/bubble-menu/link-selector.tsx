@@ -1,12 +1,13 @@
 import { l10n } from '@difizen/mana-l10n';
 import type { Editor } from '@tiptap/core';
+import { message } from 'antd';
 import classnames from 'classnames';
 import { Check, Trash } from 'lucide-react';
 import type { Dispatch, FC, SetStateAction } from 'react';
 import { useEffect, useRef } from 'react';
+
 import { getUrlFromString } from '../util';
 import './link-selector.less';
-import { message } from 'antd';
 
 interface LinkSelectorProps {
   editor: Editor;

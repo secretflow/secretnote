@@ -28,12 +28,12 @@ import {
 import { Plus, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import { genericErrorHandler, invert, hashStringToColor, wait } from '@/utils';
-import { ServerStatus } from '../server';
+import type { NodeStatusTag, SecretNoteNode } from '@/modules/node/service';
+import { NodeService } from '@/modules/node/service';
+import { ServerStatus } from '@/modules/server';
+import { getGlobalConfig } from '@/modules/storage/local-storage-service';
+import { genericErrorHandler, hashStringToColor, invert, IPRegex, wait } from '@/utils';
 import './index.less';
-import type { NodeStatusTag, SecretNoteNode } from './service';
-import { NodeService } from './service';
-import { getGlobalConfig } from '../storage/local-storage-service';
 
 const { Paragraph } = Typography;
 
@@ -229,7 +229,7 @@ export const NodeComponent = () => {
             name="podIp"
             rules={[
               {
-                pattern: /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}\:\d{1,5}$/,
+                pattern: IPRegex,
                 message: l10n.t('格式不正确'),
               },
             ]}

@@ -1,8 +1,8 @@
 // Service about project members management.
 
-import { singleton, prop, inject } from '@difizen/mana-app';
+import { inject, prop, singleton } from '@difizen/mana-app';
 
-import { _Member, BrokerService } from '@/modules/scql-broker';
+import { type _Member, BrokerService } from '@/modules/scql-broker';
 import { getProjectId } from '@/utils/scql';
 
 @singleton()

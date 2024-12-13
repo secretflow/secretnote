@@ -4,9 +4,9 @@
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
 import { ExtraView } from './extra-view';
+import { FilePreviewService, FilePreviewView, filePreviewViewKey } from './preview';
 import { FileService } from './service';
 import { FileView, fileViewKey } from './view';
-import { FilePreviewService, FilePreviewView, filePreviewViewKey } from './preview';
 
 export const FileModule = ManaModule.create().register(
   FileService,

@@ -15,15 +15,14 @@ import {
   ViewInstance,
   ViewManager,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { Collapse, type CollapseProps, Space, Tooltip, Typography } from 'antd';
 import { InfoIcon } from 'lucide-react';
 import React from 'react';
 
+import SecretNotePkgJSON from '@/../package.json';
+import { SideBarContribution } from '@/modules/layout/protocol';
 import LibroJupyterPkgJSON from '@difizen/libro-jupyter/package.json';
-import SecretNotePkgJSON from '../../../package.json';
-
-import { l10n } from '@difizen/mana-l10n';
-import { SideBarContribution } from './protocol';
 
 export const metricsMonitorKey = 'metricsMonitor';
 

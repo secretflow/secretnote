@@ -1,10 +1,9 @@
 import type { IContentsModel } from '@difizen/libro-jupyter';
 import {
   ContentsManager,
-  ExecutedWithKernelCellModel,
+  DocumentCommands,
   LibroModel,
   SaveFileErrorModal,
-  DocumentCommands,
 } from '@difizen/libro-jupyter';
 import { CommandRegistry, inject, ModalService, transient } from '@difizen/mana-app';
 import { debounce, noop } from 'lodash-es';
@@ -78,10 +77,11 @@ export class SecretNoteModel extends LibroModel {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   canRun = (..._: any) => true;
   interrupt = noop;
   shutdown = noop;
-  restart = noop;
+  restart = () => Promise.resolve();
   reconnect = noop;
   findRunningCell = noop;
   createCheckpoint = noop;

@@ -18,10 +18,9 @@ import React from 'react';
 
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-
+import { NotebookFileService } from '@/modules/notebook';
 import { genericErrorHandler } from '@/utils';
 import './index.less';
-import { NotebookFileService } from './service';
 
 export const NotebookFileComponent = () => {
   const instance = useInject<NotebookFileView>(ViewInstance);

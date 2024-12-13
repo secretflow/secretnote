@@ -3,7 +3,6 @@ import type { Editor } from '@tiptap/core';
 import { Popover } from 'antd';
 import {
   Check,
-  CheckSquare,
   ChevronDown,
   Code,
   Heading1,

@@ -1,22 +1,29 @@
 // The modal used for configuring the CCL of a table.
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
-import { Modal, message, Table, TableColumnsType, Select, Space, Flex } from 'antd';
+import { l10n } from '@difizen/mana-l10n';
+import {
+  Flex,
+  message,
+  Modal,
+  Select,
+  Space,
+  Table,
+  type TableColumnsType,
+} from 'antd';
 import { useState } from 'react';
 
-import { TableService } from './service';
 import {
   _ColumnControlConstraint,
-  _Table,
+  type _Table,
   BrokerService,
   ColumnControl,
 } from '@/modules/scql-broker';
-import { l10n } from '@difizen/mana-l10n';
-import { genericErrorHandler } from '@/utils';
 import { MemberService } from '@/modules/scql-member/service';
+import { genericErrorHandler } from '@/utils';
 import { getProjectId } from '@/utils/scql';
+import { TableService } from './service';
 
 type CCLModalData = {
   table: _Table;
@@ -72,7 +79,7 @@ const CCLModalComponent = (props: ModalItemProps<CCLModalData>) => {
    * Transform SCQL CCL to TableItem for Antd Table to display.
    */
   function transformCCLToTableData(ccl: ColumnControl[]) {
-    const tableData: TableItem[] = []; // transformed for Antd Table to display
+    const tableData_: TableItem[] = []; // transformed for Antd Table to display
     const columns = table!.columns,
       members = memberService.members;
     columns.forEach((column) => {
@@ -90,9 +97,9 @@ const CCLModalComponent = (props: ModalItemProps<CCLModalData>) => {
           item[cc.party_code] = cc.constraint;
         }
       });
-      tableData.push(item);
+      tableData_.push(item);
     });
-    return tableData;
+    return tableData_;
   }
 
   /**

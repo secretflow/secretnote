@@ -1,5 +1,5 @@
-import { LibroView, NotebookCommands } from '@difizen/libro-jupyter';
-import { ModalItem, ModalItemProps } from '@difizen/mana-app';
+import { type LibroView, NotebookCommands } from '@difizen/libro-jupyter';
+import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Modal } from 'antd';
 import { useCallback } from 'react';
@@ -12,7 +12,7 @@ export function RestartClearOutputModalComponent({
   const handleRestart = useCallback(() => {
     data?.restartClearOutput();
     close();
-  }, [data]);
+  }, [data, close]);
 
   return (
     <Modal

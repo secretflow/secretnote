@@ -2,8 +2,8 @@
 
 import { URL as LibroURL, type ISettings } from '@difizen/libro-jupyter';
 
-import { genericErrorHandler } from './error';
 import { getGlobalConfig } from '@/modules/storage/local-storage-service';
+import { genericErrorHandler } from '@/utils';
 
 /**
  * Get the base URL of a remote server for HTTP requests.

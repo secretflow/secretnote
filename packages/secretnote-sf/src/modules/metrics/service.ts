@@ -1,15 +1,14 @@
 // Service for metrics.
 
+import { IKernelConnection } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import { Poll } from '@lumino/polling';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
+import { NotebookFileService } from '@/modules/notebook';
 import type { IServer, ServerStatus } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
 import { genericErrorHandler, request } from '@/utils';
-
-import { IKernelConnection } from '@difizen/libro-jupyter';
-import { NotebookFileService } from '@/modules/notebook';
 
 // The metrics information of one single server.
 interface ServerMetric {
