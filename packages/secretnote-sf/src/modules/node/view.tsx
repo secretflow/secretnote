@@ -311,7 +311,7 @@ export const NodeComponent = () => {
         arrow={false}
       >
         {/* Add two nodes at most */}
-        {service.nodes.length < 2 && (
+        {(getGlobalConfig()?.selfDeploy ? true : service.nodes.length < 2) && (
           <Button
             icon={<Plus size={16} />}
             className="btn"
