@@ -30,9 +30,8 @@ import { TableConfigModal } from './add-modal';
 import { CCLConfigModal } from './ccl-modal';
 import { TableService } from './service';
 import { noop } from 'lodash-es';
-import { _Table, BrokerService, ColumnControl } from '@/modules/scql-broker';
+import { _Table, BrokerService } from '@/modules/scql-broker';
 import { getProjectId } from '@/utils/scql';
-import { ProjectService } from '@/modules/scql-project/service';
 import './index.less';
 import { MemberService } from '../scql-member/service';
 

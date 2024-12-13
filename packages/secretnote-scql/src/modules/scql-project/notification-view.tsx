@@ -16,7 +16,6 @@ import {
   Badge,
   Tabs,
   type TabsProps,
-  Divider,
   Tooltip,
   Avatar,
   Flex,
