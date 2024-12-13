@@ -45,7 +45,7 @@ export class FileService {
   async getFileTree() {
     const maybeServerList = await this.serverManager.getServerList();
     if (!maybeServerList) {
-      genericErrorHandler(l10n.t('获取 Server 列表失败'));
+      genericErrorHandler(new Error(l10n.t('获取 Server 列表失败')));
       return;
     }
 

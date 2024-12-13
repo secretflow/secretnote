@@ -91,21 +91,23 @@ export const TableComponent = () => {
           title: member.party,
           belongToMe: selfParty === member.party,
           isLeaf: false,
-          children: tables.map((table) => ({
-            key: `${table.tableName}-${member.party}`,
-            title: table.tableName,
-            belongToMe: selfParty === table.tableOwner,
-            isLeaf: true,
-            table,
-          })),
+          children: tables
+            // filter out those tables that does not belong to current member
+            .filter((v) => v.tableOwner === member.party)
+            .map((table) => ({
+              key: `${table.tableName}-${member.party}`,
+              title: table.tableName,
+              belongToMe: selfParty === table.tableOwner,
+              isLeaf: true,
+              table,
+            })),
         });
       });
-
       return _nodes;
     }
 
     setNodes(transformTablesToTreeNodes());
-  }, [memberService, tableService, brokerService.platformInfo]);
+  }, [memberService.members, tableService.tables, brokerService.platformInfo]);
 
   const onMenuClick = (key: string, node: TreeDataNode) => {
     switch (key) {

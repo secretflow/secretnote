@@ -106,7 +106,7 @@ export const ProjectComponent = () => {
           ]}
         />
       </div>
-      <Flex justify="center" gap={'1em'} style={{ paddingTop: '8px' }}>
+      <Flex justify="center" gap={'1em'} style={{ paddingTop: '12px' }}>
         <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
           SecretFlow
         </Typography.Link>
@@ -115,6 +115,9 @@ export const ProjectComponent = () => {
           target="_blank"
         >
           SecretNote
+        </Typography.Link>
+        <Typography.Link href="https://studio.secretflow.com" target="_blank">
+          隐语实训平台
         </Typography.Link>
       </Flex>
     </div>

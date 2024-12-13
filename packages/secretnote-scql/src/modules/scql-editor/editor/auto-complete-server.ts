@@ -10,6 +10,7 @@ import type {
   IStatement,
   ITableInfo,
 } from '@/modules/scql-editor/editor/sql-parser';
+import { genericErrorHandler } from '@/utils';
 
 type Column = {
   name: string;
@@ -87,7 +88,10 @@ const getTableCCL = async (tableName: string) => {
         resolve(ccl);
         return;
       })
-      .catch(reject);
+      .catch((e) => {
+        genericErrorHandler(e);
+        resolve([]);
+      });
   });
 
   return await getTableCCLPromiseMap[tableName];
