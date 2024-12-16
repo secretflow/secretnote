@@ -107,7 +107,13 @@ export const TableComponent = () => {
     }
 
     setNodes(transformTablesToTreeNodes());
-  }, [memberService.members, tableService.tables, brokerService.platformInfo]);
+  }, [
+    memberService,
+    tableService,
+    memberService.members,
+    tableService.tables,
+    brokerService.platformInfo,
+  ]);
 
   const onMenuClick = (key: string, node: TreeDataNode) => {
     switch (key) {

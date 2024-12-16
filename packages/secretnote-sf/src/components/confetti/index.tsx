@@ -1,11 +1,6 @@
 import confetti from 'canvas-confetti';
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 function useUntrackedValue<T>(value: T) {
   const ref = useRef(value);

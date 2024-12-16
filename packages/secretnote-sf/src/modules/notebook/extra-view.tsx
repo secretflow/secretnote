@@ -12,6 +12,7 @@ import { message, Modal, Space, Tooltip, Upload } from 'antd';
 import { Plus, Upload as UploadIcon } from 'lucide-react';
 
 import { readFile } from '@/utils';
+
 import { NotebookFileService } from './service';
 
 export const ExtraComponent = () => {

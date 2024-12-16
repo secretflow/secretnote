@@ -61,7 +61,7 @@ const getTableCCL = async (tableName: string) => {
     return await getTableCCLPromiseMap[tableName];
   }
 
-  getTableCCLPromiseMap[tableName] = new Promise((resolve, reject) => {
+  getTableCCLPromiseMap[tableName] = new Promise((resolve) => {
     if (!tableName.match(/^[a-zA-Z0-9_]+$/)) {
       // avoid e.g. SELECT * crashes the application
       return resolve([]);

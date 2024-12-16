@@ -1,6 +1,5 @@
 // The metrics panel component.
 
-import { convertSizeUnit, entriesWithSortedKey } from '@/utils';
 import {
   BaseView,
   inject,
@@ -12,6 +11,9 @@ import {
 import { l10n } from '@difizen/mana-l10n';
 import { Tag } from 'antd';
 import { useEffect } from 'react';
+
+import { convertSizeUnit, entriesWithSortedKey } from '@/utils';
+
 import './index.less';
 import { MetricsService } from './service';
 

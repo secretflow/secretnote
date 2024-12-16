@@ -3,6 +3,7 @@
 import { createViewPreference, ManaModule } from '@difizen/mana-app';
 
 import { HeaderArea } from '@/modules/layout';
+
 import { NodeService } from './service';
 import { NodeView } from './view';
 

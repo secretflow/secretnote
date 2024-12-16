@@ -1,6 +1,6 @@
 // Service for metrics.
 
-import { IKernelConnection } from '@difizen/libro-jupyter';
+import type { IKernelConnection } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
 import { Poll } from '@lumino/polling';
 

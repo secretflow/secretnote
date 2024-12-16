@@ -41,6 +41,7 @@ export const EditorComponent = () => {
             instance.notebookFileService.currentLibroView = v;
             setLibroView(v);
           }
+          return;
         })
         .catch(genericErrorHandler);
     }

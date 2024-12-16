@@ -16,9 +16,9 @@ import { useState } from 'react';
 
 import {
   _ColumnControlConstraint,
-  type _Table,
   BrokerService,
-  ColumnControl,
+  type _Table,
+  type ColumnControl,
 } from '@/modules/scql-broker';
 import { MemberService } from '@/modules/scql-member/service';
 import { genericErrorHandler } from '@/utils';
@@ -105,12 +105,12 @@ const CCLModalComponent = (props: ModalItemProps<CCLModalData>) => {
   /**
    * Transform TableItem to SCQL CCL for broker to update.
    */
-  async function transformTableDataToCCL(tableData: TableItem[]) {
+  async function transformTableDataToCCL(tableData_: TableItem[]) {
     // Since CCL corresponding with tableData might be just a subset of the complete CCL,
     // we copy the original CCL first and update it, instead of generating from tableData
     // directly.
     const ccl = (await tableService.getTableCCL(table!.tableName))!;
-    tableData.forEach((item) => {
+    tableData_.forEach((item) => {
       const columnName = item.$column;
       // update or create for each party
       Object.keys(item).forEach((maybeParty) => {

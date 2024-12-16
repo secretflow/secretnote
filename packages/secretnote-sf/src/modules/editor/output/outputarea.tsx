@@ -148,6 +148,7 @@ export class SecretNoteOutputArea extends LibroOutputArea {
   async flushOutputs() {
     // sort outputs by server name in alphabetical order
     const outputs = entriesWithSortedKey(this.kernelOutputs, this.kernelIdToServerName)
+      // eslint-ignore-next-line @typescript-eslint/no-unused-vars
       .map(([_, v]) => v)
       .flat()
       .filter((v) => v !== void 0);

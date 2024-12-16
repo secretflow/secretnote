@@ -1,3 +1,5 @@
+// eslint-disable import/order
+
 // Sidebar is the bar displayed on the left which displays notebook file list, server data file list,
 // node CPU/MEM usage, and "about" information of the application.
 
