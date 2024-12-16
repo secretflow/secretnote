@@ -16,7 +16,7 @@ SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需
 
 ### 本地启动 SecretNote SF
 
-- 安装 SecretNote Python 包，Python 版本需在 3.10 及以上、3.12 以下
+- 安装 [SecretNote Python 包](https://pypi.org/project/secretnote)，Python 版本需在 3.10 及以上、3.12 以下
 
   ```sh
   pip install secretnote
@@ -44,7 +44,7 @@ SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需
 
 SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置 CCL 和编写 Query 的难度。
 
-- 安装 SecretNote Python 包，Python 版本需在 3.10 及以上、3.12 以下
+- 安装 [SecretNote Python 包](https://pypi.org/project/secretnote)，Python 版本需在 3.10 及以上、3.12 以下
 
   ```sh
   pip install secretnote
