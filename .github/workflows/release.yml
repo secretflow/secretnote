@@ -52,7 +52,7 @@ jobs:
       - name: Bootstrap and Build
         shell: bash
         run: |
-          pnpm run ci:bootstrap
+          pnpm run ci:setup
           pnpm run ci:build
 
       - name: Publish to PyPI

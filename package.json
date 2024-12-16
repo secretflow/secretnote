@@ -12,7 +12,7 @@
     "build": "nx run-many -t build:component -t build:site && nx run-many -t build:py",
     "format:black": "python -m black pyprojects",
     "format:prettier": "prettier --write --ignore-unknown packages/**/*.{ts,tsx}",
-    "ci:bootstrap": "pnpm install --frozen-lockfile && pip install -r requirements.txt",
+    "ci:setup": ":",
     "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t typecheck:tsc",
     "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
     "ci:build": "nx run-many -t build:component -t build:site && nx run-many -t build:py:ci",
