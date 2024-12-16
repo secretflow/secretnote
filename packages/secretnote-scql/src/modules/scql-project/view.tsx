@@ -55,7 +55,7 @@ export const ProjectComponent = () => {
       <div className="content">
         <Table
           dataSource={filteredProjects}
-          rowKey="id"
+          rowKey="project_id"
           pagination={
             filteredProjects.length > 15 ? { pageSize: 10, size: 'small' } : false
           }
