@@ -34,9 +34,8 @@ Start SecretNote SCQL for SCQL programming
 secretnote scql . --config=/somewhere/config.py
 ```
 
-Common [Jupyter Command Line Options][jupyter-options] are supported. For example, to change the port, use
+Common Jupyter Command Line Options are supported. For example, to change the port, use
 
 ```bash
 secretnote sf . --ServerApp.port 8889
 ```
-
