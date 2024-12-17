@@ -1,6 +1,7 @@
-import { NotebookFileService } from '@/modules/notebook';
 import { inject, singleton } from '@difizen/mana-app';
-import { ISnippet } from './view';
+
+import { NotebookFileService } from '@/modules/notebook';
+import type { ISnippet } from '@/modules/toolbar/snippet/view';
 
 @singleton()
 export class SnippetService {

@@ -4,20 +4,23 @@ import {
   BaseView,
   inject,
   singleton,
+  Slot,
   useInject,
   view,
   ViewInstance,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import type { UploadProps } from 'antd';
-import { message, Modal, Space, Spin, Tree, Upload } from 'antd';
-import type { DataNode } from 'antd/es/tree';
+import type { TreeDataNode as DataNode, UploadProps } from 'antd';
+import { message, Modal, Space, Tree, Upload } from 'antd';
+import { noop } from 'lodash-es';
 import {
   ChevronDown,
   ClipboardCopy,
   Download,
   File,
   FileText,
+  Fullscreen,
+  ScanText,
   ScrollText,
   Table,
   Trash,
@@ -25,12 +28,14 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
+import BusySpin from '@/components/busy-spin';
 import type { Menu } from '@/components/dropdown-menu';
 import { DropdownMenu } from '@/components/dropdown-menu';
+import { FilePreviewService, LEGAL_TABLE_EXTS } from '@/modules/file/preview';
+import { FileService } from '@/modules/file/service';
 import { SideBarContribution } from '@/modules/layout';
-import { genericErrorHandler, readFile } from '@/utils';
+import { genericErrorHandler } from '@/utils';
 import './index.less';
-import { FileService } from './service';
 
 const { DirectoryTree } = Tree;
 
@@ -43,14 +48,16 @@ const IconMap: Record<string, React.ReactElement> = {
 
 export const FileComponent = () => {
   const instance = useInject<FileView>(ViewInstance);
-  const fileService = instance.fileService;
+  const { fileService, filePreviewService } = instance;
   const [isUploading, setIsUploading] = useState(false);
 
   const onMenuClick = (key: string, node: DataNode) => {
     switch (key) {
       case 'copy':
-        fileService.copyPath(node);
-        message.success(l10n.t('路径已经复制到剪切板'));
+        fileService
+          .copyPath(node)
+          .then(() => message.success(l10n.t('路径已经复制到剪切板')))
+          .catch(() => message.error(l10n.t('复制失败')));
         break;
       case 'delete':
         Modal.confirm({
@@ -72,9 +79,17 @@ export const FileComponent = () => {
       case 'download':
         fileService.downloadFile(node);
         break;
-      case 'view':
-        fileService.viewFile(node);
+      case 'previewAsText':
+      case 'previewAsTable': {
+        const {
+          serverId = '',
+          path = '',
+          serverName,
+        } = FileService.parseNodeKey(node.key as string);
+        const as_ = ({ previewAsText: 'text', previewAsTable: 'table' } as const)[key];
+        filePreviewService.preview(as_, serverId, path, serverName);
         break;
+      }
       default:
         break;
     }
@@ -99,7 +114,7 @@ export const FileComponent = () => {
   const uploadRender = (nodeData: DataNode) => {
     const props: UploadProps = {
       beforeUpload: async (file) => {
-        const isExisted = await fileService.isFileExist(nodeData, file.name);
+        const isExisted = await fileService.isFileExisted(nodeData, file.name);
         if (isExisted) {
           Modal.confirm({
             title: l10n.t('上传文件'),
@@ -129,7 +144,7 @@ export const FileComponent = () => {
   const getFileIcon = (nodeData: DataNode) => {
     const isLeaf = nodeData.isLeaf;
     if (isLeaf) {
-      const ext = fileService.getFileExt(nodeData);
+      const ext = FileService.getFileExt(nodeData);
       if (ext && ext in IconMap) {
         return IconMap[ext];
       }
@@ -140,7 +155,6 @@ export const FileComponent = () => {
 
   const titleRender = (nodeData: DataNode) => {
     const isLeaf = nodeData.isLeaf;
-
     const folderMenuItems: Menu[] = [
       {
         key: 'uploadFile',
@@ -148,8 +162,21 @@ export const FileComponent = () => {
         icon: <UploadIcon size={12} />,
       },
     ];
+    const previewAsText = {
+      key: 'previewAsText',
+      label: l10n.t('文本预览'),
+      icon: <ScanText size={12} />,
+    };
+    const previewAsTable = {
+      key: 'previewAsTable',
+      label: l10n.t('表格预览'),
+      icon: <Fullscreen size={12} />,
+    };
+
     const dataMenuItems: Menu[] = [
-      // { key: 'view', label: l10n.t('查看'), icon: <Link size={12} /> },
+      ...(LEGAL_TABLE_EXTS.includes(FileService.getFileExt(nodeData) ?? '')
+        ? [previewAsText, previewAsTable]
+        : [previewAsText]),
       {
         key: 'copy',
         label: l10n.t('复制路径到剪切板'),
@@ -172,18 +199,7 @@ export const FileComponent = () => {
           <span>{nodeData.title as string}</span>
         </Space>
         <DropdownMenu
-          icon={
-            isUploading ? (
-              <>
-                <Space direction="horizontal" size="small">
-                  <Spin size="small" />
-                  {l10n.t('正忙...')}
-                </Space>
-              </>
-            ) : (
-              void 0
-            )
-          } // undefined fallbacks to default "..." icon
+          icon={isUploading ? <BusySpin /> : void 0} // undefined fallbacks to default "..." icon
           items={isLeaf ? dataMenuItems : folderMenuItems}
           disabled={isUploading}
           onClick={(key) => {
@@ -198,17 +214,21 @@ export const FileComponent = () => {
   };
 
   return (
-    <DirectoryTree
-      blockNode
-      onSelect={() => {
-        // do nothing
-      }}
-      treeData={fileService.fileTree}
-      className="secretnote-file-tree"
-      switcherIcon={<ChevronDown size={12} />}
-      icon={null}
-      titleRender={titleRender}
-    />
+    <>
+      {fileService.fileTree === null && <BusySpin />}
+      {fileService.fileTree && (
+        <DirectoryTree
+          blockNode
+          onSelect={noop}
+          treeData={fileService.fileTree}
+          className="secretnote-file-tree"
+          switcherIcon={<ChevronDown size={12} />}
+          icon={null}
+          titleRender={titleRender}
+        />
+      )}
+      <Slot name="secretnote-file-preview-view" />
+    </>
   );
 };
 
@@ -217,6 +237,7 @@ export const fileViewKey = 'file';
 @view('secretnote-file-view')
 export class FileView extends BaseView implements SideBarContribution {
   readonly fileService: FileService;
+  readonly filePreviewService: FilePreviewService;
 
   key = fileViewKey;
   label = l10n.t('文件');
@@ -224,9 +245,13 @@ export class FileView extends BaseView implements SideBarContribution {
   defaultOpen = true;
   view = FileComponent;
 
-  constructor(@inject(FileService) fileService: FileService) {
+  constructor(
+    @inject(FileService) fileService: FileService,
+    @inject(FilePreviewService) filePreviewService: FilePreviewService,
+  ) {
     super();
     this.fileService = fileService;
+    this.filePreviewService = filePreviewService;
     this.fileService.getFileTree();
   }
 }

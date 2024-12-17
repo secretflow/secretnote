@@ -9,10 +9,11 @@ import {
   ViewInstance,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
+import { Tag } from 'antd';
 import { useEffect } from 'react';
 
-import { convertSizeUnit } from '@/utils';
-import { Tag } from 'antd';
+import { convertSizeUnit, entriesWithSortedKey } from '@/utils';
+
 import './index.less';
 import { MetricsService } from './service';
 
@@ -35,12 +36,16 @@ const MetricsComponent = () => {
     ` / ${l10n.t('内存')} ` +
     `${convertSizeUnit(v.memory, 'GB').toFixed(1)} (GB)`;
 
+  const lookupKey = Object.fromEntries(
+    Object.entries(metrics).map(([key, value]) => [key, value.name]),
+  ); // server id -> server name
+
   return (
     <div className="secretnote-kernel-status">
       <p className="title">{l10n.t('节点监控')}</p>
 
       {Object.keys(metrics).length > 0 ? (
-        Object.entries(metrics).map(([id, v]) => (
+        entriesWithSortedKey(metrics, lookupKey).map(([id, v]) => (
           <div key={id} className="kernel-status-item">
             <div className="server-name">{v.name}</div>
             <Tag style={{ fontFamily: 'monospace, monospace' }}>{formatMetric(v)}</Tag>

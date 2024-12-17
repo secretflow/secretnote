@@ -3,12 +3,6 @@
 // but the request method are overriden instead of using the globally injected one.
 // To make it short, shared comments are removed. Please refer to the original source file if you need.
 
-import {
-  createNotImplemented,
-  getDefaultServerConnectionSettings,
-  getRemoteBaseUrl,
-  requestNoUnpack,
-} from '@/utils';
 import type {
   IContentsChangedArgs,
   IContentsDrive,
@@ -17,6 +11,13 @@ import type {
 import { Drive as DefaultDrive } from '@difizen/libro-jupyter';
 import { Emitter, singleton } from '@difizen/mana-app';
 
+import {
+  createNotImplemented,
+  getDefaultServerConnectionSettings,
+  getRemoteBaseUrl,
+  requestNoUnpack,
+} from '@/utils';
+
 /**
  * Name of the customized drive.
  */
@@ -24,8 +25,8 @@ export const DriveName = 'SecretNoteContentsDrive';
 
 @singleton()
 export class SecretNoteContentsDrive implements IContentsDrive {
-  readonly name: string = DriveName; // Name of drive, used at the leading component of file paths.
-  protected apiEndpoint: string = 'api/contents';
+  readonly name = DriveName; // Name of drive, used at the leading component of file paths.
+  protected apiEndpoint = 'api/contents';
   protected _isDisposed = false;
   protected fileChangedEmitter = new Emitter<IContentsChangedArgs>();
 
@@ -72,6 +73,7 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   save = DefaultDrive.prototype.save.bind(this);
   copy = DefaultDrive.prototype.copy.bind(this);
   // this one is special because its internal doesn't use `makeRequest` directly
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getDownloadUrl = async (localPath: string, ...args: any) => {
     const baseUrl = getRemoteBaseUrl();
     // so we need to override its baseUrl temporarily to let it work
@@ -95,7 +97,9 @@ export class SecretNoteContentsDrive implements IContentsDrive {
    * Not allowed to override settings used by makeRequest here. Return nothing.
    * @override Drive._getSettings
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected _getSettings(...args: any) /* :ISettings */ {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return void 0;
   }

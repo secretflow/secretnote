@@ -14,9 +14,9 @@ import {
 import { debounce } from 'lodash-es';
 
 import { SecretNoteKernelManager } from '@/modules/kernel';
+import { NotebookFileService } from '@/modules/notebook';
 import type { IServer } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
-import { NotebookFileService } from '../notebook';
 
 @transient()
 export class SecretNoteModel extends LibroModel {

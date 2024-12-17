@@ -26,27 +26,25 @@ os.makedirs(c.ServerApp.root_dir, exist_ok=True)
 c.ResourceUseDisplay.track_cpu_percent = True
 
 c.LanguageServerManager.autodetect = False
-libro_analyzer_entry = path.abspath(
-    path.join(dirname, "../../../node_modules/@difizen/libro-analyzer/index.js")
+pylez_entry = path.abspath(
+    path.join(dirname, "../../../node_modules/@difizen/pylez/index.js")
 )
-if not path.exists(libro_analyzer_entry):
-    logging.warning(
-        f"libro-analyzer not found at {libro_analyzer_entry}. LSP will be disabled."
-    )
+if not path.exists(pylez_entry):
+    logging.warning(f"pylez not found at {pylez_entry}. LSP will be disabled.")
 c.LanguageServerManager.language_servers = {
-    # `libro-analyzer` is a derived version of pyright with virtual document enabled
+    # `pylez` is a derived version of pyright with virtual document enabled
     # whole notebook LSP ability. Note that when it runs with --stdio, the frontend
     # is unable to see its errors output in the WebSocket messages. You might need
     # to debug it blindly. (See https://github.com/microsoft/pyright/issues/4446)
     "libro-analyzer": {
-        "languages": ["python"],
-        "mime_types": ["text/x-python"],
-        "display_name": "libro-analyzer",
-        "version": 2,
         "argv": [
             "node",
-            libro_analyzer_entry,
+            pylez_entry,
             "--stdio",
         ],
+        "languages": ["python"],
+        "version": 2,
+        "mime_types": ["text/x-python"],
+        "display_name": "libro-analyzer",
     },
 }

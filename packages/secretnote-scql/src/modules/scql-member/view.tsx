@@ -12,22 +12,21 @@ import { l10n } from '@difizen/mana-l10n';
 import {
   Avatar,
   Button,
-  Tooltip,
   Form,
   Input,
   message,
   Popover,
   Space,
+  Tooltip,
   Typography,
 } from 'antd';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import './index.less';
+import { BrokerService } from '@/modules/scql-broker';
+import { MemberService } from '@/modules/scql-member/service';
 import { genericErrorHandler, invert, randomColorByName } from '@/utils';
-
-import { MemberService } from './service';
-import { BrokerService } from '../scql-broker';
+import './index.less';
 
 /**
  * Get the Id (name) of current project.

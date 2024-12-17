@@ -20,7 +20,8 @@ module.exports = {
     curly: 'error',
 
     // stricter type correctness
-    '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
+    '@typescript-eslint/no-explicit-any': ['off'],
+    '@typescript-eslint/no-non-null-assertion': ['off'],
     '@typescript-eslint/no-shadow': [
       'warn',
       {

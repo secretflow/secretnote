@@ -1,46 +1,7 @@
-import { FileReader as CsvFileReader } from '@kanaries/web-data-loader';
 import { dsvFormat } from 'd3-dsv';
 
-const getBlob = (url: string, method = 'GET'): Promise<Blob> => {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, url, true);
-    xhr.responseType = 'blob';
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        resolve(xhr.response);
-      }
-    };
-    xhr.send();
-  });
-};
-
-const saveAs = (blob: Blob, filename: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nav = window.navigator as any;
-  if (nav.msSaveOrOpenBlob) {
-    nav.msSaveBlob(blob, filename);
-  } else {
-    const link = document.createElement('a');
-    const body = document.querySelector('body');
-
-    if (body) {
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-
-      link.style.display = 'none';
-      body.appendChild(link);
-
-      link.click();
-      body.removeChild(link);
-
-      window.URL.revokeObjectURL(link.href);
-    }
-  }
-};
-
 /**
- * Read file content as text or base64 (without prelude) string.
+ * Read file content as text or base64 string without prelude.
  */
 export async function readFile(
   file: File | Blob,
@@ -56,6 +17,7 @@ export async function readFile(
         reader.readAsText(file);
       } else if (format === 'base64') {
         reader.addEventListener('loadend', () => {
+          // remove the prelude of the base64 string created by browser
           const regex = /data:.*base64,/;
           const base64 = (reader.result as string).replace(regex, '');
           resolve((base64 as string) || '');
@@ -68,35 +30,13 @@ export async function readFile(
   });
 }
 
-export async function readCSVFile(file: File): Promise<unknown> {
-  return await CsvFileReader.csvReader({
-    file: file,
-    config: {
-      type: 'reservoirSampling',
-      size: 400,
-    },
-    onLoading: (value) => {
-      // eslint-disable-next-line no-console
-      console.log(`upload progress ${(value * 100).toFixed(2) + '%'}`);
-    },
-  });
-}
+/**
+ * Parse csv string to array of objects.
+ */
+export const parseCSV = (csv: string, header?: string[], delim = ',') => {
+  const content = header ? `${header.join(delim)}\n${csv}` : csv;
 
-export const parseCSV = (csv: string, header?: string[]) => {
-  const DELIMITER = ',';
-  const content = header ? `${header.join(DELIMITER)}\n${csv}` : csv;
-  return dsvFormat(DELIMITER).parse(content);
-};
-
-export const downloadFileByBlob = (url: string, filename = '', method = 'GET') => {
-  getBlob(url, method)
-    .then((blob: Blob) => {
-      saveAs(blob, filename);
-      return;
-    })
-    .catch(() => {
-      //
-    });
+  return dsvFormat(delim).parse(content);
 };
 
 /**
@@ -133,12 +73,3 @@ export const convertSizeUnit = (
   }
   return size;
 };
-
-/**
- * Normalize a extension name, guarantee it starts with a dot.
- */
-export function normalizeExtension(extension: string): string {
-  return extension.length > 0 && extension.indexOf('.') !== 0
-    ? `.${extension}`
-    : extension;
-}

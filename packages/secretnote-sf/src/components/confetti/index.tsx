@@ -1,6 +1,5 @@
 import confetti from 'canvas-confetti';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import React from 'react';
+import type React from 'react';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 function useUntrackedValue<T>(value: T) {

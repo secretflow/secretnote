@@ -3,12 +3,6 @@
 // but the request method are overriden instead of using the globally injected one.
 // To make it short, shared comments are removed. Please refer to the original source file if you need.
 
-import {
-  createNotImplemented,
-  getDefaultServerConnectionSettings,
-  getLocalBaseUrl,
-  requestNoUnpack,
-} from '@/utils';
 import type {
   IContentsChangedArgs,
   IContentsDrive,
@@ -16,6 +10,13 @@ import type {
 } from '@difizen/libro-jupyter';
 import { Drive as DefaultDrive } from '@difizen/libro-jupyter';
 import { Emitter, singleton } from '@difizen/mana-app';
+
+import {
+  createNotImplemented,
+  getDefaultServerConnectionSettings,
+  getLocalBaseUrl,
+  requestNoUnpack,
+} from '@/utils';
 
 /**
  * Name of the customized drive.
@@ -73,7 +74,8 @@ export class SecretNoteContentsDrive implements IContentsDrive {
   save = DefaultDrive.prototype.save.bind(this);
   copy = DefaultDrive.prototype.copy.bind(this);
   // this one is special because its internal doesn't use `makeRequest` directly
-  getDownloadUrl = async (localPath: string, ...args: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getDownloadUrl = async (localPath: string, ..._: any) => {
     const baseUrl = getLocalBaseUrl();
     // so we need to override its baseUrl temporarily to let it work
     const fullURL = await DefaultDrive.prototype.getDownloadUrl.call(this, localPath, {
@@ -96,8 +98,9 @@ export class SecretNoteContentsDrive implements IContentsDrive {
    * Not allowed to override settings used by makeRequest here. Return nothing.
    * @override Drive._getSettings
    */
-  protected _getSettings(...args: any) /* :ISettings */ {
-    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected _getSettings(..._: any) /* :ISettings */ {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return void 0;
   }

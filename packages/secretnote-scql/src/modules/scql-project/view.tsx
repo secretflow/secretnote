@@ -3,23 +3,23 @@
 import {
   BaseView,
   inject,
+  ModalContribution,
+  ModalService,
   singleton,
   useInject,
   view,
   ViewInstance,
-  ModalService,
-  ModalContribution,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
+import { Button, Flex, Input, Table, Typography } from 'antd';
+import { ArrowRight, KanbanSquare, Search } from 'lucide-react';
 import { useState } from 'react';
-import { Table, Input, Button, Flex, Typography } from 'antd';
-import { Search, KanbanSquare, ArrowRight } from 'lucide-react';
 
-import './index.less';
-import { ProjectConfigModal } from './add-modal';
-import { genericErrorHandler } from '@/utils';
 import { BrokerService } from '@/modules/scql-broker';
-import { ProjectService } from './service';
+import { ProjectConfigModal } from '@/modules/scql-project/add-modal';
+import { ProjectService } from '@/modules/scql-project/service';
+import { genericErrorHandler } from '@/utils';
+import './index.less';
 
 export const ProjectComponent = () => {
   const instance = useInject<ProjectView>(ViewInstance);
@@ -55,7 +55,7 @@ export const ProjectComponent = () => {
       <div className="content">
         <Table
           dataSource={filteredProjects}
-          rowKey="id"
+          rowKey="project_id"
           pagination={
             filteredProjects.length > 15 ? { pageSize: 10, size: 'small' } : false
           }
@@ -92,7 +92,6 @@ export const ProjectComponent = () => {
               title: l10n.t('操作'),
               dataIndex: 'action',
               key: 'action',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               render: (_, record) => (
                 <Button
                   icon={<ArrowRight size={16} />}
@@ -107,7 +106,7 @@ export const ProjectComponent = () => {
           ]}
         />
       </div>
-      <Flex justify="center" gap={'1em'} style={{ paddingTop: '8px' }}>
+      <Flex justify="center" gap={'1em'} style={{ paddingTop: '12px' }}>
         <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
           SecretFlow
         </Typography.Link>
@@ -116,6 +115,9 @@ export const ProjectComponent = () => {
           target="_blank"
         >
           SecretNote
+        </Typography.Link>
+        <Typography.Link href="https://studio.secretflow.com" target="_blank">
+          隐语实训平台
         </Typography.Link>
       </Flex>
     </div>

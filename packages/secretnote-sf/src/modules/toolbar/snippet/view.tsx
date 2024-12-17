@@ -1,14 +1,14 @@
 // Snippet component.
 
+import { useInject } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import { Collapse, Drawer, Flex, message, Table, Tooltip } from 'antd';
+import { Collapse, Drawer, Flex, message, Tooltip } from 'antd';
+import endent from 'endent';
 import { ArrowUpSquareIcon, CodeIcon } from 'lucide-react';
 import { useState } from 'react';
-import endent from 'endent';
 
 import './index.less';
 import { SnippetService } from './service';
-import { useInject } from '@difizen/mana-app';
 
 export interface ISnippet {
   key: string;
@@ -16,6 +16,15 @@ export interface ISnippet {
   code: string;
 }
 export const snippets: ISnippet[] = [
+  {
+    key: 'get_self_party',
+    label: l10n.t('获取本方节点名'),
+    code: endent`
+    import os
+    # 可根据此填写相关函数中的 party 参数，避免重复两个相似的 Cell
+    self_party = os.getenv("SELF_PARTY")
+    `,
+  },
   {
     key: 'sim_2pc',
     label: l10n.t('单机仿真 2PC'),
@@ -28,7 +37,7 @@ export const snippets: ISnippet[] = [
   },
   {
     key: 'cluster_2pc',
-    label: l10n.t('多机集群 3PC'),
+    label: l10n.t('多机集群 2PC'),
     code: endent`
     network_conf = {
       "parties": {

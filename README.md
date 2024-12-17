@@ -12,11 +12,11 @@ SecretNote 是为 SecretFlow (隐语) 学习者和开发者定制的高级工具
 
 ### 隐语实训平台云 SecretNote (推荐)
 
-SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需环境配置直接拉起计算节点，欢迎 [立即体验](https://www.secret-flow.com/secretnote)。
+SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需环境配置直接拉起计算节点，欢迎 [立即体验](https://studio.secretflow.com/secretnote)。
 
 ### 本地启动 SecretNote SF
 
-- 安装 SecretNote Python 包
+- 安装 [SecretNote Python 包](https://pypi.org/project/secretnote)，Python 版本需在 3.10 及以上、3.12 以下
 
   ```sh
   pip install secretnote
@@ -44,7 +44,7 @@ SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需
 
 SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置 CCL 和编写 Query 的难度。
 
-- 安装 SecretNote Python 包
+- 安装 [SecretNote Python 包](https://pypi.org/project/secretnote)，Python 版本需在 3.10 及以上、3.12 以下
 
   ```sh
   pip install secretnote
@@ -61,8 +61,8 @@ SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置
 - 分别作为 Alice 方和 Bob 方启动 SecretNote，即可开始实验
 
   ```sh
-  secretnote scql <work_dir> --party=alice --broker=http://127.0.0.1:8991
-  secretnote scql <work_dir> --party=bob --broker=http://127.0.0.1:8992
+  secretnote scql <work_dir> --party=alice --broker=http://127.0.0.1:8081
+  secretnote scql <work_dir> --party=bob --broker=http://127.0.0.1:8082
   ```
 
 - 如有需要，请查看更完整的具体[示例](docs/SCQL-INTRO.md)
@@ -106,12 +106,12 @@ pnpm bootstrap && pnpm build # 安装依赖并初次构建
 ```sh
 pnpm run dev # 在 packages/secretnote-sf 下监视组件修改
 pnpm run dev # 在 packages/secretnote-sf-site 下启动 DevServer
-NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/sf/.jupyter/config_dev.py --no-browser
+NODE_ENV=development python -m secretnote sf <work_dir> --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-browser
 # 在 pyprojects 下启动 Jupyter Server
 ```
 
-请根据需要调整 Playground DevServer 的代理配置。如需 HMR 能力，请暂时从 `../../../secretnote-sf` 引入组件。进一步了解项目结构和 API 约定可查看 [CONTRIBUTING](CONTRIBUTING.md)。
+请根据需要调整 Playground DevServer 的代理配置。进一步了解项目结构和 API 约定可查看 [CONTRIBUTING](CONTRIBUTING.md)。
 
 ## 问题与反馈
 
-请在 [Issues](https://github.com/secretflow/secretnote/issues) 反馈，或点击 [隐语实训平台](https://www.secret-flow.com/welcome) 右上角 “反馈” 按钮加群咨询。
+请在 [Issues](https://github.com/secretflow/secretnote/issues) 反馈，或访问 [隐语实训平台](https://studio.secretflow.com/) 点击右上角 “反馈” 按钮加群咨询。

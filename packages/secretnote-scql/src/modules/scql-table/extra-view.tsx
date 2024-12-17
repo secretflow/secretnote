@@ -11,7 +11,9 @@ import {
 import { l10n } from '@difizen/mana-l10n';
 import { message, Tooltip } from 'antd';
 import { RefreshCw } from 'lucide-react';
-import { TableService } from './service';
+
+import { TableService } from '@/modules/scql-table/service';
+import { genericErrorHandler } from '@/utils';
 
 export const ExtraComponent = () => {
   const { tableService } = useInject<ExtraView>(ViewInstance);
@@ -24,7 +26,8 @@ export const ExtraComponent = () => {
           e.stopPropagation();
           tableService
             .refreshTables()
-            .then(() => message.success(l10n.t('数据表已刷新')));
+            .then(() => message.success(l10n.t('数据表已刷新')))
+            .catch(genericErrorHandler);
         }}
       />
     </Tooltip>

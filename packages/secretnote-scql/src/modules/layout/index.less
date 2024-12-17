@@ -71,6 +71,18 @@
   border-right: 1px solid var(--mana-secretnote-divider-color);
   background-color: var(--mana-secretnote-sidebar-background);
 
+  .ant-collapse {
+    overflow-y: auto;
+    .ant-tree .ant-tree-treenode-selected::before {
+      background: unset !important;
+    }
+    .ant-tree.ant-tree-directory
+      .ant-tree-treenode-selected
+      .ant-tree-node-content-wrapper:before {
+      background: unset !important;
+    }
+  }
+
   .bottom-bar {
     position: absolute;
     bottom: 0;

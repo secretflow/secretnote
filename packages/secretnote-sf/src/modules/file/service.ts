@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ContentsManager, type IContentsModel } from '@difizen/libro-jupyter';
+import type { ContentsFileFormat, IContentsModel } from '@difizen/libro-jupyter';
+import { ContentsManager } from '@difizen/libro-jupyter';
 import { inject, prop, singleton } from '@difizen/mana-app';
-import type { DataNode } from 'antd/es/tree';
+import { l10n } from '@difizen/mana-l10n';
+import type { TreeDataNode } from 'antd';
 
+import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
 import {
+  copyToClipboard,
   downloadFileByURL,
   genericErrorHandler,
   getRemoteBaseUrl,
   readFile,
   requestNoUnpack,
 } from '@/utils';
-
-import { SecretNoteServerManager, ServerStatus } from '../server';
 
 export const CHUNK_SIZE = 1024 * 1024; // 1MB
 export const BASE_PATH = '/';
@@ -20,7 +21,7 @@ export class FileService {
   protected readonly contentsManager: ContentsManager;
   protected readonly serverManager: SecretNoteServerManager;
 
-  @prop() fileTree: DataNode[] = [];
+  @prop() fileTree: TreeDataNode[] | null = null;
 
   constructor(
     @inject(ContentsManager) contentsManager: ContentsManager,
@@ -34,74 +35,78 @@ export class FileService {
     this.serverManager.onServerStopped(this.onServerChanged.bind(this));
   }
 
+  private onServerChanged() {
+    this.getFileTree();
+  }
+
+  /**
+   * Update and get the user file tree on a server.
+   */
   async getFileTree() {
     const maybeServerList = await this.serverManager.getServerList();
     if (!maybeServerList) {
-      genericErrorHandler('Failed to get server list');
+      genericErrorHandler(new Error(l10n.t('获取 Server 列表失败')));
       return;
     }
 
+    // iterate through the server list and get the file tree for each server
     const servers = maybeServerList.filter((s) => s.status === ServerStatus.Succeeded);
-    const fileTree: DataNode[] = [];
-
+    const fileTree: TreeDataNode[] = [];
     for (const server of servers) {
-      const serverNode: DataNode = {
+      const serverNode: TreeDataNode = {
         title: server.name,
         key: server.id,
         children: [],
       };
-
       try {
-        const list = await this.contentsManager.get(BASE_PATH, {
-          baseUrl: getRemoteBaseUrl(server.id),
-          content: true,
-        });
-
-        const fileList = list.content.filter((file: any) =>
-          this.isFileVisible(file.path),
-        );
-        const fileNodeList = fileList.map((file: any) => {
-          return {
+        const { content: list }: { content: IContentsModel[] } =
+          await this.contentsManager.get(BASE_PATH, {
+            baseUrl: getRemoteBaseUrl(server.id),
+            content: true,
+          });
+        const fileNodes = list
+          .filter((file) => this.isFileVisible(file.path)) // filter out hidden files
+          .map((file) => ({
             title: file.name,
-            key: this.formatNodeKey(server.id, file.path),
-            isLeaf: true,
-          };
-        });
-        const sortedFileNodeList = fileNodeList.sort((a: any, b: any) => {
-          return a.title.localeCompare(b.title);
-        });
-        serverNode.children = sortedFileNodeList;
+            key: this.formatNodeKey(server.id, server.name, file.path),
+            isLeaf: true, // no nested file is considered for now
+          }))
+          .sort((a, b) => a.title.localeCompare(b.title));
+        serverNode.children = fileNodes;
         fileTree.push(serverNode);
       } catch (err) {
         genericErrorHandler(err);
       }
     }
 
-    this.fileTree = fileTree;
-
-    return fileTree;
-  }
-
-  async isFileExist(nodeData: DataNode, name: string): Promise<boolean> {
-    const serverId = nodeData.key as string;
-    const server = await this.serverManager.getServerDetail(serverId);
-    if (!server) {
-      return false;
-    }
-    const list = await this.contentsManager.get(BASE_PATH, {
-      baseUrl: getRemoteBaseUrl(server.id),
-      content: true,
-    });
-
-    return list.content.some((file: any) => file.name === name);
+    return (this.fileTree = fileTree);
   }
 
   /**
-   * Upload file via Jupyter Server. All files are treated as binary, upload with base64 format.
+   * Check if a user file on a server is existed.
+   */
+  async isFileExisted(nodeData: TreeDataNode, name: string): Promise<boolean> {
+    const server = await this.serverManager.getServerDetail(nodeData.key as string);
+    if (!server) {
+      return false;
+    }
+
+    const { content: list }: { content: IContentsModel[] } =
+      await this.contentsManager.get(BASE_PATH, {
+        baseUrl: getRemoteBaseUrl(server.id),
+        content: true,
+      });
+
+    return list.some((file) => file.name === name);
+  }
+
+  /**
+   * Upload file via Jupyter Server. All files are treated as binary, uploaded with base64 format,
+   * and chunked if possible.
    *
    * @see https://github.com/jupyterlab/jupyterlab/blob/main/packages/filebrowser/src/model.ts
    */
-  async uploadFile(nodeData: DataNode, name: string, file: File) {
+  async uploadFile(nodeData: TreeDataNode, name: string, file: File) {
     const serverId = nodeData.key as string;
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
@@ -147,8 +152,10 @@ export class FileService {
   /**
    * Download data file in computation node.
    */
-  async downloadFile(nodeData: DataNode) {
-    const { serverId, path } = this.parseNodeKey(nodeData.key as string);
+  async downloadFile(nodeData: TreeDataNode) {
+    const { serverId = '', path = '' } = FileService.parseNodeKey(
+      nodeData.key as string,
+    );
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const baseUrl = getRemoteBaseUrl(server.id);
@@ -172,11 +179,16 @@ export class FileService {
     }
   }
 
-  async deleteFile(nodeData: DataNode) {
+  /**
+   * Delete file from computation node.
+   */
+  async deleteFile(nodeData: TreeDataNode) {
     if (!nodeData.isLeaf) {
       return;
     }
-    const { serverId, path } = this.parseNodeKey(nodeData.key as string);
+    const { serverId = '', path = '' } = FileService.parseNodeKey(
+      nodeData.key as string,
+    );
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       await this.contentsManager.delete(path, {
@@ -186,57 +198,69 @@ export class FileService {
     }
   }
 
-  async getFileContent(serverId: string, path: string) {
+  /**
+   * Get file content from computation node.
+   */
+  async getFileContent(serverId: string, path: string, format?: ContentsFileFormat) {
     const decodedPath = decodeURIComponent(path);
     const server = await this.serverManager.getServerDetail(serverId);
     if (server) {
       const data = await this.contentsManager.get(decodedPath, {
         baseUrl: getRemoteBaseUrl(server.id),
         content: true,
+        format,
       });
       return data;
     }
   }
 
-  viewFile(nodeData: DataNode) {
-    const { serverId, path } = this.parseNodeKey(nodeData.key as string);
-    const encodedPath = encodeURIComponent(path);
-    window.open(
-      `/secretnote/preview?serverId=${serverId}&path=${encodedPath}`,
-      '_blank',
-    );
+  /**
+   * Copy file path to clipboard.
+   */
+  async copyPath(nodeData: TreeDataNode) {
+    const { path } = FileService.parseNodeKey(nodeData.key as string);
+    // TODO Get the actual folder path from the server.
+    return await copyToClipboard(`/home/secretnote/workspace/${path}`);
   }
 
-  copyPath(nodeData: DataNode) {
-    const { path } = this.parseNodeKey(nodeData.key as string);
-    navigator.clipboard.writeText(`/home/secretnote/workspace/${path}`);
+  /**
+   * Get file extension from node data.
+   */
+  static getFileExt(nodeData: TreeDataNode, lowerCase = true) {
+    const { path } = FileService.parseNodeKey(nodeData.key as string);
+    return FileService.getFileExtByPath(path ?? '', lowerCase);
   }
 
-  getFileExt(nodeData: DataNode) {
-    const { path } = this.parseNodeKey(nodeData.key as string);
-    const ext = this.getFileExtByPath(path);
-    return ext;
+  /**
+   * Get file extension from file path.
+   */
+  static getFileExtByPath(path: string, lowerCase = true) {
+    const ext = path?.split('.').pop();
+    return lowerCase ? ext?.toLowerCase() : ext;
   }
 
-  getFileExtByPath(path: string) {
-    const ext = path.split('.').pop();
-    return ext;
+  /**
+   * Store the metadata of each file in node key with the format [serverId, serverName, path].
+   */
+  private formatNodeKey(serverId: string, serverName: string, path: string) {
+    return [serverId, serverName, path].join('|');
   }
 
-  private formatNodeKey(serverId: string, path: string) {
-    return `${serverId}|${path}`;
+  /**
+   * Extrate the metadata of file from node key.
+   */
+  static parseNodeKey(dataKey: string) {
+    type MaybeString = string | undefined;
+    const [serverId, serverName, path] = dataKey.split('|') as MaybeString[];
+
+    return { serverId, serverName, path };
   }
 
-  private parseNodeKey(dataKey: string) {
-    const [serverId, path] = dataKey.split('|');
-    return { serverId, path };
-  }
-
+  /**
+   * Currently no files limitation. All files are visible.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private isFileVisible(path: string) {
-    return true; // let all files be visible
-  }
-
-  private onServerChanged() {
-    this.getFileTree();
+    return true;
   }
 }

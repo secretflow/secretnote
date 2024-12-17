@@ -1,6 +1,7 @@
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel, SplitPanel } from '@difizen/mana-react';
 import React from 'react';
+
 import './index.less';
 
 export enum LayoutArea {
@@ -18,9 +19,10 @@ const SecreteNoteLayout: React.FC = () => {
       <SplitPanel id="split-panel" direction="left-to-right">
         <SplitPanel.Pane
           id="split-panel-left"
-          defaultSize={260}
-          minSize={160}
-          maxSize={400}
+          className="secretnote-split-panel-left"
+          defaultSize={280}
+          minSize={280}
+          maxSize={320}
         >
           <Slot name={LayoutArea.sidebar} />
         </SplitPanel.Pane>

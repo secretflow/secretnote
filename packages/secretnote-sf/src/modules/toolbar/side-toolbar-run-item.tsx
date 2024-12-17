@@ -6,6 +6,7 @@ import { CommandRegistry, useInject, ViewInstance } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
 import { Tooltip } from 'antd';
 import { PlayCircle } from 'lucide-react';
+
 import { CmdOrCtrl } from './keybind-instruction';
 
 export const SideToolbarRunItem = () => {

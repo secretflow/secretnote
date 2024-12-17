@@ -2,15 +2,15 @@
 
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
-import { Modal, Form, Input, message, Space, Button, Select } from 'antd';
-import { Plus, MinusSquare } from 'lucide-react';
-import { useEffect } from 'react';
 import { l10n } from '@difizen/mana-l10n';
+import { Button, Form, Input, message, Modal, Select, Space } from 'antd';
+import { MinusSquare, Plus } from 'lucide-react';
+import { useEffect } from 'react';
 
-import { _Table, BrokerService } from '@/modules/scql-broker';
+import { type _Table, BrokerService } from '@/modules/scql-broker';
+import { TableService } from '@/modules/scql-table/service';
 import { genericErrorHandler } from '@/utils';
 import { getProjectId } from '@/utils/scql';
-import { TableService } from './service';
 
 const ConfigPanel = (props: ModalItemProps<_Table>) => {
   const { visible, close, data } = props;

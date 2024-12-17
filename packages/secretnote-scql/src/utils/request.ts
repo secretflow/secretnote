@@ -1,6 +1,7 @@
+import { URL as LibroURL, PageConfig } from '@difizen/libro-jupyter';
+
 import { localStorageService } from '@/modules/storage/local-storage-service';
-import { PageConfig, URL as LibroURL } from '@difizen/libro-jupyter';
-import { genericErrorHandler } from './error';
+import { genericErrorHandler } from '@/utils';
 
 export const getRemoteBaseUrl = (serverId: string, origin = location.origin) => {
   return origin + '/secretnoteagent/' + serverId;

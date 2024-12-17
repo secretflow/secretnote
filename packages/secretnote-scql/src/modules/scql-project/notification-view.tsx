@@ -8,31 +8,30 @@ import {
   view,
   ViewInstance,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import {
-  Popover,
-  Empty,
-  Button,
-  message,
+  Avatar,
   Badge,
+  Button,
+  Empty,
+  Flex,
+  message,
+  Popover,
+  Space,
   Tabs,
   type TabsProps,
-  Divider,
   Tooltip,
-  Avatar,
-  Flex,
-  Space,
 } from 'antd';
 import { Bell, User } from 'lucide-react';
 
-import './index.less';
-import { l10n } from '@difizen/mana-l10n';
 import {
-  _ProjectInvitationRespond,
+  type _ProjectInvitationRespond,
   _ProjectInvitationStatus,
   BrokerService,
 } from '@/modules/scql-broker';
+import { ProjectService } from '@/modules/scql-project/service';
 import { genericErrorHandler } from '@/utils';
-import { ProjectService } from './service';
+import './index.less';
 
 export const InvitationNotificationComponent = () => {
   const instance = useInject<InvitationNotificationView>(ViewInstance);

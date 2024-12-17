@@ -1,30 +1,28 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type {
+  EditorState,
+  ICoordinate,
   IEditor,
+  IEditorConfig,
   IEditorOptions,
   IModel,
-  IRange,
-  IEditorConfig,
   IPosition,
-  ICoordinate,
+  IRange,
   SearchMatch,
-  EditorState,
 } from '@difizen/libro-jupyter';
 import {
+  Deferred,
   Disposable,
   DisposableCollection,
-  watch,
   Emitter,
-  Deferred,
+  watch,
 } from '@difizen/mana-app';
+import { noop } from 'lodash-es';
 import * as monaco from 'monaco-editor';
 import type { IMatching } from 'syntax-parser';
 
+import { parser } from '@/modules/scql-editor/editor/auto-complete';
+import '@/modules/scql-editor/editor/format';
 import { uuid } from '@/utils';
-
-import { parser } from './auto-complete';
-import './format';
-
 import './index.less';
 
 export type MonacoEditorType = monaco.editor.IStandaloneCodeEditor;
@@ -42,7 +40,7 @@ export class SQLEditor implements IEditor {
   protected toDispose = new DisposableCollection();
   protected oldDeltaDecorations: string[] = [];
   protected modalChangeEmitter = new Emitter<boolean>();
-  format = () => {};
+  format = noop;
 
   monacoEditor?: MonacoEditorType;
   host: HTMLElement;

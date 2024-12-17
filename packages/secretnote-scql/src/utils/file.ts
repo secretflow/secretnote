@@ -16,7 +16,6 @@ const getBlob = (url: string, method = 'GET'): Promise<Blob> => {
 };
 
 const saveAs = (blob: Blob, filename: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const nav = window.navigator as any;
   if (nav.msSaveOrOpenBlob) {
     nav.msSaveBlob(blob, filename);

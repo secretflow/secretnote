@@ -1,7 +1,7 @@
 import { inject, singleton } from '@difizen/mana-app';
 
+import { BrokerService, type Tensor } from '@/modules/scql-broker';
 import { transpose } from '@/utils';
-import { BrokerService, Tensor } from '../scql-broker';
 import { getProjectId } from '@/utils/scql';
 
 @singleton()

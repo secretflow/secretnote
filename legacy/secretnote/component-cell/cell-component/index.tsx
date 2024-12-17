@@ -1,15 +1,15 @@
 import type { IOutput } from '@difizen/libro-jupyter';
-import { Tabs, Empty, Spin, Table, Descriptions } from 'antd';
-import type { TabsProps, TableProps, DescriptionsProps } from 'antd';
-import { forwardRef, type ForwardedRef, useMemo } from 'react';
+import type { DescriptionsProps, TableProps, TabsProps } from 'antd';
+import { Descriptions, Empty, Spin, Table, Tabs } from 'antd';
+import { forwardRef, useMemo, type ForwardedRef } from 'react';
 
-import { ComponentForm } from '@/components/component-form';
 import type { ComponentSpec, Value } from '@/components/component-form';
+import { ComponentForm } from '@/components/component-form';
 
-import { generateComponentCellCode } from './cell-code';
-import { ComponentOptions, getComponentByIds, getComponentIds } from './options';
-import './index.less';
 import { ComponentReport } from '../model';
+import { generateComponentCellCode } from './cell-code';
+import './index.less';
+import { ComponentOptions, getComponentByIds, getComponentIds } from './options';
 
 interface CellComponentProps {
   component?: ComponentSpec;
@@ -22,7 +22,6 @@ interface CellComponentProps {
 }
 
 const CellComponent = forwardRef(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (props: CellComponentProps, ref: ForwardedRef<any>) => {
     const {
       component,
@@ -166,4 +165,4 @@ const CellComponent = forwardRef(
 );
 CellComponent.displayName = 'CellComponent';
 
-export { CellComponent, getComponentByIds, getComponentIds, generateComponentCellCode };
+export { CellComponent, generateComponentCellCode, getComponentByIds, getComponentIds };

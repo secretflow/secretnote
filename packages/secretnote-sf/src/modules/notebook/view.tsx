@@ -16,46 +16,46 @@ import classnames from 'classnames';
 import { ArrowRightFromLine, Copy, PenLine, Trash } from 'lucide-react';
 import React from 'react';
 
+import BusySpin from '@/components/busy-spin';
 import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-
+import { NotebookFileService } from '@/modules/notebook/service';
 import { genericErrorHandler } from '@/utils';
 import './index.less';
-import { NotebookFileService } from './service';
 
 export const NotebookFileComponent = () => {
   const instance = useInject<NotebookFileView>(ViewInstance);
-  const notebookFileService = instance.notebookFileService;
+  const service = instance.service;
   const renameInputRef = React.useRef<InputRef>(null);
 
   const onMenuClick = (key: string, file: IContentsModel) => {
     switch (key) {
       case 'rename':
         // pend a rename action
-        notebookFileService.pendRenameAction(file);
+        service.pendRenameAction(file);
         break;
       case 'delete':
         Modal.confirm({
           title: l10n.t('删除 Notebook'),
           centered: true,
           content: l10n.t('Notebook {name} 将被删除', {
-            name: notebookFileService.getFileNameWithoutExt(file.name),
+            name: service.getFileNameWithoutExt(file.name),
           }),
           okText: l10n.t('删除 Notebook'),
           cancelText: l10n.t('取消'),
           okType: 'danger',
           async onOk(close) {
-            await notebookFileService.deleteFile(file);
+            await service.deleteFile(file);
             message.success(l10n.t('Notebook 删除成功'));
             return close(Promise.resolve);
           },
         });
         break;
       case 'export':
-        notebookFileService.exportFile(file);
+        service.exportFile(file);
         break;
       case 'copy':
-        notebookFileService.copyFile(file);
+        service.copyFile(file);
         break;
       default:
         break;
@@ -67,31 +67,31 @@ export const NotebookFileComponent = () => {
    */
   const renameFile = async () => {
     try {
-      await notebookFileService.renameFile();
+      await service.renameFile();
     } catch (e) {
       genericErrorHandler(e);
       if (e instanceof Error) {
-        notebookFileService.pendingRename = null;
+        service.pendingRename = null;
       }
     }
   };
 
   return (
     <ul className="secretnote-notebook-list">
-      {notebookFileService.notebookFileList.map((file) => (
+      {service.notebookFileList === null && <BusySpin />}
+      {service.notebookFileList?.map((file) => (
         <Popover
           title={l10n.t('新文件名')}
           key={file.path}
           content={
             <Input
               ref={renameInputRef}
-              value={notebookFileService.getFileNameWithoutExt(
-                notebookFileService.pendingRename?.name,
-              )}
+              value={service.getFileNameWithoutExt(service.pendingRename?.name)}
               onChange={(e) => {
-                if (notebookFileService.pendingRename) {
-                  notebookFileService.pendingRename.name =
-                    notebookFileService.getFileNameWithExt(e.target.value);
+                if (service.pendingRename) {
+                  service.pendingRename.name = service.getFileNameWithExt(
+                    e.target.value,
+                  );
                 }
               }}
               onKeyDown={(e) => {
@@ -101,7 +101,7 @@ export const NotebookFileComponent = () => {
               }}
             />
           }
-          open={notebookFileService.pendingRename?.path === file.path}
+          open={service.pendingRename?.path === file.path}
           placement="right"
           overlayClassName="secretnote-notebook-list-popover"
           trigger={['click']}
@@ -118,12 +118,12 @@ export const NotebookFileComponent = () => {
           arrow={false}
         >
           <li
-            onClick={() => notebookFileService.openFile(file)}
+            onClick={() => service.openFile(file)}
             className={classnames({
-              current: notebookFileService.currentNotebookFile?.path === file.path,
+              current: service.currentNotebookFile?.path === file.path,
             })}
           >
-            <span>{notebookFileService.getFileNameWithoutExt(file.name)}</span>
+            <span>{service.getFileNameWithoutExt(file.name)}</span>
             <DropdownMenu
               items={[
                 {
@@ -170,11 +170,11 @@ export class NotebookFileView extends BaseView implements SideBarContribution {
   defaultOpen = true;
 
   view = NotebookFileComponent;
-  readonly notebookFileService: NotebookFileService;
+  readonly service: NotebookFileService;
 
   constructor(@inject(NotebookFileService) notebookFileService: NotebookFileService) {
     super();
-    this.notebookFileService = notebookFileService;
-    this.notebookFileService.getFileList();
+    this.service = notebookFileService;
+    this.service.getFileList();
   }
 }

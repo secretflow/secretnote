@@ -3,6 +3,12 @@
 // handled by the default web server instead of the Jupyter itself.
 // So we need to customize the server manager to manage them.
 
+import type { ISpecModels } from '@difizen/libro-jupyter';
+import { ServerConnection, ServerManager } from '@difizen/libro-jupyter';
+import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
+
+import type { SecretNoteNode } from '@/modules/node/service';
+import { ServerStatus, type IServer } from '@/modules/server';
 import {
   genericErrorHandler,
   getDefaultServerConnectionSettings,
@@ -11,12 +17,6 @@ import {
   request,
   wait,
 } from '@/utils';
-import type { ISpecModels } from '@difizen/libro-jupyter';
-import { ServerConnection, ServerManager } from '@difizen/libro-jupyter';
-
-import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
-import type { SecretNoteNode } from '../node/service';
-import { ServerStatus, type IServer } from './protocol';
 
 @singleton()
 export class SecretNoteServerManager {

@@ -6,13 +6,13 @@ import {
 } from '@difizen/libro-jupyter';
 import { ManaModule } from '@difizen/mana-app';
 
+import { SecretNoteModel } from '@/modules/editor';
+import { SecretNoteCodeCellModel, SecretNoteCodeCellView } from '@/modules/editor/cell';
+import { SecretNoteContentContribution } from '@/modules/editor/contents';
+import { SecretNoteOutputArea } from '@/modules/editor/output';
+import { JupyterWorkspaceService } from '@/modules/editor/workspace';
 import { SecretNoteKernelModule } from '@/modules/kernel';
 import { SecretNoteServerModule } from '@/modules/server';
-import { SecretNoteCodeCellModel, SecretNoteCodeCellView } from './cell';
-import { SecretNoteContentContribution } from './contents';
-import { SecretNoteModel } from './model';
-import { SecretNoteOutputArea } from './output';
-import { JupyterWorkspaceService } from './workspace';
 
 export const EditorModule = ManaModule.create()
   .register(

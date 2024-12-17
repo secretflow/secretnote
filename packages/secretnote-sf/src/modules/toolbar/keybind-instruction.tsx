@@ -1,13 +1,13 @@
 // Keybinds instruction drawer on the right.
 
-import { l10n } from '@difizen/mana-l10n';
 import { isMacintosh } from '@difizen/mana-common';
-import { Divider, Drawer, Table, Tag, Tooltip, Typography } from 'antd';
+import { l10n } from '@difizen/mana-l10n';
+import { Divider, Drawer, Table, Tag, Tooltip } from 'antd';
 import { KeyboardIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import './index.less';
 import { withId } from '@/utils';
+import './index.less';
 
 interface Keybind {
   combo: string[];

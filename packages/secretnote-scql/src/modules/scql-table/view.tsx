@@ -3,38 +3,37 @@
 import {
   BaseView,
   inject,
+  ModalContribution,
+  ModalService,
   singleton,
   useInject,
   view,
   ViewInstance,
-  ModalContribution,
-  ModalService,
 } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
-import { message, Modal, Space, Tree, Popover, Descriptions, Table } from 'antd';
 import type { TreeDataNode as _TreeDataNode } from 'antd';
+import { Descriptions, message, Modal, Popover, Space, Tree } from 'antd';
+import { noop } from 'lodash-es';
 import {
   ChevronDown,
-  Trash,
-  TableProperties,
-  Settings,
-  PlusSquare,
   Monitor,
+  PlusSquare,
+  Settings,
+  TableProperties,
+  Trash,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { DropdownMenu } from '@/components/dropdown-menu';
 import type { Menu } from '@/components/dropdown-menu';
+import { DropdownMenu } from '@/components/dropdown-menu';
 import { SideBarContribution } from '@/modules/layout';
-import { TableConfigModal } from './add-modal';
-import { CCLConfigModal } from './ccl-modal';
-import { TableService } from './service';
-import { noop } from 'lodash-es';
-import { _Table, BrokerService, ColumnControl } from '@/modules/scql-broker';
+import { type _Table, BrokerService } from '@/modules/scql-broker';
+import { MemberService } from '@/modules/scql-member/service';
+import { TableConfigModal } from '@/modules/scql-table/add-modal';
+import { CCLConfigModal } from '@/modules/scql-table/ccl-modal';
+import { TableService } from '@/modules/scql-table/service';
 import { getProjectId } from '@/utils/scql';
-import { ProjectService } from '@/modules/scql-project/service';
 import './index.less';
-import { MemberService } from '../scql-member/service';
 
 const { DirectoryTree } = Tree;
 
@@ -78,37 +77,43 @@ export const TableComponent = () => {
   const instance = useInject<TableView>(ViewInstance);
   const { tableService, brokerService, memberService, modalService } = instance;
 
-  /**
-   * Transform the results of `listTables` action into AntD tree nodes.
-   */
-  function transformTablesToTreeNodes() {
-    const { members } = memberService;
-    const { tables } = tableService;
-    const { party: selfParty } = brokerService.platformInfo;
-
-    const _nodes: TreeDataNode[] = [];
-    members.forEach((member) => {
-      _nodes.push({
-        key: member.party,
-        title: member.party,
-        belongToMe: selfParty === member.party,
-        isLeaf: false,
-        children: tables.map((table) => ({
-          key: `${table.tableName}-${member.party}`,
-          title: table.tableName,
-          belongToMe: selfParty === table.tableOwner,
-          isLeaf: true,
-          table,
-        })),
-      });
-    });
-
-    return _nodes;
-  }
-
   useEffect(() => {
+    /** Transform the results of `listTables` action into AntD tree nodes. */
+    function transformTablesToTreeNodes() {
+      const { members } = memberService;
+      const { tables } = tableService;
+      const { party: selfParty } = brokerService.platformInfo;
+
+      const _nodes: TreeDataNode[] = [];
+      members.forEach((member) => {
+        _nodes.push({
+          key: member.party,
+          title: member.party,
+          belongToMe: selfParty === member.party,
+          isLeaf: false,
+          children: tables
+            // filter out those tables that does not belong to current member
+            .filter((v) => v.tableOwner === member.party)
+            .map((table) => ({
+              key: `${table.tableName}-${member.party}`,
+              title: table.tableName,
+              belongToMe: selfParty === table.tableOwner,
+              isLeaf: true,
+              table,
+            })),
+        });
+      });
+      return _nodes;
+    }
+
     setNodes(transformTablesToTreeNodes());
-  }, [memberService.members, tableService.tables]);
+  }, [
+    memberService,
+    tableService,
+    memberService.members,
+    tableService.tables,
+    brokerService.platformInfo,
+  ]);
 
   const onMenuClick = (key: string, node: TreeDataNode) => {
     switch (key) {

@@ -1,9 +1,10 @@
 // Service related to projects and invitations.
 
-import { prop, singleton } from '@difizen/mana-app';
-import {
+import { inject, prop, singleton } from '@difizen/mana-app';
+
+import { BrokerService } from '@/modules/scql-broker';
+import type {
   _ProjectInvitationStatus,
-  BrokerService,
   ProjectDesc,
   ProjectInvitation,
 } from '@/modules/scql-broker';
@@ -14,7 +15,7 @@ export class ProjectService {
   @prop() projects: ProjectDesc[] = [];
   @prop() invitations: ProjectInvitation[] = [];
 
-  constructor(brokerService: BrokerService) {
+  constructor(@inject(BrokerService) brokerService: BrokerService) {
     this.brokerService = brokerService;
   }
 

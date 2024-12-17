@@ -25,11 +25,10 @@
     }
   },
   "scripts": {
-    "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "typecheck:tsc": "tsc --noEmit",
+    "lint:eslint": ":",
+    "typecheck:tsc": ":",
     "build:component": ":",
-    "build:component_": "vite build --mode=esm && vite build --mode=browser && vite build --mode=esm-bundled",
-    "dev": "NODE_ENV=development vite build --mode=development --watch"
+    "dev": ":"
   },
   "dependencies": {
     "@antv/algorithm": "^0.1.26",

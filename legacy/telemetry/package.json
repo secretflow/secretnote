@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build:py": ":",
-    "publish:py": "python -m hatch publish ./dist",
+    "publish:py": ":",
     "typecheck:pyright": ":",
-    "build": "nx build:py"
+    "build": ":"
   }
 }

@@ -11,7 +11,6 @@
 
 -e file:.
 -e file:pyprojects/secretnote
--e file:pyprojects/telemetry
 aiohttp==3.9.3
     # via jupyter-server-proxy
 aiosignal==1.3.1
@@ -31,8 +30,6 @@ arrow==1.3.0
     # via isoduration
 asttokens==2.4.1
     # via stack-data
-astunparse==1.6.3
-    # via secretnote-telemetry
 async-timeout==4.0.3
     # via aiohttp
 attrs==23.2.0
@@ -54,15 +51,12 @@ comm==0.2.1
     # via ipywidgets
 dataset==1.6.2
     # via secretnote
-    # via secretnote-telemetry
 debugpy==1.8.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
-deprecated==1.2.14
-    # via opentelemetry-api
 docstring-to-markdown==0.15
     # via python-lsp-server
 exceptiongroup==1.2.0
@@ -80,20 +74,13 @@ idna==3.6
     # via anyio
     # via jsonschema
     # via yarl
-importlib-metadata==6.11.0
-    # via opentelemetry-api
-importlib-resources==6.1.1
-    # via secretnote
-    # via secretnote-telemetry
 ipykernel==6.29.0
     # via secretnote
-    # via secretnote-telemetry
 ipython==8.12.3
     # via ipykernel
     # via ipywidgets
 ipywidgets==8.1.1
     # via secretnote
-    # via secretnote-telemetry
 isoduration==20.11.0
     # via jsonschema
 jedi==0.19.1
@@ -124,31 +111,23 @@ jupyter-events==0.9.0
     # via jupyter-server
 jupyter-lsp==2.2.4
     # via secretnote
-    # via secretnote-telemetry
 jupyter-resource-usage==1.0.1
     # via secretnote
-    # via secretnote-telemetry
 jupyter-server==2.12.5
     # via jupyter-lsp
     # via jupyter-resource-usage
     # via jupyter-server-proxy
     # via secretnote
-    # via secretnote-telemetry
 jupyter-server-proxy==4.1.0
     # via secretnote
-    # via secretnote-telemetry
 jupyter-server-terminals==0.5.2
     # via jupyter-server
 jupyterlab-pygments==0.3.0
     # via nbconvert
 jupyterlab-widgets==3.0.9
     # via ipywidgets
-loguru==0.7.2
-    # via secretnote-telemetry
 mako==1.3.2
     # via alembic
-markdown-it-py==3.0.0
-    # via rich
 markupsafe==2.1.4
     # via jinja2
     # via mako
@@ -156,12 +135,8 @@ markupsafe==2.1.4
 matplotlib-inline==0.1.6
     # via ipykernel
     # via ipython
-mdurl==0.1.2
-    # via markdown-it-py
 mistune==3.0.2
     # via nbconvert
-more-itertools==10.2.0
-    # via secretnote-telemetry
 multidict==6.0.5
     # via aiohttp
     # via yarl
@@ -175,24 +150,12 @@ nbformat==5.9.2
     # via nbconvert
 nest-asyncio==1.6.0
     # via ipykernel
-networkx==3.1
-    # via secretnote-telemetry
-opentelemetry-api==1.22.0
-    # via opentelemetry-sdk
-    # via secretnote-telemetry
-opentelemetry-sdk==1.22.0
-    # via secretnote-telemetry
-opentelemetry-semantic-conventions==0.43b0
-    # via opentelemetry-sdk
-orjson==3.9.12
-    # via secretnote-telemetry
 overrides==7.7.0
     # via jupyter-server
 packaging==23.2
     # via ipykernel
     # via jupyter-server
     # via nbconvert
-    # via secretnote-telemetry
 pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.3
@@ -220,12 +183,9 @@ pure-eval==0.2.2
     # via stack-data
 pycparser==2.21
     # via cffi
-pydantic==1.10.14
-    # via secretnote-telemetry
 pygments==2.17.2
     # via ipython
     # via nbconvert
-    # via rich
 python-dateutil==2.8.2
     # via arrow
     # via jupyter-client
@@ -235,7 +195,6 @@ python-lsp-jsonrpc==1.1.2
     # via python-lsp-server
 python-lsp-server==1.8.2
     # via secretnote
-    # via secretnote-telemetry
 pyyaml==6.0.1
     # via jupyter-events
 pyzmq==25.1.2
@@ -253,8 +212,6 @@ rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
     # via jsonschema
     # via jupyter-events
-rich==13.7.0
-    # via secretnote-telemetry
 rpds-py==0.17.1
     # via jsonschema
     # via referencing
@@ -264,7 +221,6 @@ simpervisor==1.0.0
     # via jupyter-server-proxy
 six==1.16.0
     # via asttokens
-    # via astunparse
     # via bleach
     # via python-dateutil
     # via rfc3339-validator
@@ -277,7 +233,6 @@ sqlalchemy==1.4.51
     # via dataset
 stack-data==0.6.3
     # via ipython
-    # via secretnote-telemetry
 terminado==0.18.0
     # via jupyter-server
     # via jupyter-server-terminals
@@ -288,8 +243,6 @@ tornado==6.4
     # via jupyter-client
     # via jupyter-server
     # via terminado
-tqdm==4.66.1
-    # via secretnote-telemetry
 traitlets==5.14.1
     # via comm
     # via ipykernel
@@ -308,9 +261,6 @@ types-python-dateutil==2.8.19.20240106
 typing-extensions==4.9.0
     # via alembic
     # via anyio
-    # via opentelemetry-sdk
-    # via pydantic
-    # via secretnote-telemetry
 ujson==5.9.0
     # via python-lsp-jsonrpc
     # via python-lsp-server
@@ -325,13 +275,7 @@ webencodings==0.5.1
     # via tinycss2
 websocket-client==1.7.0
     # via jupyter-server
-wheel==0.42.0
-    # via astunparse
 widgetsnbextension==4.0.9
     # via ipywidgets
-wrapt==1.16.0
-    # via deprecated
 yarl==1.9.4
     # via aiohttp
-zipp==3.17.0
-    # via importlib-metadata

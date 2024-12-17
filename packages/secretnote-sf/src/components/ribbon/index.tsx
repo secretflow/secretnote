@@ -23,11 +23,11 @@ function Ribbon(props: RibbonProps) {
   };
 
   const getLabel = (values: string[]) => {
-    const filterItems = items.filter((item) => values.includes(item.key));
-    if (filterItems.length === 0) {
-      return l10n.t('选择执行节点...');
+    const filtered = items.filter((item) => values.includes(item.key));
+    if (!filtered.length) {
+      return l10n.t('选择执行节点…');
     }
-    return filterItems.map((item) => item.label).join(',');
+    return filtered.map((item) => item.label).join(', ');
   };
 
   return (
@@ -40,10 +40,13 @@ function Ribbon(props: RibbonProps) {
           overlayClassName="secretnote-ribbon-popover"
           content={
             <>
-              <div className="title">{l10n.t('下面是将要执行该代码的节点列表')}:</div>
+              <div className="title">{l10n.t('请选择要执行该代码的节点列表')}:</div>
               <Space size={[0, 8]} wrap>
                 {items.map((item) => (
                   <CheckableTag
+                    style={{
+                      userSelect: 'none',
+                    }}
                     key={item.key}
                     checked={value.includes(item.key)}
                     onChange={(checked) => handleChange(item.key, checked)}

@@ -1,3 +1,4 @@
+import { MathExtension } from '@aarkue/tiptap-math-extension';
 import { l10n } from '@difizen/mana-l10n';
 import { InputRule } from '@tiptap/core';
 import { Color } from '@tiptap/extension-color';
@@ -11,8 +12,8 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import TiptapUnderline from '@tiptap/extension-underline';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
+
 import SlashCommand from './slash-command';
-import { MathExtension } from '@aarkue/tiptap-math-extension';
 
 export const defaultExtensions = [
   StarterKit.configure({

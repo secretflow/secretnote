@@ -6,6 +6,7 @@ import type { Editor as EditorClass } from '@tiptap/core';
 import type { Extension } from '@tiptap/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { useDebounceFn } from 'ahooks';
+import { noop } from 'lodash-es';
 import { useEffect, useState } from 'react';
 
 import { EditorBubbleMenu } from './bubble-menu';
@@ -15,8 +16,8 @@ import './index.less';
 export function Editor({
   defaultValue = '',
   extensions = [],
-  onUpdate = () => {},
-  onDebouncedUpdate = () => {},
+  onUpdate = noop,
+  onDebouncedUpdate = noop,
 }: {
   defaultValue: string;
   extensions?: Extension[];

@@ -8,10 +8,12 @@ import { pick } from 'lodash-es';
 
 import { genericErrorHandler, request } from '@/utils';
 import {
-  toSnakeCaseObject as snake,
   toCamelCaseObject as camel,
-  ToSnakeCaseObject,
+  toSnakeCaseObject as snake,
+  type ToSnakeCaseObject,
 } from '@/utils/object';
+
+type EmptyObject = Record<string, never>;
 
 // APIs of SCQL Broker.
 export enum BrokerActions {
@@ -228,7 +230,11 @@ export class BrokerService {
     project: Pick<ProjectDesc, 'project_id' | 'name' | 'description' | 'conf'>,
     _options?: ErrorHandlerOptions,
   ) {
-    return await requestBroker<{}>(BrokerActions.createProject, project, _options);
+    return await requestBroker<EmptyObject>(
+      BrokerActions.createProject,
+      project,
+      _options,
+    );
   }
 
   /**
@@ -249,7 +255,7 @@ export class BrokerService {
     respond: _ProjectInvitationRespond,
     _options?: ErrorHandlerOptions,
   ) {
-    return await requestBroker<{}>(
+    return await requestBroker<EmptyObject>(
       BrokerActions.processInvitation,
       snake({
         invitationId,
@@ -263,7 +269,7 @@ export class BrokerService {
    * Invite another member to join the Project you created.
    */
   async inviteMember(invitee: string, projectId: string) {
-    return await requestBroker<{}>(
+    return await requestBroker<EmptyObject>(
       BrokerActions.inviteMember,
       snake({
         invitee,
@@ -277,7 +283,7 @@ export class BrokerService {
    * Create a Table you owned in specified Project.
    */
   async createTable(projectId: string, table: _Table, _options?: ErrorHandlerOptions) {
-    return await requestBroker<{}>(
+    return await requestBroker<EmptyObject>(
       BrokerActions.createTable,
       {
         projectId,
@@ -291,7 +297,7 @@ export class BrokerService {
    * Drop a Table you owned in specified Project, the relevant CCLs will be automatically cleared.
    */
   async dropTable(projectId: string, tableName: string) {
-    return await requestBroker<{}>(BrokerActions.dropTable, {
+    return await requestBroker<EmptyObject>(BrokerActions.dropTable, {
       projectId,
       tableName,
     });
@@ -364,7 +370,7 @@ export class BrokerService {
     columnControlList: ColumnControl[],
     _options?: ErrorHandlerOptions,
   ) {
-    return await requestBroker<{}>(
+    return await requestBroker<EmptyObject>(
       BrokerActions.grantCCL,
       {
         projectId,

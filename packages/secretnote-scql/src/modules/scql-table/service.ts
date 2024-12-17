@@ -1,11 +1,12 @@
 // Service for SCQL table and CCL management.
 
 import { inject, prop, singleton } from '@difizen/mana-app';
-import { genericErrorHandler } from '@/utils';
-import { _Table, BrokerService, ColumnControl } from '../scql-broker';
-import { getProjectId } from '@/utils/scql';
-import { ProjectService } from '../scql-project/service';
 import { l10n } from '@difizen/mana-l10n';
+
+import { type _Table, BrokerService } from '@/modules/scql-broker';
+import { ProjectService } from '@/modules/scql-project/service';
+import { genericErrorHandler } from '@/utils';
+import { getProjectId } from '@/utils/scql';
 
 @singleton()
 export class TableService {

@@ -1,21 +1,22 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { BaseView, Contribution } from '@difizen/mana-app';
 import {
+  BaseView,
   contrib,
+  Contribution,
   DefaultSlotView,
+  inject,
   singleton,
   Slot,
   useInject,
   view,
   ViewInstance,
   ViewManager,
-  inject,
 } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { Collapse, Space, Tag, Typography } from 'antd';
 
-import { SideBarContribution } from './protocol';
-import { BrokerService } from '../scql-broker';
-import { l10n } from '@difizen/mana-l10n';
+import { SideBarContribution } from '@/modules/layout';
+import { BrokerService } from '@/modules/scql-broker';
 
 export enum SideBarArea {
   notebook = 'notebook',

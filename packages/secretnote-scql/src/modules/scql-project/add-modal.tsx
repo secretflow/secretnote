@@ -1,14 +1,14 @@
 // The "New Project" modal.
 
-import { Modal, Form, Input, message, Select } from 'antd';
-import { useEffect } from 'react';
 import type { ModalItem, ModalItemProps } from '@difizen/mana-app';
 import { useInject } from '@difizen/mana-app';
 import { l10n } from '@difizen/mana-l10n';
+import { Form, Input, message, Modal, Select } from 'antd';
 import { pick } from 'lodash-es';
+import { useEffect } from 'react';
 
+import { type _SPURuntimeConfig, BrokerService } from '@/modules/scql-broker';
 import { genericErrorHandler } from '@/utils';
-import { _SPURuntimeConfig, BrokerService } from '@/modules/scql-broker';
 
 // SPU configuration options.
 const SPUProtocolOptions = ['SEMI2K', 'REF2K', 'CHEETAH'].map((v) => ({

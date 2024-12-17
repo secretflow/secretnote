@@ -1,3 +1,5 @@
+// eslint-disable import/order
+
 // Sidebar is the bar displayed on the left which displays notebook file list, server data file list,
 // node CPU/MEM usage, and "about" information of the application.
 
@@ -15,16 +17,14 @@ import {
   ViewInstance,
   ViewManager,
 } from '@difizen/mana-app';
-import { Collapse, Space, Tooltip, Typography } from 'antd';
+import { l10n } from '@difizen/mana-l10n';
+import { Collapse, type CollapseProps, Space, Tooltip, Typography } from 'antd';
 import { InfoIcon } from 'lucide-react';
 import React from 'react';
 
+import SecretNotePkgJSON from '@/../package.json';
+import { SideBarContribution } from '@/modules/layout/protocol';
 import LibroJupyterPkgJSON from '@difizen/libro-jupyter/package.json';
-import ManaAppPkgJSON from '@difizen/mana-app/package.json';
-import SecretNotePkgJSON from '../../../package.json';
-
-import { l10n } from '@difizen/mana-l10n';
-import { SideBarContribution } from './protocol';
 
 export const metricsMonitorKey = 'metricsMonitor';
 
@@ -34,16 +34,19 @@ const AboutBarComponent = () => {
   const fmtPackageVersions = instance.fmtPackageVersions;
 
   return (
-    <Space direction="horizontal" align="center" size="large" className="about-bar">
+    <Space direction="horizontal" align="center" className="about-bar">
       <Typography.Link href="https://www.secretflow.org.cn/" target="_blank">
         SecretFlow
       </Typography.Link>
       <Typography.Link href="https://github.com/secretflow/secretnote" target="_blank">
         SecretNote
       </Typography.Link>
+      <Typography.Link href="https://studio.secretflow.com" target="_blank">
+        隐语实训平台
+      </Typography.Link>
       <div className="icon-container">
         <Tooltip title={fmtPackageVersions}>
-          <InfoIcon size={16} />
+          <InfoIcon size={14} />
         </Tooltip>
       </div>
     </Space>
@@ -61,7 +64,6 @@ export class AboutBarView extends BaseView {
   packageVersions = {
     'secretnote-sf': SecretNotePkgJSON.version,
     'libro-jupyter': LibroJupyterPkgJSON.version,
-    'mana-app': ManaAppPkgJSON.version,
   } as const;
   fmtPackageVersions: string;
 
@@ -83,7 +85,7 @@ export const SideBar: React.FC = () => {
   providers.sort((a, b) => a.order - b.order);
   const defaultActiveKey = providers.filter((p) => !!p.defaultOpen).map((p) => p.key);
 
-  const items = providers
+  const items: CollapseProps['items'] = providers
     .sort((a, b) => a.order - b.order)
     .map((item) => ({
       key: item.key,

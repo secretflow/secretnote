@@ -4,9 +4,8 @@ import { prop, transient, useInject, view, ViewInstance } from '@difizen/mana-ap
 import { forwardRef } from 'react';
 
 import { Editor } from '@/components/markdown-editor';
-
+import type { MarkdownCellModel } from '@/modules/markdown-editor/model';
 import './index.less';
-import type { MarkdownCellModel } from './model';
 
 export const MarkdownCell = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<MarkdownCellView>(ViewInstance);
@@ -54,15 +53,15 @@ export class MarkdownCellView extends LibroEditorCellView implements CellCollaps
     return 'secretnote-markdown-cell';
   }
 
-  focus(toEdit: boolean) {
+  focus = (toEdit: boolean) => {
     if (toEdit) {
       this.cellModel.isEdit = true;
     }
-  }
+  };
 
-  blur() {
+  blur = () => {
     this.cellModel.isEdit = false;
-  }
+  };
 
   shouldEnterEditorMode() {
     return this.cellModel.isEdit;

@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { l10n } from '@difizen/mana-l10n';
 import * as _ from 'lodash-es';
 import * as monaco from 'monaco-editor';
 
+import { BrokerService } from '@/modules/scql-broker';
 import type {
-  ITableInfo,
-  IStatement,
   ICompletionItem,
   ICursorInfo,
-} from './sql-parser';
-import { BrokerService } from '@/modules/scql-broker';
-import { l10n } from '@difizen/mana-l10n';
+  IStatement,
+  ITableInfo,
+} from '@/modules/scql-editor/editor/sql-parser';
+import { genericErrorHandler } from '@/utils';
 
 type Column = {
   name: string;
@@ -39,7 +40,7 @@ const getTables = async () => {
   }
 
   getTablesPromise = new Promise((resolve, reject) => {
-    BrokerService.ListTables(getProjectId(), void 0, true)
+    BrokerService.ListTables(getProjectId(), void 0, { reThrow: true })
       .then((results) => {
         const tables = results.map((table) => ({
           name: table.tableName,
@@ -49,9 +50,7 @@ const getTables = async () => {
         resolve(tables);
         return;
       })
-      .catch((e) => {
-        reject(e);
-      });
+      .catch(reject);
   });
 
   return await getTablesPromise;
@@ -62,12 +61,12 @@ const getTableCCL = async (tableName: string) => {
     return await getTableCCLPromiseMap[tableName];
   }
 
-  getTableCCLPromiseMap[tableName] = new Promise((resolve, reject) => {
+  getTableCCLPromiseMap[tableName] = new Promise((resolve) => {
     if (!tableName.match(/^[a-zA-Z0-9_]+$/)) {
       // avoid e.g. SELECT * crashes the application
       return resolve([]);
     }
-    BrokerService.ShowCCL(getProjectId(), [tableName], void 0, true)
+    BrokerService.ShowCCL(getProjectId(), [tableName], void 0, { reThrow: true })
       .then((results) => {
         const ccl: TableCCL[] = [];
         results?.forEach((item) => {
@@ -90,7 +89,8 @@ const getTableCCL = async (tableName: string) => {
         return;
       })
       .catch((e) => {
-        reject(e);
+        genericErrorHandler(e);
+        resolve([]);
       });
   });
 

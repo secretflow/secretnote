@@ -1,8 +1,8 @@
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel } from '@difizen/mana-react';
+import { Space, Tag } from 'antd';
 
 import { Logo } from '@/assets/svg/logo';
-import { Space, Tag } from 'antd';
 
 const { Pane } = BoxPanel;
 

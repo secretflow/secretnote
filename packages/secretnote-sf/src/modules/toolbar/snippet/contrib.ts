@@ -1,19 +1,18 @@
 // Customized command to add snippet feature for SecretNote.
 
 import {
-  Command,
-  CommandContribution,
-  CommandRegistry,
-  inject,
-  singleton,
-  ToolbarContribution,
-  ToolbarRegistry,
-} from '@difizen/mana-app';
-import {
   LibroCommandRegister,
   LibroToolbarArea,
   LibroView,
 } from '@difizen/libro-jupyter';
+import type { Command, CommandRegistry, ToolbarRegistry } from '@difizen/mana-app';
+import {
+  CommandContribution,
+  inject,
+  singleton,
+  ToolbarContribution,
+} from '@difizen/mana-app';
+
 import { SnippetView } from './view';
 
 const SnippetCommand: Command = {

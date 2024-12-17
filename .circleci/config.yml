@@ -1,3 +1,4 @@
+# This CI is used to publish secretflow/secretnote docker image.
 # See https://circleci.com/docs/configuration-reference
 # See https://circleci.com/docs/using-docker
 version: 2.1

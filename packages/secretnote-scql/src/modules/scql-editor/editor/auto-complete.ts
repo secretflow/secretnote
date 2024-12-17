@@ -1,20 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as _ from 'lodash-es';
 import * as monaco from 'monaco-editor';
-import type { IParseResult, IMatching } from 'syntax-parser';
+import type { IMatching, IParseResult } from 'syntax-parser';
 
 import {
-  onSuggestFieldGroup,
   onHoverFunctionName,
   onHoverTableField,
   onHoverTableName,
+  onSuggestFieldGroup,
   onSuggestFunctionName,
   onSuggestTableFields,
   onSuggestTableNames,
 } from './auto-complete-server';
-import type { ITableInfo, ICompletionItem, ICursorInfo } from './sql-parser';
+import type { ICompletionItem, ICursorInfo, ITableInfo } from './sql-parser';
 import { mysqlParser, reader } from './sql-parser';
 
 const language = 'sql';
@@ -80,7 +77,7 @@ monaco.languages.registerCompletionItemProvider(language, {
     }
 
     switch (cursorInfo.type) {
-      case 'tableField':
+      case 'tableField': {
         const cursorRootStatementFields = await reader.getFieldsFromStatement(
           parseResult.ast,
           parseResult.cursorKeyPath,
@@ -108,7 +105,8 @@ monaco.languages.registerCompletionItemProvider(language, {
                 : [],
             ),
         };
-      case 'tableFieldAfterGroup':
+      }
+      case 'tableFieldAfterGroup': {
         const cursorRootStatementFieldsAfter = await reader.getFieldsFromStatement(
           parseResult.ast,
           parseResult.cursorKeyPath,
@@ -125,7 +123,8 @@ monaco.languages.registerCompletionItemProvider(language, {
             })
             .concat(parserSuggestion),
         };
-      case 'tableName':
+      }
+      case 'tableName': {
         const tableNames = await onSuggestTableNames(
           cursorInfo as ICursorInfo<ITableInfo>,
         );
@@ -133,6 +132,7 @@ monaco.languages.registerCompletionItemProvider(language, {
         return {
           suggestions: tableNames.concat(parserSuggestion),
         };
+      }
       case 'functionName':
         return {
           suggestions: onSuggestFunctionName(cursorInfo.token.value),
@@ -165,7 +165,7 @@ monaco.languages.registerHoverProvider(language, {
     let contents: monaco.IMarkdownString[] = [];
 
     switch (cursorInfo.type) {
-      case 'tableField':
+      case 'tableField': {
         const extra = await reader.findFieldExtraInfo(
           parseResult.ast,
           cursorInfo,
@@ -174,7 +174,8 @@ monaco.languages.registerHoverProvider(language, {
         );
         contents = await onHoverTableField(cursorInfo.token.value, extra);
         break;
-      case 'tableFieldAfterGroup':
+      }
+      case 'tableFieldAfterGroup': {
         const extraAfter = await reader.findFieldExtraInfo(
           parseResult.ast,
           cursorInfo,
@@ -183,6 +184,7 @@ monaco.languages.registerHoverProvider(language, {
         );
         contents = await onHoverTableField(cursorInfo.token.value, extraAfter);
         break;
+      }
       case 'tableName':
         contents = await onHoverTableName(cursorInfo as ICursorInfo);
         break;

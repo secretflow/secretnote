@@ -1,7 +1,7 @@
 {
   "name": "secretnote",
   "private": true,
-  "version": "0.0.48",
+  "version": "0.0.49",
   "type": "module",
   "scripts": {
     "dev:sf": "cd .. && NODE_ENV=development python -m secretnote sf --config=./secretnote/secretnote/sf/.jupyter/config_dev.py --no-browser",
@@ -14,6 +14,7 @@
     "publish:py": "python -m hatch publish ./dist"
   },
   "dependencies": {
-    "@difizen/libro-analyzer": "^0.1.0"
+    "@difizen/libro-analyzer": "latest",
+    "@difizen/pylez": "latest"
   }
 }

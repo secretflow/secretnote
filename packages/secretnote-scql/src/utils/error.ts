@@ -15,7 +15,8 @@ export function genericErrorHandler(
   } = {},
 ) {
   console.error(e);
-  let { passthrough, silent, reThrow } = options;
+  const { passthrough } = options;
+  let { silent, reThrow } = options;
   if (passthrough) {
     silent = reThrow = true;
   }
@@ -32,7 +33,8 @@ export function genericErrorHandler(
  * Create an not-implemented function placeholder.
  */
 export function createNotImplemented(name: string) {
-  return (...args: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return (..._: any) => {
     throw new Error(`Method \`${name}\` is not implemented.`);
     return void 0 as any;
   };

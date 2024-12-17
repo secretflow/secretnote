@@ -1,3 +1,4 @@
+// Currently unused. Keeping this for future.
 module.exports = {
   extends: [
     'stylelint-config-standard',
