@@ -1,4 +1,5 @@
 # https://github.com/sveltejs/kit/blob/32afba695088b946aefe96da75b36de9b0667fbe/.github/workflows/release.yml
+# https://github.com/secretflow/web-ci/blob/main/.github/actions/ci-setup/action.yml
 name: 'Release'
 
 on:
@@ -20,8 +21,7 @@ jobs:
 
   publish:
     needs: [ci]
-    if: |
-      needs.ci.result == 'success'
+    if: needs.ci.result == 'success'
     name: Publish
     runs-on: ubuntu-latest
     permissions:
@@ -38,10 +38,8 @@ jobs:
         with:
           run_install: false
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+      - name: Setup rye
+        uses: eifinger/setup-rye@v4
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -51,9 +49,10 @@ jobs:
 
       - name: Bootstrap and Build
         shell: bash
+        # use the same bootstrap and build command as local to ensure consistency
         run: |
-          pnpm run ci:setup
-          pnpm run ci:build
+          pnpm run bootstrap
+          pnpm run build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
