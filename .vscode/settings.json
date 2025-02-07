@@ -83,5 +83,9 @@
     "--cov-report=html"
   ],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "black-formatter.args": [
+    "--config",
+    "${workspaceFolder}/pyprojects/secretnote/pyproject.toml"
+  ]
 }
