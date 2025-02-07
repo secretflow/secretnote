@@ -12,8 +12,16 @@ on:
   workflow_call:
 
 jobs:
+  # https://github.com/orgs/community/discussions/25722#discussioncomment-3248921
+  dont-run-on-draft-pr:
+    if: github.event.pull_request.draft == true
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+
   ci-javascript:
     name: 'CI: JavaScript'
+    needs: dont-run-on-draft-pr
     uses: secretflow/web-ci/.github/workflows/ci-javascript.yml@main
     with:
       node-version: ${{ matrix.node-version }}
@@ -26,6 +34,7 @@ jobs:
 
   ci-python:
     name: 'CI: Python'
+    needs: dont-run-on-draft-pr
     uses: secretflow/web-ci/.github/workflows/ci-python.yml@main
     with:
       node-version: ${{ matrix.node-version }}
