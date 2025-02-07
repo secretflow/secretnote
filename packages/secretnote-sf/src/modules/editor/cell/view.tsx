@@ -32,6 +32,7 @@ import { Ribbon } from '@/components/ribbon';
 import type { SecretNoteModel } from '@/modules/editor/model';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
+import { getGlobalConfig } from '@/modules/storage/local-storage-service';
 import { compareDateString } from '@/utils';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
@@ -44,6 +45,7 @@ const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
         items={partyList.map((name) => ({ label: name, key: name }))}
         value={parties}
         onChange={(val) => instance.onPartiesChange(val)}
+        readonly={instance.readonly}
       >
         <CellEditorMemo />
       </Ribbon>
@@ -63,6 +65,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   view = SecretNoteCodeCellComponent;
 
   @prop() parties: string[] = [];
+  @prop() readonly: boolean = false;
 
   get partyList() {
     return this.serverManager.servers
@@ -82,6 +85,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.parties = this.getInitialParties();
+    this.readonly = !!getGlobalConfig()?.readonly;
   }
 
   /**

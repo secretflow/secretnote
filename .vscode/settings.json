@@ -87,5 +87,6 @@
   "black-formatter.args": [
     "--config",
     "${workspaceFolder}/pyprojects/secretnote/pyproject.toml"
-  ]
+  ],
+  "eslint.enable": false
 }

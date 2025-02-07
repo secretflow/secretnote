@@ -23,6 +23,7 @@ export interface ISecretNoteAppProps {
   backendURL?: string; // backend URL before `/secretnote/*`
   tokenKey?: string; // token key in local storage
   selfDeploy?: boolean; // whether to deploy the app by oneself
+  readonly?: boolean // whether the app is running in readonly mode
 }
 
 const App = (props: ISecretNoteAppProps): JSX.Element => {
@@ -44,11 +45,10 @@ const App = (props: ISecretNoteAppProps): JSX.Element => {
         ToolbarModule,
         WelcomeModule,
         SnippetModule,
-        // TODO this module requires some updates
-        // ComponentCellModule,
+        // ComponentCellModule, // TODO this module requires some updates
       ]}
       onReady={() => {
-        // do some initialization
+        // perform some initialization here
         message.config({
           maxCount: 1,
         });
