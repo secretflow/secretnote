@@ -29,10 +29,10 @@ import { isUndefined } from 'lodash-es';
 import { forwardRef } from 'react';
 
 import { Ribbon } from '@/components/ribbon';
+import { SecretNoteConfigService } from '@/modules/config';
 import type { SecretNoteModel } from '@/modules/editor/model';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
-import { getGlobalConfig } from '@/modules/storage/local-storage-service';
 import { compareDateString } from '@/utils';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
@@ -80,12 +80,13 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     @inject(CodeEditorManager) codeEditorManager: CodeEditorManager,
     @inject(SecretNoteServerManager) serverManager: SecretNoteServerManager,
     @inject(SecretNoteKernelManager) kernelManager: SecretNoteKernelManager,
+    @inject(SecretNoteConfigService) configService: SecretNoteConfigService,
   ) {
     super(options, cellService, viewManager, codeEditorManager);
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.parties = this.getInitialParties();
-    this.readonly = !!getGlobalConfig()?.readonly;
+    this.readonly = !!configService.getItem('readonly');
   }
 
   /**

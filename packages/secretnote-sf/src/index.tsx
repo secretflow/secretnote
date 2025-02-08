@@ -1,6 +1,8 @@
-import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
+import { ManaAppPreset, ManaComponents, once } from '@difizen/mana-app';
 import { message } from 'antd';
+import { useCallback } from 'react';
 
+import { ConfigModule, SecretNoteConfigLocalStorageKey } from '@/modules/config';
 import { EditorModule } from '@/modules/editor';
 import { FileModule } from '@/modules/file';
 import { LayoutModule } from '@/modules/layout';
@@ -8,8 +10,6 @@ import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { MetricsModule } from '@/modules/metrics';
 import { NodeModule } from '@/modules/node';
 import { NotebookModule } from '@/modules/notebook';
-import { StorageModule } from '@/modules/storage';
-import { localStorageService } from '@/modules/storage/local-storage-service';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 import { SnippetModule } from '@/modules/toolbar/snippet';
@@ -23,19 +23,26 @@ export interface ISecretNoteAppProps {
   backendURL?: string; // backend URL before `/secretnote/*`
   tokenKey?: string; // token key in local storage
   selfDeploy?: boolean; // whether to deploy the app by oneself
-  readonly?: boolean // whether the app is running in readonly mode
+  readonly?: boolean; // whether the app is running in readonly mode
 }
 
 const App = (props: ISecretNoteAppProps): JSX.Element => {
+  useCallback(
+    once(() =>
+      localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(props)),
+    ),
+    [],
+  )();
+
   return (
     <ManaComponents.Application
       key="secretnote-sf"
       asChild={true}
       modules={[
         ManaAppPreset,
+        ConfigModule,
         LayoutModule,
         ThemeModule,
-        StorageModule,
         EditorModule,
         MetricsModule,
         NodeModule,
@@ -52,7 +59,6 @@ const App = (props: ISecretNoteAppProps): JSX.Element => {
         message.config({
           maxCount: 1,
         });
-        localStorageService.setData('globalConfig', props);
       }}
     />
   );

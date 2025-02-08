@@ -13,6 +13,8 @@ import {
   ToolbarContribution,
 } from '@difizen/mana-app';
 
+import { SecretNoteConfigService } from '@/modules/config';
+import { isReadonly } from '@/utils';
 import { SnippetView } from './view';
 
 const SnippetCommand: Command = {
@@ -21,9 +23,14 @@ const SnippetCommand: Command = {
 @singleton({ contrib: [CommandContribution, ToolbarContribution] })
 export class SnippetContribution implements CommandContribution, ToolbarContribution {
   protected readonly commandRegister: LibroCommandRegister;
+  protected readonly configService: SecretNoteConfigService;
 
-  constructor(@inject(LibroCommandRegister) commandRegister: LibroCommandRegister) {
+  constructor(
+    @inject(LibroCommandRegister) commandRegister: LibroCommandRegister,
+    @inject(SecretNoteConfigService) configService: SecretNoteConfigService,
+  ) {
     this.commandRegister = commandRegister;
+    this.configService = configService;
   }
 
   registerCommands(command: CommandRegistry) {
@@ -40,6 +47,9 @@ export class SnippetContribution implements CommandContribution, ToolbarContribu
   }
 
   registerToolbarItems(registry: ToolbarRegistry) {
+    if (isReadonly(this.configService)) {
+      return;
+    }
     registry.registerItem({
       id: SnippetCommand.id,
       command: SnippetCommand.id,

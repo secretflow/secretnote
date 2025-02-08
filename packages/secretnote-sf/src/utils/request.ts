@@ -2,7 +2,7 @@
 
 import { URL as LibroURL, type ISettings } from '@difizen/libro-jupyter';
 
-import { getGlobalConfig } from '@/modules/storage/local-storage-service';
+import { getSecretNoteConfig } from '@/modules/config';
 import { genericErrorHandler } from '@/utils';
 
 /**
@@ -12,7 +12,7 @@ import { genericErrorHandler } from '@/utils';
  */
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   // Try to get the backend URL from the global config (component props)
-  const backendUrl = getGlobalConfig()?.backendURL ?? '/';
+  const backendUrl = getSecretNoteConfig()?.backendURL ?? '/';
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 
@@ -80,7 +80,7 @@ const getCookie = (name: string) => {
  * Get the authentication token from the local storage.
  */
 export const getToken = (): string | null => {
-  const key = getGlobalConfig()?.tokenKey || 'pocketbase_auth';
+  const key = getSecretNoteConfig()?.tokenKey || 'pocketbase_auth';
   const auth = localStorage.getItem(key);
   if (auth) {
     try {

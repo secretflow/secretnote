@@ -5,7 +5,7 @@ import './index.less';
 export default function App() {
   return (
     <div className="secretnote-sf-container">
-      <SecretNoteSF backendURL="/" selfDeploy />
+      <SecretNoteSF backendURL="/" selfDeploy readonly />
     </div>
   );
 }

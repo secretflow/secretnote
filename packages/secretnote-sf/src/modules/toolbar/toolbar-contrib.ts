@@ -1,11 +1,14 @@
 import { KernelCommands, NotebookCommands } from '@difizen/libro-jupyter';
 import {
+  inject,
   ModalContribution,
   singleton,
   ToolbarContribution,
   type ToolbarRegistry,
 } from '@difizen/mana-app';
 
+import { isReadonly } from '@/utils';
+import { SecretNoteConfigService } from '../config';
 import './index.less';
 import { KeybindInstruction } from './keybind-instruction';
 import { RestartClearOutputModal } from './restart-clear-outputs-modal';
@@ -16,6 +19,12 @@ import { TopToolbarRunItem } from './top-toolbar-run-item';
 export class SecretNoteToolbarContribution
   implements ToolbarContribution, ModalContribution
 {
+  protected readonly configService: SecretNoteConfigService;
+
+  constructor(@inject(SecretNoteConfigService) configService: SecretNoteConfigService) {
+    this.configService = configService;
+  }
+
   registerToolbarItems(registry: ToolbarRegistry) {
     // don't allow manually kernel switch
     registry.unregisterItem(KernelCommands.ShowKernelStatusAndSelector.id);
@@ -45,11 +54,12 @@ export class SecretNoteToolbarContribution
     });
     // Replace with our own keybind instructions
     registry.unregisterItem('notebook:keybind-instructions');
-    registry.registerItem({
-      id: 'notebook:keybind-instructions',
-      command: 'notebook:keybind-instructions',
-      icon: KeybindInstruction,
-    });
+    !isReadonly(this.configService) &&
+      registry.registerItem({
+        id: 'notebook:keybind-instructions',
+        command: 'notebook:keybind-instructions',
+        icon: KeybindInstruction,
+      });
   }
 
   registerModals() {

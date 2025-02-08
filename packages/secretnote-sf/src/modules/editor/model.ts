@@ -13,11 +13,11 @@ import {
 } from '@difizen/mana-app';
 import { debounce } from 'lodash-es';
 
+import { SecretNoteConfigService } from '@/modules/config';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { NotebookFileService } from '@/modules/notebook';
 import type { IServer } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
-import { getGlobalConfig } from '../storage/local-storage-service';
 
 @transient()
 export class SecretNoteModel extends LibroModel {
@@ -60,6 +60,7 @@ export class SecretNoteModel extends LibroModel {
     @inject(ModalService) modalService: ModalService,
     @inject(CommandRegistry) commandRegistry: CommandRegistry,
     @inject(NotebookFileService) notebookFileService: NotebookFileService,
+    @inject(SecretNoteConfigService) configService: SecretNoteConfigService,
   ) {
     super();
     this.kernelManager = kernelManager;
@@ -67,13 +68,14 @@ export class SecretNoteModel extends LibroModel {
     this.modalService = modalService;
     this.commandRegistry = commandRegistry;
     this.notebookFileService = notebookFileService;
+
     this.serverManager.onServerAdded(this.onServerAdded.bind(this));
     this.serverManager.onServerDeleted(this.onServerDeleted.bind(this));
     this.serverManager.onServerStarted(this.onServerAdded.bind(this));
     this.serverManager.onServerStopped(this.onServerDeleted.bind(this));
     this.onChanged(this.autoSave.bind(this));
 
-    if (getGlobalConfig()?.readonly) {
+    if (configService.getItem('readonly')) {
       this.isEditMode =
         this.cellsEditable =
         this.inputEditable =
