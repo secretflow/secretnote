@@ -14,10 +14,10 @@ on:
 jobs:
   # https://github.com/orgs/community/discussions/25722#discussioncomment-3248921
   dont-run-on-draft-pr:
-    if: github.event.pull_request.draft == true
+    name: Don't Run on Draft PR
     runs-on: ubuntu-latest
     steps:
-      - run: exit 1
+      - uses: z0gSh1u/dont-run-on-draft-pr@v1
 
   ci-javascript:
     name: 'CI: JavaScript'
