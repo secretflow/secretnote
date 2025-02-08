@@ -33,7 +33,7 @@ import { SecretNoteConfigService } from '@/modules/config';
 import type { SecretNoteModel } from '@/modules/editor/model';
 import { SecretNoteKernelManager } from '@/modules/kernel';
 import { SecretNoteServerManager, ServerStatus } from '@/modules/server';
-import { compareDateString } from '@/utils';
+import { compareDateString, isReadonly } from '@/utils';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SecretNoteCodeCellView>(ViewInstance);
@@ -86,7 +86,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.parties = this.getInitialParties();
-    this.readonly = !!configService.getItem('readonly');
+    this.readonly = isReadonly(configService);
   }
 
   /**

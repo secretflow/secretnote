@@ -1,12 +1,12 @@
 import { DefaultSlotView, singleton, Slot, useInject, view } from '@difizen/mana-app';
+import { l10n } from '@difizen/mana-l10n';
 import { BoxPanel } from '@difizen/mana-react';
+import { Space, Tag } from 'antd';
 import React from 'react';
 
 import { Logo } from '@/assets/svg';
-import { showWhenReadonly } from '@/utils';
-import { l10n } from '@difizen/mana-l10n';
-import { Space, Tag } from 'antd';
-import { SecretNoteConfigService } from '../config';
+import { SecretNoteConfigService } from '@/modules/config';
+import { isReadonly, showWhenReadonly } from '@/utils';
 
 const { Pane } = BoxPanel;
 
@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
       <Pane flex={1}>
         <div
           className="logo"
-          onClick={() => !configService.getItem('readonly') && window.location.reload()}
+          onClick={() => !isReadonly(configService) && window.location.reload()}
         >
           <Logo style={{ width: 26, height: 26, marginRight: 4 }} />
           <Space>

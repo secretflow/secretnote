@@ -3,13 +3,16 @@ const svgr = require('esbuild-plugin-svgr');
 const { defineConfig } = require('tsup');
 
 const dtsIndex = `
-declare const App: (props: {
+declare const SFWorkspace: (props: {
   backendURL?: string;
   tokenKey?: string;
   selfDeploy?: boolean;
+}) => JSX.Element;
+declare const SFPreview: (props: {
+  backendURL?: string;
   readonly?: boolean;
 }) => JSX.Element;
-export { App as default };`.trim();
+export { SFPreview, SFWorkspace };`.trim();
 
 module.exports = defineConfig((overrides) => ({
   outDir: 'dist',

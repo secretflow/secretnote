@@ -13,8 +13,8 @@ import '../../override.less';
 const App = (): JSX.Element => {
   return (
     <ManaComponents.Application
-      key={'scql-project'}
-      asChild={true}
+      key="secretnote-scql-project"
+      asChild
       modules={[
         ManaAppPreset,
         StorageModule,

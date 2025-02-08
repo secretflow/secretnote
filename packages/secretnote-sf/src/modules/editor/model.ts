@@ -18,6 +18,7 @@ import { SecretNoteKernelManager } from '@/modules/kernel';
 import { NotebookFileService } from '@/modules/notebook';
 import type { IServer } from '@/modules/server';
 import { SecretNoteServerManager } from '@/modules/server';
+import { isReadonly } from '@/utils';
 
 @transient()
 export class SecretNoteModel extends LibroModel {
@@ -75,11 +76,15 @@ export class SecretNoteModel extends LibroModel {
     this.serverManager.onServerStopped(this.onServerDeleted.bind(this));
     this.onChanged(this.autoSave.bind(this));
 
-    if (configService.getItem('readonly')) {
+    if (isReadonly(configService)) {
       this.isEditMode =
-        this.cellsEditable =
         this.inputEditable =
         this.outputEditable =
+        this.cellsEditable =
+        this.savable =
+        this.runnable =
+        this.lspEnabled =
+        this.executable =
           false;
     }
   }

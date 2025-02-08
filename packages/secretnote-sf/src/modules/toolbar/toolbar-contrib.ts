@@ -52,14 +52,23 @@ export class SecretNoteToolbarContribution
       group: ['group2'],
       order: 'a',
     });
-    // Replace with our own keybind instructions
+    // Always hide the default keybind instructions
     registry.unregisterItem('notebook:keybind-instructions');
-    !isReadonly(this.configService) &&
-      registry.registerItem({
-        id: 'notebook:keybind-instructions',
-        command: 'notebook:keybind-instructions',
-        icon: KeybindInstruction,
-      });
+    // Replace with our own keybind instructions
+    registry.registerItem({
+      id: 'notebook:keybind-instructions',
+      command: 'notebook:keybind-instructions',
+      icon: KeybindInstruction,
+    });
+    // Hide these toolbar buttons in readonly mode
+    if (isReadonly(this.configService)) {
+      [
+        'notebook:keybind-instructions',
+        'document:save',
+        'notebook:enable-or-disable-all-output-scrolling',
+        'notebook:hide-all-cell',
+      ].forEach((v) => registry.unregisterItem(v));
+    }
   }
 
   registerModals() {

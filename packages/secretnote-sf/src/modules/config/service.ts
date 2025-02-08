@@ -2,9 +2,11 @@
 
 import { singleton } from '@difizen/mana-app';
 
-import type { ISecretNoteAppProps } from '@/.';
+import type { ISecretNotePreviewProps } from '@/pages/sf-preview';
+import type { ISecretNoteWorkspaceProps } from '@/pages/sf-workspace';
+type ISecretNoteAppProps = ISecretNoteWorkspaceProps & ISecretNotePreviewProps;
 
-export const SecretNoteConfigLocalStorageKey = 'secretnote_config';
+export const SecretNoteConfigLocalStorageKey = 'secretnote:config';
 
 /**
  * This function helps to get the config from the localStorage

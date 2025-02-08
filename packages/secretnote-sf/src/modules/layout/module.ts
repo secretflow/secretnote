@@ -4,7 +4,6 @@ import { createSlotPreference, ManaModule, RootSlotId } from '@difizen/mana-app'
 
 import { HeaderView } from './header';
 import { LayoutArea, LayoutView } from './layout';
-import { PreviewLayoutArea, PreviewLayoutView } from './preview';
 import { SideBarContribution } from './protocol';
 import { AboutBarView, aboutBarViewKey, SideBarView } from './sidebar';
 
@@ -35,20 +34,3 @@ export const LayoutModule = ManaModule.create()
       view: AboutBarView,
     }),
   );
-
-/**
- * The preview layout with header and content but without sidebar.
- * Used in file preview and SCQL project page.
- */
-export const PreviewLayoutModule = ManaModule.create().register(
-  HeaderView,
-  PreviewLayoutView,
-  createSlotPreference({
-    slot: RootSlotId,
-    view: PreviewLayoutView,
-  }),
-  createSlotPreference({
-    slot: PreviewLayoutArea.header,
-    view: HeaderView,
-  }),
-);
