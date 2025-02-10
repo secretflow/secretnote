@@ -45,6 +45,7 @@ export class NotebookFileService {
 
   @prop() notebookFileList: IContentsModel[] | null = null;
   @prop() currentNotebookFile: IContentsModel | null = null;
+  // see packages/secretnote-sf/src/modules/notebook/editor-view.tsx
   @prop() currentLibroView: LibroView | null = null;
   @prop() pendingRename: { path: string; name: string } | null = null;
 
@@ -68,6 +69,7 @@ export class NotebookFileService {
    * @see `loadContent` in `/editor/contents/contents-contrib.ts`
    */
   openFile(file: IContentsModel) {
+    console.log('openFile, currentLibroView', this.currentLibroView);
     if (this.currentNotebookFile !== file) {
       const previous = this.currentNotebookFile;
       this.currentNotebookFile = file;
@@ -251,13 +253,21 @@ export class NotebookFileService {
     };
   }
 
+  /**
+   * Get the file name without the extension name of notebook files.
+   */
   getFileNameWithoutExt(name?: string) {
     if (!name) {
       return '';
     }
-    return name.endsWith(FILE_EXT) ? name.replace(FILE_EXT, '') : name;
+    return name.endsWith(FILE_EXT)
+      ? name.substring(0, name.length - FILE_EXT.length)
+      : name;
   }
 
+  /**
+   * Get the file name with the extension name of notebook files.
+   */
   getFileNameWithExt(name?: string) {
     if (!name) {
       return '';
