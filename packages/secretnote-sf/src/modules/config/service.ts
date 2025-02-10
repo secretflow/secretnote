@@ -4,6 +4,7 @@ import { singleton } from '@difizen/mana-app';
 
 import type { ISecretNotePreviewProps } from '@/pages/sf-preview';
 import type { ISecretNoteWorkspaceProps } from '@/pages/sf-workspace';
+import type { ValueOf } from '@/utils';
 type ISecretNoteAppProps = ISecretNoteWorkspaceProps & ISecretNotePreviewProps;
 
 export const SecretNoteConfigLocalStorageKey = 'secretnote:config';
@@ -37,7 +38,7 @@ export class SecretNoteConfigService {
     localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(this.config));
   }
 
-  getItem(key: keyof ISecretNoteAppProps) {
-    return this.config[key];
+  getItem<T = ValueOf<ISecretNoteAppProps>>(key: keyof ISecretNoteAppProps) {
+    return this.config[key] as T;
   }
 }

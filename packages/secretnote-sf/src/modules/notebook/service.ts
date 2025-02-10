@@ -69,7 +69,6 @@ export class NotebookFileService {
    * @see `loadContent` in `/editor/contents/contents-contrib.ts`
    */
   openFile(file: IContentsModel) {
-    console.log('openFile, currentLibroView', this.currentLibroView);
     if (this.currentNotebookFile !== file) {
       const previous = this.currentNotebookFile;
       this.currentNotebookFile = file;
@@ -256,7 +255,7 @@ export class NotebookFileService {
   /**
    * Get the file name without the extension name of notebook files.
    */
-  getFileNameWithoutExt(name?: string) {
+  static getFileNameWithoutExt(name?: string) {
     if (!name) {
       return '';
     }
@@ -268,7 +267,7 @@ export class NotebookFileService {
   /**
    * Get the file name with the extension name of notebook files.
    */
-  getFileNameWithExt(name?: string) {
+  static getFileNameWithExt(name?: string) {
     if (!name) {
       return '';
     }

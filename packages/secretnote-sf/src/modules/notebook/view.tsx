@@ -39,7 +39,7 @@ export const NotebookFileComponent = () => {
           title: l10n.t('删除 Notebook'),
           centered: true,
           content: l10n.t('Notebook {name} 将被删除', {
-            name: service.getFileNameWithoutExt(file.name),
+            name: NotebookFileService.getFileNameWithoutExt(file.name),
           }),
           okText: l10n.t('删除 Notebook'),
           cancelText: l10n.t('取消'),
@@ -86,10 +86,12 @@ export const NotebookFileComponent = () => {
           content={
             <Input
               ref={renameInputRef}
-              value={service.getFileNameWithoutExt(service.pendingRename?.name)}
+              value={NotebookFileService.getFileNameWithoutExt(
+                service.pendingRename?.name,
+              )}
               onChange={(e) => {
                 if (service.pendingRename) {
-                  service.pendingRename.name = service.getFileNameWithExt(
+                  service.pendingRename.name = NotebookFileService.getFileNameWithExt(
                     e.target.value,
                   );
                 }
@@ -123,7 +125,7 @@ export const NotebookFileComponent = () => {
               current: service.currentNotebookFile?.path === file.path,
             })}
           >
-            <span>{service.getFileNameWithoutExt(file.name)}</span>
+            <span>{NotebookFileService.getFileNameWithoutExt(file.name)}</span>
             <DropdownMenu
               items={[
                 {

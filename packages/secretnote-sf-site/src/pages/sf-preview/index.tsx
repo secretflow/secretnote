@@ -5,7 +5,7 @@ import './index.less';
 export default function App() {
   return (
     <div className="secretnote-sf-preview-container">
-      <SFPreview backendURL="/" readonly />
+      <SFPreview blobURL={'TODO'} readonly />
     </div>
   );
 }

@@ -9,7 +9,7 @@ declare const SFWorkspace: (props: {
   selfDeploy?: boolean;
 }) => JSX.Element;
 declare const SFPreview: (props: {
-  backendURL?: string;
+  blobURL?: string;
   readonly?: boolean;
 }) => JSX.Element;
 export { SFPreview, SFWorkspace };`.trim();

@@ -88,5 +88,6 @@
     "--config",
     "${workspaceFolder}/pyprojects/secretnote/pyproject.toml"
   ],
-  "eslint.enable": false
+  "eslint.enable": false,
+  "CodeFuse.EnableCodeGenerator": true
 }
