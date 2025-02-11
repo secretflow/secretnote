@@ -1,4 +1,4 @@
-// Services for notebook manupulation (readonly mode).
+// Services for notebook manupulation (preview mode).
 // see `src/modules/notebook/service.ts`
 
 import type { IContentsModel, LibroView } from '@difizen/libro-jupyter';
@@ -6,7 +6,7 @@ import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
 import { SecretNoteConfigService } from '@/modules/config';
 import { NotebookFileService } from '@/modules/notebook';
-import { createNotImplemented, requestNoUnpack } from '@/utils';
+import { createNotImplemented, genericErrorHandler, requestNoUnpack } from '@/utils';
 
 export const PREVIEW_NOTEBOOK_FILENAME = '__SecretNotePreview.ipynb';
 
@@ -25,7 +25,9 @@ export class PreviewNotebookFileService {
   constructor(@inject(SecretNoteConfigService) configService: SecretNoteConfigService) {
     this.fileURL = configService.getItem('fileURL');
     if (this.fileURL) {
-      this.getFile(this.fileURL).then((v) => this.openFile(v));
+      this.getFile(this.fileURL)
+        .then((v) => this.openFile(v))
+        .catch(genericErrorHandler);
     }
   }
 

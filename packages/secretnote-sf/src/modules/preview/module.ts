@@ -1,6 +1,7 @@
-// Mana module for notebook preview.
-// see `packages/secretnote-sf/src/modules/notebook/module.ts`
-// see `packages/secretnote-sf/src/modules/editor/module.ts`
+// Mana modules for notebook preview.
+// see `src/modules/notebook/module.ts`
+// see `src/modules/server/module.ts`
+// see `src/modules/editor/module.ts`
 
 import {
   LibroCodeCellModel,

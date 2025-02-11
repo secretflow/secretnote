@@ -1,8 +1,7 @@
 // This is the very first app of SecretNote SF, full-featured version.
 
-import { ManaAppPreset, ManaComponents, once } from '@difizen/mana-app';
+import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 import { message } from 'antd';
-import { useCallback } from 'react';
 
 import { ConfigModule, SecretNoteConfigLocalStorageKey } from '@/modules/config';
 import { EditorModule } from '@/modules/editor';
@@ -19,6 +18,7 @@ import { WelcomeModule } from '@/modules/welcome';
 // import { ComponentCellModule } from '@/modules/component-cell'
 
 import '@/lang';
+import { useRunOnce } from '@/utils/hook';
 import '../../override.less';
 
 export interface ISecretNoteWorkspaceProps {
@@ -28,12 +28,9 @@ export interface ISecretNoteWorkspaceProps {
 }
 
 const App = (props: ISecretNoteWorkspaceProps): JSX.Element => {
-  useCallback(
-    once(() =>
-      localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(props)),
-    ),
-    [],
-  )();
+  useRunOnce(() =>
+    localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(props)),
+  );
 
   return (
     <ManaComponents.Application

@@ -1,3 +1,6 @@
+// Layout for preview mode.
+// see `src/modules/layout/layout.tsx`
+
 import { DefaultSlotView, singleton, Slot, view } from '@difizen/mana-app';
 import { BoxPanel, SplitPanel } from '@difizen/mana-react';
 import React from 'react';

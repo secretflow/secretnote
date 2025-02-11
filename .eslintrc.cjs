@@ -15,6 +15,9 @@ module.exports = {
   ignorePatterns: ['dist', '.eslintrc.*', 'tsup.config.js'],
 
   rules: {
+    // let's bypass them
+    'promise/always-return': 'off',
+
     // common pitfalls
     eqeqeq: 'error',
     curly: 'error',

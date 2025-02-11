@@ -1,14 +1,14 @@
 // Keybinds instruction drawer on the right.
 
+import { useInject } from '@difizen/mana-app';
 import { isMacintosh } from '@difizen/mana-common';
 import { l10n } from '@difizen/mana-l10n';
 import { Divider, Drawer, Table, Tag, Tooltip } from 'antd';
 import { KeyboardIcon } from 'lucide-react';
 import { useState } from 'react';
 
+import { SecretNoteConfigService } from '@/modules/config';
 import { hideWhenReadonly, withId } from '@/utils';
-import { useInject } from '@difizen/mana-app';
-import { SecretNoteConfigService } from '../config';
 import './index.less';
 
 interface Keybind {

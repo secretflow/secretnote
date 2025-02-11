@@ -1,7 +1,5 @@
-// Different from traditional Jupyter Server, SecretNote connects to multiple nodes,
-// i.e., multiple Jupyter Servers, and the server start/stop/... operations are
-// handled by the default web server instead of the Jupyter itself.
-// So we need to customize the server manager to manage them.
+// Server manager for preview mode.
+// see `src/modules/server/server-manager.ts`
 
 import { Emitter, prop, singleton } from '@difizen/mana-app';
 

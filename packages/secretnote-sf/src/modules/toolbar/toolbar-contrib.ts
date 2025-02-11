@@ -7,8 +7,9 @@ import {
   type ToolbarRegistry,
 } from '@difizen/mana-app';
 
+import { SecretNoteConfigService } from '@/modules/config';
 import { isReadonly } from '@/utils';
-import { SecretNoteConfigService } from '../config';
+
 import './index.less';
 import { KeybindInstruction } from './keybind-instruction';
 import { RestartClearOutputModal } from './restart-clear-outputs-modal';

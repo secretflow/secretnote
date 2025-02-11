@@ -6,6 +6,7 @@ import { ContentContribution } from '@difizen/libro-jupyter';
 import { URI, inject, singleton } from '@difizen/mana-app';
 
 import type { SecretNoteModel } from '@/modules/editor';
+
 import { PreviewNotebookFileService } from './service';
 
 @singleton({ contrib: ContentContribution })

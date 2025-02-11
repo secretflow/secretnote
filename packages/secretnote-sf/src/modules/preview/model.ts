@@ -1,3 +1,6 @@
+// Notebook model for preview mode.
+// see `src/modules/editor/model.ts`
+
 import type { IContentsModel } from '@difizen/libro-jupyter';
 import { LibroModel } from '@difizen/libro-jupyter';
 import { prop, transient } from '@difizen/mana-app';

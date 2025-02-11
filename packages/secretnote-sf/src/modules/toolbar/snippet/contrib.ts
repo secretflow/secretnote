@@ -15,6 +15,7 @@ import {
 
 import { SecretNoteConfigService } from '@/modules/config';
 import { isReadonly } from '@/utils';
+
 import { SnippetView } from './view';
 
 const SnippetCommand: Command = {

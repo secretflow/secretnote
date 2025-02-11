@@ -73,7 +73,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
   view = SecretNoteCodeCellComponent;
 
   @prop() parties: string[] = [];
-  @prop() readonly: boolean = false;
+  @prop() readonly = false;
 
   get partyList() {
     return this.serverManager.servers

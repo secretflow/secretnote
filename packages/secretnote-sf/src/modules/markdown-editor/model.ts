@@ -1,7 +1,8 @@
-import { isReadonly } from '@/utils';
 import { CellOptions, LibroCellModel } from '@difizen/libro-jupyter';
 import { inject, prop, transient } from '@difizen/mana-app';
-import { SecretNoteConfigService } from '../config';
+
+import { SecretNoteConfigService } from '@/modules/config';
+import { isReadonly } from '@/utils';
 
 @transient()
 export class MarkdownCellModel extends LibroCellModel {

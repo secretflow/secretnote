@@ -5,6 +5,7 @@ import { singleton } from '@difizen/mana-app';
 import type { ISecretNotePreviewProps } from '@/pages/sf-preview';
 import type { ISecretNoteWorkspaceProps } from '@/pages/sf-workspace';
 import type { ValueOf } from '@/utils';
+
 type ISecretNoteAppProps = ISecretNoteWorkspaceProps & ISecretNotePreviewProps;
 
 export const SecretNoteConfigLocalStorageKey = 'secretnote:config';
@@ -33,6 +34,7 @@ export class SecretNoteConfigService {
     value: ISecretNoteAppProps[keyof ISecretNoteAppProps],
   ) {
     // update the config and sync it to localStorage
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this.config[key] = value;
     localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(this.config));

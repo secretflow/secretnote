@@ -6,4 +6,5 @@ export const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve,
 /**
  * A noop function that returns a Promise.
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const anoop = async () => {};
