@@ -1,6 +1,5 @@
 import { ManaAppPreset, ManaComponents } from '@difizen/mana-app';
 
-import '@/lang';
 import { LayoutModule } from '@/modules/layout';
 import { MarkdownCellModule } from '@/modules/markdown-editor';
 import { NotebookModule } from '@/modules/notebook';
@@ -13,6 +12,8 @@ import { SCQLToolbarModule } from '@/modules/scql-toolbar';
 import { StorageModule } from '@/modules/storage';
 import { ThemeModule } from '@/modules/theme';
 import { WelcomeModule } from '@/modules/welcome';
+
+import '@/lang';
 import '../../override.less';
 
 const App = (): JSX.Element => {

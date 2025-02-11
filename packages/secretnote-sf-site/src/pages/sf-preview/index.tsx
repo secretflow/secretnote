@@ -3,9 +3,11 @@ import { SFPreview } from '../../../../secretnote-sf'; // use local version duri
 import './index.less';
 
 export default function App() {
+  const notebookFileURL = 'FILL_ME_WITH_YOUR_NOTEBOOK_FILE_URL';
+
   return (
     <div className="secretnote-sf-preview-container">
-      <SFPreview blobURL={'TODO'} readonly />
+      <SFPreview fileURL={notebookFileURL} readonly />
     </div>
   );
 }
