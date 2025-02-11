@@ -8,17 +8,18 @@ import {
   LibroJupyterModule,
   LibroModel,
 } from '@difizen/libro-jupyter';
-import { createSlotPreference, ManaModule } from '@difizen/mana-app';
+import { createSlotPreference, ManaModule, RootSlotId } from '@difizen/mana-app';
 
 import { SecretNoteCodeCellModel, SecretNoteCodeCellView } from '@/modules/editor/cell';
 import { SecretNoteOutputArea } from '@/modules/editor/output';
 import { JupyterWorkspaceService } from '@/modules/editor/workspace';
 import { SecretNoteKernelModule } from '@/modules/kernel';
-import { LayoutArea } from '@/modules/layout';
+import { HeaderView, LayoutArea } from '@/modules/layout';
+import { SecretNoteServerManager } from '@/modules/server';
 
-import { SecretNoteServerManager } from '../server';
 import { PreviewSecretNoteContentContribution } from './contents-contrib';
 import { PreviewEditorView } from './editor-view';
+import { PreviewLayoutView } from './layout';
 import { PreviewSecretNoteModel } from './model';
 import { PreviewSecretNoteServerManager } from './server-manager';
 import { PreviewNotebookFileService } from './service';
@@ -54,3 +55,17 @@ export const PreviewEditorModule = ManaModule.create()
     { token: LibroCodeCellView, useClass: SecretNoteCodeCellView },
   )
   .dependOn(LibroJupyterModule, PreviewSecretNoteServerModule, SecretNoteKernelModule);
+
+// Module for the layout of the preview page (without sidebar).
+export const PreviewLayoutModule = ManaModule.create().register(
+  HeaderView,
+  PreviewLayoutView,
+  createSlotPreference({
+    slot: RootSlotId,
+    view: PreviewLayoutView,
+  }),
+  createSlotPreference({
+    slot: LayoutArea.header,
+    view: HeaderView,
+  }),
+);

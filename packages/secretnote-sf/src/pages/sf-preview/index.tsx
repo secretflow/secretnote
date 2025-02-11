@@ -5,9 +5,12 @@ import { message } from 'antd';
 import { useCallback } from 'react';
 
 import { ConfigModule, SecretNoteConfigLocalStorageKey } from '@/modules/config';
-import { LayoutModule } from '@/modules/layout';
 import { MarkdownCellModule } from '@/modules/markdown-editor';
-import { PreviewEditorModule, PreviewNotebookModule } from '@/modules/preview';
+import {
+  PreviewEditorModule,
+  PreviewLayoutModule,
+  PreviewNotebookModule,
+} from '@/modules/preview';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 
@@ -34,7 +37,7 @@ const App = (props: ISecretNotePreviewProps): JSX.Element => {
       modules={[
         ManaAppPreset,
         ConfigModule,
-        LayoutModule,
+        PreviewLayoutModule,
         ThemeModule,
         PreviewNotebookModule,
         PreviewEditorModule,
