@@ -8,7 +8,7 @@ import { anoop } from '@/utils';
 export class PreviewSecretNoteModel extends LibroModel {
   public currentFileContents!: IContentsModel;
 
-  @prop() lspEnabled = false;
+  @prop() lspEnabled = false; // don't use LSP for preview
 
   constructor() {
     super();

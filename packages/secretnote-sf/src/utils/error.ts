@@ -25,7 +25,7 @@ export function genericErrorHandler(
 }
 
 /**
- * Create an not-implemented function placeholder.
+ * Create an not-implemented function placeholder that throws.
  */
 export function createNotImplemented(name: string) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

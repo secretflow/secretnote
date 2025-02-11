@@ -36,8 +36,8 @@ const App = (props: ISecretNotePreviewProps): JSX.Element => {
         ConfigModule,
         LayoutModule,
         ThemeModule,
-        PreviewEditorModule,
         PreviewNotebookModule,
+        PreviewEditorModule,
         MarkdownCellModule,
         ToolbarModule,
       ]}

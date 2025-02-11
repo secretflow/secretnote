@@ -15,13 +15,16 @@ import { SecretNoteOutputArea } from '@/modules/editor/output';
 import { JupyterWorkspaceService } from '@/modules/editor/workspace';
 import { SecretNoteKernelModule } from '@/modules/kernel';
 import { LayoutArea } from '@/modules/layout';
-import { SecretNoteServerModule } from '@/modules/server';
 
+import { SecretNoteServerManager } from '../server';
 import { PreviewSecretNoteContentContribution } from './contents-contrib';
 import { PreviewEditorView } from './editor-view';
 import { PreviewSecretNoteModel } from './model';
+import { PreviewSecretNoteServerManager } from './server-manager';
 import { PreviewNotebookFileService } from './service';
 
+// Customized Notebook Module for notebook preview without abilities of modifying notebook files
+// see `src/modules/notebook/module.ts`
 export const PreviewNotebookModule = ManaModule.create().register(
   PreviewEditorView,
   PreviewNotebookFileService,
@@ -31,6 +34,15 @@ export const PreviewNotebookModule = ManaModule.create().register(
   }),
 );
 
+// Customized Server Module for notebook preview without abilities of LSP
+// see `src/modules/server/module.ts`
+export const PreviewSecretNoteServerModule = ManaModule.create().register({
+  token: SecretNoteServerManager, // override using token SecretNoteServerManager
+  useClass: PreviewSecretNoteServerManager,
+});
+
+// Customized Editor Module for notebook preview without abilities of editing notebook file
+// see `src/modules/editor/module.ts`
 export const PreviewEditorModule = ManaModule.create()
   .register(
     PreviewSecretNoteContentContribution,
@@ -41,4 +53,4 @@ export const PreviewEditorModule = ManaModule.create()
     { token: LibroCodeCellModel, useClass: SecretNoteCodeCellModel },
     { token: LibroCodeCellView, useClass: SecretNoteCodeCellView },
   )
-  .dependOn(LibroJupyterModule, SecretNoteServerModule, SecretNoteKernelModule);
+  .dependOn(LibroJupyterModule, PreviewSecretNoteServerModule, SecretNoteKernelModule);
