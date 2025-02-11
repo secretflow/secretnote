@@ -6,7 +6,7 @@ import { Emitter, inject, prop, singleton } from '@difizen/mana-app';
 
 import { SecretNoteConfigService } from '@/modules/config';
 import { NotebookFileService } from '@/modules/notebook';
-import { createNotImplemented } from '@/utils';
+import { createNotImplemented, requestNoUnpack } from '@/utils';
 
 export const PREVIEW_NOTEBOOK_FILENAME = '__SecretNotePreview.ipynb';
 
@@ -18,14 +18,14 @@ export class PreviewNotebookFileService {
   }>();
   readonly onNotebookFileChanged = this.onNotebookFileChangedEmitter.event;
 
-  @prop() blobURL: string | undefined = undefined;
+  @prop() fileURL: string | undefined = undefined;
   @prop() currentNotebookFile: IContentsModel | null = null;
   @prop() currentLibroView: LibroView | null = null;
 
   constructor(@inject(SecretNoteConfigService) configService: SecretNoteConfigService) {
-    this.blobURL = configService.getItem('blobURL');
-    if (this.blobURL) {
-      this.getFile(this.blobURL).then((v) => this.openFile(v));
+    this.fileURL = configService.getItem('fileURL');
+    if (this.fileURL) {
+      this.getFile(this.fileURL).then((v) => this.openFile(v));
     }
   }
 
@@ -41,15 +41,13 @@ export class PreviewNotebookFileService {
   isFileExisted = createNotImplemented('isFileExisted');
   uploadFile = createNotImplemented('uploadFile');
 
-  async getFile(blobURL: string) {
-    // TODO use makeReqeust here
-    const file = await (await fetch(blobURL)).json();
-    // debugger;
+  async getFile(fileURL: string) {
+    const file = await requestNoUnpack(fileURL, { method: 'GET', _external: true });
 
     return {
       name: PREVIEW_NOTEBOOK_FILENAME,
-      path: blobURL,
-      content: file,
+      path: fileURL,
+      content: await file.json(),
     } as IContentsModel;
   }
 
@@ -57,7 +55,7 @@ export class PreviewNotebookFileService {
     [
       {
         name: PREVIEW_NOTEBOOK_FILENAME,
-        path: this.blobURL,
+        path: this.fileURL,
       },
     ] as IContentsModel[];
 }

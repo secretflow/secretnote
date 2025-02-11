@@ -18,11 +18,13 @@ export function Editor({
   extensions = [],
   onUpdate = noop,
   onDebouncedUpdate = noop,
+  readonly = false,
 }: {
   defaultValue: string;
   extensions?: Extension[];
   onUpdate?: (editor?: EditorClass) => void | Promise<void>;
   onDebouncedUpdate?: (editor?: EditorClass, content?: string) => void | Promise<void>;
+  readonly?: boolean;
 }) {
   const [content, setContent] = useState<string>(defaultValue);
   const [hydrated, setHydrated] = useState(false);
@@ -37,6 +39,7 @@ export function Editor({
   );
 
   const editor = useEditor({
+    editable: !readonly,
     extensions: [...defaultExtensions, ...extensions],
     editorProps: {
       handleDOMEvents: {
@@ -73,7 +76,7 @@ export function Editor({
       }}
       className="markdown-editor"
     >
-      {editor && <EditorBubbleMenu editor={editor} />}
+      {editor && !readonly && <EditorBubbleMenu editor={editor} />}
       <EditorContent editor={editor} />
     </div>
   );

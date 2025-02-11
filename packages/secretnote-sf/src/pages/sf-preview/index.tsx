@@ -15,7 +15,7 @@ import '@/lang';
 import '../../override.less';
 
 export interface ISecretNotePreviewProps {
-  blobURL?: string; // Blob URL of the notebook to preview
+  fileURL?: string; // file URL of the notebook to preview
   readonly?: boolean; // whether the app is running in readonly mode
 }
 

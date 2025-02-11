@@ -1,4 +1,4 @@
-export * from './array';
+export * from './array-object';
 export * from './color';
 export * from './error';
 export * from './file';

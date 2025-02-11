@@ -1,3 +1,5 @@
+import { pick } from 'lodash-es';
+
 /**
  * Add the index as id to each item in the array.
  */
@@ -27,4 +29,14 @@ export function entriesWithSortedKey<T>(
   }
 
   return keys.map((k) => [k, obj[k]] as [string, T]);
+}
+
+/**
+ * Pick except keys.
+ */
+export function pickExcept<T extends object, K extends keyof T>(obj: T, keys: K[]) {
+  return pick(
+    obj,
+    Object.keys(obj).filter((k) => !keys.includes(k as K)),
+  ) as Omit<T, K>;
 }
