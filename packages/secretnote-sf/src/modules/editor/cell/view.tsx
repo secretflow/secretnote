@@ -38,14 +38,22 @@ import { compareDateString, isReadonly } from '@/utils';
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SecretNoteCodeCellView>(ViewInstance);
   const { partyList, parties } = instance;
+  const { readonly } = instance;
 
   return (
     <div className={instance.className} ref={ref} tabIndex={10} onBlur={instance.blur}>
       <Ribbon
-        items={partyList.map((name) => ({ label: name, key: name }))}
+        readonly={readonly}
+        // under readonly mode, we don't have corresponding servers in partyList
+        // just show parties recorded in the cell metadata
+        items={(readonly ? parties : partyList).map((name) => ({
+          label: name,
+          key: name,
+        }))}
         value={parties}
-        onChange={(val) => instance.onPartiesChange(val)}
-        readonly={instance.readonly}
+        onChange={(val) => {
+          !readonly && instance.onPartiesChange(val);
+        }}
       >
         <CellEditorMemo />
       </Ribbon>
@@ -85,8 +93,8 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     super(options, cellService, viewManager, codeEditorManager);
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
-    this.parties = this.getInitialParties();
     this.readonly = isReadonly(configService);
+    this.parties = this.getInitialParties();
   }
 
   /**
@@ -257,6 +265,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
 
   /**
    * Get the initialization value of parties for a cell.
+   * If readonly, return party names recorded in the cell metadata regardless of the server list.
    * If the cell has been executed before, return those saved in the cell metadata.
    * If can't, return the previous cell's parties.
    * If still can't, all parties will be returned.
@@ -266,7 +275,10 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     if (execution && execution.parties) {
       try {
         const parties: string[] = JSON.parse(execution.parties as string);
-        return parties.filter((p) => this.partyList.includes(p));
+        return this.readonly
+          ? parties
+          : // filter out parties that are not in the server list
+            parties.filter((p) => this.partyList.includes(p));
       } catch (e) {
         return [];
       }
