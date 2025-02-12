@@ -28,11 +28,18 @@ import {
 import { Plus, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
+import { SecretNoteConfigService } from '@/modules/config';
 import type { NodeStatusTag, SecretNoteNode } from '@/modules/node/service';
 import { NodeService } from '@/modules/node/service';
 import { ServerStatus } from '@/modules/server';
-import { getGlobalConfig } from '@/modules/storage/local-storage-service';
-import { genericErrorHandler, hashStringToColor, invert, IPRegex, wait } from '@/utils';
+import {
+  genericErrorHandler,
+  hashStringToColor,
+  hideWhenReadonly,
+  invert,
+  IPRegex,
+  wait,
+} from '@/utils';
 import './index.less';
 
 const { Paragraph } = Typography;
@@ -67,7 +74,7 @@ const formatNodeStatus = (
  */
 const NodeDetails = (props: { node: SecretNoteNode }) => {
   const instance = useInject<NodeView>(ViewInstance);
-  const service = instance.service;
+  const service = instance.nodeService;
   const { node } = props;
   const { resourcesAndVersions: nodeRV } = node;
   const { status, text } = formatNodeStatus(node);
@@ -154,7 +161,7 @@ export const NodeComponent = () => {
   const [addLoading, setAddLoading] = useState(false);
   const [addProgress, setAddProgress] = useState(0);
   const instance = useInject<NodeView>(ViewInstance);
-  const service = instance.service;
+  const { nodeService, configService } = instance;
 
   const handleAddNode = async () => {
     const values = await form.validateFields();
@@ -165,7 +172,7 @@ export const NodeComponent = () => {
       1000, // ~30s in total
     );
     try {
-      const server = await service.addNode(values);
+      const server = await nodeService.addNode(values);
       if (server.status === ServerStatus.Succeeded) {
         message.success(l10n.t('节点添加成功'));
       } else {
@@ -223,7 +230,7 @@ export const NodeComponent = () => {
         >
           <Input placeholder="alice" />
         </Form.Item>
-        {getGlobalConfig()?.selfDeploy ? (
+        {configService.getItem('selfDeploy') ? (
           <Form.Item
             label={l10n.t('地址')}
             name="podIp"
@@ -264,10 +271,10 @@ export const NodeComponent = () => {
   );
 
   return (
-    <div className="secretnote-node">
+    <div className="secretnote-node" style={hideWhenReadonly(configService)}>
       <span className="title">{l10n.t('节点列表')}:&nbsp;</span>
       <Avatar.Group>
-        {service.nodes.map((node) => (
+        {nodeService.nodes.map((node) => (
           <Popover
             key={node.id}
             content={<NodeDetails node={node} />}
@@ -311,7 +318,9 @@ export const NodeComponent = () => {
         arrow={false}
       >
         {/* Add two nodes at most */}
-        {(getGlobalConfig()?.selfDeploy ? true : service.nodes.length < 2) && (
+        {(configService.getItem('selfDeploy')
+          ? true
+          : nodeService.nodes.length < 2) && (
           <Button
             icon={<Plus size={16} />}
             className="btn"
@@ -319,7 +328,7 @@ export const NodeComponent = () => {
           />
         )}
       </Popover>
-      {service.loading && <Spin size="small" className="ml-2" />}
+      {nodeService.loading && <Spin size="small" className="ml-2" />}
     </div>
   );
 };
@@ -328,10 +337,15 @@ export const NodeComponent = () => {
 @view('secretnote-node-view')
 export class NodeView extends BaseView {
   view = NodeComponent;
-  readonly service: NodeService;
+  readonly nodeService: NodeService;
+  readonly configService: SecretNoteConfigService;
 
-  constructor(@inject(NodeService) service: NodeService) {
+  constructor(
+    @inject(NodeService) nodeService: NodeService,
+    @inject(SecretNoteConfigService) configService: SecretNoteConfigService,
+  ) {
     super();
-    this.service = service;
+    this.nodeService = nodeService;
+    this.configService = configService;
   }
 }

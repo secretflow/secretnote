@@ -22,8 +22,10 @@ import { Collapse, type CollapseProps, Space, Tooltip, Typography } from 'antd';
 import { InfoIcon } from 'lucide-react';
 import React from 'react';
 
-import SecretNotePkgJSON from '@/../package.json';
 import { SideBarContribution } from '@/modules/layout/protocol';
+
+import SecretNotePkgJSON from '@/../package.json';
+// eslint-disable-next-line import/order
 import LibroJupyterPkgJSON from '@difizen/libro-jupyter/package.json';
 
 export const metricsMonitorKey = 'metricsMonitor';

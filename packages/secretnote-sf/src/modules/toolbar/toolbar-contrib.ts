@@ -1,10 +1,14 @@
 import { KernelCommands, NotebookCommands } from '@difizen/libro-jupyter';
 import {
+  inject,
   ModalContribution,
   singleton,
   ToolbarContribution,
   type ToolbarRegistry,
 } from '@difizen/mana-app';
+
+import { SecretNoteConfigService } from '@/modules/config';
+import { isReadonly } from '@/utils';
 
 import './index.less';
 import { KeybindInstruction } from './keybind-instruction';
@@ -16,6 +20,12 @@ import { TopToolbarRunItem } from './top-toolbar-run-item';
 export class SecretNoteToolbarContribution
   implements ToolbarContribution, ModalContribution
 {
+  protected readonly configService: SecretNoteConfigService;
+
+  constructor(@inject(SecretNoteConfigService) configService: SecretNoteConfigService) {
+    this.configService = configService;
+  }
+
   registerToolbarItems(registry: ToolbarRegistry) {
     // don't allow manually kernel switch
     registry.unregisterItem(KernelCommands.ShowKernelStatusAndSelector.id);
@@ -43,13 +53,23 @@ export class SecretNoteToolbarContribution
       group: ['group2'],
       order: 'a',
     });
-    // Replace with our own keybind instructions
+    // Always hide the default keybind instructions
     registry.unregisterItem('notebook:keybind-instructions');
+    // Replace with our own keybind instructions
     registry.registerItem({
       id: 'notebook:keybind-instructions',
       command: 'notebook:keybind-instructions',
       icon: KeybindInstruction,
     });
+    // Hide these toolbar buttons in readonly mode
+    if (isReadonly(this.configService)) {
+      [
+        'notebook:keybind-instructions',
+        'document:save',
+        'notebook:enable-or-disable-all-output-scrolling',
+        'notebook:hide-all-cell',
+      ].forEach((v) => registry.unregisterItem(v));
+    }
   }
 
   registerModals() {

@@ -8,14 +8,18 @@ interface RibbonProps {
   items: { label: string; key: string }[];
   value: string[];
   onChange?: (value: string[]) => void;
+  readonly?: boolean;
 }
 
 const { CheckableTag } = Tag;
 
 function Ribbon(props: RibbonProps) {
-  const { items, value, onChange } = props;
+  const { items, value, onChange, readonly } = props;
 
   const handleChange = (tag: string, checked: boolean) => {
+    if (readonly) {
+      return;
+    }
     const nextSelectedTags = checked ? [...value, tag] : value.filter((t) => t !== tag);
     if (onChange) {
       onChange(nextSelectedTags);

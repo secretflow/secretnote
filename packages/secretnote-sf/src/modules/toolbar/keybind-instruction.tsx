@@ -1,12 +1,14 @@
 // Keybinds instruction drawer on the right.
 
+import { useInject } from '@difizen/mana-app';
 import { isMacintosh } from '@difizen/mana-common';
 import { l10n } from '@difizen/mana-l10n';
 import { Divider, Drawer, Table, Tag, Tooltip } from 'antd';
 import { KeyboardIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import { withId } from '@/utils';
+import { SecretNoteConfigService } from '@/modules/config';
+import { hideWhenReadonly, withId } from '@/utils';
 import './index.less';
 
 interface Keybind {
@@ -73,11 +75,13 @@ export const MagicCommands = withId<MagicCommand>([
 
 export const KeybindInstruction = () => {
   const [open, setOpen] = useState(false);
+  const configService = useInject(SecretNoteConfigService);
 
   return (
     <>
       <Tooltip title={l10n.t('快捷键和 Magic 命令')} placement="bottom">
         <KeyboardIcon
+          style={hideWhenReadonly(configService)}
           onClick={() => setOpen((v) => !v)}
           size={18}
           className="libro-top-toolbar-custom-icon"

@@ -25,6 +25,7 @@ export const MarkdownCell = forwardRef<HTMLDivElement>((props, ref) => {
       className="markdown-cell"
     >
       <Editor
+        readonly={instance.cellModel.readonly}
         defaultValue={instance.cellModel.value}
         onDebouncedUpdate={(editor, content) => {
           instance.cellModel.value = content || '';

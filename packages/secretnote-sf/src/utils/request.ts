@@ -2,8 +2,8 @@
 
 import { URL as LibroURL, type ISettings } from '@difizen/libro-jupyter';
 
-import { getGlobalConfig } from '@/modules/storage/local-storage-service';
-import { genericErrorHandler } from '@/utils';
+import { getSecretNoteConfig } from '@/modules/config';
+import { genericErrorHandler, pickExcept } from '@/utils';
 
 /**
  * Get the base URL of a remote server for HTTP requests.
@@ -12,7 +12,7 @@ import { genericErrorHandler } from '@/utils';
  */
 export const getRemoteBaseUrl = (targetId = '', endSlash = false) => {
   // Try to get the backend URL from the global config (component props)
-  const backendUrl = getGlobalConfig()?.backendURL ?? '/';
+  const backendUrl = getSecretNoteConfig()?.backendURL ?? '/';
   const origin =
     !backendUrl || backendUrl === '/' ? window.location.origin : backendUrl;
 
@@ -62,7 +62,7 @@ export const createResponseError = async (response: Response) => {
  * If `targetId` is provided, the base URL goes into a specific K8s Pod.
  * Otherwise it goes to the default web server.
  */
-const normalizeURL = (url: string, targetId = '') => {
+export const normalizeURL = (url: string, targetId = '') => {
   const urlObj = new URL(LibroURL.join(getRemoteBaseUrl(targetId), url));
   return urlObj.href;
 };
@@ -70,7 +70,7 @@ const normalizeURL = (url: string, targetId = '') => {
 /**
  * Get a cookie by name.
  */
-const getCookie = (name: string) => {
+export const getCookie = (name: string) => {
   // from http://www.tornadoweb.org/en/stable/guide/security.html
   const matches = document.cookie.match('\\b' + name + '=([^;]*)\\b');
   return matches?.[1];
@@ -80,7 +80,7 @@ const getCookie = (name: string) => {
  * Get the authentication token from the local storage.
  */
 export const getToken = (): string | null => {
-  const key = getGlobalConfig()?.tokenKey || 'pocketbase_auth';
+  const key = getSecretNoteConfig()?.tokenKey || 'pocketbase_auth';
   const auth = localStorage.getItem(key);
   if (auth) {
     try {
@@ -116,14 +116,15 @@ export const getDefaultServerConnectionSettings = () => {
  * Otherwise it goes to the default web server.
  * Token will be carried if there are any.
  * This method will not unpack the Response to JSON.
+ * Set `_external` to true to use the url as-is without normalization.
  */
 export const requestNoUnpack = async (
   url: string,
-  init: RequestInit,
+  config: RequestInit & { _external?: boolean },
   targetId = '',
 ) => {
   // normalize the URL
-  let requestUrl = normalizeURL(url, targetId);
+  let requestUrl = config._external ? url : normalizeURL(url, targetId);
   // forcely avoid caching by adding a timestamp
   // because some clients or servers might not handle cache headers properly
   requestUrl += (/\?/.test(url) ? '&' : '?') + new Date().getTime();
@@ -132,7 +133,7 @@ export const requestNoUnpack = async (
   const req = new window.Request(requestUrl, {
     cache: 'no-store',
     credentials: 'same-origin',
-    ...init,
+    ...pickExcept(config, ['_external']),
   });
   // handle authentication
   const token = getToken();

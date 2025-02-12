@@ -10,6 +10,7 @@ export class SQLContentContribution implements ContentContribution {
   canHandle = () => {
     return 3;
   };
+
   async loadContent(options: NotebookOption, model: NotebookModel) {
     const secretNoteModel = model as SecretNoteModel;
     const fileUri = new URI(options.resource);

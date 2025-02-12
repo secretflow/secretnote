@@ -25,7 +25,7 @@ export const DriveName = 'SecretNoteContentsDrive';
 
 @singleton()
 export class SecretNoteContentsDrive implements IContentsDrive {
-  readonly name = DriveName; // Name of drive, used at the leading component of file paths.
+  readonly name = DriveName; // Name of drive, used as the leading component of file paths.
   protected apiEndpoint = 'api/contents';
   protected _isDisposed = false;
   protected fileChangedEmitter = new Emitter<IContentsChangedArgs>();
