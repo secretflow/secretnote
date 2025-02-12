@@ -90,14 +90,14 @@ importers:
         specifier: 0.3.4
         version: 0.3.4(@types/node@20.5.1)(@types/react@18.3.16)(antd@5.22.4(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(mapbox-gl@1.13.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(webpack@4.41.5)
       '@difizen/mana-app':
-        specifier: 0.1.31
-        version: 0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.1.32
+        version: 0.1.32(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@difizen/mana-l10n':
-        specifier: 0.1.31
-        version: 0.1.31(react@18.3.1)
+        specifier: 0.1.32
+        version: 0.1.32(react@18.3.1)
       '@difizen/mana-react':
-        specifier: 0.1.31
-        version: 0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.1.32
+        version: 0.1.32(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@kanaries/web-data-loader':
         specifier: ^0.1.7
         version: 0.1.7
@@ -1692,42 +1692,20 @@ packages:
       react: '>=16'
       react-dom: '>=16'
 
-  '@difizen/mana-app@0.1.31':
-    resolution: {integrity: sha512-rRBJ8m4E+UDRk2UBgVokvmyfwtu3H18spQHxutLbsolR5g9ABHsQ9c2TqTon9NQ+16pQ/xUk3G1W1KLda9yNPQ==}
-    peerDependencies:
-      react: '>=16.8.6'
-      react-dom: '>=16.8.6'
-
   '@difizen/mana-app@0.1.32':
     resolution: {integrity: sha512-eLT9sYTwNrm7MavW1MfZ0hWLETGQvTYkuzTMTzwPrE9vDg4wl+72FZxJyUnp7frsRXhJ+18inmtQhBizmIJTpw==}
     peerDependencies:
       react: '>=16.8.6'
       react-dom: '>=16.8.6'
 
-  '@difizen/mana-common@0.1.31':
-    resolution: {integrity: sha512-OQcxPmP1a7PZR73y58tmTASyG9sjdmQYmCD/hWtdaOBQfH/a7GJOFO0Dt2Igba4yisSuwZBY+qEQap/o2SlX9Q==}
-
   '@difizen/mana-common@0.1.32':
     resolution: {integrity: sha512-s9AtjBvLirBuQMV/9XxgoLY79TAE8lJFrNBcuhe/uSgi2dlRmJr1PZJgh4prMv2AWFEgJbvqh+CEPUZKf/wShA==}
-
-  '@difizen/mana-core@0.1.31':
-    resolution: {integrity: sha512-fEZNABZcffEaDnAXeQpl0F2zRt6CoUSGMmuWCDwDhoIrKDf+rYFuyQZHTMcxVe3lS0aPwcsgRhCMDABkFX7dBA==}
 
   '@difizen/mana-core@0.1.32':
     resolution: {integrity: sha512-0z1vXDhvoLE/I5ncSKmw7bHK0vDPI247FAHdUtRN9mEJBPkXc4MlwBDcWdXbBCUeCtOkyMBxxS/1HISbf7Jgnw==}
 
-  '@difizen/mana-l10n@0.1.31':
-    resolution: {integrity: sha512-BOIedZu4qyiSUnAeTUOMycJj4ePFbHhj4Ccu4C0yfHzOpiqgh3x07tYe+Ta86gf08vfQXiiBRTkW1Q97s3PChg==}
-    peerDependencies:
-      react: '>=16.8.6'
-
   '@difizen/mana-l10n@0.1.32':
     resolution: {integrity: sha512-xzNrdtJukDdMDOwNUA7QRZfMCftRSzw3v6M0O0XK25sqFLXSNfqvYHSTE3zX2zcgoJW5j4BLVRECiU+vu/MNdQ==}
-    peerDependencies:
-      react: '>=16.8.6'
-
-  '@difizen/mana-observable@0.1.31':
-    resolution: {integrity: sha512-BNnJP6CEAhrfP3zG3mi1Nu3iFnegTPexMl9sApUcLzFUJ45BVlpjCnfW5ynxi85qUwU8Kt84tpAnnC+8wVkRWA==}
     peerDependencies:
       react: '>=16.8.6'
 
@@ -1736,20 +1714,11 @@ packages:
     peerDependencies:
       react: '>=16.8.6'
 
-  '@difizen/mana-react@0.1.31':
-    resolution: {integrity: sha512-pLBi+c1Tex2OkvNpqqJeDudfPYEN7j6zbVuyq8wPQ0XDPyVtFiA59hbtiHu2vWQmY8o28RkqARf+/4c94fPnHg==}
-    peerDependencies:
-      react: '>=16.8.6'
-      react-dom: '>=16.8.6'
-
   '@difizen/mana-react@0.1.32':
     resolution: {integrity: sha512-2ObmbaOSdliJH1BHyBF0dPA+u7IviKuKsi42PYqGjoQltUHTFoPcvv2LmJkwIR9WIh6xVnBcLHueYmz5hq7Ltg==}
     peerDependencies:
       react: '>=16.8.6'
       react-dom: '>=16.8.6'
-
-  '@difizen/mana-syringe@0.1.31':
-    resolution: {integrity: sha512-matHHiocLhA3a1JK/ycM7qQIf63qFGlhaEmQWQtwi1M4zA3i0km4bzjNC+jrbO2s3hBswrV4f2XoArKo83y2Sg==}
 
   '@difizen/mana-syringe@0.1.32':
     resolution: {integrity: sha512-XlLao41LyTqKB2pSC6FMMir/AF4h1ng/BN8uVZkBkY5Y8qMgAvSGShNYfA8gx4ve5zMsbIBTKiYjzd2nlovYzg==}
@@ -15088,9 +15057,9 @@ snapshots:
       '@aarkue/tiptap-math-extension': 1.3.3(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))(@tiptap/pm@2.10.3)
       '@antv/s2': 1.56.2
       '@difizen/libro-jupyter': 0.3.4(@types/node@20.5.1)(@types/react@18.3.16)(antd@5.22.4(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(webpack@4.41.5)
-      '@difizen/mana-app': 0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@difizen/mana-l10n': 0.1.31(react@18.3.1)
-      '@difizen/mana-react': 0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-app': 0.1.32(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@difizen/mana-l10n': 0.1.32(react@18.3.1)
+      '@difizen/mana-react': 0.1.32(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@kanaries/web-data-loader': 0.1.7
       '@lumino/polling': 2.1.3
       '@tiptap/core': 2.10.3(@tiptap/pm@2.10.3)
@@ -17440,32 +17409,6 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@difizen/mana-app@0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@ant-design/icons': 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@difizen/mana-common': 0.1.31
-      '@difizen/mana-core': 0.1.31(react@18.3.1)
-      '@difizen/mana-l10n': 0.1.31(react@18.3.1)
-      '@difizen/mana-observable': 0.1.31(react@18.3.1)
-      '@difizen/mana-react': 0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@difizen/mana-syringe': 0.1.31
-      '@types/lodash.debounce': 4.0.3
-      '@types/react-virtualized': 9.22.0
-      classnames: 2.5.1
-      debug: 4.4.0
-      file-icons-js: 1.0.3
-      font-awesome: 4.7.0
-      lodash.debounce: 4.0.8
-      perfect-scrollbar: 1.5.6
-      rc-tooltip: 5.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      react-virtualized: 9.22.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      uuid: 9.0.1
-      vscode-uri: 2.1.2
-    transitivePeerDependencies:
-      - supports-color
-
   '@difizen/mana-app@0.1.32(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@ant-design/icons': 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -17492,26 +17435,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@difizen/mana-common@0.1.31':
-    dependencies:
-      path-browserify: 1.0.1
-
   '@difizen/mana-common@0.1.32':
     dependencies:
       path-browserify: 1.0.1
-
-  '@difizen/mana-core@0.1.31(react@18.3.1)':
-    dependencies:
-      '@difizen/mana-common': 0.1.32
-      '@difizen/mana-observable': 0.1.31(react@18.3.1)
-      '@difizen/mana-syringe': 0.1.31
-      ajv: 8.17.1
-      debug: 4.4.0
-      resize-observer-polyfill: 1.5.1
-      vscode-uri: 2.1.2
-    transitivePeerDependencies:
-      - react
-      - supports-color
 
   '@difizen/mana-core@0.1.32(react@18.3.1)':
     dependencies:
@@ -17526,20 +17452,9 @@ snapshots:
       - react
       - supports-color
 
-  '@difizen/mana-l10n@0.1.31(react@18.3.1)':
-    dependencies:
-      react: 18.3.1
-
   '@difizen/mana-l10n@0.1.32(react@18.3.1)':
     dependencies:
       react: 18.3.1
-
-  '@difizen/mana-observable@0.1.31(react@18.3.1)':
-    dependencies:
-      '@difizen/mana-common': 0.1.32
-      '@difizen/mana-syringe': 0.1.31
-      react: 18.3.1
-      reflect-metadata: 0.1.14
 
   '@difizen/mana-observable@0.1.32(react@18.3.1)':
     dependencies:
@@ -17547,19 +17462,6 @@ snapshots:
       '@difizen/mana-syringe': 0.1.32
       react: 18.3.1
       reflect-metadata: 0.1.14
-
-  '@difizen/mana-react@0.1.31(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@ant-design/icons': 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@difizen/mana-common': 0.1.31
-      classnames: 2.5.1
-      rc-dropdown: 3.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      rc-motion: 2.9.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      rc-notification: 5.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      rc-tabs: 11.16.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      rc-util: 4.21.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   '@difizen/mana-react@0.1.32(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -17573,12 +17475,6 @@ snapshots:
       rc-util: 4.21.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-
-  '@difizen/mana-syringe@0.1.31':
-    dependencies:
-      '@difizen/mana-common': 0.1.32
-      inversify: 5.1.1
-      reflect-metadata: 0.1.14
 
   '@difizen/mana-syringe@0.1.32':
     dependencies:
@@ -18507,7 +18403,7 @@ snapshots:
 
   '@material-ui/styles@4.11.5(@types/react@18.3.16)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       '@emotion/hash': 0.8.0
       '@material-ui/types': 5.1.0(@types/react@18.3.16)
       '@material-ui/utils': 4.11.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
@@ -18530,7 +18426,7 @@ snapshots:
 
   '@material-ui/system@4.12.2(@types/react@18.3.16)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       '@material-ui/utils': 4.11.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       csstype: 2.6.21
       prop-types: 15.8.1
@@ -18549,7 +18445,7 @@ snapshots:
 
   '@material-ui/utils@4.11.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
@@ -20191,7 +20087,7 @@ snapshots:
 
   '@umijs/history@5.3.1':
     dependencies:
-      '@babel/runtime': 7.23.6
+      '@babel/runtime': 7.26.0
       query-string: 6.14.1
 
   '@umijs/lint@4.3.36(eslint@8.57.1)(jest@29.7.0(@types/node@20.5.1)(ts-node@10.9.2(@types/node@18.19.68)(typescript@5.7.2)))(postcss-less@6.0.0(postcss@8.4.49))(stylelint@15.11.0(typescript@5.7.2))(typescript@5.7.2)':
@@ -22768,7 +22664,7 @@ snapshots:
 
   css-vendor@2.0.8:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       is-in-browser: 1.1.3
 
   css-what@3.4.2: {}
@@ -23860,11 +23756,11 @@ snapshots:
       object.assign: 4.1.5
       object.entries: 1.1.8
 
-  eslint-config-airbnb-base@14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1)(eslint@7.18.0))(eslint@7.18.0):
+  eslint-config-airbnb-base@14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0))(eslint@7.18.0):
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 7.18.0
-      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0)
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
       object.assign: 4.1.5
       object.entries: 1.1.8
 
@@ -23884,12 +23780,29 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5):
+    dependencies:
+      array-find: 1.0.0
+      debug: 2.6.9
+      enhanced-resolve: 0.9.1
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
+      find-root: 1.1.0
+      has: 1.0.4
+      interpret: 1.4.0
+      lodash: 4.17.21
+      node-libs-browser: 2.2.1
+      resolve: 1.22.8
+      semver: 5.7.2
+      webpack: 4.41.5
+    transitivePeerDependencies:
+      - supports-color
+
   eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5):
     dependencies:
       array-find: 1.0.0
       debug: 2.6.9
       enhanced-resolve: 0.9.1
-      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0)
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@4.2.3))(eslint-import-resolver-webpack@0.12.1)(eslint@7.18.0)
       find-root: 1.1.0
       has: 1.0.4
       interpret: 1.4.0
@@ -23932,14 +23845,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5))(eslint@7.18.0):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 4.18.0(eslint@7.18.0)(typescript@4.2.3)
       eslint: 7.18.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5)
+      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5)
     transitivePeerDependencies:
       - supports-color
 
@@ -23981,7 +23894,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0):
+  eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.flat: 1.3.2
@@ -23990,7 +23903,7 @@ snapshots:
       doctrine: 1.5.0
       eslint: 7.18.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5))(eslint@7.18.0)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
       has: 1.0.4
       minimatch: 3.1.2
       object.values: 1.2.0
@@ -25734,7 +25647,7 @@ snapshots:
 
   history@4.10.1:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       loose-envify: 1.4.0
       resolve-pathname: 3.0.0
       tiny-invariant: 1.3.3
@@ -26937,10 +26850,7 @@ snapshots:
       pretty-format: 25.5.0
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - utf-8-validate
 
   jest-leak-detector@25.5.0:
     dependencies:
@@ -27441,46 +27351,46 @@ snapshots:
 
   jss-plugin-camel-case@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       hyphenate-style-name: 1.1.0
       jss: 10.10.0
 
   jss-plugin-default-unit@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       jss: 10.10.0
 
   jss-plugin-global@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       jss: 10.10.0
 
   jss-plugin-nested@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       jss: 10.10.0
       tiny-warning: 1.0.3
 
   jss-plugin-props-sort@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       jss: 10.10.0
 
   jss-plugin-rule-value-function@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       jss: 10.10.0
       tiny-warning: 1.0.3
 
   jss-plugin-vendor-prefixer@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       css-vendor: 2.0.8
       jss: 10.10.0
 
   jss@10.10.0:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       csstype: 3.1.3
       is-in-browser: 1.1.3
       tiny-warning: 1.0.3
@@ -28737,7 +28647,7 @@ snapshots:
 
   mini-create-react-context@0.3.3(prop-types@15.8.1)(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       prop-types: 15.8.1
       react: 16.14.0
       tiny-warning: 1.0.3
@@ -30743,11 +30653,11 @@ snapshots:
       enzyme: 3.11.0
       enzyme-adapter-react-16: 1.15.8(enzyme@3.11.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       eslint: 7.18.0
-      eslint-config-airbnb-base: 14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1)(eslint@7.18.0))(eslint@7.18.0)
+      eslint-config-airbnb-base: 14.1.0(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0))(eslint@7.18.0)
       eslint-config-prettier: 7.2.0(eslint@7.18.0)
-      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1)(webpack@4.41.5)
+      eslint-import-resolver-webpack: 0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5)
       eslint-plugin-babel: 5.3.1(eslint@7.18.0)
-      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0)
+      eslint-plugin-import: 2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint-import-resolver-webpack@0.12.1(eslint-plugin-import@2.22.1(@typescript-eslint/parser@4.18.0(eslint@7.18.0)(typescript@5.7.2))(eslint@7.18.0))(webpack@4.41.5))(eslint@7.18.0)
       eslint-plugin-react: 7.22.0(eslint@7.18.0)
       eslint-plugin-react-hooks: 4.2.0(eslint@7.18.0)
       file-loader: 5.0.2(webpack@4.41.5)
@@ -31619,7 +31529,7 @@ snapshots:
 
   react-router@5.1.2(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -31646,7 +31556,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -31862,7 +31772,7 @@ snapshots:
 
   regenerator-transform@0.15.2:
     dependencies:
-      '@babel/runtime': 7.17.9
+      '@babel/runtime': 7.26.0
 
   regex-cache@0.4.4:
     dependencies:

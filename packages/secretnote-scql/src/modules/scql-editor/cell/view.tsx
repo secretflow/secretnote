@@ -69,7 +69,7 @@ export class SQLCellView extends LibroExecutableCellView {
   @prop() editorView?: CodeEditorView = void 0;
 
   get cellModel() {
-    return this.model as SQLCellModel;
+    return this.model as unknown as SQLCellModel;
   }
 
   constructor(
