@@ -15,10 +15,10 @@ import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
 import { SnippetModule } from '@/modules/toolbar/snippet';
 import { WelcomeModule } from '@/modules/welcome';
+import { useRunOnce } from '@/utils/hook';
 // import { ComponentCellModule } from '@/modules/component-cell'
 
 import '@/lang';
-import { useRunOnce } from '@/utils/hook';
 import '../../override.less';
 
 export interface ISecretNoteWorkspaceProps {

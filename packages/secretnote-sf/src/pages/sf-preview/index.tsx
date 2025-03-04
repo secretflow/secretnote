@@ -12,9 +12,9 @@ import {
 } from '@/modules/preview';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
+import { useRunOnce } from '@/utils/hook';
 
 import '@/lang';
-import { useRunOnce } from '@/utils/hook';
 import '../../override.less';
 import './index.less';
 

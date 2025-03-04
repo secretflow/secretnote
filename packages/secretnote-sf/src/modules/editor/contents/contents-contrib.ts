@@ -40,7 +40,6 @@ export class SecretNoteContentContribution implements ContentContribution {
       // @see https://github.com/difizen/libro/commit/b91cd7588ba4adcb3ca83f241fe42471b30cdc26#diff-32d01fca78d40feed75dcc29437fae22f74ebe33ec16ee11fde7c6c220bedbdbR23
       model.id = model.filePath = currentFileContents.path;
 
-      /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
       // @ts-ignore
       if (!model.quickEditMode && !model.readOnly) {
         model.startKernelConnection();
