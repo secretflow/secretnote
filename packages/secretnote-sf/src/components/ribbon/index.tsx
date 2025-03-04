@@ -1,3 +1,5 @@
+// This is the ribbon on the top-right corner of each code cell used for selecting parties.
+
 import { l10n } from '@difizen/mana-l10n';
 import { Badge, Popover, Space, Tag } from 'antd';
 import React from 'react';
@@ -5,8 +7,8 @@ import './index.less';
 
 interface RibbonProps {
   children: React.ReactNode;
-  items: { label: string; key: string }[];
-  value: string[];
+  items: { label: string; key: string }[]; // selectable parties that are already added nodes
+  value: string[]; // selected parties that is saved in the metadata of the cell execution
   onChange?: (value: string[]) => void;
   readonly?: boolean;
 }
@@ -44,20 +46,23 @@ function Ribbon(props: RibbonProps) {
           overlayClassName="secretnote-ribbon-popover"
           content={
             <>
-              <div className="title">{l10n.t('请选择要执行该代码的节点列表')}:</div>
+              <div className="title">{l10n.t('请选择要执行该代码的节点列表')}</div>
               <Space size={[0, 8]} wrap>
-                {items.map((item) => (
-                  <CheckableTag
-                    style={{
-                      userSelect: 'none',
-                    }}
-                    key={item.key}
-                    checked={value.includes(item.key)}
-                    onChange={(checked) => handleChange(item.key, checked)}
-                  >
-                    {item.label}
-                  </CheckableTag>
-                ))}
+                {items.length
+                  ? items.map((item) => (
+                      <CheckableTag
+                        style={{
+                          userSelect: 'none',
+                          border: '1px solid #d9d9d9',
+                        }}
+                        key={item.key}
+                        checked={value.includes(item.key)}
+                        onChange={(checked) => handleChange(item.key, checked)}
+                      >
+                        {item.label}
+                      </CheckableTag>
+                    ))
+                  : l10n.t('还未拉起任何节点')}
               </Space>
             </>
           }
