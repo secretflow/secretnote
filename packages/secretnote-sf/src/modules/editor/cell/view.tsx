@@ -37,20 +37,20 @@ import { compareDateString, isReadonly } from '@/utils';
 
 const SecretNoteCodeCellComponent = forwardRef<HTMLDivElement>((props, ref) => {
   const instance = useInject<SecretNoteCodeCellView>(ViewInstance);
-  const { partyList, parties } = instance;
+  const { allParties, cellParties } = instance;
   const { readonly } = instance;
 
   return (
     <div className={instance.className} ref={ref} tabIndex={10} onBlur={instance.blur}>
       <Ribbon
         readonly={readonly}
-        // under readonly mode, we don't have corresponding servers in partyList
+        // under readonly mode, we don't have corresponding servers in allParties
         // just show parties recorded in the cell metadata
-        items={(readonly ? parties : partyList).map((name) => ({
+        items={(readonly ? cellParties : allParties).map((name) => ({
           label: name,
           key: name,
         }))}
-        value={parties}
+        value={cellParties}
         onChange={(val) => {
           !readonly && instance.onPartiesChange(val);
         }}
@@ -72,10 +72,10 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
 
   view = SecretNoteCodeCellComponent;
 
-  @prop() parties: string[] = [];
+  @prop() cellParties: string[] = [];
   @prop() readonly = false;
 
-  get partyList() {
+  get allParties() {
     return this.serverManager.servers
       .filter((s) => s.status === ServerStatus.Succeeded)
       .map((server) => server.name);
@@ -94,7 +94,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     this.serverManager = serverManager;
     this.kernelManager = kernelManager;
     this.readonly = isReadonly(configService);
-    this.parties = this.getInitialParties();
+    this.cellParties = this.getInitialParties();
   }
 
   /**
@@ -114,7 +114,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
       return (
         server &&
         server.status === ServerStatus.Succeeded &&
-        this.parties.includes(server.name)
+        this.cellParties.includes(server.name)
       );
     });
   }
@@ -258,7 +258,7 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
    * Handle the change of parties user selected on the right-top corner of the cell.
    */
   onPartiesChange(parties: string[]) {
-    this.parties = parties;
+    this.cellParties = parties;
     this.savePartiesToMeta(parties);
     lastParties = parties;
   }
@@ -275,23 +275,24 @@ export class SecretNoteCodeCellView extends JupyterCodeCellView {
     if (execution && execution.parties) {
       try {
         const parties: string[] = JSON.parse(execution.parties as string);
-        return this.readonly
-          ? parties
-          : // filter out parties that are not in the server list
-            parties.filter((p) => this.partyList.includes(p));
+        if (this.readonly) {
+          return parties;
+        }
+        // filter out parties that are not in the server list
+        return parties.filter((p) => this.allParties.includes(p));
       } catch (e) {
         return [];
       }
     } else if (lastParties.length > 0) {
       return lastParties; // load parties from previous cell settings
     }
-    return this.partyList;
+    return this.allParties;
   }
 
   /**
    * Save the parties user selected to the cell model metadata.
    */
-  savePartiesToMeta(parties = this.parties) {
+  savePartiesToMeta(parties = this.cellParties) {
     const execution = this.model.metadata.execution as ExecutionMeta;
     if (execution) {
       execution.parties = JSON.stringify(parties);
