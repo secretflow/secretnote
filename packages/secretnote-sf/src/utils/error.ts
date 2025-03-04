@@ -14,11 +14,11 @@ export function genericErrorHandler(
     reThrow?: boolean;
   } = {},
 ) {
+  // eslint-disable-next-line no-console
+  console.error(e);
   if (!options?.silent) {
     message.error(getErrorString(e));
-    console.error(e);
   }
-  // eslint-disable-next-line no-console
   if (options?.reThrow) {
     throw e;
   }

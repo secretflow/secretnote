@@ -14,6 +14,7 @@ export function genericErrorHandler(
     reThrow?: boolean;
   } = {},
 ) {
+  // eslint-disable-next-line no-console
   console.error(e);
   const { passthrough } = options;
   let { silent, reThrow } = options;
@@ -23,7 +24,6 @@ export function genericErrorHandler(
   if (!silent) {
     message.error(e?.message || e.toString());
   }
-  // eslint-disable-next-line no-console
   if (reThrow) {
     throw e;
   }

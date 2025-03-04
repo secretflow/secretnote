@@ -40,3 +40,14 @@ export function pickExcept<T extends object, K extends keyof T>(obj: T, keys: K[
     Object.keys(obj).filter((k) => !keys.includes(k as K)),
   ) as Omit<T, K>;
 }
+
+/**
+ * JSON parse with fallback.
+ */
+export function jsonParseSafe(json: string, fallback: any = {}) {
+  try {
+    return JSON.parse(json);
+  } catch (e) {
+    return fallback;
+  }
+}

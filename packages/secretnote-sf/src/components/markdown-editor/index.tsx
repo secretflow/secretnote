@@ -58,7 +58,6 @@ export function Editor({
       onUpdate(e.editor);
       debouncedUpdates(e);
     },
-    autofocus: 'end',
   });
 
   // Hydrate the editor with the content from localStorage.

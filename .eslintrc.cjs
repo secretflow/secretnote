@@ -17,6 +17,7 @@ module.exports = {
   rules: {
     // let's bypass them
     'promise/always-return': 'off',
+    '@typescript-eslint/ban-ts-comment': 'warn',
 
     // common pitfalls
     eqeqeq: 'error',

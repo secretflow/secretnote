@@ -1,6 +1,6 @@
 {
   "name": "@alipay/secretnote-sf",
-  "version": "0.0.50",
+  "version": "0.0.51",
   "license": "Apache-2.0",
   "author": "vectorse@126.com",
   "repository": "https://github.com/secretflow/secretnote/tree/main/packages/secretnote",
@@ -14,8 +14,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "pnpm run build:component",
-    "build:component": "tsup src/index.tsx --inject react-shim.js",
-    "dev": "tsup src/index.tsx --watch --inject react-shim.js",
+    "build:component": "tsup src/index.ts --inject react-shim.js",
+    "dev": "tsup src/index.ts --watch --inject react-shim.js",
     "lint:eslint": "eslint . --ext ts,tsx",
     "typecheck:tsc": "tsc -p tsconfig.json --noEmit",
     "pb": "pnpm publish --no-git-checks --filter @secretflow/secretnote-sf"

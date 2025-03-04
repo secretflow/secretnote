@@ -12,10 +12,11 @@ import {
 } from '@/modules/preview';
 import { ThemeModule } from '@/modules/theme';
 import { ToolbarModule } from '@/modules/toolbar';
+import { useRunOnce } from '@/utils/hook';
 
 import '@/lang';
-import { useRunOnce } from '@/utils/hook';
 import '../../override.less';
+import './index.less';
 
 export interface ISecretNotePreviewProps {
   fileURL?: string; // file URL of the notebook to preview
@@ -23,9 +24,9 @@ export interface ISecretNotePreviewProps {
 }
 
 const App = (props: ISecretNotePreviewProps): JSX.Element => {
-  useRunOnce(() =>
-    localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(props)),
-  );
+  useRunOnce(() => {
+    localStorage.setItem(SecretNoteConfigLocalStorageKey, JSON.stringify(props));
+  });
 
   return (
     <ManaComponents.Application
