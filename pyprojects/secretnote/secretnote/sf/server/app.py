@@ -4,11 +4,18 @@ import sys
 import os
 from jupyter_server.extension.application import ExtensionApp, ExtensionAppJinjaMixin
 from .services.nodes_handlers import nodes_handlers
-from .services.pages_handlers import pages_handlers
+from .services.pages_handlers import pages_handlers, compute_node_pages_handlers
 from .services.misc_handlers import misc_handlers
 from .services.contents_handlers import contents_handlers
 
 __dirname__ = os.path.dirname(__file__)
+
+_AS_COMPUTE_NODE = False
+
+
+def set_as_compute_node(value: bool):
+    global _AS_COMPUTE_NODE
+    _AS_COMPUTE_NODE = value
 
 
 class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
@@ -39,7 +46,7 @@ class SecretNoteApp(ExtensionAppJinjaMixin, ExtensionApp):
             *misc_handlers,
             *contents_handlers,
             *nodes_handlers,
-            *pages_handlers,
+            *(compute_node_pages_handlers if _AS_COMPUTE_NODE else pages_handlers),
         ]
         self.handlers.extend(handlers)
 
