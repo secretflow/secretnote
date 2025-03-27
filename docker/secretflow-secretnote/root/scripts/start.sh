@@ -11,4 +11,7 @@ if [ -z "${PORT}" ]; then
   PORT=8888
 fi
 
-secretnote sf --config=/home/secretnote/.jupyter/jupyter_server_config.py --allow-root --no-browser --port $PORT
+# `--_as-compute-node` is a private flag only used for SecretNote SF Docker image build
+secretnote sf --_as-compute-node \
+  --config=/home/secretnote/.jupyter/jupyter_server_config.py \
+  --allow-root --no-browser --port $PORT

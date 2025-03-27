@@ -32,10 +32,33 @@ class SinglePageApplicationHandler(
             self.write(self.render_template("index.html"))
 
 
+class ThisIsComputeNodeHintPageHandler(
+    ExtensionHandlerMixin,
+    ExtensionHandlerJinjaMixin,
+    FileFindHandler,
+):
+    @web.authenticated
+    async def get(self, *_):
+        """This handler is only activated when `--_as-compute-node` flag is set,
+        so as to hint the user is visiting the wrong SecretNote page holding
+        by the compute node instead of the SecretNote installed locally.
+        """
+        self.clear()
+        self.write(self.render_template("this-is-compute-node.html"))
+
+
 pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
     (
         "/secretnote/(.*)",
         SinglePageApplicationHandler,
         {"path": single_page_static_path},
+    ),
+]
+
+compute_node_pages_handlers: List[Tuple[str, Type[JupyterHandler], Dict]] = [
+    (
+        "/secretnote/(.*)",
+        ThisIsComputeNodeHintPageHandler,
+        {},
     ),
 ]

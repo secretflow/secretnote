@@ -16,7 +16,7 @@
     "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t typecheck:tsc",
     "ci:check:python": "nx run-many -t format:black -t test:pytest -t typecheck:pyright",
     "ci:build": "nx run-many -t build:component -t build:site && nx run-many -t build:py:ci",
-    "docker:build": "docker buildx build --build-arg SECRETFLOW_VERSION=1.10.0b0 --platform linux/arm64 -t secretflow/secretnote:1.10.0b0 -f ./docker/secretflow-secretnote/Dockerfile .",
+    "docker:build": "docker buildx build --build-arg SECRETFLOW_VERSION=1.11.0b1 --platform linux/arm64 -t secretflow/secretnote:1.11.0b1 -f ./docker/secretflow-secretnote/Dockerfile .",
     "docker:up": "docker-compose -f ./docker/secretnote-sf-sim/docker-compose.yml up"
   },
   "devDependencies": {

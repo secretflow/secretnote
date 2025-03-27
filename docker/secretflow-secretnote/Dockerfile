@@ -1,7 +1,7 @@
 # This Dockerfile will build the secretflow/secretnote image for depolying a node
 # for SecretNote.
 
-ARG SECRETFLOW_VERSION="1.10.0b0"
+ARG SECRETFLOW_VERSION="1.11.0b1"
 
 # Get the repository and remove unncessary files
 FROM alpine:3.14 AS source-tree

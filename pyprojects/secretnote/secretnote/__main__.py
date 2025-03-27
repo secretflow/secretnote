@@ -6,7 +6,7 @@ def main():
     parser.add_argument(
         "_positionals",
         nargs=argparse.ZERO_OR_MORE,
-        help=f"<mode>? <work_dir>?. <mode> in {MODE_CHOICES} (default: sf). <work_dir> (default: .).",
+        help=f"<mode>? <work_dir>? [<mode> in {MODE_CHOICES} (default: sf); <work_dir> (default: .)]",
     )
     # [DEPRECATED] legacy --mode support
     _deprecationWarning = "[DEPRECATED] `--mode`. Use positional `mode` instead."
@@ -17,6 +17,8 @@ def main():
         required=False,
         help=_deprecationWarning,
     )
+    # [PRIVATE] whether it's running as a compute node inside the Docker image
+    parser.add_argument("--_as-compute-node", action=argparse.BooleanOptionalAction)
     args, rest_args = parser.parse_known_args()
 
     # normalize positional arguments
@@ -38,7 +40,9 @@ def main():
 
         SecretNoteApp().launch([work_dir, *rest_args])
     else:
-        from .sf.server.app import SecretNoteApp
+        from .sf.server.app import SecretNoteApp, set_as_compute_node
+
+        set_as_compute_node(args._as_compute_node)
 
         SecretNoteApp().launch([work_dir, *rest_args])
 

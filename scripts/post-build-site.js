@@ -24,3 +24,11 @@ fs.rmSync(dst, {
 fs.cpSync(src, dst, {
   recursive: true,
 });
+// copy the hint page for --_as-compute-node
+if (siteName === 'sf') {
+  const filename = 'this-is-compute-node.html';
+  fs.copyFileSync(
+    path.join(__dirname, `./${filename}`),
+    path.join(dst, `./${filename}`),
+  );
+}

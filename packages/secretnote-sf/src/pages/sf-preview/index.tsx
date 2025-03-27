@@ -16,7 +16,6 @@ import { useRunOnce } from '@/utils/hook';
 
 import '@/lang';
 import '../../override.less';
-import './index.less';
 
 export interface ISecretNotePreviewProps {
   fileURL?: string; // file URL of the notebook to preview

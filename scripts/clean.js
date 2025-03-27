@@ -23,6 +23,11 @@ const candidates = [
   // Python projects
   './pyprojects/secretnote/.ipynb_checkpoints',
   ...distAndDep('./pyprojects/secretnote'),
+  './pyprojects/secretnote/secretnote/__pycache__',
+  './pyprojects/secretnote/secretnote/sf/www',
+  './pyprojects/secretnote/secretnote/scql/www',
+  './pyprojects/secretnote/secretnote/sf/__pycache__',
+  './pyprojects/secretnote/secretnote/scql/__pycache__',
 ].map((v) => path.join(workDir, v));
 
 candidates.forEach((dir) => {

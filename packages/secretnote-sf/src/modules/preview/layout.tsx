@@ -23,7 +23,7 @@ const PreviewSecreteNoteLayout: React.FC = () => {
       <SplitPanel id="split-panel" direction="left-to-right">
         <SplitPanel.Pane
           id="split-panel-left"
-          className="secretnote-split-panel-left"
+          className="secretnote-preview-split-panel-left"
           // hide the left sidebar when preview
           defaultSize={0}
           minSize={0}
@@ -36,7 +36,7 @@ const PreviewSecreteNoteLayout: React.FC = () => {
           minSize={400}
           flex={1}
           flexGrow={1}
-          className="secretnote-split-panel-right"
+          className="secretnote-preview-split-panel-right"
         >
           <Slot name={LayoutArea.main} />
         </SplitPanel.Pane>
