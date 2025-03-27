@@ -38,7 +38,12 @@ SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需
 
   使用上述配置的节点地址为 `127.0.0.1:8090` 和 `127.0.0.1:8092`。在代码中，节点间可通过 service 名相互访问；镜像使用 8888 作为 Notebook 服务端口，6379 作为 Ray 端口，8000 作为 SecretFlow 集群网络端口，8001 作为 SPU 端口
 
-- 如有需要，请查看更完整的具体[示例](docs/SECRETFLOW-INTRO.md)
+- 典型的本地运行的两计算节点（2PC）架构示意图如下所示。如有需要，请查看更完整的具体[示例](docs/SECRETFLOW-INTRO.md)
+
+<p align="center">
+  <img src="docs/images/sf-2pc-arch.jpg" alt="sf-2pc-arch" style="width: 600px;" />
+</p>
+
 
 ### 本地启动 SecretNote SCQL
 
