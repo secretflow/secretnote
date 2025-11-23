@@ -1,5 +1,5 @@
 // Service for interacting with backend's broker APIs only without states.
-// @see https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.0b1/reference/broker-api
+// @see https://www.secretflow.org.cn/zh-CN/docs/scql/1.0.0b1/reference/broker-api
 // @see pyprojects/secretnote/secretnote/scql/server/services/broker_manager.py
 // The schema follows the document, best effort.
 
@@ -133,18 +133,24 @@ export type Tensor = {
   shape: TensorShape;
   elem_type: 'PrimitiveDataType_UNDEFINED' | TableColumnDesc['dtype'];
   option: 'VALUE' | 'REFERENCE' | 'VARIABLE';
-  status:
+  status?:
     | 'TENSORSTATUS_UNKNOWN'
     | 'TENSORSTATUS_PRIVATE'
     | 'TENSORSTATUS_SECRET'
     | 'TENSORSTATUS_CIPHER'
     | 'TENSORSTATUS_PUBLIC';
+  annotation?: any;
+  // Legacy fields for backwards compatibility with SCQL < 1.0.0b1
   int32_data?: number[];
   int64_data?: number[];
   float_data?: number[];
   double_data?: number[];
   string_data?: string[];
   bool_data?: boolean[];
+  // New field for SCQL >= 1.0.0b1
+  ss?: {
+    ss?: string[];
+  };
 };
 
 // scql.pb.QueryResult

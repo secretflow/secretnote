@@ -2,9 +2,11 @@
 
 下面演示在一台机器上使用 SCQL + SecretNote 来模拟不同参与方完成一次 SCQL Query。
 
+**版本兼容性说明：** 本文档适配 SCQL 1.0.0b1 及以上版本。如需使用旧版本 SCQL，请参考对应的 SecretNote 历史版本。
+
 ### 准备环境
 
-使用 docker 以 P2P 模式部署 SCQL 系统，可以参考[官网文档](https://www.secretflow.org.cn/zh-CN/docs/scql/0.5.0b2/topics/deployment/how-to-deploy-p2p-cluster)。简单起见，我们直接使用 [scql p2p examples](https://github.com/secretflow/scql/tree/main/examples/p2p-tutorial)。
+使用 docker 以 P2P 模式部署 SCQL 系统，可以参考[官网文档](https://www.secretflow.org.cn/zh-CN/docs/scql/1.0.0b1/topics/deployment/how-to-deploy-p2p-cluster)。简单起见，我们直接使用 [scql p2p examples](https://github.com/secretflow/scql/tree/main/examples/p2p-tutorial)。
 
 ![p2p-tutorial.jpg](./images/p2p-tutorial.png)
 

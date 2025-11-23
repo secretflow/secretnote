@@ -49,13 +49,15 @@ SecretNote SF 现在隐语实训平台提供云端版本，开箱即用，无需
 
 SecretNote SCQL 提供了 P2P SCQL 的产品化封装，降低了开发者配置 CCL 和编写 Query 的难度。
 
+**版本兼容性说明：** SecretNote 当前适配 SCQL 1.0.0b1 及以上版本。如需使用旧版本 SCQL，请参考对应的 SecretNote 历史版本。
+
 - 安装 [SecretNote Python 包](https://pypi.org/project/secretnote)，Python 版本需在 3.10 及以上、3.12 以下
 
   ```sh
   pip install secretnote
   ```
 
-- 使用 [P2P 方式](https://www.secretflow.org.cn/zh-CN/docs/scql/main/topics/deployment/how-to-deploy-p2p-cluster) 拉起 SCQL 环境，参考 [scql/examples/p2p-tutorial](https://github.com/secretflow/scql/tree/main/examples/p2p-tutorial)，下载该文件夹，执行
+- 使用 [P2P 方式](https://www.secretflow.org.cn/zh-CN/docs/scql/1.0.0b1/topics/deployment/how-to-deploy-p2p-cluster) 拉起 SCQL 环境，参考 [scql/examples/p2p-tutorial](https://github.com/secretflow/scql/tree/main/examples/p2p-tutorial)，下载该文件夹，执行
 
   ```sh
   bash setup.sh && docker compose up -d

@@ -38,6 +38,13 @@ export class QueryService {
 
   getRow(row: Tensor) {
     let res;
+    
+    // For SCQL >= 1.0.0b1, check the new ss field first
+    if (row.ss?.ss && row.ss.ss.length) {
+      return row.ss.ss;
+    }
+    
+    // For backwards compatibility with SCQL < 1.0.0b1, check legacy fields
     (
       [
         'int32_data',

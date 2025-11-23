@@ -1,6 +1,6 @@
 # This is the manager that interacts with SCQL's broker, just like "broker's broker".
 # SCQL itself exposes a set of APIs to manage projects, tables, and column control lists (CCLs).
-# @see https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.0b1/reference/broker-api
+# @see https://www.secretflow.org.cn/zh-CN/docs/scql/1.0.0b1/reference/broker-api
 # APIs here are consistent with those of SCQL's broker.
 
 from typing import Any, Dict, List, Union
@@ -17,7 +17,9 @@ Table{"columns":[{"dtype":"string","name":"ID"},{"dtype":"int","name":"age"}],
       "db_type":"mysql","ref_table":"bob.user_stats","table_name":"tb","table_owner":"bob"}
 ColumnControlList{"col":{"column_name":"ID","table_name":"ta"},"constraint":"PLAINTEXT",
                   "party_code":"alice"}
-OutColumns{"elem_type":"STRING","name":"ID","option":"VALUE","shape":{"dim":[{"dim_value":"2"},
+OutColumns (SCQL >= 1.0.0b1): {"elem_type":"STRING","name":"ID","option":"VALUE","shape":{"dim":[{"dim_value":"2"},
+           {"dim_value":"1"}]},"ss":{"ss":["alice","bob"]}}
+OutColumns (SCQL < 1.0.0b1): {"elem_type":"STRING","name":"ID","option":"VALUE","shape":{"dim":[{"dim_value":"2"},
            {"dim_value":"1"}]},"string_data":["alice","bob"]}
 """
 Project = Dict[str, Any]
