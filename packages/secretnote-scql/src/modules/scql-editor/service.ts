@@ -40,8 +40,9 @@ export class QueryService {
     let res;
     
     // For SCQL >= 1.0.0b1, check the new ss field first
-    if (row.ss?.ss && row.ss.ss.length) {
-      return row.ss.ss;
+    const ssData = row.ss?.ss;
+    if (ssData && ssData.length) {
+      return ssData;
     }
     
     // For backwards compatibility with SCQL < 1.0.0b1, check legacy fields
